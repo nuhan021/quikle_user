@@ -14,5 +14,7 @@ enum PaymentMethods {
   creditCard,
   paystack,
   razorPay,
-  paytm
+  paytm,
 }
+
+enum CustomFonts { obviously, poppins, inter, manrope }

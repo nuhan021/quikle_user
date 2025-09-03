@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:video_player/video_player.dart';
 import '../../controllers/splash_controller.dart';
 import '../widgets/box_skeleton.dart';
@@ -90,7 +91,7 @@ class SplashScreen extends GetView<SplashController> {
                               fontWeight: FontWeight.w500,
                               fontSize: 18.sp,
                               height: 1.3,
-                              color: Colors.white,
+                              color: AppColors.eggshellWhite,
                             ),
                           ),
                           TextSpan(
@@ -100,7 +101,7 @@ class SplashScreen extends GetView<SplashController> {
                               fontWeight: FontWeight.w500,
                               fontSize: 18.sp,
                               height: 1.3,
-                              color: const Color(0xFFF8B800),
+                              color: AppColors.beakYellow,
                             ),
                           ),
                         ],
