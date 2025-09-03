@@ -1,14 +1,26 @@
 import 'package:get/get.dart';
+import 'package:quikle_user/features/auth/presentation/screens/verification_scree.dart';
 import 'package:quikle_user/features/splash/presentation/screens/splash_screen.dart';
+import 'package:quikle_user/features/auth/presentation/screens/login_screen.dart';
 
 class AppRoute {
-  static String splashScreen = "/";
-  static String loginScreen = "/loginScreen";
+  static const String _splash = '/';
+  static const String _login = '/login';
+  static const String _verify = '/verify';
+  static const String _home = '/home';
 
-  static String getLoginScreen() => loginScreen;
-  static String getSplashScreen() => splashScreen;
+  static String getSplashScreen() => _splash;
+  static String getLoginScreen() => _login;
+  static String getVerify() => _verify;
+  static String getHome() => _home;
 
-  static List<GetPage> routes = [
-    GetPage(name: splashScreen, page: () => const SplashScreen()),
+  static final List<GetPage<dynamic>> routes = <GetPage>[
+    GetPage(name: _splash, page: () => const SplashScreen()),
+    GetPage(name: _login, page: () => const LoginScreen()),
+    GetPage(name: _verify, page: () => const VerificationScreen()),
+    // GetPage(
+    //   name: _home,
+    //   page: () => const _PlaceholderHome(),
+    // ),
   ];
 }
