@@ -19,89 +19,86 @@ class LoginScreen extends StatelessWidget {
         statusBarColor: Colors.transparent,
         statusBarIconBrightness: Brightness.light,
       ),
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        body: SafeArea(
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20.w),
-            child: Column(
-              children: [
-                SizedBox(height: 64.h),
-                CommonWidgets.appLogo(),
-                SizedBox(height: 16.h),
-                SizedBox(
-                  width: 209.w,
-                  child: Text.rich(
-                    TextSpan(
-                      children: [
-                        TextSpan(
-                          text: 'Welcome ',
-                          style: getTextStyle(
-                            font: CustomFonts.obviously,
-                            color: AppColors.beakYellow,
-                            fontSize: 22.sp,
-                            fontWeight: FontWeight.w500,
-                            lineHeight: 1.20,
-                          ),
+      child: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20.w),
+          child: Column(
+            children: [
+              SizedBox(height: 64.h),
+              CommonWidgets.appLogo(),
+              SizedBox(height: 16.h),
+              SizedBox(
+                width: 209.w,
+                child: Text.rich(
+                  TextSpan(
+                    children: [
+                      TextSpan(
+                        text: 'Welcome ',
+                        style: getTextStyle(
+                          font: CustomFonts.obviously,
+                          color: AppColors.beakYellow,
+                          fontSize: 22.sp,
+                          fontWeight: FontWeight.w500,
+                          lineHeight: 1.20,
                         ),
-                        TextSpan(
-                          text: 'Back!',
-                          style: getTextStyle(
-                            font: CustomFonts.obviously,
-                            color: AppColors.eggshellWhite,
-                            fontSize: 22.sp,
-                            fontWeight: FontWeight.w500,
-                          ),
+                      ),
+                      TextSpan(
+                        text: 'Back!',
+                        style: getTextStyle(
+                          font: CustomFonts.obviously,
+                          color: AppColors.eggshellWhite,
+                          fontSize: 22.sp,
+                          fontWeight: FontWeight.w500,
                         ),
-                      ],
-                    ),
-                    textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              SizedBox(height: 64.h),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Phone Number',
+                  style: getTextStyle(
+                    font: CustomFonts.inter,
+                    color: AppColors.eggshellWhite,
+                    fontSize: 16.sp,
                   ),
                 ),
-                SizedBox(height: 64.h),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Phone Number',
-                    style: getTextStyle(
-                      font: CustomFonts.inter,
-                      color: AppColors.eggshellWhite,
-                      fontSize: 16.sp,
-                    ),
+              ),
+              SizedBox(height: 10.h),
+              CommonWidgets.customTextField(
+                controller: controller.phoneController,
+                hintText: 'Enter Your Phone Number',
+                keyboardType: TextInputType.phone,
+              ),
+              SizedBox(height: 24.h),
+              CommonWidgets.primaryButton(
+                text: 'Log In',
+                onTap: controller.onTapLogin,
+              ),
+              const Spacer(),
+              SizedBox(
+                width: 352.w,
+                child: Text(
+                  "Don't have an account?",
+                  textAlign: TextAlign.center,
+                  style: getTextStyle(
+                    font: CustomFonts.inter,
+                    color: AppColors.eggshellWhite,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
-                SizedBox(height: 10.h),
-                CommonWidgets.customTextField(
-                  controller: controller.phoneController,
-                  hintText: 'Enter Your Phone Number',
-                  keyboardType: TextInputType.phone,
-                ),
-                SizedBox(height: 24.h),
-                CommonWidgets.primaryButton(
-                  text: 'Log In',
-                  onTap: controller.onTapLogin,
-                ),
-                const Spacer(),
-                SizedBox(
-                  width: 352.w,
-                  child: Text(
-                    "Don't have an account?",
-                    textAlign: TextAlign.center,
-                    style: getTextStyle(
-                      font: CustomFonts.inter,
-                      color: AppColors.eggshellWhite,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-                SizedBox(height: 12.h),
-                CommonWidgets.secondaryButton(
-                  text: 'Create An Account',
-                  onTap: controller.onTapCreateAccount,
-                ),
-                SizedBox(height: 24.h),
-              ],
-            ),
+              ),
+              SizedBox(height: 12.h),
+              CommonWidgets.secondaryButton(
+                text: 'Create An Account',
+                onTap: controller.onTapCreateAccount,
+              ),
+              SizedBox(height: 24.h),
+            ],
           ),
         ),
       ),
