@@ -6,6 +6,7 @@ import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:video_player/video_player.dart';
 import '../../controllers/splash_controller.dart';
 import '../widgets/box_skeleton.dart';
+import '../../../auth/presentation/screens/login_screen.dart';
 
 class SplashScreen extends GetView<SplashController> {
   const SplashScreen({super.key});
@@ -108,6 +109,27 @@ class SplashScreen extends GetView<SplashController> {
                       ),
                     ),
                   ),
+                ),
+              );
+            }),
+            // Animated Login Screen
+            Obx(() {
+              return AnimatedPositioned(
+                duration: const Duration(milliseconds: 600),
+                curve: Curves.easeOutCubic,
+                left: 0,
+                right: 0,
+                bottom: controller.showLogin.value ? 0 : -1.sh,
+                height: 1.sh,
+                child: Container(
+                  decoration: const BoxDecoration(
+                    color: Colors.black,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(24),
+                      topRight: Radius.circular(24),
+                    ),
+                  ),
+                  child: const LoginScreen(),
                 ),
               );
             }),
