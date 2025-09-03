@@ -8,11 +8,12 @@ import 'package:quikle_user/core/utils/constants/enums.dart';
 import 'package:quikle_user/core/utils/constants/image_path.dart';
 import 'package:quikle_user/features/auth/controllers/verification_controller.dart';
 
-class VerificationScreen extends GetView<VerificationController> {
+class VerificationScreen extends StatelessWidget {
   const VerificationScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.find<VerificationController>();
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,

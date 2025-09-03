@@ -9,6 +9,7 @@ class SplashController extends GetxController {
   static const double _ellipseTopIdle = 812.0;
   static const double _ellipseTopPlaying = 666.0;
   final RxDouble ellipseTop = _ellipseTopIdle.obs;
+  final RxBool showLogin = false.obs;
 
   final Duration ellipseTriggerAt = const Duration(seconds: 2);
   bool _ellipseMoved = false;

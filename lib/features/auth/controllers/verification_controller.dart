@@ -56,7 +56,7 @@ class VerificationController extends GetxController {
       final code = digits.map((e) => e.text).join();
       // TODO: integrate API later: await _auth.verify(phone, code)
       await Future<void>.delayed(const Duration(milliseconds: 400));
-      Get.offAllNamed(AppRoute.getHome());
+      Get.offAllNamed(AppRoute.getWelcome());
     } finally {
       isVerifying.value = false;
     }

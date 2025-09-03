@@ -34,7 +34,7 @@ class LoginController extends GetxController {
   }
 
   void onTapCreateAccount() {
-    Get.toNamed(AppRoute.getHome());
+    Get.toNamed(AppRoute.getRegister());
   }
 
   @override
