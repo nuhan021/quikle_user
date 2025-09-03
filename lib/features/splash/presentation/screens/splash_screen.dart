@@ -112,7 +112,6 @@ class SplashScreen extends GetView<SplashController> {
                 ),
               );
             }),
-            // Animated Login Screen
             Obx(() {
               return AnimatedPositioned(
                 duration: const Duration(milliseconds: 600),
@@ -122,13 +121,16 @@ class SplashScreen extends GetView<SplashController> {
                 bottom: controller.showLogin.value ? 0 : -1.sh,
                 height: 1.sh,
                 child: Container(
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     color: Colors.black,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(24),
-                      topRight: Radius.circular(24),
-                    ),
+                    borderRadius: controller.showLogin.value
+                        ? BorderRadius.zero
+                        : const BorderRadius.only(
+                            topLeft: Radius.circular(24),
+                            topRight: Radius.circular(24),
+                          ),
                   ),
+
                   child: const LoginScreen(),
                 ),
               );
