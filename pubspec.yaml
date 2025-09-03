@@ -94,7 +94,7 @@ flutter:
   fonts:
     - family: Obviously
       fonts:
-        - asset: assets/fonts/ObviouslyVariable.ttf
+        - asset: assets/fonts/Obviously-Regular.otf
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
