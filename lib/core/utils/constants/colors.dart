@@ -66,4 +66,7 @@ class AppColors {
   static const Color beakYellow = Color(0xFFFFC200);
   static const Color ebonyBlack = Colors.black;
   static const Color featherGrey = Color(0xFF9B9B9B);
+
+  //Navbar colors
+  static const Color gradientColor = Color(0xFFFFC200);
 }
