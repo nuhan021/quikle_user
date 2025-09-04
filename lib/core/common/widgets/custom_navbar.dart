@@ -19,8 +19,7 @@ class CustomNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 108.h,
-      width: 393.w,
+      height: 100.h,
       padding: EdgeInsets.only(top: 14.h, left: 12.w, right: 12.w),
       decoration: BoxDecoration(
         color: Colors.black.withValues(alpha: 0.80),
@@ -73,10 +72,8 @@ class CustomNavBar extends StatelessWidget {
                   isSelected: currentIndex == 2,
                   onTap: () => onTap(2),
                 ),
-                // User profile button - with fallback icon
                 _NavItem(
                   icon: Iconsax.user,
-                  //fallbackIcon: Iconsax.user, // Add fallback icon
                   label: 'Ananya',
                   isSelected: currentIndex == 3,
                   onTap: () => onTap(3),
@@ -93,7 +90,7 @@ class CustomNavBar extends StatelessWidget {
 class _NavItem extends StatelessWidget {
   final IconData? icon;
   final String? iconAsset;
-  final IconData? fallbackIcon; // Add fallback icon parameter
+  final IconData? fallbackIcon;
   final String label;
   final bool isSelected;
   final Function() onTap;
@@ -125,7 +122,6 @@ class _NavItem extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Icon with better error handling
               iconAsset != null
                   ? Image.asset(
                       iconAsset!,
@@ -149,7 +145,6 @@ class _NavItem extends StatelessWidget {
                           ? AppColors.beakYellow
                           : AppColors.eggshellWhite,
                     ),
-              // Space between icon and label
               if (showText) SizedBox(height: 8.h),
               // Label
               if (showText)
@@ -160,7 +155,7 @@ class _NavItem extends StatelessWidget {
                     color: isSelected
                         ? AppColors.beakYellow
                         : AppColors.eggshellWhite,
-                    fontSize: 16.sp,
+                    fontSize: 14.sp,
                     fontWeight: FontWeight.w400,
                   ),
                 ),
