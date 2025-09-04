@@ -16,10 +16,10 @@ class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
 
   final List<Widget> _screens = [
-    HomeContentScreen(), // Remove navbar from this
-    OrdersScreen(), // Remove navbar from this
-    CategoriesScreen(), // Remove navbar from this
-    ProfileScreen(), // Remove navbar from this
+    HomeContentScreen(),
+    OrdersScreen(),
+    CategoriesScreen(),
+    ProfileScreen(),
   ];
 
   void _onNavItemTapped(int index) {
@@ -36,6 +36,7 @@ class _MainScreenState extends State<MainScreen> {
         currentIndex: _currentIndex,
         onTap: _onNavItemTapped,
       ),
+      backgroundColor: const Color(0xFFF0F0F0),
     );
   }
 }
