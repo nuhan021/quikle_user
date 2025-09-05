@@ -4,6 +4,8 @@ class ProductModel {
   final String imagePath;
   final int categoryId;
   final bool isFavorite;
+  final double rating;
+  final String? weight;
 
   const ProductModel({
     required this.title,
@@ -11,15 +13,17 @@ class ProductModel {
     required this.imagePath,
     required this.categoryId,
     this.isFavorite = false,
+    this.rating = 4.5,
+    this.weight,
   });
-
-  // CopyWith method for easy state updates
   ProductModel copyWith({
     String? title,
     String? price,
     String? imagePath,
     int? categoryId,
     bool? isFavorite,
+    double? rating,
+    String? weight,
   }) {
     return ProductModel(
       title: title ?? this.title,
@@ -27,10 +31,11 @@ class ProductModel {
       imagePath: imagePath ?? this.imagePath,
       categoryId: categoryId ?? this.categoryId,
       isFavorite: isFavorite ?? this.isFavorite,
+      rating: rating ?? this.rating,
+      weight: weight ?? this.weight,
     );
   }
 
-  // Equality and hashCode for proper comparison
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
@@ -39,7 +44,9 @@ class ProductModel {
         other.price == price &&
         other.imagePath == imagePath &&
         other.categoryId == categoryId &&
-        other.isFavorite == isFavorite;
+        other.isFavorite == isFavorite &&
+        other.rating == rating &&
+        other.weight == weight;
   }
 
   @override
@@ -48,7 +55,9 @@ class ProductModel {
         price.hashCode ^
         imagePath.hashCode ^
         categoryId.hashCode ^
-        isFavorite.hashCode;
+        isFavorite.hashCode ^
+        rating.hashCode ^
+        weight.hashCode;
   }
 }
 

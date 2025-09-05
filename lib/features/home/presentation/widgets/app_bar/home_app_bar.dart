@@ -19,7 +19,9 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
           borderRadius: const BorderRadius.vertical(
             bottom: Radius.circular(20),
           ),
-          border: Border(bottom: BorderSide(color: Colors.yellow, width: 2)),
+          border: Border(
+            bottom: BorderSide(color: AppColors.gradientColor, width: 2),
+          ),
         ),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),

@@ -1,7 +1,6 @@
-export 'home_app_bar.dart';
-export 'search_bar.dart';
-export 'categories_section.dart';
-export 'category_item.dart';
-export 'offer_banner.dart';
-export 'product_section.dart';
-export 'product_item.dart';
+// Home widgets barrel file - organized by features
+export 'app_bar/app_bar.dart';
+export 'search/search.dart';
+export 'categories/categories.dart';
+export 'banners/banners.dart';
+export 'products/products.dart';

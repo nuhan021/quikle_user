@@ -1,12 +1,10 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
 import 'package:quikle_user/core/utils/constants/image_path.dart';
 import 'package:quikle_user/features/home/data/models/category_model.dart';
 import 'package:quikle_user/features/home/data/models/product_model.dart';
 
 class HomeService {
   Future<List<CategoryModel>> fetchCategories() async {
-    //await Future.delayed(Duration(seconds: 2));
     return [
       CategoryModel(title: 'All', iconPath: ImagePath.allIcon, id: 0),
       CategoryModel(title: 'Food', iconPath: ImagePath.foodIcon, id: 1),
@@ -31,7 +29,6 @@ class HomeService {
     ];
   }
 
-  // Get product sections for "All" category (6 items each)
   Future<List<ProductSectionModel>> fetchProductSections() async {
     return [
       ProductSectionModel(
@@ -104,6 +101,8 @@ class HomeService {
       imagePath: ImagePath.foodIcon,
       categoryId: 1,
       isFavorite: true,
+      rating: 4.8,
+      weight: '2 pieces',
     ),
     ProductModel(
       title: 'Chicken Sandwich',
@@ -111,6 +110,8 @@ class HomeService {
       imagePath: ImagePath.foodIcon,
       categoryId: 1,
       isFavorite: false,
+      rating: 4.6,
+      weight: '1 sandwich',
     ),
     ProductModel(
       title: 'Chicken Burger',
@@ -118,24 +119,32 @@ class HomeService {
       imagePath: ImagePath.foodIcon,
       categoryId: 1,
       isFavorite: true,
+      rating: 4.9,
+      weight: '1 burger',
     ),
     ProductModel(
       title: 'Tandoori Chicken Pizza',
       price: '\$220',
       imagePath: ImagePath.foodIcon,
       categoryId: 1,
+      rating: 4.7,
+      weight: 'Medium size',
     ),
     ProductModel(
       title: 'Indian Pan Biryani',
       price: '\$180',
       imagePath: ImagePath.foodIcon,
       categoryId: 1,
+      rating: 4.8,
+      weight: '2 portions',
     ),
     ProductModel(
       title: 'Spice Chicken Shawarma',
       price: '\$140',
       imagePath: ImagePath.foodIcon,
       categoryId: 1,
+      rating: 4.5,
+      weight: '1 wrap',
     ),
   ];
 
@@ -145,36 +154,48 @@ class HomeService {
       price: '\$180',
       imagePath: ImagePath.foodIcon,
       categoryId: 2,
+      rating: 4.6,
+      weight: '1 liter',
     ),
     ProductModel(
       title: 'Bread Slice - Brown Bread',
       price: '\$160',
       imagePath: ImagePath.foodIcon,
       categoryId: 2,
+      rating: 4.4,
+      weight: '400g pack',
     ),
     ProductModel(
       title: 'Fresh Banana - Yellow Banana',
       price: '\$80',
       imagePath: ImagePath.foodIcon,
       categoryId: 2,
+      rating: 4.7,
+      weight: '1kg bunch',
     ),
     ProductModel(
       title: 'Wheat Wheat Flour - Atta',
       price: '\$120',
       imagePath: ImagePath.foodIcon,
       categoryId: 2,
+      rating: 4.5,
+      weight: '1kg pack',
     ),
     ProductModel(
       title: 'Basmati Rice - Premium Quality',
       price: '\$200',
       imagePath: ImagePath.foodIcon,
       categoryId: 2,
+      rating: 4.8,
+      weight: '2kg pack',
     ),
     ProductModel(
       title: 'Free Range Eggs - Dozen Pack',
       price: '\$140',
       imagePath: ImagePath.foodIcon,
       categoryId: 2,
+      rating: 4.6,
+      weight: '12 pieces',
     ),
   ];
 
@@ -184,36 +205,48 @@ class HomeService {
       price: '\$160',
       imagePath: ImagePath.foodIcon,
       categoryId: 3,
+      rating: 4.3,
+      weight: '20 tablets',
     ),
     ProductModel(
       title: 'Antiseptic Mouthwash',
       price: '\$140',
       imagePath: ImagePath.foodIcon,
       categoryId: 3,
+      rating: 4.5,
+      weight: '250ml bottle',
     ),
     ProductModel(
       title: 'Ibuprofen Pain Relief',
       price: '\$120',
       imagePath: ImagePath.foodIcon,
       categoryId: 3,
+      rating: 4.6,
+      weight: '30 tablets',
     ),
     ProductModel(
       title: 'Cough Suppressant Syrup',
       price: '\$180',
       imagePath: ImagePath.foodIcon,
       categoryId: 3,
+      rating: 4.2,
+      weight: '100ml bottle',
     ),
     ProductModel(
       title: 'Vitamin C - Immune Support',
       price: '\$160',
       imagePath: ImagePath.foodIcon,
       categoryId: 3,
+      rating: 4.7,
+      weight: '60 tablets',
     ),
     ProductModel(
       title: 'Paracetamol Fever Relief',
       price: '\$100',
       imagePath: ImagePath.foodIcon,
       categoryId: 3,
+      rating: 4.4,
+      weight: '10 tablets',
     ),
   ];
 
@@ -223,36 +256,48 @@ class HomeService {
       price: '\$160',
       imagePath: ImagePath.foodIcon,
       categoryId: 4,
+      rating: 4.5,
+      weight: '500ml bottle',
     ),
     ProductModel(
       title: 'Powerful Dish Soap',
       price: '\$140',
       imagePath: ImagePath.foodIcon,
       categoryId: 4,
+      rating: 4.6,
+      weight: '250ml bottle',
     ),
     ProductModel(
       title: 'Glass Cleaner Spray',
       price: '\$120',
       imagePath: ImagePath.foodIcon,
       categoryId: 4,
+      rating: 4.3,
+      weight: '300ml bottle',
     ),
     ProductModel(
       title: 'Disinfectant Wipes',
       price: '\$180',
       imagePath: ImagePath.foodIcon,
       categoryId: 4,
+      rating: 4.7,
+      weight: '100 wipes',
     ),
     ProductModel(
       title: 'Liquid Laundry Detergent',
       price: '\$200',
       imagePath: ImagePath.foodIcon,
       categoryId: 4,
+      rating: 4.8,
+      weight: '1 liter',
     ),
     ProductModel(
       title: 'All-Purpose Cleaner',
       price: '\$160',
       imagePath: ImagePath.foodIcon,
       categoryId: 4,
+      rating: 4.4,
+      weight: '500ml bottle',
     ),
   ];
 
@@ -262,36 +307,48 @@ class HomeService {
       price: '\$180',
       imagePath: ImagePath.foodIcon,
       categoryId: 5,
+      rating: 4.6,
+      weight: '50ml bottle',
     ),
     ProductModel(
       title: 'Whitening Toothpaste',
       price: '\$160',
       imagePath: ImagePath.foodIcon,
       categoryId: 5,
+      rating: 4.4,
+      weight: '100g tube',
     ),
     ProductModel(
       title: 'Hydrating Body Lotion',
       price: '\$140',
       imagePath: ImagePath.foodIcon,
       categoryId: 5,
+      rating: 4.7,
+      weight: '200ml bottle',
     ),
     ProductModel(
       title: 'Revitalizing Shampoo',
       price: '\$180',
       imagePath: ImagePath.foodIcon,
       categoryId: 5,
+      rating: 4.5,
+      weight: '250ml bottle',
     ),
     ProductModel(
       title: 'Soothing Lip Balm',
       price: '\$100',
       imagePath: ImagePath.foodIcon,
       categoryId: 5,
+      rating: 4.3,
+      weight: '4g stick',
     ),
     ProductModel(
       title: 'Daily Face Moisturizer',
       price: '\$160',
       imagePath: ImagePath.foodIcon,
       categoryId: 5,
+      rating: 4.6,
+      weight: '50ml tube',
     ),
   ];
 
@@ -301,36 +358,48 @@ class HomeService {
       price: '\$220',
       imagePath: ImagePath.foodIcon,
       categoryId: 6,
+      rating: 4.8,
+      weight: '2kg pack',
     ),
     ProductModel(
       title: 'Super Soft Shampoo',
       price: '\$160',
       imagePath: ImagePath.foodIcon,
       categoryId: 6,
+      rating: 4.5,
+      weight: '250ml bottle',
     ),
     ProductModel(
       title: 'Durable Chew Toy',
       price: '\$80',
       imagePath: ImagePath.foodIcon,
       categoryId: 6,
+      rating: 4.6,
+      weight: '1 piece',
     ),
     ProductModel(
       title: 'Cozy Dog Bed - Medium Size',
       price: '\$180',
       imagePath: ImagePath.foodIcon,
       categoryId: 6,
+      rating: 4.7,
+      weight: 'Medium size',
     ),
     ProductModel(
       title: 'Stainless Steel Food Bowl',
       price: '\$120',
       imagePath: ImagePath.foodIcon,
       categoryId: 6,
+      rating: 4.4,
+      weight: '500ml capacity',
     ),
     ProductModel(
       title: 'Premium Dry Cat Food',
       price: '\$200',
       imagePath: ImagePath.foodIcon,
       categoryId: 6,
+      rating: 4.7,
+      weight: '1.5kg pack',
     ),
   ];
 
@@ -340,36 +409,48 @@ class HomeService {
       price: '\$160',
       imagePath: ImagePath.foodIcon,
       categoryId: 7,
+      rating: 4.5,
+      weight: '1 piece',
     ),
     ProductModel(
       title: 'Bluetooth Wireless Speaker',
       price: '\$180',
       imagePath: ImagePath.foodIcon,
       categoryId: 7,
+      rating: 4.7,
+      weight: '1 piece',
     ),
     ProductModel(
       title: 'Succulent Plant Trio',
       price: '\$100',
       imagePath: ImagePath.foodIcon,
       categoryId: 7,
+      rating: 4.3,
+      weight: '3 plants',
     ),
     ProductModel(
       title: 'Personalized Travel Mug',
       price: '\$140',
       imagePath: ImagePath.foodIcon,
       categoryId: 7,
+      rating: 4.6,
+      weight: '350ml capacity',
     ),
     ProductModel(
       title: 'Stainless Steel Water Bottle',
       price: '\$120',
       imagePath: ImagePath.foodIcon,
       categoryId: 7,
+      rating: 4.4,
+      weight: '500ml capacity',
     ),
     ProductModel(
       title: 'Aromatherapy Essential Oil Set',
       price: '\$200',
       imagePath: ImagePath.foodIcon,
       categoryId: 7,
+      rating: 4.8,
+      weight: '6 bottles set',
     ),
   ];
 }

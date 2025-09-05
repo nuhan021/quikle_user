@@ -5,6 +5,7 @@ import 'package:quikle_user/features/auth/presentation/screens/welcome_screen.da
 import 'package:quikle_user/features/main/presentation/screens/main_screen.dart';
 import 'package:quikle_user/features/splash/presentation/screens/splash_screen.dart';
 import 'package:quikle_user/features/auth/presentation/screens/login_screen.dart';
+import 'package:quikle_user/features/cart/presentation/screens/cart_screen.dart';
 
 class AppRoute {
   static const String _splash = '/';
@@ -14,6 +15,7 @@ class AppRoute {
   static const String _welcome = '/welcome';
   static const String _home = '/home';
   static const String _main = '/main';
+  static const String _cart = '/cart';
 
   static String getSplashScreen() => _splash;
   static String getLoginScreen() => _login;
@@ -22,6 +24,7 @@ class AppRoute {
   static String getHome() => _home;
   static String getMain() => _main;
   static String getWelcome() => _welcome;
+  static String getCart() => _cart;
 
   static final List<GetPage<dynamic>> routes = <GetPage>[
     GetPage(name: _splash, page: () => const SplashScreen()),
@@ -31,6 +34,7 @@ class AppRoute {
     GetPage(name: _welcome, page: () => const WelcomeScreen()),
     GetPage(name: _home, page: () => const MainScreen()),
     GetPage(name: _main, page: () => const MainScreen()),
+    GetPage(name: _cart, page: () => const CartScreen()),
 
     // GetPage(
     //   name: _home,
