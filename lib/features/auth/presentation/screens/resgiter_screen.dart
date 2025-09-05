@@ -7,7 +7,6 @@ import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums.dart';
 import 'package:quikle_user/features/auth/controllers/register_controller.dart';
 import 'package:quikle_user/features/auth/presentation/widgets/common_widgets.dart';
-import 'package:quikle_user/routes/app_routes.dart'; // Import reusable widgets
 
 class RegisterScreen extends GetView<RegisterController> {
   const RegisterScreen({super.key});
@@ -120,14 +119,7 @@ class RegisterScreen extends GetView<RegisterController> {
                             SizedBox(height: 16.h),
                             CommonWidgets.primaryButton(
                               text: 'Create Account',
-                              onTap: () {
-                                final phone = controller.phoneController.text
-                                    .trim();
-                                Get.toNamed(
-                                  AppRoute.getVerify(),
-                                  arguments: {'phone': phone},
-                                );
-                              },
+                              onTap: controller.onTapCreateAccount,
                             ),
                           ],
                         ),

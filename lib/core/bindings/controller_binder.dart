@@ -1,17 +1,20 @@
-import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:quikle_user/core/services/user_service.dart';
 import 'package:quikle_user/features/auth/controllers/login_controller.dart';
 import 'package:quikle_user/features/auth/controllers/register_controller.dart';
 import 'package:quikle_user/features/auth/controllers/verification_controller.dart';
 import 'package:quikle_user/features/auth/controllers/welcome_controller.dart';
 import 'package:quikle_user/features/auth/data/services/auth_service.dart';
 import 'package:quikle_user/features/splash/controllers/splash_controller.dart';
+import 'package:quikle_user/features/cart/controllers/cart_controller.dart';
 
 class ControllerBinder extends Bindings {
   @override
   void dependencies() {
     // Services
+    Get.put<UserService>(UserService(), permanent: true);
     Get.lazyPut<AuthService>(() => AuthService(), fenix: true);
+
     // Controllers
     Get.lazyPut<SplashController>(() => SplashController(), fenix: true);
     Get.put<LoginController>(LoginController(), permanent: true);
@@ -21,5 +24,8 @@ class ControllerBinder extends Bindings {
       fenix: true,
     );
     Get.lazyPut<WelcomeController>(() => WelcomeController(), fenix: true);
+
+    // Cart Controller - permanent for persistent cart
+    Get.put<CartController>(CartController(), permanent: true);
   }
 }

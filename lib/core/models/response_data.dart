@@ -4,9 +4,10 @@ class ResponseData {
   final String errorMessage;
   final dynamic responseData;
 
-  ResponseData(
-      {required this.isSuccess,
-        required this.statusCode,
-        required this.errorMessage ,
-        required this.responseData});
+  ResponseData({
+    required this.isSuccess,
+    required this.statusCode,
+    required this.errorMessage,
+    required this.responseData,
+  });
 }
