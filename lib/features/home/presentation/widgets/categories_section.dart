@@ -7,11 +7,13 @@ import 'category_item.dart';
 class CategoriesSection extends StatelessWidget {
   final List<CategoryModel> categories;
   final Function(CategoryModel) onCategoryTap;
+  final int selectedCategoryId;
 
   const CategoriesSection({
     super.key,
     required this.categories,
     required this.onCategoryTap,
+    this.selectedCategoryId = 0,
   });
 
   @override
@@ -50,6 +52,7 @@ class CategoriesSection extends StatelessWidget {
                   child: CategoryItem(
                     category: categories[index],
                     onTap: () => onCategoryTap(categories[index]),
+                    isSelected: categories[index].id == selectedCategoryId,
                   ),
                 );
               },

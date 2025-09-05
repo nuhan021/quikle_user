@@ -69,4 +69,7 @@ class AppColors {
 
   //Navbar colors
   static const Color gradientColor = Color(0xFFFFC200);
+
+  //Product cart colors
+  static const Color cardColor = Color(0xFFEDEDED);
 }
