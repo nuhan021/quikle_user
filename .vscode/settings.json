@@ -2,5 +2,12 @@
     "cSpell.words": [
         "Getx",
         "quikle"
-    ]
+    ],
+    "dart.debugExternalPackageLibraries": false,
+    "dart.debugSdkLibraries": false,
+    "dart.vmServiceLogFile": null,
+    "dart.evaluateGettersInDebugViews": true,
+    "dart.evaluateToStringInDebugViews": true,
+    "dart.flutterHotReloadOnSave": "manual",
+    "dart.hotReloadOnSave": "manual"
 }

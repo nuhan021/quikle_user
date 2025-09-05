@@ -14,4 +14,6 @@ class ImagePath {
   static const String personalcareIcon = 'assets/icons/personalCareIcon.png';
   static const String petSuppliesIcon = 'assets/icons/petsuppliesIcon.png';
   static const String customIcon = 'assets/icons/customIcon.png';
+  static const String cartIcon = 'assets/icons/cart.png';
+  static const String favoriteIcon = 'assets/icons/favourite.png';
 }

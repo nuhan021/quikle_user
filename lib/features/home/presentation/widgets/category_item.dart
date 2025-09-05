@@ -7,8 +7,14 @@ import '../../data/models/category_model.dart';
 class CategoryItem extends StatelessWidget {
   final CategoryModel category;
   final VoidCallback onTap;
+  final bool isSelected;
 
-  const CategoryItem({super.key, required this.category, required this.onTap});
+  const CategoryItem({
+    super.key,
+    required this.category,
+    required this.onTap,
+    this.isSelected = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +29,16 @@ class CategoryItem extends StatelessWidget {
             Container(
               width: 48.w,
               height: 48.h,
+              decoration: isSelected
+                  ? BoxDecoration(
+                      color: const Color(0xFFFF6B35).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: const Color(0xFFFF6B35),
+                        width: 2,
+                      ),
+                    )
+                  : null,
               child: category.iconPath.isNotEmpty
                   ? Image.asset(
                       category.iconPath,
@@ -33,14 +49,18 @@ class CategoryItem extends StatelessWidget {
                         return Icon(
                           Icons.category,
                           size: 30.sp,
-                          color: const Color(0xFFFF6B35),
+                          color: isSelected
+                              ? const Color(0xFFFF6B35)
+                              : const Color(0xFFFF6B35),
                         );
                       },
                     )
                   : Icon(
                       Icons.category,
                       size: 30.sp,
-                      color: const Color(0xFFFF6B35),
+                      color: isSelected
+                          ? const Color(0xFFFF6B35)
+                          : const Color(0xFFFF6B35),
                     ),
             ),
             const SizedBox(height: 6), // Reduced from 8 to 6
@@ -49,7 +69,8 @@ class CategoryItem extends StatelessWidget {
                 category.title,
                 style: getTextStyle(
                   font: CustomFonts.inter,
-                  color: Colors.black,
+                  color: isSelected ? const Color(0xFFFF6B35) : Colors.black,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                 ),
                 textAlign: TextAlign.center,
                 maxLines: 2,

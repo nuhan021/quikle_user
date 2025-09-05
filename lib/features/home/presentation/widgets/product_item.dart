@@ -1,16 +1,23 @@
 import 'package:flutter/material.dart';
-import '../../data/models/product_model.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:quikle_user/core/common/styles/global_text_style.dart';
+import 'package:quikle_user/core/utils/constants/colors.dart';
+import 'package:quikle_user/core/utils/constants/enums.dart';
+import 'package:quikle_user/core/utils/constants/image_path.dart';
+import 'package:quikle_user/features/home/data/models/product_model.dart';
 
 class ProductItem extends StatelessWidget {
   final ProductModel product;
   final VoidCallback onTap;
   final VoidCallback onAddToCart;
+  final VoidCallback? onFavoriteToggle;
 
   const ProductItem({
     super.key,
     required this.product,
     required this.onTap,
     required this.onAddToCart,
+    this.onFavoriteToggle,
   });
 
   @override
@@ -18,48 +25,83 @@ class ProductItem extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
+        decoration: ShapeDecoration(
+          color: AppColors.textWhite,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8.r),
+          ),
+          shadows: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
-              spreadRadius: 1,
-              blurRadius: 4,
+              color: AppColors.cardColor,
+              blurRadius: 8,
               offset: const Offset(0, 2),
+              spreadRadius: 0,
             ),
           ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Product Image Placeholder
-            Container(
-              height: 80,
-              width: double.infinity,
-              decoration: const BoxDecoration(
-                color: Color(0xFFF8F9FA),
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(12),
-                  topRight: Radius.circular(12),
+            // product image box
+            Stack(
+              children: [
+                Container(
+                  height: 90.h,
+                  width: double.infinity,
+                  decoration: ShapeDecoration(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4.r),
+                    ),
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: Center(
+                    child: Image.asset(
+                      product.imagePath,
+                      width: 56.w,
+                      height: 56.w,
+                      fit: BoxFit.contain,
+                      filterQuality: FilterQuality.high,
+                    ),
+                  ),
                 ),
-              ),
-              child: Icon(product.icon, size: 40, color: Colors.grey[400]),
+                // Favorite icon in top right corner
+                Positioned(
+                  top: 8.h,
+                  right: 8.w,
+                  child: GestureDetector(
+                    onTap: onFavoriteToggle,
+                    child: SizedBox(
+                      width: 20.w,
+                      height: 20.w,
+                      child: Center(
+                        child: Image.asset(
+                          ImagePath.favoriteIcon,
+                          fit: BoxFit.cover,
+                          color: product.isFavorite
+                              ? Colors.red
+                              : AppColors.ebonyBlack.withOpacity(0.6),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
 
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.all(8),
+                padding: EdgeInsets.all(8.w),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       product.title,
-                      style: const TextStyle(
-                        fontSize: 12,
+                      style: getTextStyle(
+                        font: CustomFonts.inter,
+                        fontSize: 12.sp,
                         fontWeight: FontWeight.w500,
-                        color: Colors.black,
+                        color: AppColors.ebonyBlack,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -69,25 +111,28 @@ class ProductItem extends StatelessWidget {
                       children: [
                         Text(
                           product.price,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
+                          style: getTextStyle(
+                            font: CustomFonts.inter,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.ebonyBlack,
                           ),
                         ),
                         GestureDetector(
                           onTap: onAddToCart,
                           child: Container(
-                            width: 24,
-                            height: 24,
+                            width: 24.w,
+                            height: 24.w,
                             decoration: BoxDecoration(
-                              color: const Color(0xFFFF6B35),
-                              borderRadius: BorderRadius.circular(6),
+                              //color: const Color(0xFFFF6B35),
+                              borderRadius: BorderRadius.circular(6.r),
                             ),
-                            child: const Icon(
-                              Icons.add,
-                              color: Colors.white,
-                              size: 16,
+                            clipBehavior: Clip.antiAlias,
+                            child: Center(
+                              child: Image.asset(
+                                ImagePath.cartIcon,
+                                fit: BoxFit.cover,
+                                filterQuality: FilterQuality.high,
+                              ),
                             ),
                           ),
                         ),
