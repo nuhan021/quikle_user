@@ -24,9 +24,8 @@ class CartItemModel {
       identical(this, other) ||
       other is CartItemModel &&
           runtimeType == other.runtimeType &&
-          product.title == other.product.title &&
-          product.categoryId == other.product.categoryId;
+          product.id == other.product.id;
 
   @override
-  int get hashCode => product.title.hashCode ^ product.categoryId.hashCode;
+  int get hashCode => product.id.hashCode;
 }

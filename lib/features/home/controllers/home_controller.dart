@@ -1,26 +1,27 @@
 import 'package:get/get.dart';
 import 'package:quikle_user/features/home/data/services/home_services.dart';
 import 'package:quikle_user/features/cart/controllers/cart_controller.dart';
+import 'package:quikle_user/routes/app_routes.dart';
 import '../data/models/category_model.dart';
 import '../data/models/product_model.dart';
 
 class HomeController extends GetxController {
   final HomeService _homeService = HomeService();
   late final CartController _cartController;
-  final _selectedCategoryId = 0.obs;
+  final _selectedCategoryId = '0'.obs;
   final _categories = <CategoryModel>[].obs;
   final _products = <ProductModel>[].obs;
   final _productSections = <ProductSectionModel>[].obs;
   final _filteredProducts = <ProductModel>[].obs;
   final _isLoading = false.obs;
-  int get selectedCategoryId => _selectedCategoryId.value;
+  String get selectedCategoryId => _selectedCategoryId.value;
   List<CategoryModel> get categories => _categories;
   List<ProductModel> get products => _products;
   List<ProductSectionModel> get productSections => _productSections;
   List<ProductModel> get filteredProducts => _filteredProducts;
   bool get isLoading => _isLoading.value;
-  bool get isShowingAllCategories => _selectedCategoryId.value == 0;
-  String? getCategoryIconPath(int categoryId) {
+  bool get isShowingAllCategories => _selectedCategoryId.value == '0';
+  String? getCategoryIconPath(String categoryId) {
     try {
       final category = _categories.firstWhere((cat) => cat.id == categoryId);
       return category.iconPath;
@@ -29,7 +30,7 @@ class HomeController extends GetxController {
     }
   }
 
-  String? getCategoryTitle(int categoryId) {
+  String? getCategoryTitle(String categoryId) {
     try {
       final category = _categories.firstWhere((cat) => cat.id == categoryId);
       return category.title;
@@ -57,7 +58,7 @@ class HomeController extends GetxController {
   }
 
   Future<void> _loadContent() async {
-    if (_selectedCategoryId.value == 0) {
+    if (_selectedCategoryId.value == '0') {
       _productSections.value = await _homeService.fetchProductSections();
       _filteredProducts.clear();
     } else {
@@ -100,7 +101,8 @@ class HomeController extends GetxController {
   }
 
   void onProductPressed(ProductModel product) {
-    // Handle product tap
+    // Navigate to product details screen
+    Get.toNamed(AppRoute.getProductDetails(), arguments: product);
   }
 
   void onAddToCartPressed(ProductModel product) {
@@ -124,20 +126,12 @@ class HomeController extends GetxController {
   }
 
   void _updateProductInLists(ProductModel oldProduct, ProductModel newProduct) {
-    final productIndex = _products.indexWhere(
-      (p) =>
-          p.title == oldProduct.title &&
-          p.categoryId == oldProduct.categoryId &&
-          p.price == oldProduct.price,
-    );
+    final productIndex = _products.indexWhere((p) => p.id == oldProduct.id);
     if (productIndex != -1) {
       _products[productIndex] = newProduct;
     }
     final filteredIndex = _filteredProducts.indexWhere(
-      (p) =>
-          p.title == oldProduct.title &&
-          p.categoryId == oldProduct.categoryId &&
-          p.price == oldProduct.price,
+      (p) => p.id == oldProduct.id,
     );
     if (filteredIndex != -1) {
       _filteredProducts[filteredIndex] = newProduct;
@@ -149,16 +143,14 @@ class HomeController extends GetxController {
     ) {
       final section = _productSections[sectionIndex];
       final productInSectionIndex = section.products.indexWhere(
-        (p) =>
-            p.title == oldProduct.title &&
-            p.categoryId == oldProduct.categoryId &&
-            p.price == oldProduct.price,
+        (p) => p.id == oldProduct.id,
       );
 
       if (productInSectionIndex != -1) {
         final updatedProducts = List<ProductModel>.from(section.products);
         updatedProducts[productInSectionIndex] = newProduct;
         final updatedSection = ProductSectionModel(
+          id: section.id,
           viewAllText: section.viewAllText,
           products: updatedProducts,
           categoryId: section.categoryId,
@@ -170,7 +162,7 @@ class HomeController extends GetxController {
     update();
   }
 
-  void onViewAllPressed(int categoryId) {
+  void onViewAllPressed(String categoryId) {
     final category = _categories.firstWhere((cat) => cat.id == categoryId);
     onCategoryPressed(category);
   }
