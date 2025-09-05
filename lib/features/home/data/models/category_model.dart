@@ -1,7 +1,7 @@
 class CategoryModel {
   final String title;
   final String iconPath;
-  final int id; // Changed to int
+  final int id;
 
   const CategoryModel({
     required this.title,

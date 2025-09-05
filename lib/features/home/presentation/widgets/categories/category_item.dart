@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:quikle_user/core/common/styles/global_text_style.dart';
 import 'package:quikle_user/core/utils/constants/enums.dart';
-import '../../data/models/category_model.dart';
+import '../../../data/models/category_model.dart';
 
 class CategoryItem extends StatelessWidget {
   final CategoryModel category;

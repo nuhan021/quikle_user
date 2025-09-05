@@ -6,6 +6,7 @@ import 'package:quikle_user/features/auth/controllers/verification_controller.da
 import 'package:quikle_user/features/auth/controllers/welcome_controller.dart';
 import 'package:quikle_user/features/auth/data/services/auth_service.dart';
 import 'package:quikle_user/features/splash/controllers/splash_controller.dart';
+import 'package:quikle_user/features/cart/controllers/cart_controller.dart';
 
 class ControllerBinder extends Bindings {
   @override
@@ -23,5 +24,8 @@ class ControllerBinder extends Bindings {
       fenix: true,
     );
     Get.lazyPut<WelcomeController>(() => WelcomeController(), fenix: true);
+
+    // Cart Controller - permanent for persistent cart
+    Get.put<CartController>(CartController(), permanent: true);
   }
 }

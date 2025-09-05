@@ -67,9 +67,16 @@ class AppColors {
   static const Color ebonyBlack = Colors.black;
   static const Color featherGrey = Color(0xFF9B9B9B);
 
+  //App home page color 0xFFF5F5F5
+  static const Color homeGrey = Color(0xFFF5F5F5);
   //Navbar colors
   static const Color gradientColor = Color(0xFFFFC200);
 
   //Product cart colors
   static const Color cardColor = Color(0xFFEDEDED);
+  static const Color emptyCardText = Color(0xFF5D5D5D);
+
+  //Cart screen colors
+  static const Color freeGiftCard = Color(0xFFB1B1B1);
+  static const Color freeColor = Color(0xFF06BC4C);
 }

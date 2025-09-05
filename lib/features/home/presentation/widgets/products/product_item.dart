@@ -106,26 +106,7 @@ class ProductItem extends StatelessWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    if (product.weight != null) ...[
-                      SizedBox(height: 4.h),
-                      Row(
-                        children: [
-                          Icon(Icons.star, color: Colors.orange, size: 12.sp),
-                          SizedBox(width: 2.w),
-                          Expanded(
-                            child: Text(
-                              '${product.rating} • ${product.weight}',
-                              style: getTextStyle(
-                                font: CustomFonts.inter,
-                                fontSize: 10.sp,
-                                color: AppColors.ebonyBlack.withOpacity(0.7),
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [

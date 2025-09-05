@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:quikle_user/core/utils/constants/colors.dart';
 import '../widgets/widgets.dart';
-import '../widgets/search_bar.dart' as custom_search;
+import '../widgets/search/search_bar.dart' as custom_search;
 import '../../controllers/home_controller.dart';
 
 class HomeContentScreen extends StatelessWidget {
@@ -20,7 +21,7 @@ class HomeContentScreen extends StatelessWidget {
       ),
       child: SafeArea(
         child: Scaffold(
-          backgroundColor: const Color(0xFFF0F0F0),
+          backgroundColor: AppColors.homeGrey,
           appBar: HomeAppBar(
             onNotificationTap: controller.onNotificationPressed,
           ),
@@ -31,12 +32,9 @@ class HomeContentScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Search Bar
                         custom_search.SearchBar(
                           onTap: controller.onSearchPressed,
                         ),
-
-                        // Categories Section
                         CategoriesSection(
                           categories: controller.categories,
                           onCategoryTap: controller.onCategoryPressed,
@@ -45,14 +43,11 @@ class HomeContentScreen extends StatelessWidget {
 
                         const SizedBox(height: 24),
 
-                        // Big Offer Banner
                         Center(child: OfferBanner()),
 
                         const SizedBox(height: 24),
 
-                        // Show either product sections (All category) or filtered products (specific category)
                         if (controller.isShowingAllCategories) ...[
-                          // Product Sections for "All" category
                           Column(
                             children: controller.productSections
                                 .map(
@@ -76,7 +71,6 @@ class HomeContentScreen extends StatelessWidget {
                                 .toList(),
                           ),
                         ] else ...[
-                          // Products Grid for specific category
                           Container(
                             padding: EdgeInsets.symmetric(horizontal: 16.sp),
                             child: Column(
