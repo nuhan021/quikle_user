@@ -20,4 +20,5 @@ class ImagePath {
   static const String cartImage = 'assets/icons/cart.png';
   static const String emptyCart = 'assets/icons/empty_cart.png';
   static const String lockIcon = 'assets/icons/lock.png';
+  static const String homeIcon = 'assets/icons/home.png';
 }

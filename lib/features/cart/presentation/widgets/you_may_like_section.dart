@@ -166,7 +166,7 @@ class _YouMayLikeSectionState extends State<YouMayLikeSection> {
                                     fontWeight: FontWeight.w500,
                                     color: AppColors.ebonyBlack,
                                   ),
-                                  maxLines: 2,
+                                  maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
                                 SizedBox(height: 4.h),
