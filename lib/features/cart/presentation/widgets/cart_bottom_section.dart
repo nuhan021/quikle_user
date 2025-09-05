@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:quikle_user/core/common/styles/global_text_style.dart';
+import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums.dart';
+import 'package:quikle_user/core/utils/constants/image_path.dart';
 
 class CartBottomSection extends StatelessWidget {
   final VoidCallback onPlaceOrder;
@@ -23,14 +25,15 @@ class CartBottomSection extends StatelessWidget {
           Row(
             children: [
               Container(
-                padding: EdgeInsets.all(8.w),
-                decoration: BoxDecoration(
-                  color: Colors.yellow[100],
-                  borderRadius: BorderRadius.circular(8.r),
+                padding: EdgeInsets.only(right: 8.w),
+                child: Image.asset(
+                  ImagePath.homeIcon,
+                  width: 40.w,
+                  height: 40.h,
+                  // fit: BoxFit.contain,
                 ),
-                child: Icon(Icons.home, color: Colors.orange, size: 20.sp),
               ),
-              SizedBox(width: 12.w),
+              SizedBox(width: 8.w),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -39,32 +42,45 @@ class CartBottomSection extends StatelessWidget {
                       'Delivering to Home',
                       style: getTextStyle(
                         font: CustomFonts.inter,
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black,
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.ebonyBlack,
                       ),
                     ),
                     Text(
-                      'Aditya Singh, Anytime fitness..........',
+                      'Aditya Singh, Anytime fitness....',
                       style: getTextStyle(
                         font: CustomFonts.inter,
-                        fontSize: 12.sp,
+                        fontSize: 14.sp,
                         color: Colors.grey[600]!,
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
               ),
               GestureDetector(
                 onTap: () {},
-                child: Text(
-                  'Change',
-                  style: getTextStyle(
-                    font: CustomFonts.inter,
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.yellow[700]!,
-                  ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.keyboard_arrow_down,
+                      size: 25.sp,
+                      color: Colors.grey[600],
+                    ),
+                    SizedBox(width: 4.w),
+                    Text(
+                      'Change',
+                      style: getTextStyle(
+                        font: CustomFonts.inter,
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.beakYellow,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -79,7 +95,7 @@ class CartBottomSection extends StatelessWidget {
                   child: Container(
                     padding: EdgeInsets.symmetric(vertical: 14.h),
                     decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey[300]!),
+                      border: Border.all(color: AppColors.ebonyBlack),
                       borderRadius: BorderRadius.circular(8.r),
                     ),
                     child: Row(
@@ -89,13 +105,17 @@ class CartBottomSection extends StatelessWidget {
                           'Pay Using',
                           style: getTextStyle(
                             font: CustomFonts.inter,
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.w500,
+                            fontSize: 18.sp,
+                            fontWeight: FontWeight.w600,
                             color: Colors.black,
                           ),
                         ),
                         SizedBox(width: 8.w),
-                        Icon(Icons.keyboard_arrow_down, size: 20.sp),
+                        Icon(
+                          Icons.keyboard_arrow_down,
+                          size: 20.sp,
+                          color: Colors.black,
+                        ),
                       ],
                     ),
                   ),
@@ -109,6 +129,7 @@ class CartBottomSection extends StatelessWidget {
                     padding: EdgeInsets.symmetric(vertical: 14.h),
                     decoration: BoxDecoration(
                       color: Colors.black,
+                      border: Border.all(color: Colors.transparent),
                       borderRadius: BorderRadius.circular(8.r),
                     ),
                     child: Center(
@@ -116,9 +137,9 @@ class CartBottomSection extends StatelessWidget {
                         'Place order',
                         style: getTextStyle(
                           font: CustomFonts.inter,
-                          fontSize: 16.sp,
+                          fontSize: 18.sp,
                           fontWeight: FontWeight.w600,
-                          color: Colors.yellow,
+                          color: AppColors.beakYellow,
                         ),
                       ),
                     ),
