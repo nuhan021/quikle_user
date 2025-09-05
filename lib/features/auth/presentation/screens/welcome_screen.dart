@@ -8,11 +8,12 @@ import 'package:quikle_user/core/utils/constants/enums.dart';
 import 'package:quikle_user/core/utils/constants/image_path.dart';
 import 'package:quikle_user/features/auth/controllers/welcome_controller.dart';
 
-class WelcomeScreen extends GetView<WelcomeController> {
+class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    Get.find<WelcomeController>();
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,

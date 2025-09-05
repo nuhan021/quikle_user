@@ -1,6 +1,5 @@
 import 'package:get/get.dart';
 import 'package:video_player/video_player.dart';
-import 'package:quikle_user/routes/app_routes.dart';
 
 class SplashController extends GetxController {
   late final VideoPlayerController video;
