@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:quikle_user/core/common/styles/global_text_style.dart';
+import 'package:quikle_user/core/utils/constants/colors.dart';
+import 'package:quikle_user/core/utils/constants/enums.dart';
 import '../../data/models/question_model.dart';
 
 class QuestionsWidget extends StatelessWidget {
@@ -19,6 +22,7 @@ class QuestionsWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Section Title
         Text(
           'Question & Answer',
           style: TextStyle(
@@ -29,8 +33,34 @@ class QuestionsWidget extends StatelessWidget {
         ),
         SizedBox(height: 16.h),
 
-        // Ask question button
+        // Input box to ask a question
+        TextField(
+          maxLines: 3,
+          decoration: InputDecoration(
+            hintText: "Ask your question here...",
+            hintStyle: getTextStyle(
+              font: CustomFonts.inter,
+              fontSize: 14.sp,
+              color: AppColors.featherGrey,
+            ),
+            filled: true,
+            fillColor: AppColors.homeGrey,
+            contentPadding: EdgeInsets.all(12.w),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8.r),
+              borderSide: BorderSide(color: Colors.grey.shade300, width: 1),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8.r),
+              borderSide: const BorderSide(color: Colors.black, width: 1.5),
+            ),
+          ),
+        ),
+
+        SizedBox(height: 12.h),
+
         SizedBox(
+          height: 48.h,
           width: double.infinity,
           child: OutlinedButton(
             onPressed: onAskQuestion,
@@ -43,9 +73,9 @@ class QuestionsWidget extends StatelessWidget {
             ),
             child: Text(
               'Ask Question',
-              style: TextStyle(
-                fontSize: 14.sp,
-                fontWeight: FontWeight.w500,
+              style: getTextStyle(
+                font: CustomFonts.manrope,
+                fontWeight: FontWeight.w600,
                 color: Colors.black,
               ),
             ),
@@ -56,7 +86,7 @@ class QuestionsWidget extends StatelessWidget {
 
         // Questions list
         if (questions.isNotEmpty) ...[
-          ...questions.map((question) => _buildQuestionItem(question)),
+          ...questions.map((question) => _buildQuestionCard(question)),
         ] else ...[
           Center(
             child: Text(
@@ -73,84 +103,77 @@ class QuestionsWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildQuestionItem(QuestionModel question) {
-    return Padding(
-      padding: EdgeInsets.only(bottom: 16.h),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          CircleAvatar(
-            radius: 16.r,
-            backgroundImage: AssetImage(question.userImage),
-          ),
-          SizedBox(width: 12.w),
-          Expanded(
-            child: Column(
+  Widget _buildQuestionCard(QuestionModel question) {
+    return Container(
+      margin: EdgeInsets.only(bottom: 12.h),
+      decoration: BoxDecoration(
+        color: AppColors.textWhite,
+        borderRadius: BorderRadius.circular(8.r),
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(12.w),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    Text(
-                      question.userName,
-                      style: TextStyle(
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black,
-                      ),
-                    ),
-                    SizedBox(width: 8.w),
-                    Text(
-                      question.timeAgo,
-                      style: TextStyle(
-                        fontSize: 12.sp,
-                        color: Colors.grey[500],
-                      ),
-                    ),
-                  ],
+                CircleAvatar(
+                  radius: 16.r,
+                  backgroundImage: AssetImage(question.userImage),
                 ),
-                SizedBox(height: 8.h),
-                Text(
-                  question.question,
-                  style: TextStyle(
-                    fontSize: 13.sp,
-                    color: Colors.grey[700],
-                    height: 1.4,
+                SizedBox(width: 12.w),
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        question.userName,
+                        style: getTextStyle(
+                          font: CustomFonts.inter,
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black,
+                        ),
+                      ),
+                      Text(
+                        question.timeAgo,
+                        style: getTextStyle(
+                          font: CustomFonts.inter,
+                          fontSize: 12.sp,
+                          color: AppColors.featherGrey,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                SizedBox(height: 8.h),
-                GestureDetector(
-                  onTap: () => onReply(question),
-                  child: Text(
-                    'Reply',
-                    style: TextStyle(
-                      fontSize: 12.sp,
-                      fontWeight: FontWeight.w500,
-                      color: const Color(0xFFFF6B35),
-                    ),
-                  ),
-                ),
-                if (question.answer.isNotEmpty) ...[
-                  SizedBox(height: 8.h),
-                  Container(
-                    padding: EdgeInsets.all(12.sp),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[100],
-                      borderRadius: BorderRadius.circular(8.r),
-                    ),
-                    child: Text(
-                      question.answer,
-                      style: TextStyle(
-                        fontSize: 13.sp,
-                        color: Colors.grey[700],
-                        height: 1.4,
-                      ),
-                    ),
-                  ),
-                ],
               ],
             ),
-          ),
-        ],
+
+            SizedBox(height: 8.h),
+
+            Text(
+              question.question,
+              style: getTextStyle(font: CustomFonts.inter),
+            ),
+
+            SizedBox(height: 8.h),
+
+            Align(
+              alignment: Alignment.bottomRight,
+              child: GestureDetector(
+                onTap: () => onReply(question),
+                child: Text(
+                  'Reply',
+                  style: getTextStyle(
+                    font: CustomFonts.inter,
+                    color: AppColors.ebonyBlack,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

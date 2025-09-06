@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:quikle_user/core/common/styles/global_text_style.dart';
+import 'package:quikle_user/core/utils/constants/colors.dart';
+import 'package:quikle_user/core/utils/constants/enums.dart';
 import '../../data/models/review_model.dart';
 
 class ReviewsWidget extends StatelessWidget {
@@ -28,20 +31,21 @@ class ReviewsWidget extends StatelessWidget {
           children: [
             Text(
               'Ratings & Reviews',
-              style: TextStyle(
-                fontSize: 18.sp,
+              style: getTextStyle(
+                font: CustomFonts.inter,
+                fontSize: 16.sp,
                 fontWeight: FontWeight.w600,
-                color: Colors.black,
+                color: AppColors.ebonyBlack,
               ),
             ),
             GestureDetector(
               onTap: onSeeAll,
               child: Text(
                 'See All',
-                style: TextStyle(
-                  fontSize: 14.sp,
+                style: getTextStyle(
+                  font: CustomFonts.inter,
                   fontWeight: FontWeight.w500,
-                  color: const Color(0xFFFF6B35),
+                  color: AppColors.ebonyBlack,
                 ),
               ),
             ),
@@ -104,7 +108,7 @@ class ReviewsWidget extends StatelessWidget {
                                   (ratingDistribution[i.toString()] ?? 0) / 100,
                               backgroundColor: Colors.grey[300],
                               valueColor: const AlwaysStoppedAnimation<Color>(
-                                Colors.orange,
+                                AppColors.beakYellow,
                               ),
                             ),
                           ),
@@ -118,25 +122,49 @@ class ReviewsWidget extends StatelessWidget {
         ),
 
         SizedBox(height: 16.h),
+        TextField(
+          maxLines: 3,
+          decoration: InputDecoration(
+            hintText: "Write your review here...",
+            hintStyle: getTextStyle(
+              font: CustomFonts.inter,
+              fontSize: 14.sp,
+              color: AppColors.featherGrey,
+            ),
+            filled: true,
+            fillColor: AppColors.homeGrey,
+            contentPadding: EdgeInsets.all(12.w),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8.r),
+              borderSide: BorderSide(color: Colors.grey.shade300, width: 1),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8.r),
+              borderSide: const BorderSide(color: Colors.black, width: 1.5),
+            ),
+          ),
+        ),
 
-        // Write review button
+        SizedBox(height: 12.h),
         SizedBox(
+          height: 48.h,
           width: double.infinity,
-          child: OutlinedButton(
+          child: ElevatedButton(
             onPressed: onWriteReview,
-            style: OutlinedButton.styleFrom(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.black,
               padding: EdgeInsets.symmetric(vertical: 12.h),
-              side: const BorderSide(color: Colors.black),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8.r),
               ),
             ),
             child: Text(
               'Write A Review',
-              style: TextStyle(
-                fontSize: 14.sp,
-                fontWeight: FontWeight.w500,
-                color: Colors.black,
+              style: getTextStyle(
+                font: CustomFonts.inter,
+                fontSize: 18.sp,
+                fontWeight: FontWeight.w600,
+                color: AppColors.eggshellWhite,
               ),
             ),
           ),
@@ -144,84 +172,108 @@ class ReviewsWidget extends StatelessWidget {
 
         SizedBox(height: 16.h),
 
-        // Reviews list
-        ...reviews.map((review) => _buildReviewItem(review)),
+        ...reviews.map((review) => _buildReviewCard(review)),
       ],
     );
   }
 
-  Widget _buildReviewItem(ReviewModel review) {
-    return Padding(
-      padding: EdgeInsets.only(bottom: 16.h),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          CircleAvatar(
-            radius: 16.r,
-            backgroundImage: AssetImage(review.userImage),
-          ),
-          SizedBox(width: 12.w),
-          Expanded(
-            child: Column(
+  Widget _buildReviewCard(ReviewModel review) {
+    return Container(
+      margin: EdgeInsets.only(bottom: 12.h),
+      decoration: BoxDecoration(
+        color: AppColors.textWhite, // keep your current bg
+        borderRadius: BorderRadius.circular(8.r),
+        border: Border.all(color: Colors.white, width: 1),
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(12.w),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    Text(
-                      review.userName,
-                      style: TextStyle(
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black,
+                CircleAvatar(
+                  radius: 16.r,
+                  backgroundImage: AssetImage(review.userImage),
+                ),
+                SizedBox(width: 12.w),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              review.userName,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: getTextStyle(
+                                font: CustomFonts.inter,
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.ebonyBlack,
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 8.w),
+                          Text(
+                            review.timeAgo,
+                            style: getTextStyle(
+                              font: CustomFonts.inter,
+                              fontSize: 12.sp,
+                              color: AppColors.featherGrey,
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                    SizedBox(width: 8.w),
-                    Text(
-                      review.timeAgo,
-                      style: TextStyle(
-                        fontSize: 12.sp,
-                        color: Colors.grey[500],
+                      Row(
+                        children: List.generate(5, (index) {
+                          return Icon(
+                            index < review.rating.floor()
+                                ? Icons.star
+                                : Icons.star_border,
+                            color: Colors.orange,
+                            size: 12.sp,
+                          );
+                        }),
                       ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 4.h),
-                Row(
-                  children: List.generate(5, (index) {
-                    return Icon(
-                      index < review.rating.floor()
-                          ? Icons.star
-                          : Icons.star_border,
-                      color: Colors.orange,
-                      size: 12.sp,
-                    );
-                  }),
-                ),
-                SizedBox(height: 8.h),
-                Text(
-                  review.comment,
-                  style: TextStyle(
-                    fontSize: 13.sp,
-                    color: Colors.grey[700],
-                    height: 1.4,
-                  ),
-                ),
-                SizedBox(height: 8.h),
-                GestureDetector(
-                  onTap: () {},
-                  child: Text(
-                    'Reply',
-                    style: TextStyle(
-                      fontSize: 12.sp,
-                      fontWeight: FontWeight.w500,
-                      color: const Color(0xFFFF6B35),
-                    ),
+                    ],
                   ),
                 ),
               ],
             ),
-          ),
-        ],
+
+            SizedBox(height: 10.h),
+
+            Text(
+              review.comment,
+              style: getTextStyle(
+                font: CustomFonts.inter,
+                fontSize: 14.sp,
+                color: AppColors.ebonyBlack,
+                //height: 1.4,
+              ),
+            ),
+
+            SizedBox(height: 8.h),
+
+            Align(
+              alignment: Alignment.bottomRight,
+              child: GestureDetector(
+                onTap: () {},
+                child: Text(
+                  'Reply',
+                  style: getTextStyle(
+                    font: CustomFonts.inter,
+                    color: AppColors.ebonyBlack,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

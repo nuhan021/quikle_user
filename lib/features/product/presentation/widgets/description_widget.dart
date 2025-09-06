@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:quikle_user/core/common/styles/global_text_style.dart';
+import 'package:quikle_user/core/utils/constants/colors.dart';
+import 'package:quikle_user/core/utils/constants/enums.dart';
 
 class DescriptionWidget extends StatelessWidget {
   final String description;
@@ -13,19 +16,19 @@ class DescriptionWidget extends StatelessWidget {
       children: [
         Text(
           'Description',
-          style: TextStyle(
-            fontSize: 18.sp,
+          style: getTextStyle(
+            font: CustomFonts.inter,
+            fontSize: 16.sp,
             fontWeight: FontWeight.w600,
-            color: Colors.black,
+            color: AppColors.ebonyBlack,
           ),
         ),
         SizedBox(height: 8.h),
         Text(
           description,
-          style: TextStyle(
-            fontSize: 14.sp,
-            color: Colors.grey[600],
-            height: 1.5,
+          style: getTextStyle(
+            font: CustomFonts.inter,
+            color: AppColors.featherGrey,
           ),
         ),
       ],

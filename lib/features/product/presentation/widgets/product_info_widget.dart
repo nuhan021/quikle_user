@@ -27,6 +27,7 @@ class ProductInfoWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Product title
         Text(
           title,
           style: getTextStyle(
@@ -37,6 +38,8 @@ class ProductInfoWidget extends StatelessWidget {
           ),
         ),
         SizedBox(height: 8.h),
+
+        // Rating + reviews
         Row(
           children: [
             Icon(Icons.star, color: Colors.orange, size: 16.sp),
@@ -60,6 +63,8 @@ class ProductInfoWidget extends StatelessWidget {
           ],
         ),
         SizedBox(height: 16.h),
+
+        // Pricing section
         Row(
           children: [
             Text(
@@ -74,20 +79,21 @@ class ProductInfoWidget extends StatelessWidget {
             SizedBox(width: 8.w),
             Text(
               originalPrice,
-              style: getTextStyle(
-                font: CustomFonts.inter,
-                fontSize: 14.sp,
-                fontWeight: FontWeight.w500,
-                color: AppColors.ebonyBlack,
-              ),
+              style:
+                  getTextStyle(
+                    font: CustomFonts.inter,
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.featherGrey,
+                  ).copyWith(
+                    decoration: TextDecoration.lineThrough,
+                    decorationColor: AppColors.featherGrey,
+                    decorationThickness: 1.5,
+                  ),
             ),
             SizedBox(width: 8.w),
             Container(
               padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
-              // decoration: BoxDecoration(
-              //   color: AppColors.beakYellow,
-              //   borderRadius: BorderRadius.circular(4.r),
-              // ),
               child: Text(
                 discount,
                 style: TextStyle(
