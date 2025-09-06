@@ -56,9 +56,7 @@ class AppRoute {
     GetPage(name: _cart, page: () => const CartScreen()),
     GetPage(
       name: _productDetails,
-      page: () => ProductDetailsScreen(
-        product: Get.arguments['product'] as ProductModel,
-      ),
+      page: () => ProductDetailsScreen(product: Get.arguments as ProductModel),
     ),
     GetPage(name: _categoryDetail, page: () => const CategoryDetailScreen()),
     GetPage(name: _unifiedCategory, page: () => const UnifiedCategoryScreen()),

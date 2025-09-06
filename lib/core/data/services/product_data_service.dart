@@ -36,7 +36,7 @@ class ProductDataService {
       imagePath: ImagePath.foodIcon,
       categoryId: '1',
       subcategoryId: 'food_biryani',
-      shopId: 'shop_1',
+      shopId: 'shop_2',
       rating: 4.9,
       weight: '2 portions',
     ),

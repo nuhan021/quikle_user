@@ -45,6 +45,8 @@ class ProductController extends GetxController {
       _ratingDistribution.value = _productService.getRatingDistribution(
         productModel,
       );
+    } catch (e) {
+      print('Error loading product details: $e');
     } finally {
       _isLoading.value = false;
     }
