@@ -34,13 +34,12 @@ class ProductSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ===== Header with ONLY bottom border =====
           Container(
             width: double.infinity,
             padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 12.w),
             decoration: const BoxDecoration(
               border: Border(
-                bottom: BorderSide(width: 1, color: Color(0xFFEDEDED)),
+                bottom: BorderSide(width: 3, color: Color(0xFFEDEDED)),
               ),
             ),
             child: Row(

@@ -6,7 +6,7 @@ import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/features/home/presentation/widgets/app_bar/home_app_bar.dart';
 import 'package:quikle_user/features/home/presentation/widgets/banners/offer_banner.dart';
 import 'package:quikle_user/features/home/presentation/widgets/categories/categories_section.dart';
-import 'package:quikle_user/features/home/presentation/widgets/product_item.dart';
+import 'package:quikle_user/features/home/presentation/widgets/products/product_item.dart';
 import 'package:quikle_user/features/home/presentation/widgets/products/product_section.dart';
 import '../widgets/search/search_bar.dart' as custom_search;
 import '../../controllers/home_controller.dart';
@@ -166,7 +166,7 @@ class HomeContentScreen extends StatelessWidget {
                           ),
                         ],
 
-                        const SizedBox(height: 100),
+                        //const SizedBox(height: 100),
                       ],
                     ),
                   ),

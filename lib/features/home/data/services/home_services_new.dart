@@ -27,7 +27,7 @@ class HomeService {
       const CategoryModel(
         id: '5',
         title: 'Personal Care',
-        iconPath: ImagePath.personalcareIcon,
+        iconPath: ImagePath.personalCareIcon,
       ),
       const CategoryModel(
         id: '6',
