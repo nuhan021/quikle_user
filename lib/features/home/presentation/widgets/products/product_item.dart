@@ -93,7 +93,7 @@ class ProductItem extends StatelessWidget {
                 padding: EdgeInsets.all(8.w),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Text(
                       product.title,
@@ -106,6 +106,36 @@ class ProductItem extends StatelessWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
+
+                    SizedBox(height: 4.h),
+
+                    // Rating and Reviews Row
+                    Row(
+                      children: [
+                        const Icon(Icons.star, color: Colors.orange, size: 12),
+                        SizedBox(width: 2.w),
+                        Text(
+                          '${product.rating}',
+                          style: getTextStyle(
+                            font: CustomFonts.inter,
+                            fontSize: 10.sp,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.ebonyBlack,
+                          ),
+                        ),
+                        SizedBox(width: 4.w),
+                        Text(
+                          '(${product.reviewsCount})',
+                          style: getTextStyle(
+                            font: CustomFonts.inter,
+                            fontSize: 10.sp,
+                            color: AppColors.featherGrey,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const Spacer(),
 
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,

@@ -96,8 +96,17 @@ class HomeController extends GetxController {
   }
 
   Future<void> onCategoryPressed(CategoryModel category) async {
-    _selectedCategoryId.value = category.id;
-    await _loadContent();
+    // Navigate to unified category screen for all categories except "All"
+    if (category.id != '0') {
+      Get.toNamed(
+        AppRoute.getUnifiedCategory(),
+        arguments: {'category': category},
+      );
+    } else {
+      // For "All" category, filter on the home page
+      _selectedCategoryId.value = category.id;
+      await _loadContent();
+    }
   }
 
   void onProductPressed(ProductModel product) {
@@ -164,7 +173,17 @@ class HomeController extends GetxController {
 
   void onViewAllPressed(String categoryId) {
     final category = _categories.firstWhere((cat) => cat.id == categoryId);
-    onCategoryPressed(category);
+
+    // Navigate to unified category screen for all categories except "All"
+    if (categoryId != '0') {
+      Get.toNamed(
+        AppRoute.getUnifiedCategory(),
+        arguments: {'category': category},
+      );
+    } else {
+      // For "All" category, just filter on the home page
+      onCategoryPressed(category);
+    }
   }
 
   void onShopNowPressed() {

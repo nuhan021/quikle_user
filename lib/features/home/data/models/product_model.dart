@@ -5,9 +5,11 @@ class ProductModel {
   final String price;
   final String imagePath;
   final String categoryId;
+  final String? subcategoryId;
   final String shopId;
   final bool isFavorite;
   final double rating;
+  final int reviewsCount;
   final String? weight;
 
   const ProductModel({
@@ -17,9 +19,11 @@ class ProductModel {
     required this.price,
     required this.imagePath,
     required this.categoryId,
+    this.subcategoryId,
     required this.shopId,
     this.isFavorite = false,
     this.rating = 4.5,
+    this.reviewsCount = 25,
     this.weight,
   });
   ProductModel copyWith({
@@ -29,9 +33,11 @@ class ProductModel {
     String? price,
     String? imagePath,
     String? categoryId,
+    String? subcategoryId,
     String? shopId,
     bool? isFavorite,
     double? rating,
+    int? reviewsCount,
     String? weight,
   }) {
     return ProductModel(
@@ -41,9 +47,11 @@ class ProductModel {
       price: price ?? this.price,
       imagePath: imagePath ?? this.imagePath,
       categoryId: categoryId ?? this.categoryId,
+      subcategoryId: subcategoryId ?? this.subcategoryId,
       shopId: shopId ?? this.shopId,
       isFavorite: isFavorite ?? this.isFavorite,
       rating: rating ?? this.rating,
+      reviewsCount: reviewsCount ?? this.reviewsCount,
       weight: weight ?? this.weight,
     );
   }
@@ -57,6 +65,7 @@ class ProductModel {
         other.price == price &&
         other.imagePath == imagePath &&
         other.categoryId == categoryId &&
+        other.subcategoryId == subcategoryId &&
         other.shopId == shopId &&
         other.isFavorite == isFavorite &&
         other.rating == rating &&
@@ -70,6 +79,7 @@ class ProductModel {
         price.hashCode ^
         imagePath.hashCode ^
         categoryId.hashCode ^
+        subcategoryId.hashCode ^
         shopId.hashCode ^
         isFavorite.hashCode ^
         rating.hashCode ^
