@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:quikle_user/features/home/data/models/product_model.dart';
-import 'package:quikle_user/features/home/presentation/widgets/product_item.dart';
+import 'package:quikle_user/features/home/presentation/widgets/products/product_item.dart';
 
 class SimilarProductsWidget extends StatelessWidget {
   final List<ProductModel> products;
