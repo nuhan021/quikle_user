@@ -122,14 +122,10 @@ class ProductDetailsScreen extends StatelessWidget {
                                   ),
 
                                 SizedBox(height: 16.h),
-
-                                // Store Info
                                 if (controller.shop != null)
                                   StoreInfoWidget(shop: controller.shop!),
 
                                 SizedBox(height: 24.h),
-
-                                // Description
                                 DescriptionWidget(
                                   description: controller.description,
                                 ),
@@ -156,8 +152,6 @@ class ProductDetailsScreen extends StatelessWidget {
                                 ),
 
                                 SizedBox(height: 24.h),
-
-                                // You May Like Section (reused from cart screen)
                                 YouMayLikeSection(
                                   onAddToCart: (product) =>
                                       controller.addToCartFromSimilar(product),
@@ -167,15 +161,12 @@ class ProductDetailsScreen extends StatelessWidget {
                                       controller.onSimilarProductTap(product),
                                 ),
 
-                                SizedBox(
-                                  height: 100.h,
-                                ), // Space for bottom button
+                                SizedBox(height: 100.h),
                               ],
                             ),
                           ),
                         ),
 
-                        // Bottom Add to Cart Button
                         Container(
                           padding: EdgeInsets.all(16.sp),
                           decoration: BoxDecoration(
@@ -227,7 +218,6 @@ class ProductDetailsScreen extends StatelessWidget {
                     ),
             ),
 
-            // Floating Cart Button
             const FloatingCartButton(),
           ],
         ),

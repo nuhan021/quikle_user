@@ -8,7 +8,6 @@ import 'package:quikle_user/features/categories/presentation/widgets/category_ap
 import 'package:quikle_user/features/categories/presentation/widgets/search_and_filters_section.dart';
 import 'package:quikle_user/features/categories/presentation/widgets/popular_items_section.dart';
 import 'package:quikle_user/features/categories/presentation/widgets/product_grid_section.dart';
-import 'package:quikle_user/features/categories/presentation/widgets/grocery_navigation_section.dart';
 import 'package:quikle_user/features/home/presentation/widgets/banners/offer_banner.dart';
 import 'package:quikle_user/features/home/presentation/widgets/products/product_item.dart';
 
@@ -51,6 +50,8 @@ class UnifiedCategoryScreen extends StatelessWidget {
                         onVoiceTap: () {},
                       ),
                       SizedBox(height: 24.h),
+
+                      // Main categories/subcategories section
                       PopularItemsSection(
                         subcategories: controller.availableSubcategories,
                         onSubcategoryTap: controller.onSubcategoryTap,
@@ -58,6 +59,18 @@ class UnifiedCategoryScreen extends StatelessWidget {
                             ? 'Popular Items'
                             : controller.sectionTitle.value,
                       ),
+
+                      // Show second row for grocery subcategories if main category is selected
+                      if (controller.isGroceryCategory &&
+                          controller.selectedMainCategory.value != null &&
+                          controller.filterSubcategories.isNotEmpty)
+                        PopularItemsSection(
+                          subcategories: controller.filterSubcategories,
+                          onSubcategoryTap: controller.onSubcategoryTap,
+                          title:
+                              'Select ${controller.selectedMainCategory.value!.title}',
+                        ),
+
                       SizedBox(height: 22.h),
                       OfferBanner(),
                       SizedBox(height: 24.h),
@@ -78,10 +91,11 @@ class UnifiedCategoryScreen extends StatelessWidget {
     if (controller.showingAllProducts.value) {
       return _buildAllProductsView(controller);
     }
-    if (controller.isGroceryCategory &&
-        controller.selectedMainCategory.value != null) {
-      return _buildGrocerySelectedView(controller);
+
+    if (controller.isGroceryCategory) {
+      return _buildGroceryContentView(controller);
     }
+
     return _buildDefaultCategoryView(controller);
   }
 
@@ -118,44 +132,38 @@ class UnifiedCategoryScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildGrocerySelectedView(UnifiedCategoryController controller) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          GroceryNavigationSection(
-            onBackToCategories: controller.resetToMainCategories,
-            subcategories: controller.availableSubcategories,
-            onSubcategoryTap: controller.onSubcategoryTap,
-          ),
+  Widget _buildGroceryContentView(UnifiedCategoryController controller) {
+    // Only show products if subcategory is selected and products exist
+    if (controller.selectedSubcategory.value != null &&
+        controller.displayProducts.isNotEmpty) {
+      return Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16.w),
+        child: ProductGridSection(
+          title: controller.productsTitle.value,
+          products: controller.displayProducts,
+          onProductTap: controller.onProductTap,
+          onAddToCart: controller.onAddToCart,
+          onFavoriteToggle: controller.onFavoriteToggle,
+          showViewAll: false,
+          maxItems: controller.displayProducts.length,
+          crossAxisCount: 2,
+        ),
+      );
+    }
 
-          SizedBox(height: 24.h),
-          if (controller.displayProducts.isNotEmpty)
-            ProductGridSection(
-              title: 'Products',
-              products: controller.displayProducts,
-              onProductTap: controller.onProductTap,
-              onAddToCart: controller.onAddToCart,
-              onFavoriteToggle: controller.onFavoriteToggle,
-              showViewAll: false,
-              maxItems: controller.displayProducts.length,
-              crossAxisCount: 2,
-            )
-          else
-            Center(
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 40.h),
-                child: Text(
-                  'No products available',
-                  style: TextStyle(
-                    color: AppColors.featherGrey,
-                    fontSize: 16.sp,
-                  ),
-                ),
-              ),
-            ),
-        ],
+    // Show message if no products or selections not complete
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: 40.h),
+        child: Text(
+          controller.selectedMainCategory.value == null
+              ? 'Please select a category above'
+              : controller.selectedSubcategory.value == null
+              ? 'Please select a subcategory above'
+              : 'No products available',
+          style: TextStyle(color: AppColors.featherGrey, fontSize: 16.sp),
+          textAlign: TextAlign.center,
+        ),
       ),
     );
   }
