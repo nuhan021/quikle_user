@@ -75,7 +75,7 @@ class ProductService {
   }
 
   String getProductDescription(ProductModel product) {
-    return 'Fresh organic avocados sourced directly from local farms. Rich in healthy fats, perfect for salads, smoothies, or enjoying as a spread. These avocados sourced directly from local farms. Rich in nutrients and perfect for a healthy diet.';
+    return product.description;
   }
 
   Map<String, dynamic> getRatingDistribution(ProductModel product) {

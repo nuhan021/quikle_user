@@ -40,29 +40,27 @@ class StoreInfoWidget extends StatelessWidget {
                   shop.deliveryTime,
                   style: getTextStyle(
                     font: CustomFonts.inter,
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w400,
-                    color: AppColors.ebonyBlack,
+                    color: AppColors.featherGrey,
                   ),
                 ),
               ],
             ),
           ),
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-            decoration: BoxDecoration(
-              color: shop.isOpen ? Colors.green : Colors.red,
-              borderRadius: BorderRadius.circular(6.r),
-            ),
-            child: Text(
-              shop.isOpen ? 'Open' : 'Closed',
-              style: TextStyle(
-                fontSize: 10.sp,
-                fontWeight: FontWeight.w500,
-                color: Colors.white,
-              ),
-            ),
-          ),
+          // Container(
+          //   padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+          //   decoration: BoxDecoration(
+          //     color: shop.isOpen ? Colors.green : Colors.red,
+          //     borderRadius: BorderRadius.circular(6.r),
+          //   ),
+          //   child: Text(
+          //     shop.isOpen ? 'Open' : 'Closed',
+          //     style: TextStyle(
+          //       fontSize: 10.sp,
+          //       fontWeight: FontWeight.w500,
+          //       color: Colors.white,
+          //     ),
+          //   ),
+          // ),
         ],
       ),
     );

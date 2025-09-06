@@ -1,6 +1,7 @@
 class ProductModel {
   final String id;
   final String title;
+  final String description;
   final String price;
   final String imagePath;
   final String categoryId;
@@ -12,6 +13,7 @@ class ProductModel {
   const ProductModel({
     required this.id,
     required this.title,
+    required this.description,
     required this.price,
     required this.imagePath,
     required this.categoryId,
@@ -23,6 +25,7 @@ class ProductModel {
   ProductModel copyWith({
     String? id,
     String? title,
+    String? description,
     String? price,
     String? imagePath,
     String? categoryId,
@@ -34,6 +37,7 @@ class ProductModel {
     return ProductModel(
       id: id ?? this.id,
       title: title ?? this.title,
+      description: description ?? this.description,
       price: price ?? this.price,
       imagePath: imagePath ?? this.imagePath,
       categoryId: categoryId ?? this.categoryId,

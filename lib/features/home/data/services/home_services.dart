@@ -135,6 +135,8 @@ class HomeService {
     const ProductModel(
       id: 'food_1',
       title: 'Butter Croissant & Cappuccino',
+      description:
+          'A delicious butter croissant served with a cup of cappuccino.',
       price: '\$18',
       imagePath: ImagePath.foodIcon,
       categoryId: '1',
@@ -146,6 +148,8 @@ class HomeService {
     const ProductModel(
       id: 'food_2',
       title: 'Chicken Sandwich',
+      description:
+          'A delicious butter croissant served with a cup of cappuccino.',
       price: '\$16',
       imagePath: ImagePath.foodIcon,
       categoryId: '1',
@@ -157,6 +161,8 @@ class HomeService {
     const ProductModel(
       id: 'food_3',
       title: 'Chicken Burger',
+      description:
+          'A delicious butter croissant served with a cup of cappuccino.',
       price: '\$19',
       imagePath: ImagePath.foodIcon,
       categoryId: '1',
@@ -168,6 +174,8 @@ class HomeService {
     const ProductModel(
       id: 'food_4',
       title: 'Tandoori Chicken Pizza',
+      description:
+          'A delicious butter croissant served with a cup of cappuccino.',
       price: '\$22',
       imagePath: ImagePath.foodIcon,
       categoryId: '1',
@@ -178,6 +186,8 @@ class HomeService {
     const ProductModel(
       id: 'food_5',
       title: 'Fresh Vegetable Salad',
+      description:
+          'A delicious butter croissant served with a cup of cappuccino.',
       price: '\$14',
       imagePath: ImagePath.foodIcon,
       categoryId: '1',
@@ -188,6 +198,8 @@ class HomeService {
     const ProductModel(
       id: 'food_6',
       title: 'Indian Pan Biryani',
+      description:
+          'A delicious butter croissant served with a cup of cappuccino.',
       price: '\$18',
       imagePath: ImagePath.foodIcon,
       categoryId: '1',
@@ -198,6 +210,8 @@ class HomeService {
     const ProductModel(
       id: 'food_7',
       title: 'Spice Chicken Shawarma',
+      description:
+          'A delicious butter croissant served with a cup of cappuccino.',
       price: '\$14',
       imagePath: ImagePath.foodIcon,
       categoryId: '1',
@@ -211,6 +225,8 @@ class HomeService {
     const ProductModel(
       id: 'grocery_1',
       title: 'Organic Milk - Amul Fresh',
+      description:
+          'A delicious butter croissant served with a cup of cappuccino.',
       price: '\$5',
       imagePath: ImagePath.groceryIcon,
       categoryId: '2',
@@ -221,6 +237,8 @@ class HomeService {
     const ProductModel(
       id: 'grocery_2',
       title: 'Bread Slice - Brown Bread',
+      description:
+          'A delicious butter croissant served with a cup of cappuccino.',
       price: '\$3',
       imagePath: ImagePath.groceryIcon,
       categoryId: '2',
@@ -231,6 +249,8 @@ class HomeService {
     const ProductModel(
       id: 'grocery_3',
       title: 'Fresh Banana - Yellow Banana',
+      description:
+          'A delicious butter croissant served with a cup of cappuccino.',
       price: '\$2',
       imagePath: ImagePath.groceryIcon,
       categoryId: '2',
@@ -243,6 +263,8 @@ class HomeService {
       title: 'Wheat Flour - Atta',
       price: '\$4',
       imagePath: ImagePath.groceryIcon,
+      description:
+          'A delicious butter croissant served with a cup of cappuccino.',
       categoryId: '2',
       shopId: 'shop_2',
       rating: 4.5,
@@ -251,6 +273,8 @@ class HomeService {
     const ProductModel(
       id: 'grocery_5',
       title: 'Basmati Rice - Premium Quality',
+      description:
+          'A delicious butter croissant served with a cup of cappuccino.',
       price: '\$8',
       imagePath: ImagePath.groceryIcon,
       categoryId: '2',
@@ -261,6 +285,8 @@ class HomeService {
     const ProductModel(
       id: 'grocery_6',
       title: 'Free Range Eggs - Dozen Pack',
+      description:
+          'A delicious butter croissant served with a cup of cappuccino.',
       price: '\$6',
       imagePath: ImagePath.groceryIcon,
       categoryId: '2',
@@ -274,6 +300,8 @@ class HomeService {
     const ProductModel(
       id: 'medicine_1',
       title: 'Antacid Chewable Tablet',
+      description:
+          'A delicious butter croissant served with a cup of cappuccino.',
       price: '\$8',
       imagePath: ImagePath.medicineIcon,
       categoryId: '3',
@@ -284,6 +312,8 @@ class HomeService {
     const ProductModel(
       id: 'medicine_2',
       title: 'Antiseptic Mouthwash',
+      description:
+          'A delicious butter croissant served with a cup of cappuccino.',
       price: '\$7',
       imagePath: ImagePath.medicineIcon,
       categoryId: '3',
@@ -294,6 +324,8 @@ class HomeService {
     const ProductModel(
       id: 'medicine_3',
       title: 'Ibuprofen Pain Relief',
+      description:
+          'A delicious butter croissant served with a cup of cappuccino.',
       price: '\$6',
       imagePath: ImagePath.medicineIcon,
       categoryId: '3',
@@ -304,6 +336,8 @@ class HomeService {
     const ProductModel(
       id: 'medicine_4',
       title: 'Cough Suppressant Syrup',
+      description:
+          'A delicious butter croissant served with a cup of cappuccino.',
       price: '\$9',
       imagePath: ImagePath.medicineIcon,
       categoryId: '3',
@@ -314,6 +348,8 @@ class HomeService {
     const ProductModel(
       id: 'medicine_5',
       title: 'Vitamin C - Immune Support',
+      description:
+          'A delicious butter croissant served with a cup of cappuccino.',
       price: '\$8',
       imagePath: ImagePath.medicineIcon,
       categoryId: '3',
@@ -324,6 +360,8 @@ class HomeService {
     const ProductModel(
       id: 'medicine_6',
       title: 'Paracetamol Fever Relief',
+      description:
+          'A delicious butter croissant served with a cup of cappuccino.',
       price: '\$5',
       imagePath: ImagePath.medicineIcon,
       categoryId: '3',
@@ -337,6 +375,8 @@ class HomeService {
     const ProductModel(
       id: 'cleaning_1',
       title: 'Cleaning Spray - Lemon Fresh',
+      description:
+          'A delicious butter croissant served with a cup of cappuccino.',
       price: '\$8',
       imagePath: ImagePath.cleaningIcon,
       categoryId: '4',
@@ -347,6 +387,8 @@ class HomeService {
     const ProductModel(
       id: 'cleaning_2',
       title: 'Powerful Dish Soap',
+      description:
+          'A delicious butter croissant served with a cup of cappuccino.',
       price: '\$7',
       imagePath: ImagePath.cleaningIcon,
       categoryId: '4',
@@ -357,6 +399,8 @@ class HomeService {
     const ProductModel(
       id: 'cleaning_3',
       title: 'Glass Cleaner Spray',
+      description:
+          'A delicious butter croissant served with a cup of cappuccino.',
       price: '\$6',
       imagePath: ImagePath.cleaningIcon,
       categoryId: '4',
@@ -367,6 +411,8 @@ class HomeService {
     const ProductModel(
       id: 'cleaning_4',
       title: 'Disinfectant Wipes',
+      description:
+          'A delicious butter croissant served with a cup of cappuccino.',
       price: '\$9',
       imagePath: ImagePath.cleaningIcon,
       categoryId: '4',
@@ -377,6 +423,8 @@ class HomeService {
     const ProductModel(
       id: 'cleaning_5',
       title: 'Liquid Laundry Detergent',
+      description:
+          'A delicious butter croissant served with a cup of cappuccino.',
       price: '\$10',
       imagePath: ImagePath.cleaningIcon,
       categoryId: '4',
@@ -387,6 +435,8 @@ class HomeService {
     const ProductModel(
       id: 'cleaning_6',
       title: 'All-Purpose Cleaner',
+      description:
+          'A delicious butter croissant served with a cup of cappuccino.',
       price: '\$8',
       imagePath: ImagePath.cleaningIcon,
       categoryId: '4',
@@ -400,6 +450,8 @@ class HomeService {
     const ProductModel(
       id: 'care_1',
       title: 'Moisturizing Face Cream',
+      description:
+          'A delicious butter croissant served with a cup of cappuccino.',
       price: '\$12',
       imagePath: ImagePath.personalCareIcon,
       categoryId: '5',
@@ -410,6 +462,8 @@ class HomeService {
     const ProductModel(
       id: 'care_2',
       title: 'Nourishing Hair Shampoo',
+      description:
+          'A delicious butter croissant served with a cup of cappuccino.',
       price: '\$10',
       imagePath: ImagePath.personalCareIcon,
       categoryId: '5',
@@ -420,6 +474,8 @@ class HomeService {
     const ProductModel(
       id: 'care_3',
       title: 'Long Lasting Perfume',
+      description:
+          'A delicious butter croissant served with a cup of cappuccino.',
       price: '\$18',
       imagePath: ImagePath.personalCareIcon,
       categoryId: '5',
@@ -430,6 +486,8 @@ class HomeService {
     const ProductModel(
       id: 'care_4',
       title: 'Whitening Toothpaste',
+      description:
+          'A delicious butter croissant served with a cup of cappuccino.',
       price: '\$8',
       imagePath: ImagePath.personalCareIcon,
       categoryId: '5',
@@ -440,6 +498,8 @@ class HomeService {
     const ProductModel(
       id: 'care_5',
       title: 'Hydrating Body Lotion',
+      description:
+          'A delicious butter croissant served with a cup of cappuccino.',
       price: '\$14',
       imagePath: ImagePath.personalCareIcon,
       categoryId: '5',
@@ -450,6 +510,8 @@ class HomeService {
     const ProductModel(
       id: 'care_6',
       title: 'Soothing Lip Balm',
+      description:
+          'A delicious butter croissant served with a cup of cappuccino.',
       price: '\$5',
       imagePath: ImagePath.personalCareIcon,
       categoryId: '5',
@@ -463,6 +525,8 @@ class HomeService {
     const ProductModel(
       id: 'pet_1',
       title: 'Premium Dry Dog Food',
+      description:
+          'A delicious butter croissant served with a cup of cappuccino.',
       price: '\$22',
       imagePath: ImagePath.petSuppliesIcon,
       categoryId: '6',
@@ -473,6 +537,8 @@ class HomeService {
     const ProductModel(
       id: 'pet_2',
       title: 'Super Soft Shampoo',
+      description:
+          'A delicious butter croissant served with a cup of cappuccino.',
       price: '\$8',
       imagePath: ImagePath.petSuppliesIcon,
       categoryId: '6',
@@ -483,6 +549,8 @@ class HomeService {
     const ProductModel(
       id: 'pet_3',
       title: 'Durable Chew Toy',
+      description:
+          'A delicious butter croissant served with a cup of cappuccino.',
       price: '\$4',
       imagePath: ImagePath.petSuppliesIcon,
       categoryId: '6',
@@ -493,6 +561,8 @@ class HomeService {
     const ProductModel(
       id: 'pet_4',
       title: 'Cozy Dog Bed - Medium Size',
+      description:
+          'A delicious butter croissant served with a cup of cappuccino.',
       price: '\$18',
       imagePath: ImagePath.petSuppliesIcon,
       categoryId: '6',
@@ -503,6 +573,8 @@ class HomeService {
     const ProductModel(
       id: 'pet_5',
       title: 'Stainless Steel Food Bowl',
+      description:
+          'A delicious butter croissant served with a cup of cappuccino.',
       price: '\$6',
       imagePath: ImagePath.petSuppliesIcon,
       categoryId: '6',
@@ -513,6 +585,8 @@ class HomeService {
     const ProductModel(
       id: 'pet_6',
       title: 'Premium Dry Cat Food',
+      description:
+          'A delicious butter croissant served with a cup of cappuccino.',
       price: '\$20',
       imagePath: ImagePath.petSuppliesIcon,
       categoryId: '6',
@@ -526,6 +600,8 @@ class HomeService {
     const ProductModel(
       id: 'custom_1',
       title: 'Adjustable LED Desk Lamp',
+      description:
+          'A delicious butter croissant served with a cup of cappuccino.',
       price: '\$16',
       imagePath: ImagePath.customIcon,
       categoryId: '7',
@@ -536,6 +612,8 @@ class HomeService {
     const ProductModel(
       id: 'custom_2',
       title: 'Bluetooth Wireless Speaker',
+      description:
+          'A delicious butter croissant served with a cup of cappuccino.',
       price: '\$18',
       imagePath: ImagePath.customIcon,
       categoryId: '7',
@@ -546,6 +624,8 @@ class HomeService {
     const ProductModel(
       id: 'custom_3',
       title: 'Succulent Plant Trio',
+      description:
+          'A delicious butter croissant served with a cup of cappuccino.',
       price: '\$10',
       imagePath: ImagePath.customIcon,
       categoryId: '7',
@@ -556,6 +636,8 @@ class HomeService {
     const ProductModel(
       id: 'custom_4',
       title: 'Personalized Travel Mug',
+      description:
+          'A delicious butter croissant served with a cup of cappuccino.',
       price: '\$14',
       imagePath: ImagePath.customIcon,
       categoryId: '7',
@@ -566,6 +648,8 @@ class HomeService {
     const ProductModel(
       id: 'custom_5',
       title: 'Stainless Steel Water Bottle',
+      description:
+          'A delicious butter croissant served with a cup of cappuccino.',
       price: '\$12',
       imagePath: ImagePath.customIcon,
       categoryId: '7',
@@ -576,6 +660,8 @@ class HomeService {
     const ProductModel(
       id: 'custom_6',
       title: 'Aromatherapy Essential Oil Set',
+      description:
+          'A delicious butter croissant served with a cup of cappuccino.',
       price: '\$20',
       imagePath: ImagePath.customIcon,
       categoryId: '7',
