@@ -7,6 +7,12 @@ import 'package:quikle_user/features/splash/presentation/screens/splash_screen.d
 import 'package:quikle_user/features/auth/presentation/screens/login_screen.dart';
 import 'package:quikle_user/features/cart/presentation/screens/cart_screen.dart';
 import 'package:quikle_user/features/product/presentation/screens/product_details_screen.dart';
+import 'package:quikle_user/features/categories/presentation/screens/category_detail_screen.dart';
+import 'package:quikle_user/features/categories/presentation/screens/subcategory_products_screen.dart';
+import 'package:quikle_user/features/categories/presentation/screens/main_category_products_screen.dart';
+import 'package:quikle_user/features/categories/presentation/screens/grocery_navigation_screen.dart';
+import 'package:quikle_user/features/categories/presentation/screens/unified_category_screen.dart';
+import 'package:quikle_user/features/home/data/models/product_model.dart';
 
 class AppRoute {
   static const String _splash = '/';
@@ -18,6 +24,11 @@ class AppRoute {
   static const String _main = '/main';
   static const String _cart = '/cart';
   static const String _productDetails = '/product-details';
+  static const String _categoryDetail = '/category-detail';
+  static const String _unifiedCategory = '/unified-category';
+  static const String _subcategoryProducts = '/subcategory-products';
+  static const String _mainCategoryProducts = '/main-category-products';
+  static const String _groceryNavigation = '/grocery-navigation';
 
   static String getSplashScreen() => _splash;
   static String getLoginScreen() => _login;
@@ -28,6 +39,11 @@ class AppRoute {
   static String getWelcome() => _welcome;
   static String getCart() => _cart;
   static String getProductDetails() => _productDetails;
+  static String getCategoryDetail() => _categoryDetail;
+  static String getUnifiedCategory() => _unifiedCategory;
+  static String getSubcategoryProducts() => _subcategoryProducts;
+  static String getMainCategoryProducts() => _mainCategoryProducts;
+  static String getGroceryNavigation() => _groceryNavigation;
 
   static final List<GetPage<dynamic>> routes = <GetPage>[
     GetPage(name: _splash, page: () => const SplashScreen()),
@@ -40,7 +56,23 @@ class AppRoute {
     GetPage(name: _cart, page: () => const CartScreen()),
     GetPage(
       name: _productDetails,
-      page: () => ProductDetailsScreen(product: Get.arguments),
+      page: () => ProductDetailsScreen(
+        product: Get.arguments['product'] as ProductModel,
+      ),
+    ),
+    GetPage(name: _categoryDetail, page: () => const CategoryDetailScreen()),
+    GetPage(name: _unifiedCategory, page: () => const UnifiedCategoryScreen()),
+    GetPage(
+      name: _subcategoryProducts,
+      page: () => const SubcategoryProductsScreen(),
+    ),
+    GetPage(
+      name: _mainCategoryProducts,
+      page: () => const MainCategoryProductsScreen(),
+    ),
+    GetPage(
+      name: _groceryNavigation,
+      page: () => const GroceryNavigationScreen(),
     ),
 
     // GetPage(
