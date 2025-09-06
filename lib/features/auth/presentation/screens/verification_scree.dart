@@ -323,14 +323,6 @@ class VerificationScreen extends StatelessWidget {
       ),
     );
   }
-
-  String _maskPhone(String phone) {
-    // simple: show last 4, mask rest
-    final p = phone.replaceAll(RegExp(r'\s'), '');
-    if (p.length <= 4) return phone;
-    final last = p.substring(p.length - 4);
-    return '•••• •••• $last';
-  }
 }
 
 class _OtpCell extends StatelessWidget {

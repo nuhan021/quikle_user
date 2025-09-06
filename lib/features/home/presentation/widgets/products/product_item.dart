@@ -42,7 +42,6 @@ class ProductItem extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // product image box
             Stack(
               children: [
                 Container(
@@ -64,7 +63,6 @@ class ProductItem extends StatelessWidget {
                     ),
                   ),
                 ),
-                // Favorite icon in top right corner
                 Positioned(
                   top: 8.h,
                   right: 8.w,
@@ -108,8 +106,6 @@ class ProductItem extends StatelessWidget {
                     ),
 
                     SizedBox(height: 4.h),
-
-                    // Rating and Reviews Row
                     Row(
                       children: [
                         const Icon(Icons.star, color: Colors.orange, size: 12),
@@ -125,7 +121,7 @@ class ProductItem extends StatelessWidget {
                         ),
                         SizedBox(width: 4.w),
                         Text(
-                          '(${product.reviewsCount})',
+                          '${product.reviewsCount} reviews',
                           style: getTextStyle(
                             font: CustomFonts.inter,
                             fontSize: 10.sp,

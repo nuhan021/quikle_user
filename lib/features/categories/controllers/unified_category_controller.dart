@@ -274,7 +274,6 @@ class UnifiedCategoryController extends GetxController {
       displayProducts.value = allProducts;
       productsTitle.value = '${currentCategory.title} - All Items';
     } else {
-      // Go back to filtered view if there was a selection
       if (selectedSubcategory.value != null) {
         final filteredProducts = allProducts
             .where(

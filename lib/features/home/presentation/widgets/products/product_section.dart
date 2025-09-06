@@ -79,7 +79,6 @@ class ProductSection extends StatelessWidget {
 
           SizedBox(height: 16.h),
 
-          // ===== Grid of products =====
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -87,7 +86,7 @@ class ProductSection extends StatelessWidget {
               crossAxisCount: 3,
               crossAxisSpacing: 12.w,
               mainAxisSpacing: 12.h,
-              childAspectRatio: 0.68,
+              childAspectRatio: 0.60.h,
             ),
             itemCount: math.min(section.products.length, 6),
             itemBuilder: (context, index) {

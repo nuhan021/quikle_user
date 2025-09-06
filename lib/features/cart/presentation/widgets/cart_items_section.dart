@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'package:quikle_user/core/common/styles/global_text_style.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums.dart';
-import 'package:quikle_user/core/utils/constants/image_path.dart';
 
 import '../../controllers/cart_controller.dart';
 

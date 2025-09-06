@@ -3,6 +3,7 @@ class ImagePath {
   static const String verifyIcon = 'assets/icons/verify.png';
   static const String categoryIcon = 'assets/icons/category.png';
   static const String profileIcon = 'assets/icons/profileImage.png';
+  static const String profile = 'assets/icons/profile.png';
   static const String locationIcon = 'assets/icons/location.png';
   static const String walletIcon = 'assets/icons/wallet.png';
   static const String voiceIcon = 'assets/icons/voice_icon.png';

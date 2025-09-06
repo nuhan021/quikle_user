@@ -1,0 +1,110 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:quikle_user/core/common/styles/global_text_style.dart';
+import 'package:quikle_user/core/utils/constants/colors.dart';
+import 'package:quikle_user/core/utils/constants/enums.dart';
+import 'package:quikle_user/features/home/data/models/product_model.dart';
+import 'package:quikle_user/features/home/presentation/widgets/products/product_item.dart';
+
+class ProductGridSection extends StatelessWidget {
+  final String title;
+  final List<ProductModel> products;
+  final Function(ProductModel) onProductTap;
+  final Function(ProductModel) onAddToCart;
+  final Function(ProductModel) onFavoriteToggle;
+  final VoidCallback? onViewAllTap;
+  final int maxItems;
+  final int crossAxisCount;
+  final bool showViewAll;
+
+  const ProductGridSection({
+    super.key,
+    required this.title,
+    required this.products,
+    required this.onProductTap,
+    required this.onAddToCart,
+    required this.onFavoriteToggle,
+    this.onViewAllTap,
+    this.maxItems = 6,
+    this.crossAxisCount = 2,
+    this.showViewAll = true,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (products.isEmpty) return const SizedBox.shrink();
+
+    final displayProducts = products.take(maxItems).toList();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Only show title section if title is not empty
+        if (title.isNotEmpty)
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.w),
+            child: Container(
+              width: double.infinity,
+              padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 12.w),
+              decoration: const BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(width: 3, color: Color(0xFFEDEDED)),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    title,
+                    style: getTextStyle(
+                      font: CustomFonts.obviously,
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.ebonyBlack,
+                    ),
+                  ),
+                  if (showViewAll && onViewAllTap != null)
+                    GestureDetector(
+                      onTap: onViewAllTap,
+                      child: Text(
+                        'View all',
+                        style: getTextStyle(
+                          font: CustomFonts.inter,
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+        if (title.isNotEmpty) SizedBox(height: 16.h),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16.w),
+          child: GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: crossAxisCount,
+              crossAxisSpacing: 12.w,
+              mainAxisSpacing: 12.h,
+              childAspectRatio: crossAxisCount == 3 ? 0.60 : 1,
+            ),
+            itemCount: displayProducts.length,
+            itemBuilder: (context, index) {
+              final product = displayProducts[index];
+              return ProductItem(
+                product: product,
+                onTap: () => onProductTap(product),
+                onAddToCart: () => onAddToCart(product),
+                onFavoriteToggle: () => onFavoriteToggle(product),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}

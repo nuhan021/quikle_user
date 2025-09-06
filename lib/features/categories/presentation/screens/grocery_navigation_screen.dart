@@ -6,7 +6,6 @@ import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums.dart';
 import 'package:quikle_user/features/categories/controllers/grocery_navigation_controller.dart';
 import 'package:quikle_user/features/categories/presentation/widgets/popular_items_section.dart';
-import 'package:quikle_user/features/categories/presentation/widgets/subcategory_grid_section.dart';
 
 class GroceryNavigationScreen extends StatelessWidget {
   const GroceryNavigationScreen({super.key});
@@ -95,12 +94,79 @@ class GroceryNavigationScreen extends StatelessWidget {
 
               // Subcategories Grid
               if (controller.currentSubcategories.isNotEmpty) ...[
-                SubcategoryGridSection(
-                  title: controller.currentLevel.value == 0
-                      ? 'Shop by Category'
-                      : 'Browse ${controller.currentTitle.value}',
-                  subcategories: controller.currentSubcategories,
-                  onSubcategoryTap: controller.onSubcategoryTap,
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        controller.currentLevel.value == 0
+                            ? 'Shop by Category'
+                            : 'Browse ${controller.currentTitle.value}',
+                        style: getTextStyle(
+                          font: CustomFonts.obviously,
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.ebonyBlack,
+                        ),
+                      ),
+                      SizedBox(height: 16.h),
+                      GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 12.w,
+                          mainAxisSpacing: 12.h,
+                          childAspectRatio: 2.5,
+                        ),
+                        itemCount: controller.currentSubcategories.length,
+                        itemBuilder: (context, index) {
+                          final subcategory =
+                              controller.currentSubcategories[index];
+                          return GestureDetector(
+                            onTap: () =>
+                                controller.onSubcategoryTap(subcategory),
+                            child: Container(
+                              padding: EdgeInsets.all(12.w),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(8.r),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withValues(alpha: 0.1),
+                                    blurRadius: 4,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                children: [
+                                  Image.asset(
+                                    subcategory.iconPath,
+                                    width: 24.w,
+                                    height: 24.h,
+                                  ),
+                                  SizedBox(width: 8.w),
+                                  Expanded(
+                                    child: Text(
+                                      subcategory.title,
+                                      style: getTextStyle(
+                                        font: CustomFonts.inter,
+                                        fontSize: 14.sp,
+                                        fontWeight: FontWeight.w500,
+                                        color: AppColors.ebonyBlack,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
                 ),
                 SizedBox(height: 24.h),
               ],
