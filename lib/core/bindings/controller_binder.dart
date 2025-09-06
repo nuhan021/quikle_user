@@ -5,6 +5,7 @@ import 'package:quikle_user/features/auth/controllers/register_controller.dart';
 import 'package:quikle_user/features/auth/controllers/verification_controller.dart';
 import 'package:quikle_user/features/auth/controllers/welcome_controller.dart';
 import 'package:quikle_user/features/auth/data/services/auth_service.dart';
+import 'package:quikle_user/features/product/controllers/product_controller.dart';
 import 'package:quikle_user/features/splash/controllers/splash_controller.dart';
 import 'package:quikle_user/features/cart/controllers/cart_controller.dart';
 
@@ -27,5 +28,6 @@ class ControllerBinder extends Bindings {
 
     // Cart Controller - permanent for persistent cart
     Get.put<CartController>(CartController(), permanent: true);
+    Get.put<ProductController>(ProductController(), permanent: true);
   }
 }

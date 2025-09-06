@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:quikle_user/core/utils/constants/colors.dart';
 
 class ProductImageWidget extends StatelessWidget {
   final String imagePath;

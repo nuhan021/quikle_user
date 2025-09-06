@@ -26,22 +26,13 @@ class PopularItemsSection extends StatelessWidget {
       children: [
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 16.w),
-          child: Container(
-            width: double.infinity,
-            padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 12.w),
-            decoration: const BoxDecoration(
-              border: Border(
-                bottom: BorderSide(width: 3, color: Color(0xFFEDEDED)),
-              ),
-            ),
-            child: Text(
-              title,
-              style: getTextStyle(
-                font: CustomFonts.obviously,
-                fontSize: 16.sp,
-                fontWeight: FontWeight.w500,
-                color: AppColors.ebonyBlack,
-              ),
+          child: Text(
+            title,
+            style: getTextStyle(
+              font: CustomFonts.obviously,
+              fontSize: 16.sp,
+              fontWeight: FontWeight.w500,
+              color: AppColors.ebonyBlack,
             ),
           ),
         ),
@@ -58,17 +49,18 @@ class PopularItemsSection extends StatelessWidget {
                 onTap: () => onSubcategoryTap(subcategory),
                 child: Container(
                   width: 60.w,
-                  margin: EdgeInsets.only(right: 35.w),
+                  margin: EdgeInsets.only(right: 16.w),
                   child: Column(
                     children: [
                       Container(
                         width: 60.w,
                         height: 60.h,
                         decoration: BoxDecoration(
+                          color: Colors.white,
                           borderRadius: BorderRadius.circular(12.r),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.grey.withOpacity(0.04),
+                              color: Colors.grey.withValues(alpha: 0.04),
                               blurRadius: 16,
                               offset: const Offset(0, 4),
                             ),
@@ -77,7 +69,8 @@ class PopularItemsSection extends StatelessWidget {
                         child: Center(
                           child: Image.asset(
                             subcategory.iconPath,
-                            fit: BoxFit.contain,
+                            width: 32.w,
+                            height: 32.h,
                           ),
                         ),
                       ),
@@ -89,7 +82,7 @@ class PopularItemsSection extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: getTextStyle(
                           font: CustomFonts.inter,
-                          fontSize: 14.sp,
+                          fontSize: 12.sp,
                           fontWeight: FontWeight.w500,
                           color: AppColors.ebonyBlack,
                         ),
