@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:quikle_user/core/common/widgets/cart_animation_overlay.dart';
+import 'package:quikle_user/core/common/widgets/floating_cart_button.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/features/categories/controllers/unified_category_controller.dart';
 import 'package:quikle_user/features/categories/presentation/widgets/category_app_bar.dart';
@@ -30,78 +31,84 @@ class UnifiedCategoryScreen extends StatelessWidget {
       child: CartAnimationWrapper(
         child: Scaffold(
           backgroundColor: AppColors.homeGrey,
-          body: Column(
+          body: Stack(
             children: [
-              Obx(
-                () => CategoryAppBar(
-                  title: controller.categoryTitle.value,
-                  onNotificationTap: () {},
-                  onProfileTap: () {},
-                ),
-              ),
-              Expanded(
-                child: Obx(() {
-                  if (controller.isLoading.value) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-
-                  return SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        SearchAndFiltersSection(
-                          searchController: searchController,
-                          onSearchChanged: controller.onSearchChanged,
-                          onSortTap: () =>
-                              _showSortBottomSheet(context, controller),
-                          onFilterTap: () =>
-                              _showFilterBottomSheet(context, controller),
-                          onVoiceTap: () {},
-                          searchHint:
-                              'Search in ${controller.categoryTitle.value}...',
-                        ),
-                        SizedBox(height: 24.h),
-
-                        // Main categories section - always visible
-                        PopularItemsSection(
-                          subcategories: controller.isGroceryCategory
-                              ? controller.allCategories
-                              : controller.availableSubcategories,
-                          onSubcategoryTap: controller.onSubcategoryTap,
-                          title: controller.isGroceryCategory
-                              ? 'Categories'
-                              : controller.sectionTitle.value.isEmpty
-                              ? 'Popular Items'
-                              : controller.sectionTitle.value,
-                          selectedSubcategory: controller.isGroceryCategory
-                              ? controller.selectedMainCategory.value
-                              : controller.selectedSubcategory.value,
-                        ),
-
-                        // Subcategories section - show for grocery when main category is selected
-                        if (controller.isGroceryCategory &&
-                            controller.selectedMainCategory.value != null &&
-                            controller.filterSubcategories.isNotEmpty) ...[
-                          SizedBox(height: 20.h),
-                          PopularItemsSection(
-                            subcategories: controller.filterSubcategories,
-                            onSubcategoryTap: controller.onSubcategoryTap,
-                            title:
-                                'Select ${controller.selectedMainCategory.value!.title}',
-                            selectedSubcategory:
-                                controller.selectedSubcategory.value,
-                          ),
-                        ],
-
-                        SizedBox(height: 26.h),
-                        OfferBanner(),
-                        SizedBox(height: 24.h),
-                        _buildContent(controller),
-                        SizedBox(height: 32.h),
-                      ],
+              Column(
+                children: [
+                  Obx(
+                    () => CategoryAppBar(
+                      title: controller.categoryTitle.value,
+                      onNotificationTap: () {},
+                      onProfileTap: () {},
                     ),
-                  );
-                }),
+                  ),
+                  Expanded(
+                    child: Obx(() {
+                      if (controller.isLoading.value) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+
+                      return SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            SearchAndFiltersSection(
+                              searchController: searchController,
+                              onSearchChanged: controller.onSearchChanged,
+                              onSortTap: () =>
+                                  _showSortBottomSheet(context, controller),
+                              onFilterTap: () =>
+                                  _showFilterBottomSheet(context, controller),
+                              onVoiceTap: () {},
+                              searchHint:
+                                  'Search in ${controller.categoryTitle.value}...',
+                            ),
+                            SizedBox(height: 24.h),
+
+                            // Main categories section - always visible
+                            PopularItemsSection(
+                              subcategories: controller.isGroceryCategory
+                                  ? controller.allCategories
+                                  : controller.availableSubcategories,
+                              onSubcategoryTap: controller.onSubcategoryTap,
+                              title: controller.isGroceryCategory
+                                  ? 'Categories'
+                                  : controller.sectionTitle.value.isEmpty
+                                  ? 'Popular Items'
+                                  : controller.sectionTitle.value,
+                              selectedSubcategory: controller.isGroceryCategory
+                                  ? controller.selectedMainCategory.value
+                                  : controller.selectedSubcategory.value,
+                            ),
+
+                            // Subcategories section - show for grocery when main category is selected
+                            if (controller.isGroceryCategory &&
+                                controller.selectedMainCategory.value != null &&
+                                controller.filterSubcategories.isNotEmpty) ...[
+                              SizedBox(height: 20.h),
+                              PopularItemsSection(
+                                subcategories: controller.filterSubcategories,
+                                onSubcategoryTap: controller.onSubcategoryTap,
+                                title:
+                                    'Select ${controller.selectedMainCategory.value!.title}',
+                                selectedSubcategory:
+                                    controller.selectedSubcategory.value,
+                              ),
+                            ],
+
+                            SizedBox(height: 26.h),
+                            OfferBanner(),
+                            SizedBox(height: 24.h),
+                            _buildContent(controller),
+                            SizedBox(height: 32.h),
+                          ],
+                        ),
+                      );
+                    }),
+                  ),
+                ],
               ),
+              // Floating Cart Button
+              const FloatingCartButton(),
             ],
           ),
         ),
