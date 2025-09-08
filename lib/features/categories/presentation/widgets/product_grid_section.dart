@@ -4,7 +4,8 @@ import 'package:quikle_user/core/common/styles/global_text_style.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums.dart';
 import 'package:quikle_user/features/home/data/models/product_model.dart';
-import 'package:quikle_user/features/home/presentation/widgets/products/product_item.dart';
+import 'package:quikle_user/features/home/data/models/shop_model.dart';
+import 'package:quikle_user/features/categories/presentation/widgets/category_product_item.dart';
 
 class ProductGridSection extends StatelessWidget {
   final String title;
@@ -16,6 +17,8 @@ class ProductGridSection extends StatelessWidget {
   final int maxItems;
   final int crossAxisCount;
   final bool showViewAll;
+  final bool isGroceryCategory;
+  final Map<String, ShopModel>? shops;
 
   const ProductGridSection({
     super.key,
@@ -28,6 +31,8 @@ class ProductGridSection extends StatelessWidget {
     this.maxItems = 6,
     this.crossAxisCount = 2,
     this.showViewAll = true,
+    this.isGroceryCategory = false,
+    this.shops,
   });
 
   @override
@@ -42,7 +47,7 @@ class ProductGridSection extends StatelessWidget {
         // Only show title section if title is not empty
         if (title.isNotEmpty)
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.w),
+            padding: EdgeInsets.symmetric(horizontal: 8.w),
             child: Container(
               width: double.infinity,
               padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 12.w),
@@ -95,11 +100,15 @@ class ProductGridSection extends StatelessWidget {
             itemCount: displayProducts.length,
             itemBuilder: (context, index) {
               final product = displayProducts[index];
-              return ProductItem(
+              final shop = shops?[product.shopId];
+
+              return CategoryProductItem(
                 product: product,
                 onTap: () => onProductTap(product),
                 onAddToCart: () => onAddToCart(product),
                 onFavoriteToggle: () => onFavoriteToggle(product),
+                isGroceryCategory: isGroceryCategory,
+                shop: shop,
               );
             },
           ),

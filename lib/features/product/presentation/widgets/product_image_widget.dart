@@ -5,14 +5,12 @@ class ProductImageWidget extends StatelessWidget {
   final String imagePath;
   final bool isFavorite;
   final VoidCallback onFavoriteToggle;
-  final VoidCallback onShare;
 
   const ProductImageWidget({
     super.key,
     required this.imagePath,
     required this.isFavorite,
     required this.onFavoriteToggle,
-    required this.onShare,
   });
 
   @override
@@ -39,22 +37,6 @@ class ProductImageWidget extends StatelessWidget {
             right: 16.w,
             child: Row(
               children: [
-                GestureDetector(
-                  onTap: onShare,
-                  child: Container(
-                    padding: EdgeInsets.all(8.sp),
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      Icons.share,
-                      size: 20.sp,
-                      color: Colors.black54,
-                    ),
-                  ),
-                ),
-                SizedBox(width: 8.w),
                 GestureDetector(
                   onTap: onFavoriteToggle,
                   child: Container(

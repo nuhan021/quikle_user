@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:quikle_user/features/home/data/models/product_model.dart';
-import 'package:quikle_user/features/home/presentation/widgets/products/product_item.dart';
+import 'package:quikle_user/core/common/widgets/unified_product_card.dart';
 
 class SimilarProductsWidget extends StatelessWidget {
   final List<ProductModel> products;
@@ -35,15 +35,10 @@ class SimilarProductsWidget extends StatelessWidget {
             scrollDirection: Axis.horizontal,
             itemCount: products.length,
             itemBuilder: (context, index) {
-              return Container(
-                width: 120.w,
-                margin: EdgeInsets.only(right: 12.w),
-                child: ProductItem(
-                  product: products[index],
-                  onTap: () => onProductTap(products[index]),
-                  onAddToCart: () {},
-                  onFavoriteToggle: () {},
-                ),
+              return UnifiedProductCard(
+                product: products[index],
+                onTap: () => onProductTap(products[index]),
+                variant: ProductCardVariant.horizontal,
               );
             },
           ),

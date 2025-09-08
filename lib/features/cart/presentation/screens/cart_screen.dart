@@ -32,43 +32,49 @@ class CartScreen extends StatelessWidget {
         return Scaffold(
           backgroundColor: AppColors.homeGrey,
           body: SafeArea(
-            child: Column(
-              children: [
-                CartAppBar(
-                  onClearAll: () => _showClearCartDialog(cartController),
-                ),
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        SizedBox(height: 16.h),
-                        const FreeGiftAndProgressSection(),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  CartAppBar(
+                    onClearAll: () => _showClearCartDialog(cartController),
+                  ),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          SizedBox(height: 16.h),
+                          const FreeGiftAndProgressSection(),
 
-                        SizedBox(height: 19.h),
-                        const CartItemsSection(),
+                          SizedBox(height: 19.h),
+                          const CartItemsSection(),
 
-                        SizedBox(height: 19.h),
-                        YouMayLikeSection(
-                          onAddToCart: (product) =>
-                              cartController.addToCart(product),
-                          onFavoriteToggle: (product) =>
-                              homeController.onFavoriteToggle(product),
-                          onProductTap: (product) {
-                            // Navigate to product details if needed
-                            // Get.toNamed('/product-details', arguments: product);
-                          },
-                        ),
+                          SizedBox(height: 19.h),
+                          YouMayLikeSection(
+                            onAddToCart: (product) =>
+                                cartController.addToCart(product),
+                            onFavoriteToggle: (product) =>
+                                homeController.onFavoriteToggle(product),
+                            onProductTap: (product) {
+                              // Navigate to product details if needed
+                              Get.toNamed(
+                                '/product-details',
+                                arguments: product,
+                              );
+                            },
+                          ),
 
-                        SizedBox(height: 100.h),
-                      ],
+                          SizedBox(height: 100.h),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                CartBottomSection(
-                  onPlaceOrder: () => _handlePlaceOrder(cartController),
-                  onPaymentMethodTap: () => _showPaymentMethods(),
-                ),
-              ],
+                  CartBottomSection(
+                    onPlaceOrder: () => _handlePlaceOrder(cartController),
+                    onPaymentMethodTap: () => _showPaymentMethods(),
+                  ),
+                ],
+              ),
             ),
           ),
         );

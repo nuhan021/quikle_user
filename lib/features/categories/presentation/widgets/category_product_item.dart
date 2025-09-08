@@ -1,19 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:quikle_user/core/common/widgets/unified_product_card.dart';
 import 'package:quikle_user/features/home/data/models/product_model.dart';
+import 'package:quikle_user/features/home/data/models/shop_model.dart';
 
-class ProductItem extends StatelessWidget {
+class CategoryProductItem extends StatelessWidget {
   final ProductModel product;
   final VoidCallback onTap;
   final VoidCallback onAddToCart;
   final VoidCallback? onFavoriteToggle;
+  final bool isGroceryCategory;
+  final ShopModel? shop;
 
-  const ProductItem({
+  const CategoryProductItem({
     super.key,
     required this.product,
     required this.onTap,
     required this.onAddToCart,
     this.onFavoriteToggle,
+    this.isGroceryCategory = false,
+    this.shop,
   });
 
   @override
@@ -23,7 +28,9 @@ class ProductItem extends StatelessWidget {
       onTap: onTap,
       onAddToCart: onAddToCart,
       onFavoriteToggle: onFavoriteToggle,
-      variant: ProductCardVariant.home,
+      variant: ProductCardVariant.category,
+      isGroceryCategory: isGroceryCategory,
+      shop: shop,
     );
   }
 }

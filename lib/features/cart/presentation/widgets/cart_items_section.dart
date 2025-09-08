@@ -15,7 +15,7 @@ class CartItemsSection extends StatelessWidget {
     final cartController = Get.find<CartController>();
 
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 16.w),
+      //margin: EdgeInsets.symmetric(horizontal: 16.w),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12.r),
