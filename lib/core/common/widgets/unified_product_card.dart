@@ -53,6 +53,7 @@ class UnifiedProductCard extends StatefulWidget {
 
 class _UnifiedProductCardState extends State<UnifiedProductCard> {
   final GlobalKey _cartButtonKey = GlobalKey();
+  final GlobalKey _imageKey = GlobalKey();
 
   void _handleAddToCart() {
     if (widget.onAddToCart != null) {
@@ -72,34 +73,34 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
   }
 
   void _triggerCartAnimation() {
-    final cartAnimationController = Get.find<CartAnimationController>();
+    final controller = Get.find<CartAnimationController>();
 
-    // Get source position
-    final RenderBox? sourceBox =
-        _cartButtonKey.currentContext?.findRenderObject() as RenderBox?;
+    final sourceBox =
+        _imageKey.currentContext?.findRenderObject() as RenderBox?;
     if (sourceBox == null) return;
 
-    final sourcePosition = sourceBox.localToGlobal(Offset.zero);
-    final sourceCenter = Offset(
-      sourcePosition.dx + sourceBox.size.width / 2,
-      sourcePosition.dy + sourceBox.size.height / 2,
+    final topLeft = sourceBox.localToGlobal(Offset.zero);
+    final center = Offset(
+      topLeft.dx + sourceBox.size.width / 2,
+      topLeft.dy + sourceBox.size.height / 2,
     );
 
-    // Default floating cart position (bottom right)
-    final screenSize = MediaQuery.of(context).size;
-    final targetPosition = Offset(
-      screenSize.width - 40.w,
-      screenSize.height - 100.h,
-    );
+    final screen = MediaQuery.of(context).size;
+    final target = Offset(screen.width - 40.w, screen.height - 100.h);
 
-    // Create and trigger animation
-    final animation = CartAnimation(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      startPosition: sourceCenter,
-      endPosition: targetPosition,
-    );
+    final startSize = sourceBox.size.shortestSide.clamp(24.0, 80.0);
+    final endSize = 28.w;
 
-    cartAnimationController.addAnimation(animation);
+    controller.addAnimation(
+      CartAnimation(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        imagePath: widget.product.imagePath,
+        startPosition: center,
+        endPosition: target,
+        startSize: startSize,
+        endSize: endSize,
+      ),
+    );
   }
 
   @override
@@ -163,6 +164,7 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
     return Stack(
       children: [
         Container(
+          key: _imageKey,
           height: imageHeight,
           width: double.infinity,
           decoration: ShapeDecoration(
