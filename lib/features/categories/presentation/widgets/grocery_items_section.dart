@@ -121,8 +121,6 @@ class GroceryItemsSection extends StatelessWidget {
             },
           ),
         ),
-
-        // Subcategories Section (only show if main category is selected and subcategories exist)
         if (selectedMainCategory != null && subcategories.isNotEmpty) ...[
           SizedBox(height: 24.h),
           Padding(

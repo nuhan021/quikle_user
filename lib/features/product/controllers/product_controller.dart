@@ -54,6 +54,19 @@ class ProductController extends GetxController {
 
   void onAddToCart() {
     if (_product.value != null) {
+      if (!_product.value!.canAddToCart) {
+        if (_product.value!.isMedicine &&
+            _product.value!.isOTC &&
+            !_product.value!.hasPrescriptionUploaded) {
+          Get.snackbar(
+            'Prescription Required',
+            'Please upload a valid prescription to add this OTC medicine to your cart.',
+            duration: const Duration(seconds: 3),
+          );
+        }
+        return;
+      }
+
       _cartController.addToCart(_product.value!);
       Get.snackbar(
         'Added to Cart',
@@ -61,6 +74,33 @@ class ProductController extends GetxController {
         duration: const Duration(seconds: 2),
       );
     }
+  }
+
+  void onUploadPrescription() {
+    // Handle prescription upload
+    if (_product.value != null) {
+      // In a real app, this would open a file picker or camera
+      // For now, we'll simulate successful upload
+      final updatedProduct = _product.value!.copyWith(
+        hasPrescriptionUploaded: true,
+      );
+      _product.value = updatedProduct;
+
+      Get.snackbar(
+        'Prescription Uploaded',
+        'Your prescription has been uploaded successfully. You can now add this medicine to your cart.',
+        duration: const Duration(seconds: 3),
+      );
+    }
+  }
+
+  void onViewPrescription() {
+    // Handle view prescription
+    Get.snackbar(
+      'View Prescription',
+      'Prescription viewer will open here.',
+      duration: const Duration(seconds: 2),
+    );
   }
 
   void onFavoriteToggle() {

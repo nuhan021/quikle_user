@@ -9,12 +9,14 @@ class PopularItemsSection extends StatelessWidget {
   final List<SubcategoryModel> subcategories;
   final Function(SubcategoryModel) onSubcategoryTap;
   final String title;
+  final SubcategoryModel? selectedSubcategory;
 
   const PopularItemsSection({
     super.key,
     required this.subcategories,
     required this.onSubcategoryTap,
     this.title = 'Popular Items',
+    this.selectedSubcategory,
   });
 
   @override
@@ -54,6 +56,8 @@ class PopularItemsSection extends StatelessWidget {
             itemCount: subcategories.length,
             itemBuilder: (context, index) {
               final subcategory = subcategories[index];
+              final isSelected = selectedSubcategory?.id == subcategory.id;
+
               return GestureDetector(
                 onTap: () => onSubcategoryTap(subcategory),
                 child: Container(
@@ -66,6 +70,12 @@ class PopularItemsSection extends StatelessWidget {
                         height: 60.h,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(12.r),
+                          border: isSelected
+                              ? Border.all(
+                                  color: AppColors.beakYellow,
+                                  width: 2,
+                                )
+                              : null,
                           boxShadow: [
                             BoxShadow(
                               color: Colors.grey.withOpacity(0.04),
@@ -91,7 +101,9 @@ class PopularItemsSection extends StatelessWidget {
                           font: CustomFonts.inter,
                           fontSize: 14.sp,
                           fontWeight: FontWeight.w500,
-                          color: AppColors.ebonyBlack,
+                          color: isSelected
+                              ? AppColors.beakYellow
+                              : AppColors.ebonyBlack,
                         ),
                       ),
                     ],

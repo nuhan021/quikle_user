@@ -68,7 +68,7 @@ class ProductService {
       'shop_1': ShopModel(
         id: 'shop_1',
         name: 'Tandoori Tarang',
-        deliveryTime: 'Delivery in 30-35 min',
+        deliveryTime: '30-35 min',
         image: ImagePath.profileIcon,
         rating: 4.8,
         address: '123 Food Street, City',
@@ -77,7 +77,7 @@ class ProductService {
       'shop_2': ShopModel(
         id: 'shop_2',
         name: 'Fresh Market',
-        deliveryTime: 'Delivery in 25-30 min',
+        deliveryTime: '25-30 min',
         image: ImagePath.profileIcon,
         rating: 4.6,
         address: '456 Market Lane, City',
@@ -86,7 +86,7 @@ class ProductService {
       'shop_3': ShopModel(
         id: 'shop_3',
         name: 'Health Plus Pharmacy',
-        deliveryTime: 'Delivery in 15-20 min',
+        deliveryTime: '15-20 min',
         image: ImagePath.profileIcon,
         rating: 4.9,
         address: '789 Health Ave, City',

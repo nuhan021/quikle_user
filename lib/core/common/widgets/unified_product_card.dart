@@ -1,0 +1,550 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
+import 'package:quikle_user/core/common/styles/global_text_style.dart';
+import 'package:quikle_user/core/common/widgets/cart_animation_overlay.dart';
+import 'package:quikle_user/core/utils/constants/colors.dart';
+import 'package:quikle_user/core/utils/constants/enums.dart';
+import 'package:quikle_user/core/utils/constants/image_path.dart';
+import 'package:quikle_user/features/home/data/models/product_model.dart';
+import 'package:quikle_user/features/home/data/models/shop_model.dart';
+
+enum ProductCardVariant {
+  home, // Home screen grid
+  category, // Category screen grid
+  youMayLike, // You may like section
+  cart, // Cart item (horizontal layout)
+  horizontal, // Horizontal list view
+}
+
+class UnifiedProductCard extends StatefulWidget {
+  final ProductModel product;
+  final VoidCallback onTap;
+  final VoidCallback? onAddToCart;
+  final VoidCallback? onFavoriteToggle;
+  final VoidCallback? onRemove; // For cart items
+  final VoidCallback? onIncrease; // For cart items
+  final VoidCallback? onDecrease; // For cart items
+  final ProductCardVariant variant;
+  final bool isGroceryCategory;
+  final ShopModel? shop;
+  final int? quantity; // For cart items
+  final bool enableCartAnimation; // Enable cart animation
+
+  const UnifiedProductCard({
+    super.key,
+    required this.product,
+    required this.onTap,
+    this.onAddToCart,
+    this.onFavoriteToggle,
+    this.onRemove,
+    this.onIncrease,
+    this.onDecrease,
+    this.variant = ProductCardVariant.home,
+    this.isGroceryCategory = false,
+    this.shop,
+    this.quantity,
+    this.enableCartAnimation = true,
+  });
+
+  @override
+  State<UnifiedProductCard> createState() => _UnifiedProductCardState();
+}
+
+class _UnifiedProductCardState extends State<UnifiedProductCard> {
+  final GlobalKey _cartButtonKey = GlobalKey();
+
+  void _handleAddToCart() {
+    if (widget.onAddToCart != null) {
+      // Trigger cart animation if enabled
+      if (widget.enableCartAnimation) {
+        try {
+          Get.find<CartAnimationController>();
+          _triggerCartAnimation();
+        } catch (e) {
+          // Cart animation controller not found, just proceed with normal add to cart
+        }
+      }
+
+      // Call the original onAddToCart callback
+      widget.onAddToCart!();
+    }
+  }
+
+  void _triggerCartAnimation() {
+    final cartAnimationController = Get.find<CartAnimationController>();
+
+    // Get source position
+    final RenderBox? sourceBox =
+        _cartButtonKey.currentContext?.findRenderObject() as RenderBox?;
+    if (sourceBox == null) return;
+
+    final sourcePosition = sourceBox.localToGlobal(Offset.zero);
+    final sourceCenter = Offset(
+      sourcePosition.dx + sourceBox.size.width / 2,
+      sourcePosition.dy + sourceBox.size.height / 2,
+    );
+
+    // Default floating cart position (bottom right)
+    final screenSize = MediaQuery.of(context).size;
+    final targetPosition = Offset(
+      screenSize.width - 40.w,
+      screenSize.height - 100.h,
+    );
+
+    // Create and trigger animation
+    final animation = CartAnimation(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      startPosition: sourceCenter,
+      endPosition: targetPosition,
+    );
+
+    cartAnimationController.addAnimation(animation);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    switch (widget.variant) {
+      case ProductCardVariant.cart:
+        return _buildCartCard();
+      case ProductCardVariant.horizontal:
+        return _buildHorizontalCard();
+      default:
+        return _buildVerticalCard();
+    }
+  }
+
+  Widget _buildVerticalCard() {
+    return GestureDetector(
+      onTap: widget.onTap,
+      child: Container(
+        decoration: ShapeDecoration(
+          color: AppColors.textWhite,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(
+              widget.variant == ProductCardVariant.youMayLike ? 12.r : 8.r,
+            ),
+          ),
+          shadows: [
+            BoxShadow(
+              color: AppColors.cardColor,
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+              spreadRadius: 0,
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildImageSection(),
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.all(
+                  widget.variant == ProductCardVariant.youMayLike ? 12.sp : 8.w,
+                ),
+                child: _buildProductInfo(),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildImageSection() {
+    final imageHeight = widget.variant == ProductCardVariant.youMayLike
+        ? 120.h
+        : 90.h;
+    final imageSize = widget.variant == ProductCardVariant.youMayLike
+        ? 64.w
+        : 56.w;
+
+    return Stack(
+      children: [
+        Container(
+          height: imageHeight,
+          width: double.infinity,
+          decoration: ShapeDecoration(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(
+                top: Radius.circular(
+                  widget.variant == ProductCardVariant.youMayLike ? 12.r : 4.r,
+                ),
+              ),
+            ),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: Center(
+            child: Image.asset(
+              widget.product.imagePath,
+              width: imageSize,
+              height: imageSize,
+              fit: BoxFit.contain,
+              filterQuality: FilterQuality.high,
+            ),
+          ),
+        ),
+
+        // OTC Label for medicines
+        if (widget.product.isMedicine && widget.product.isOTC)
+          Positioned(
+            top: widget.variant == ProductCardVariant.youMayLike ? 8.h : 6.h,
+            left: widget.variant == ProductCardVariant.youMayLike ? 8.w : 6.w,
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.h),
+              decoration: BoxDecoration(
+                color: AppColors.otcLabelColor,
+                borderRadius: BorderRadius.circular(
+                  widget.variant == ProductCardVariant.youMayLike ? 4.r : 3.r,
+                ),
+              ),
+              child: Text(
+                'OTC',
+                style: getTextStyle(
+                  font: CustomFonts.inter,
+                  fontSize: widget.variant == ProductCardVariant.youMayLike
+                      ? 8.sp
+                      : 7.sp,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+
+        // Favorite icon
+        if (widget.onFavoriteToggle != null)
+          Positioned(
+            top: 8.h,
+            right: 8.w,
+            child: GestureDetector(
+              onTap: widget.onFavoriteToggle,
+              child: SizedBox(
+                width: 20.w,
+                height: 20.w,
+                child: Center(
+                  child: Image.asset(
+                    ImagePath.favoriteIcon,
+                    fit: BoxFit.cover,
+                    color: widget.product.isFavorite
+                        ? Colors.red
+                        : AppColors.ebonyBlack.withValues(alpha: 0.6),
+                  ),
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildProductInfo() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        // Product title
+        Text(
+          widget.product.title,
+          style: getTextStyle(
+            font: CustomFonts.inter,
+            fontSize: 12.sp,
+            fontWeight: FontWeight.w500,
+            color: AppColors.ebonyBlack,
+          ),
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
+
+        SizedBox(height: 4.h),
+
+        if (widget.variant == ProductCardVariant.category ||
+            widget.variant == ProductCardVariant.youMayLike) ...[
+          Row(
+            children: [
+              const Icon(Icons.star, color: Colors.orange, size: 12),
+              SizedBox(width: 2.w),
+              Text(
+                '${widget.product.rating}',
+                style: getTextStyle(
+                  font: CustomFonts.inter,
+                  fontSize: 10.sp,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.ebonyBlack,
+                ),
+              ),
+              SizedBox(width: 8.w),
+              Expanded(child: _buildCategorySpecificInfo()),
+            ],
+          ),
+        ],
+
+        const Spacer(),
+
+        // Price and Add to Cart
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              widget.product.price,
+              style: getTextStyle(
+                font: CustomFonts.inter,
+                fontSize: widget.variant == ProductCardVariant.youMayLike
+                    ? 16.sp
+                    : 14.sp,
+                fontWeight: widget.variant == ProductCardVariant.youMayLike
+                    ? FontWeight.w700
+                    : FontWeight.w600,
+                color: widget.variant == ProductCardVariant.youMayLike
+                    ? Colors.black
+                    : AppColors.ebonyBlack,
+              ),
+            ),
+            if (widget.onAddToCart != null)
+              GestureDetector(
+                key: _cartButtonKey, // Add GlobalKey for animation
+                onTap: widget.product.canAddToCart ? _handleAddToCart : null,
+                child: Container(
+                  width: widget.variant == ProductCardVariant.youMayLike
+                      ? 30.w
+                      : 24.w,
+                  height: widget.variant == ProductCardVariant.youMayLike
+                      ? 30.w
+                      : 24.w,
+                  decoration: BoxDecoration(
+                    color: widget.product.canAddToCart
+                        ? Colors.transparent
+                        : Colors.grey.withValues(alpha: 0.3),
+                    borderRadius: BorderRadius.circular(
+                      widget.variant == ProductCardVariant.youMayLike
+                          ? 4.r
+                          : 6.r,
+                    ),
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: Center(
+                    child: Image.asset(
+                      ImagePath.cartIcon,
+                      width: widget.variant == ProductCardVariant.youMayLike
+                          ? 22.w
+                          : null,
+                      height: widget.variant == ProductCardVariant.youMayLike
+                          ? 22.w
+                          : null,
+                      fit: BoxFit.cover,
+                      filterQuality: FilterQuality.high,
+                      color: widget.product.canAddToCart ? null : Colors.grey,
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCategorySpecificInfo() {
+    if (widget.isGroceryCategory) {
+      return Row(
+        children: [
+          Icon(Icons.scale_outlined, color: AppColors.featherGrey, size: 10.w),
+          SizedBox(width: 2.w),
+          Text(
+            widget.product.weight ?? '1 piece',
+            style: getTextStyle(
+              font: CustomFonts.inter,
+              fontSize: 10.sp,
+              color: AppColors.featherGrey,
+            ),
+          ),
+        ],
+      );
+    } else {
+      return Row(
+        children: [
+          Icon(Icons.access_time, color: AppColors.featherGrey, size: 10.w),
+          SizedBox(width: 2.w),
+          Text(
+            widget.shop?.deliveryTime ?? 'Fast delivery',
+            style: getTextStyle(
+              font: CustomFonts.inter,
+              fontSize: 10.sp,
+              color: AppColors.featherGrey,
+            ),
+          ),
+        ],
+      );
+    }
+  }
+
+  Widget _buildCartCard() {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+      padding: EdgeInsets.all(12.w),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withValues(alpha: 0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          // Product Image
+          GestureDetector(
+            onTap: widget.onTap,
+            child: Container(
+              width: 80.w,
+              height: 80.w,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8.r),
+              ),
+              child: Center(
+                child: Image.asset(
+                  widget.product.imagePath,
+                  width: 40.w,
+                  height: 40.w,
+                  fit: BoxFit.contain,
+                  filterQuality: FilterQuality.high,
+                ),
+              ),
+            ),
+          ),
+          SizedBox(width: 12.w),
+
+          // Product Details
+          Expanded(
+            child: GestureDetector(
+              onTap: widget.onTap,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.product.title,
+                    style: getTextStyle(
+                      font: CustomFonts.inter,
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.ebonyBlack,
+                    ),
+                  ),
+                  SizedBox(height: 6.h),
+                  Text(
+                    widget.product.price,
+                    style: getTextStyle(
+                      font: CustomFonts.inter,
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.ebonyBlack,
+                    ),
+                  ),
+                  if (widget.quantity != null) ...[
+                    SizedBox(height: 6.h),
+                    Text(
+                      'Total: ₹${(widget.quantity! * _getNumericPrice()).toStringAsFixed(2)}',
+                      style: getTextStyle(
+                        font: CustomFonts.inter,
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.ebonyBlack,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+
+          // Quantity Controls
+          if (widget.onIncrease != null &&
+              widget.onDecrease != null &&
+              widget.onRemove != null)
+            Column(
+              children: [
+                GestureDetector(
+                  onTap: widget.onRemove,
+                  child: Container(
+                    padding: EdgeInsets.all(4.w),
+                    decoration: BoxDecoration(
+                      color: Colors.red.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(4.r),
+                    ),
+                    child: Icon(Icons.close, size: 16.sp, color: Colors.red),
+                  ),
+                ),
+                SizedBox(height: 8.h),
+                Row(
+                  children: [
+                    GestureDetector(
+                      onTap: widget.onDecrease,
+                      child: Container(
+                        width: 24.w,
+                        height: 24.w,
+                        decoration: BoxDecoration(
+                          color: AppColors.ebonyBlack,
+                          borderRadius: BorderRadius.circular(4.r),
+                        ),
+                        child: Icon(
+                          Icons.remove,
+                          color: Colors.white,
+                          size: 16.sp,
+                        ),
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.symmetric(horizontal: 8.w),
+                      child: Text(
+                        '${widget.quantity ?? 1}',
+                        style: getTextStyle(
+                          font: CustomFonts.inter,
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.ebonyBlack,
+                        ),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: widget.onIncrease,
+                      child: Container(
+                        width: 24.w,
+                        height: 24.w,
+                        decoration: BoxDecoration(
+                          color: AppColors.ebonyBlack,
+                          borderRadius: BorderRadius.circular(4.r),
+                        ),
+                        child: Icon(
+                          Icons.add,
+                          color: Colors.white,
+                          size: 16.sp,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHorizontalCard() {
+    return Container(
+      width: 120.w,
+      margin: EdgeInsets.only(right: 12.w),
+      child: _buildVerticalCard(),
+    );
+  }
+
+  double _getNumericPrice() {
+    // Extract numeric value from price string (assumes format like "₹50" or "50")
+    final priceString = widget.product.price.replaceAll(RegExp(r'[^\d.]'), '');
+    return double.tryParse(priceString) ?? 0.0;
+  }
+}

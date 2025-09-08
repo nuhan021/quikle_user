@@ -360,14 +360,20 @@ class CategoryService {
         // Produce subcategories
         return fetchProduceSubcategories();
       } else if (parentSubcategoryId == 'grocery_cooking') {
-        // Cooking subcategories (placeholder for future implementation)
-        return [];
+        // Cooking subcategories
+        return fetchCookingSubcategories();
       } else if (parentSubcategoryId == 'grocery_meats') {
-        // Meats subcategories (placeholder for future implementation)
-        return [];
+        // Meats subcategories
+        return fetchMeatsSubcategories();
       } else if (parentSubcategoryId == 'grocery_oils') {
-        // Oils subcategories (placeholder for future implementation)
-        return [];
+        // Oils subcategories
+        return fetchOilsSubcategories();
+      } else if (parentSubcategoryId == 'grocery_dairy') {
+        // Dairy subcategories
+        return fetchDairySubcategories();
+      } else if (parentSubcategoryId == 'grocery_grains') {
+        // Grains subcategories
+        return fetchGrainsSubcategories();
       }
       // Add more subcategory handling for other grocery main categories as needed
       return [];
@@ -388,6 +394,196 @@ class CategoryService {
       return fetchCustomSubcategories();
     }
     return [];
+  }
+
+  // Cooking subcategories (second level - under Cooking)
+  Future<List<SubcategoryModel>> fetchCookingSubcategories() async {
+    return [
+      const SubcategoryModel(
+        id: 'cooking_spices',
+        title: 'Spices',
+        description: 'Herbs and spices',
+        iconPath: ImagePath.groceryIcon,
+        categoryId: '2',
+        parentSubcategoryId: 'grocery_cooking',
+      ),
+      const SubcategoryModel(
+        id: 'cooking_condiments',
+        title: 'Condiments',
+        description: 'Sauces and condiments',
+        iconPath: ImagePath.groceryIcon,
+        categoryId: '2',
+        parentSubcategoryId: 'grocery_cooking',
+      ),
+      const SubcategoryModel(
+        id: 'cooking_baking',
+        title: 'Baking',
+        description: 'Baking ingredients',
+        iconPath: ImagePath.groceryIcon,
+        categoryId: '2',
+        parentSubcategoryId: 'grocery_cooking',
+      ),
+      const SubcategoryModel(
+        id: 'cooking_canned',
+        title: 'Canned Foods',
+        description: 'Canned and preserved foods',
+        iconPath: ImagePath.groceryIcon,
+        categoryId: '2',
+        parentSubcategoryId: 'grocery_cooking',
+      ),
+    ];
+  }
+
+  // Meats subcategories (second level - under Meats)
+  Future<List<SubcategoryModel>> fetchMeatsSubcategories() async {
+    return [
+      const SubcategoryModel(
+        id: 'meats_chicken',
+        title: 'Chicken',
+        description: 'Fresh chicken and poultry',
+        iconPath: ImagePath.groceryIcon,
+        categoryId: '2',
+        parentSubcategoryId: 'grocery_meats',
+      ),
+      const SubcategoryModel(
+        id: 'meats_beef',
+        title: 'Beef',
+        description: 'Fresh beef cuts',
+        iconPath: ImagePath.groceryIcon,
+        categoryId: '2',
+        parentSubcategoryId: 'grocery_meats',
+      ),
+      const SubcategoryModel(
+        id: 'meats_fish',
+        title: 'Fish & Seafood',
+        description: 'Fresh fish and seafood',
+        iconPath: ImagePath.groceryIcon,
+        categoryId: '2',
+        parentSubcategoryId: 'grocery_meats',
+      ),
+      const SubcategoryModel(
+        id: 'meats_processed',
+        title: 'Processed Meats',
+        description: 'Sausages, bacon, and deli meats',
+        iconPath: ImagePath.groceryIcon,
+        categoryId: '2',
+        parentSubcategoryId: 'grocery_meats',
+      ),
+    ];
+  }
+
+  // Oils subcategories (second level - under Oils)
+  Future<List<SubcategoryModel>> fetchOilsSubcategories() async {
+    return [
+      const SubcategoryModel(
+        id: 'oils_cooking',
+        title: 'Cooking Oils',
+        description: 'Cooking and frying oils',
+        iconPath: ImagePath.groceryIcon,
+        categoryId: '2',
+        parentSubcategoryId: 'grocery_oils',
+      ),
+      const SubcategoryModel(
+        id: 'oils_olive',
+        title: 'Olive Oil',
+        description: 'Extra virgin and regular olive oil',
+        iconPath: ImagePath.groceryIcon,
+        categoryId: '2',
+        parentSubcategoryId: 'grocery_oils',
+      ),
+      const SubcategoryModel(
+        id: 'oils_specialty',
+        title: 'Specialty Oils',
+        description: 'Coconut, sesame, and other specialty oils',
+        iconPath: ImagePath.groceryIcon,
+        categoryId: '2',
+        parentSubcategoryId: 'grocery_oils',
+      ),
+      const SubcategoryModel(
+        id: 'oils_vinegar',
+        title: 'Vinegar',
+        description: 'Cooking vinegars and dressings',
+        iconPath: ImagePath.groceryIcon,
+        categoryId: '2',
+        parentSubcategoryId: 'grocery_oils',
+      ),
+    ];
+  }
+
+  // Dairy subcategories (second level - under Dairy)
+  Future<List<SubcategoryModel>> fetchDairySubcategories() async {
+    return [
+      const SubcategoryModel(
+        id: 'dairy_milk',
+        title: 'Milk',
+        description: 'Fresh milk and alternatives',
+        iconPath: ImagePath.groceryIcon,
+        categoryId: '2',
+        parentSubcategoryId: 'grocery_dairy',
+      ),
+      const SubcategoryModel(
+        id: 'dairy_cheese',
+        title: 'Cheese',
+        description: 'Various types of cheese',
+        iconPath: ImagePath.groceryIcon,
+        categoryId: '2',
+        parentSubcategoryId: 'grocery_dairy',
+      ),
+      const SubcategoryModel(
+        id: 'dairy_yogurt',
+        title: 'Yogurt',
+        description: 'Greek yogurt, regular yogurt',
+        iconPath: ImagePath.groceryIcon,
+        categoryId: '2',
+        parentSubcategoryId: 'grocery_dairy',
+      ),
+      const SubcategoryModel(
+        id: 'dairy_eggs',
+        title: 'Eggs',
+        description: 'Fresh eggs and egg products',
+        iconPath: ImagePath.groceryIcon,
+        categoryId: '2',
+        parentSubcategoryId: 'grocery_dairy',
+      ),
+    ];
+  }
+
+  // Grains subcategories (second level - under Grains)
+  Future<List<SubcategoryModel>> fetchGrainsSubcategories() async {
+    return [
+      const SubcategoryModel(
+        id: 'grains_rice',
+        title: 'Rice',
+        description: 'Basmati, jasmine, and other rice varieties',
+        iconPath: ImagePath.groceryIcon,
+        categoryId: '2',
+        parentSubcategoryId: 'grocery_grains',
+      ),
+      const SubcategoryModel(
+        id: 'grains_flour',
+        title: 'Flour',
+        description: 'Wheat, almond, and specialty flours',
+        iconPath: ImagePath.groceryIcon,
+        categoryId: '2',
+        parentSubcategoryId: 'grocery_grains',
+      ),
+      const SubcategoryModel(
+        id: 'grains_cereal',
+        title: 'Cereals',
+        description: 'Breakfast cereals and oats',
+        iconPath: ImagePath.groceryIcon,
+        categoryId: '2',
+        parentSubcategoryId: 'grocery_grains',
+      ),
+      const SubcategoryModel(
+        id: 'grains_pasta',
+        title: 'Pasta',
+        description: 'Dried pasta and noodles',
+        iconPath: ImagePath.groceryIcon,
+        categoryId: '2',
+        parentSubcategoryId: 'grocery_grains',
+      ),
+    ];
   }
 
   // Get products by subcategory

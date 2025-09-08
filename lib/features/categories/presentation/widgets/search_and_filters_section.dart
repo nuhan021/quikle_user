@@ -7,17 +7,21 @@ import 'package:quikle_user/core/utils/constants/enums.dart';
 import 'package:quikle_user/core/utils/constants/image_path.dart';
 
 class SearchAndFiltersSection extends StatelessWidget {
-  final VoidCallback? onSearchTap;
+  final Function(String)? onSearchChanged;
   final VoidCallback? onSortTap;
   final VoidCallback? onFilterTap;
   final VoidCallback? onVoiceTap;
+  final String searchHint;
+  final TextEditingController? searchController;
 
   const SearchAndFiltersSection({
     super.key,
-    this.onSearchTap,
+    this.onSearchChanged,
     this.onSortTap,
     this.onFilterTap,
     this.onVoiceTap,
+    this.searchHint = 'Search products...',
+    this.searchController,
   });
 
   @override
@@ -46,12 +50,24 @@ class SearchAndFiltersSection extends StatelessWidget {
                     children: [
                       SizedBox(width: 16.w),
                       Expanded(
-                        child: Text(
-                          'Search for "Biryani"',
+                        child: TextField(
+                          controller: searchController,
+                          onChanged: onSearchChanged,
+                          decoration: InputDecoration(
+                            hintText: searchHint,
+                            hintStyle: getTextStyle(
+                              font: CustomFonts.manrope,
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.featherGrey,
+                            ),
+                            border: InputBorder.none,
+                            enabledBorder: InputBorder.none,
+                            focusedBorder: InputBorder.none,
+                          ),
                           style: getTextStyle(
                             font: CustomFonts.manrope,
                             fontWeight: FontWeight.w500,
-                            color: AppColors.featherGrey,
+                            color: AppColors.ebonyBlack,
                           ),
                         ),
                       ),
@@ -88,7 +104,10 @@ class SearchAndFiltersSection extends StatelessWidget {
                     color: Colors.white,
                     size: 24,
                   ),
-                  onPressed: onSearchTap,
+                  onPressed: () {
+                    // Search functionality can be triggered here if needed
+                    // For now, the search is handled by onChanged in TextField
+                  },
                 ),
               ),
             ],
