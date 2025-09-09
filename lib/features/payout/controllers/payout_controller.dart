@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:quikle_user/features/orders/data/models/order_model.dart';
 import 'package:quikle_user/features/payout/presentation/widgets/order_success_dialog.dart';
 import '../data/models/delivery_option_model.dart';
 import '../data/models/payment_method_model.dart';
 import '../../profile/data/models/shipping_address_model.dart';
-import '../data/models/order_model.dart';
 import '../data/services/payout_service.dart';
 import '../../cart/controllers/cart_controller.dart';
 import '../../user/controllers/user_controller.dart';

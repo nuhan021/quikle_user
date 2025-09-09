@@ -1,4 +1,4 @@
-import '../../../../core/utils/constants/enums/order_enums.dart';
+import 'package:quikle_user/core/utils/constants/enums/address_type_enums.dart';
 
 class ShippingAddressModel {
   final String id;
