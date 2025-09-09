@@ -43,6 +43,7 @@ class HomeContentScreen extends StatelessWidget {
                           categories: controller.categories,
                           onCategoryTap: controller.onCategoryPressed,
                           selectedCategoryId: controller.selectedCategoryId,
+                          showTitle: true,
                         ),
 
                         const SizedBox(height: 24),

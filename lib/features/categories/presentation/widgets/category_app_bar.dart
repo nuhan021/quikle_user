@@ -9,12 +9,16 @@ class CategoryAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final VoidCallback? onNotificationTap;
   final VoidCallback? onProfileTap;
+  final VoidCallback? onBackTap;
+  final bool showBackButton;
 
   const CategoryAppBar({
     super.key,
     required this.title,
     this.onNotificationTap,
     this.onProfileTap,
+    this.onBackTap,
+    this.showBackButton = true,
   });
 
   @override
@@ -31,9 +35,20 @@ class CategoryAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
         ),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          padding: EdgeInsets.symmetric(
+            horizontal: showBackButton ? 8.w : 16.w,
+          ),
           child: Row(
             children: [
+              if (showBackButton)
+                IconButton(
+                  icon: Icon(
+                    Icons.arrow_back,
+                    color: Colors.black,
+                    size: 24.sp,
+                  ),
+                  onPressed: onBackTap ?? () => Navigator.pop(context),
+                ),
               Expanded(
                 child: Text(
                   title,
@@ -55,7 +70,6 @@ class CategoryAppBar extends StatelessWidget implements PreferredSizeWidget {
                     ),
                     onPressed: onNotificationTap,
                   ),
-                  //SizedBox(width: 2.w),
                   IconButton(
                     icon: Icon(
                       Iconsax.profile_circle,
@@ -74,5 +88,5 @@ class CategoryAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight); // Match HomeAppBar height
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }

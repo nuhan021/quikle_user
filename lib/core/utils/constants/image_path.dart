@@ -33,4 +33,5 @@ class ImagePath {
   static const String orderShipped = 'assets/icons/order_shipped.png';
 
   static const String map = 'assets/images/map.png';
+  static const String shopImage = 'assets/images/shopImage.png';
 }
