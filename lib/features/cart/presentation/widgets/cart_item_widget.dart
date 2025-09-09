@@ -20,7 +20,7 @@ class CartItemWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return UnifiedProductCard(
       product: cartItem.product,
-      onTap: () {}, // Cart items don't need onTap navigation
+      onTap: () {},
       onIncrease: onIncrease,
       onDecrease: onDecrease,
       onRemove: onRemove,

@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 import 'package:quikle_user/core/models/response_data.dart';
-import 'package:quikle_user/core/models/user_model.dart';
-import 'package:quikle_user/core/services/user_service.dart';
+import 'package:quikle_user/features/user/data/models/user_model.dart';
+import 'package:quikle_user/features/user/data/services/user_service.dart';
 
 class AuthService {
   late final UserService _userService;
@@ -10,22 +10,14 @@ class AuthService {
     _userService = Get.find<UserService>();
   }
 
-  // Getter for current user from UserService
   UserModel? get currentUser => _userService.currentUser;
   String get currentToken => _userService.token;
   bool get isLoggedIn => _userService.isLoggedIn;
 
   Future<ResponseData> login(String phone) async {
     try {
-      // TODO: Replace with actual API call
-      // final response = await _networkCaller.postRequest(
-      //   'your-api-base-url/auth/login',
-      //   body: {'phone': phone},
-      // );
-
       await Future<void>.delayed(const Duration(milliseconds: 500));
 
-      // Mock successful response using your ResponseData model
       final mockUser = UserModel(
         id: '1',
         name: 'User',
@@ -56,15 +48,8 @@ class AuthService {
 
   Future<ResponseData> register(String name, String phone) async {
     try {
-      // TODO: Replace with actual API call
-      // final response = await _networkCaller.postRequest(
-      //   'your-api-base-url/auth/register',
-      //   body: {'name': name, 'phone': phone},
-      // );
-
       await Future<void>.delayed(const Duration(milliseconds: 500));
 
-      // Mock successful response
       final mockUser = UserModel(
         id: '2',
         name: name,
@@ -95,15 +80,8 @@ class AuthService {
 
   Future<ResponseData> verifyOtp(String phone, String otp) async {
     try {
-      // TODO: Replace with actual API call
-      // final response = await _networkCaller.postRequest(
-      //   'your-api-base-url/auth/verify-otp',
-      //   body: {'phone': phone, 'otp': otp},
-      // );
-
       await Future<void>.delayed(const Duration(milliseconds: 500));
 
-      // Mock successful verification
       final mockUser = UserModel(
         id: '3',
         name: 'John Doe',
@@ -115,7 +93,6 @@ class AuthService {
 
       const mockToken = 'mock_jwt_token_here';
 
-      // Store user session in UserService
       await _userService.setUser(mockUser, mockToken);
 
       return ResponseData(
@@ -139,20 +116,11 @@ class AuthService {
   }
 
   Future<void> logout() async {
-    // TODO: Call API to invalidate token
-    // await _networkCaller.postRequest('your-api-base-url/auth/logout');
-
     await _userService.clearUser();
   }
 
   Future<ResponseData> resendOtp(String phone) async {
     try {
-      // TODO: Replace with actual API call
-      // final response = await _networkCaller.postRequest(
-      //   'your-api-base-url/auth/resend-otp',
-      //   body: {'phone': phone},
-      // );
-
       await Future<void>.delayed(const Duration(milliseconds: 500));
 
       return ResponseData(
@@ -171,29 +139,19 @@ class AuthService {
     }
   }
 
-  // Get user profile from API
   Future<ResponseData> getUserProfile() async {
     try {
-      // TODO: Replace with actual API call
-      // final response = await _networkCaller.getRequest(
-      //   'your-api-base-url/auth/profile',
-      //   token: currentToken,
-      // );
-
       await Future<void>.delayed(const Duration(milliseconds: 300));
 
-      // Mock user profile
       final mockUser = UserModel(
         id: currentUser?.id ?? '1',
         name: currentUser?.name ?? 'John Doe',
         phone: currentUser?.phone ?? '+1234567890',
-        email: 'john.doe@example.com',
         isVerified: true,
         createdAt: currentUser?.createdAt ?? DateTime.now(),
         updatedAt: DateTime.now(),
       );
 
-      // Update user in service
       _userService.updateUser(mockUser);
 
       return ResponseData(
@@ -216,23 +174,13 @@ class AuthService {
     }
   }
 
-  // Update user profile
   Future<ResponseData> updateProfile(Map<String, dynamic> data) async {
     try {
-      // TODO: Replace with actual API call
-      // final response = await _networkCaller.postRequest(
-      //   'your-api-base-url/auth/profile',
-      //   body: data,
-      //   token: currentToken,
-      // );
-
       await Future<void>.delayed(const Duration(milliseconds: 300));
 
-      // Mock updated user
       final updatedUser = currentUser?.copyWith(
         name: data['name'] ?? currentUser?.name,
-        email: data['email'] ?? currentUser?.email,
-        address: data['address'] ?? currentUser?.address,
+        phone: data['phone'] ?? currentUser?.phone,
         updatedAt: DateTime.now(),
       );
 

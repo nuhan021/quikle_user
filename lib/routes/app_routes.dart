@@ -12,6 +12,7 @@ import 'package:quikle_user/features/categories/presentation/screens/subcategory
 import 'package:quikle_user/features/categories/presentation/screens/main_category_products_screen.dart';
 import 'package:quikle_user/features/categories/presentation/screens/grocery_navigation_screen.dart';
 import 'package:quikle_user/features/categories/presentation/screens/unified_category_screen.dart';
+import 'package:quikle_user/features/payout/presentation/screens/checkout_screen.dart';
 import 'package:quikle_user/features/home/data/models/product_model.dart';
 
 class AppRoute {
@@ -29,6 +30,7 @@ class AppRoute {
   static const String _subcategoryProducts = '/subcategory-products';
   static const String _mainCategoryProducts = '/main-category-products';
   static const String _groceryNavigation = '/grocery-navigation';
+  static const String _checkout = '/checkout';
 
   static String getSplashScreen() => _splash;
   static String getLoginScreen() => _login;
@@ -44,6 +46,7 @@ class AppRoute {
   static String getSubcategoryProducts() => _subcategoryProducts;
   static String getMainCategoryProducts() => _mainCategoryProducts;
   static String getGroceryNavigation() => _groceryNavigation;
+  static String getCheckout() => _checkout;
 
   static final List<GetPage<dynamic>> routes = <GetPage>[
     GetPage(name: _splash, page: () => const SplashScreen()),
@@ -72,6 +75,7 @@ class AppRoute {
       name: _groceryNavigation,
       page: () => const GroceryNavigationScreen(),
     ),
+    GetPage(name: _checkout, page: () => const CheckoutScreen()),
 
     // GetPage(
     //   name: _home,

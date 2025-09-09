@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import 'package:quikle_user/core/common/widgets/cart_animation_overlay.dart';
 import 'package:quikle_user/core/common/widgets/floating_cart_button.dart';
 import 'package:quikle_user/core/common/styles/global_text_style.dart';
-import 'package:quikle_user/core/utils/constants/enums.dart';
+import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/features/cart/presentation/widgets/you_may_like_section.dart';
 import 'package:quikle_user/features/home/data/models/product_model.dart';
@@ -98,7 +98,6 @@ class ProductDetailsScreen extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Product Image
                             if (controller.product != null)
                               ProductImageWidget(
                                 imagePath: controller.product!.imagePath,
@@ -108,7 +107,6 @@ class ProductDetailsScreen extends StatelessWidget {
 
                             SizedBox(height: 24.h),
 
-                            // Product Info
                             if (controller.product != null)
                               ProductInfoWidget(
                                 title: controller.product!.title,
@@ -121,7 +119,6 @@ class ProductDetailsScreen extends StatelessWidget {
 
                             SizedBox(height: 16.h),
 
-                            // Store Info
                             if (controller.shop != null)
                               StoreInfoWidget(shop: controller.shop!),
 
@@ -132,7 +129,6 @@ class ProductDetailsScreen extends StatelessWidget {
                               description: controller.description,
                             ),
 
-                            // ========= Add to Cart (normal products) =========
                             SizedBox(height: 16.h),
                             if (!(controller.product?.isMedicine == true &&
                                 controller.product!.isOTC))
@@ -142,7 +138,6 @@ class ProductDetailsScreen extends StatelessWidget {
                                 onPressed: controller.onAddToCart,
                               ),
 
-                            // ========= OTC Medicine Section =========
                             if (controller.product?.isMedicine == true &&
                                 controller.product!.isOTC)
                               Column(
@@ -345,7 +340,6 @@ class ProductDetailsScreen extends StatelessWidget {
                                     ),
                                   ),
 
-                                  // Add to Cart under the OTC box
                                   SizedBox(height: 12.h),
                                   _buildAddToCartButton(
                                     enabled:
@@ -362,7 +356,6 @@ class ProductDetailsScreen extends StatelessWidget {
 
                             SizedBox(height: 24.h),
 
-                            // Reviews
                             ReviewsWidget(
                               rating: controller.product?.rating ?? 4.8,
                               reviews: controller.reviews,
@@ -373,7 +366,6 @@ class ProductDetailsScreen extends StatelessWidget {
 
                             SizedBox(height: 24.h),
 
-                            // Questions
                             QuestionsWidget(
                               questions: controller.questions,
                               onAskQuestion: controller.onAskQuestion,
@@ -381,8 +373,6 @@ class ProductDetailsScreen extends StatelessWidget {
                             ),
 
                             SizedBox(height: 24.h),
-
-                            // You may like
                             YouMayLikeSection(
                               onAddToCart: (p) =>
                                   controller.addToCartFromSimilar(p),
@@ -407,7 +397,6 @@ class ProductDetailsScreen extends StatelessWidget {
     );
   }
 
-  // ---------- Private helper: uniform CTA ----------
   Widget _buildAddToCartButton({
     required bool enabled,
     required VoidCallback? onPressed,

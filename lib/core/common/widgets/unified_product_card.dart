@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:quikle_user/core/common/styles/global_text_style.dart';
 import 'package:quikle_user/core/common/widgets/cart_animation_overlay.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
-import 'package:quikle_user/core/utils/constants/enums.dart';
+import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 import 'package:quikle_user/core/utils/constants/image_path.dart';
 import 'package:quikle_user/features/home/data/models/product_model.dart';
 import 'package:quikle_user/features/home/data/models/shop_model.dart';
@@ -188,7 +188,6 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
           ),
         ),
 
-        // OTC Label for medicines
         if (widget.product.isMedicine && widget.product.isOTC)
           Positioned(
             top: widget.variant == ProductCardVariant.youMayLike ? 8.h : 6.h,
@@ -215,7 +214,6 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
             ),
           ),
 
-        // Favorite icon
         if (widget.onFavoriteToggle != null)
           Positioned(
             top: 8.h,
@@ -226,12 +224,14 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
                 width: 20.w,
                 height: 20.w,
                 child: Center(
-                  child: Image.asset(
-                    ImagePath.favoriteIcon,
-                    fit: BoxFit.cover,
+                  child: Icon(
+                    widget.product.isFavorite
+                        ? Icons.favorite
+                        : Icons.favorite_border,
+                    size: 20.sp,
                     color: widget.product.isFavorite
                         ? Colors.red
-                        : AppColors.ebonyBlack.withValues(alpha: 0.6),
+                        : Colors.black54,
                   ),
                 ),
               ),
@@ -284,7 +284,6 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
 
         const Spacer(),
 
-        // Price and Add to Cart
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [

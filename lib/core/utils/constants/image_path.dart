@@ -22,4 +22,6 @@ class ImagePath {
   static const String emptyCart = 'assets/icons/empty_cart.png';
   static const String lockIcon = 'assets/icons/lock.png';
   static const String homeIcon = 'assets/icons/home.png';
+  static const String checkIcon = 'assets/icons/check.png';
+  static const String dangerIcon = 'assets/icons/dangerIcon.png';
 }

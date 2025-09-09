@@ -5,7 +5,7 @@ import 'package:quikle_user/core/common/styles/global_text_style.dart';
 import 'package:quikle_user/core/common/widgets/cart_animation_overlay.dart';
 import 'package:quikle_user/core/common/widgets/floating_cart_button.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
-import 'package:quikle_user/core/utils/constants/enums.dart';
+import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 import 'package:quikle_user/core/utils/constants/image_path.dart';
 import 'package:quikle_user/features/categories/controllers/main_category_products_controller.dart';
 
