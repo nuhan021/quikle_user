@@ -8,5 +8,3 @@ enum OrderStatus {
   cancelled,
   refunded,
 }
-
-enum AddressType { home, office, other }
