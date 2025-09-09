@@ -79,7 +79,6 @@ class VerificationController extends GetxController {
         final response = await _auth.verifyOtp(phone, code);
 
         if (response.isSuccess) {
-          // Extract message from response data
           String message = 'Phone number verified successfully';
           if (response.responseData != null &&
               response.responseData['message'] != null) {
@@ -90,11 +89,9 @@ class VerificationController extends GetxController {
             'Success',
             message,
             snackPosition: SnackPosition.TOP,
-            backgroundColor: Colors.green.withOpacity(0.1),
+            backgroundColor: Colors.green.withValues(alpha: 0.1),
             colorText: Colors.green,
           );
-
-          // Navigate to welcome or home screen
           Get.offAllNamed(AppRoute.getWelcome());
         } else {
           errorMessage.value = response.errorMessage;
@@ -102,7 +99,7 @@ class VerificationController extends GetxController {
             'Error',
             response.errorMessage,
             snackPosition: SnackPosition.TOP,
-            backgroundColor: Colors.red.withOpacity(0.1),
+            backgroundColor: Colors.red.withValues(alpha: 0.1),
             colorText: Colors.red,
           );
         }
@@ -112,7 +109,7 @@ class VerificationController extends GetxController {
           'Error',
           'Something went wrong. Please try again.',
           snackPosition: SnackPosition.TOP,
-          backgroundColor: Colors.red.withOpacity(0.1),
+          backgroundColor: Colors.red.withValues(alpha: 0.1),
           colorText: Colors.red,
         );
       } finally {
@@ -128,7 +125,7 @@ class VerificationController extends GetxController {
         'Validation Error',
         'Please enter complete 6-digit OTP',
         snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.orange.withOpacity(0.1),
+        backgroundColor: Colors.orange.withValues(alpha: 0.1),
         colorText: Colors.orange,
       );
       return false;
@@ -144,7 +141,6 @@ class VerificationController extends GetxController {
       final response = await _auth.resendOtp(phone);
 
       if (response.isSuccess) {
-        // Extract message from response data
         String message = 'OTP resent successfully';
         if (response.responseData != null &&
             response.responseData['message'] != null) {
@@ -155,7 +151,7 @@ class VerificationController extends GetxController {
           'Success',
           message,
           snackPosition: SnackPosition.TOP,
-          backgroundColor: Colors.green.withOpacity(0.1),
+          backgroundColor: Colors.green.withValues(alpha: 0.1),
           colorText: Colors.green,
         );
         _startTimer();
@@ -164,7 +160,7 @@ class VerificationController extends GetxController {
           'Error',
           response.errorMessage,
           snackPosition: SnackPosition.TOP,
-          backgroundColor: Colors.red.withOpacity(0.1),
+          backgroundColor: Colors.red.withValues(alpha: 0.1),
           colorText: Colors.red,
         );
       }
@@ -173,7 +169,7 @@ class VerificationController extends GetxController {
         'Error',
         'Failed to resend OTP. Please try again.',
         snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.red.withOpacity(0.1),
+        backgroundColor: Colors.red.withValues(alpha: 0.1),
         colorText: Colors.red,
       );
     }
