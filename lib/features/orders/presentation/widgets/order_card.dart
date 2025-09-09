@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:quikle_user/core/common/styles/global_text_style.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 import 'package:quikle_user/core/utils/constants/enums/order_enums.dart';
 import 'package:quikle_user/features/orders/data/models/order_model.dart';
+import 'package:quikle_user/features/orders/presentation/screens/order_tracking_screen.dart';
 import 'package:quikle_user/features/orders/presentation/widgets/order_item_widget.dart';
 import 'package:quikle_user/features/orders/presentation/widgets/order_status_helpers.dart';
 
@@ -17,6 +19,20 @@ class OrderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final now = DateTime.now();
+    final difference = order.estimatedDelivery?.difference(now);
+    String estimatedDeliveryTime = '';
+
+    if (order.status == OrderStatus.delivered) {
+      estimatedDeliveryTime = 'Delivered';
+    } else if (order.status == OrderStatus.cancelled) {
+      estimatedDeliveryTime = 'Delivery Cancelled';
+    } else if (difference != null && difference.inMinutes > 0) {
+      estimatedDeliveryTime = '${difference.inMinutes} mins';
+    } else if (difference != null && difference.inMinutes <= 0) {
+      estimatedDeliveryTime = 'Delivery time passed';
+    }
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -27,7 +43,7 @@ class OrderCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(12.r),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.08),
+              color: Colors.black.withOpacity(0.08),
               blurRadius: 8.r,
               offset: Offset(0, 4.h),
             ),
@@ -75,14 +91,13 @@ class OrderCard extends StatelessWidget {
                 ),
               ],
             ),
-
             SizedBox(height: 12.h),
             if (order.estimatedDelivery != null) ...[
               RichText(
                 text: TextSpan(
                   children: [
                     TextSpan(
-                      text: 'Estimated Delivery Time : ',
+                      text: 'Estimated Delivery Time: ',
                       style: getTextStyle(
                         font: CustomFonts.inter,
                         fontSize: 14.sp,
@@ -91,7 +106,7 @@ class OrderCard extends StatelessWidget {
                       ),
                     ),
                     TextSpan(
-                      text: '30-45 minutes',
+                      text: estimatedDeliveryTime,
                       style: getTextStyle(
                         font: CustomFonts.inter,
                         fontSize: 14.sp,
@@ -102,8 +117,8 @@ class OrderCard extends StatelessWidget {
                   ],
                 ),
               ),
-              SizedBox(height: 12.h),
             ],
+            SizedBox(height: 8.h),
             Container(height: 1.h, color: const Color(0xFFEEEEEE)),
             SizedBox(height: 12.h),
             Text(
@@ -119,7 +134,6 @@ class OrderCard extends StatelessWidget {
             Container(height: 1.h, color: const Color(0xFFEEEEEE)),
             SizedBox(height: 12.h),
             ...order.items.map((item) => OrderItemWidget(item: item)),
-
             SizedBox(height: 12.h),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -151,8 +165,7 @@ class OrderCard extends StatelessWidget {
                 height: 50.h,
                 child: ElevatedButton(
                   onPressed: () {
-                    // TODO: Navigate to order tracking page
-                    print('Track order: ${order.orderId}');
+                    Get.to(() => OrderTrackingScreen(order: order));
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.ebonyBlack,
