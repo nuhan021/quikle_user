@@ -31,4 +31,6 @@ class ImagePath {
   static const String orderCancelled = 'assets/icons/cancelled.png';
   static const String orderConfirmed = 'assets/icons/ordered.png';
   static const String orderShipped = 'assets/icons/order_shipped.png';
+
+  static const String map = 'assets/images/map.png';
 }
