@@ -4,7 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:quikle_user/core/common/styles/global_text_style.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
-import 'package:quikle_user/core/utils/constants/enums.dart';
+import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 import 'package:quikle_user/core/utils/constants/image_path.dart';
 import 'package:quikle_user/features/auth/controllers/verification_controller.dart';
 
@@ -322,14 +322,6 @@ class VerificationScreen extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  String _maskPhone(String phone) {
-    // simple: show last 4, mask rest
-    final p = phone.replaceAll(RegExp(r'\s'), '');
-    if (p.length <= 4) return phone;
-    final last = p.substring(p.length - 4);
-    return '•••• •••• $last';
   }
 }
 

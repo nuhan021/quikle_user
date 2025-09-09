@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:quikle_user/core/common/styles/global_text_style.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
-import 'package:quikle_user/core/utils/constants/enums.dart';
+import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 import 'package:quikle_user/features/home/data/models/shop_model.dart';
 
 class StoreInfoWidget extends StatelessWidget {
@@ -40,29 +40,27 @@ class StoreInfoWidget extends StatelessWidget {
                   shop.deliveryTime,
                   style: getTextStyle(
                     font: CustomFonts.inter,
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w400,
-                    color: AppColors.ebonyBlack,
+                    color: AppColors.featherGrey,
                   ),
                 ),
               ],
             ),
           ),
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-            decoration: BoxDecoration(
-              color: shop.isOpen ? Colors.green : Colors.red,
-              borderRadius: BorderRadius.circular(6.r),
-            ),
-            child: Text(
-              shop.isOpen ? 'Open' : 'Closed',
-              style: TextStyle(
-                fontSize: 10.sp,
-                fontWeight: FontWeight.w500,
-                color: Colors.white,
-              ),
-            ),
-          ),
+          // Container(
+          //   padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+          //   decoration: BoxDecoration(
+          //     color: shop.isOpen ? Colors.green : Colors.red,
+          //     borderRadius: BorderRadius.circular(6.r),
+          //   ),
+          //   child: Text(
+          //     shop.isOpen ? 'Open' : 'Closed',
+          //     style: TextStyle(
+          //       fontSize: 10.sp,
+          //       fontWeight: FontWeight.w500,
+          //       color: Colors.white,
+          //     ),
+          //   ),
+          // ),
         ],
       ),
     );

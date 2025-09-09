@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:quikle_user/core/common/styles/global_text_style.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
-import 'package:quikle_user/core/utils/constants/enums.dart';
+import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 import '../../../data/models/product_model.dart';
 import 'product_item.dart';
 
@@ -34,13 +34,12 @@ class ProductSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ===== Header with ONLY bottom border =====
           Container(
             width: double.infinity,
             padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 12.w),
             decoration: const BoxDecoration(
               border: Border(
-                bottom: BorderSide(width: 1, color: Color(0xFFEDEDED)),
+                bottom: BorderSide(width: 3, color: Color(0xFFEDEDED)),
               ),
             ),
             child: Row(
@@ -80,7 +79,6 @@ class ProductSection extends StatelessWidget {
 
           SizedBox(height: 16.h),
 
-          // ===== Grid of products =====
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -88,7 +86,7 @@ class ProductSection extends StatelessWidget {
               crossAxisCount: 3,
               crossAxisSpacing: 12.w,
               mainAxisSpacing: 12.h,
-              childAspectRatio: 0.68,
+              childAspectRatio: 0.60.h,
             ),
             itemCount: math.min(section.products.length, 6),
             itemBuilder: (context, index) {

@@ -63,19 +63,43 @@ class ProductService {
 
   // Mock shop information - now gets the actual shop data
   ShopModel getShopInfo(ProductModel product) {
-    return ShopModel(
-      id: product.shopId,
-      name: 'Tandoori Tarang',
-      deliveryTime: 'Delivery in 30-35 min',
-      image: ImagePath.profileIcon,
-      rating: 4.8,
-      address: '123 Food Street, City',
-      isOpen: true,
-    );
+    // Define all available shops
+    final shops = {
+      'shop_1': ShopModel(
+        id: 'shop_1',
+        name: 'Tandoori Tarang',
+        deliveryTime: '30-35 min',
+        image: ImagePath.profileIcon,
+        rating: 4.8,
+        address: '123 Food Street, City',
+        isOpen: true,
+      ),
+      'shop_2': ShopModel(
+        id: 'shop_2',
+        name: 'Fresh Market',
+        deliveryTime: '25-30 min',
+        image: ImagePath.profileIcon,
+        rating: 4.6,
+        address: '456 Market Lane, City',
+        isOpen: true,
+      ),
+      'shop_3': ShopModel(
+        id: 'shop_3',
+        name: 'Health Plus Pharmacy',
+        deliveryTime: '15-20 min',
+        image: ImagePath.profileIcon,
+        rating: 4.9,
+        address: '789 Health Ave, City',
+        isOpen: true,
+      ),
+    };
+
+    // Return the correct shop based on product's shopId
+    return shops[product.shopId] ?? shops['shop_1']!;
   }
 
   String getProductDescription(ProductModel product) {
-    return 'Fresh organic avocados sourced directly from local farms. Rich in healthy fats, perfect for salads, smoothies, or enjoying as a spread. These avocados sourced directly from local farms. Rich in nutrients and perfect for a healthy diet.';
+    return product.description;
   }
 
   Map<String, dynamic> getRatingDistribution(ProductModel product) {

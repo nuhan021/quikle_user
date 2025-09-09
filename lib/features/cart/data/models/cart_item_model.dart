@@ -13,6 +13,13 @@ class CartItemModel {
     );
   }
 
+  String get quantityDisplay {
+    if (product.weight != null && product.weight!.isNotEmpty) {
+      return '$quantity ${product.weight}';
+    }
+    return '$quantity ${quantity == 1 ? 'unit' : 'units'}';
+  }
+
   double get totalPrice {
     final priceString = product.price.replaceAll(RegExp(r'[^\d.]'), '');
     final price = double.tryParse(priceString) ?? 0.0;

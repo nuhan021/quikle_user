@@ -3,6 +3,7 @@ class ImagePath {
   static const String verifyIcon = 'assets/icons/verify.png';
   static const String categoryIcon = 'assets/icons/category.png';
   static const String profileIcon = 'assets/icons/profileImage.png';
+  static const String profile = 'assets/icons/profile.png';
   static const String locationIcon = 'assets/icons/location.png';
   static const String walletIcon = 'assets/icons/wallet.png';
   static const String voiceIcon = 'assets/icons/voice_icon.png';
@@ -11,7 +12,7 @@ class ImagePath {
   static const String groceryIcon = 'assets/icons/groceries.png';
   static const String medicineIcon = 'assets/icons/medicine.png';
   static const String cleaningIcon = 'assets/icons/cleaningIcon.png';
-  static const String personalcareIcon = 'assets/icons/personalCareIcon.png';
+  static const String personalCareIcon = 'assets/icons/personalCareIcon.png';
   static const String petSuppliesIcon = 'assets/icons/petsuppliesIcon.png';
   static const String customIcon = 'assets/icons/customIcon.png';
   static const String cartIcon = 'assets/icons/add_cart.png';
@@ -21,4 +22,6 @@ class ImagePath {
   static const String emptyCart = 'assets/icons/empty_cart.png';
   static const String lockIcon = 'assets/icons/lock.png';
   static const String homeIcon = 'assets/icons/home.png';
+  static const String checkIcon = 'assets/icons/check.png';
+  static const String dangerIcon = 'assets/icons/dangerIcon.png';
 }

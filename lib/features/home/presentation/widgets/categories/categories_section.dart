@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quikle_user/core/common/styles/global_text_style.dart';
-import 'package:quikle_user/core/utils/constants/enums.dart';
+import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 import '../../../data/models/category_model.dart';
 import 'category_item.dart';
 

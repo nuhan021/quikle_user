@@ -73,9 +73,11 @@ class CartController extends GetxController {
 
   void onCheckout() {
     if (hasItems) {
+      Get.toNamed('/checkout');
+    } else {
       Get.snackbar(
-        'Checkout',
-        'Proceeding to checkout with ${totalItems} items.',
+        'Empty Cart',
+        'Please add items to cart before checkout.',
         duration: const Duration(seconds: 2),
       );
     }

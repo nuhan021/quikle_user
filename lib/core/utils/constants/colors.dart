@@ -56,7 +56,7 @@ class AppColors {
   // Utility Colors
   static const Color success = Color(0xFF4CAF50); // Green for success messages
   static const Color warning = Color(0xFFFFA726); // Orange for warnings
-  static const Color error = Color(0xFFF44336); // Red for error messages
+  static const Color error = Color(0xFFF44336);
   static const Color info = Color(
     0xFF29B6F6,
   ); // Blue for informational messages
@@ -79,4 +79,7 @@ class AppColors {
   //Cart screen colors
   static const Color freeGiftCard = Color(0xFFB1B1B1);
   static const Color freeColor = Color(0xFF06BC4C);
+
+  //Otc label color
+  static const Color otcLabelColor = Color(0xFFFF0000);
 }

@@ -3,8 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:quikle_user/core/common/styles/global_text_style.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
-import 'package:quikle_user/core/utils/constants/enums.dart';
-import 'package:quikle_user/core/utils/constants/image_path.dart';
+import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 
 import '../../controllers/cart_controller.dart';
 
@@ -16,7 +15,7 @@ class CartItemsSection extends StatelessWidget {
     final cartController = Get.find<CartController>();
 
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 16.w),
+      //margin: EdgeInsets.symmetric(horizontal: 16.w),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12.r),
