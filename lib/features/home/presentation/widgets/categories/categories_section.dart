@@ -8,12 +8,14 @@ class CategoriesSection extends StatelessWidget {
   final List<CategoryModel> categories;
   final Function(CategoryModel) onCategoryTap;
   final String selectedCategoryId;
+  final bool showTitle;
 
   const CategoriesSection({
     super.key,
     required this.categories,
     required this.onCategoryTap,
     this.selectedCategoryId = '0',
+    this.showTitle = true,
   });
 
   @override
@@ -21,19 +23,21 @@ class CategoriesSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Text(
-            'All Categories',
-            style: getTextStyle(
-              font: CustomFonts.obviously,
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-              color: Colors.black,
+        if (showTitle) ...[
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Text(
+              'All Categories',
+              style: getTextStyle(
+                font: CustomFonts.obviously,
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: Colors.black,
+              ),
             ),
           ),
-        ),
-        const SizedBox(height: 16),
+          const SizedBox(height: 16),
+        ],
         Container(
           width: double.infinity,
           padding: const EdgeInsets.symmetric(vertical: 16),

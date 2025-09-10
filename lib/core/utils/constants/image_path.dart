@@ -24,4 +24,14 @@ class ImagePath {
   static const String homeIcon = 'assets/icons/home.png';
   static const String checkIcon = 'assets/icons/check.png';
   static const String dangerIcon = 'assets/icons/dangerIcon.png';
+
+  //Order status type icon
+  static const String orderPending = 'assets/icons/pending.png';
+  static const String orderedDelivered = 'assets/icons/delivered.png';
+  static const String orderCancelled = 'assets/icons/cancelled.png';
+  static const String orderConfirmed = 'assets/icons/ordered.png';
+  static const String orderShipped = 'assets/icons/order_shipped.png';
+
+  static const String map = 'assets/images/map.png';
+  static const String shopImage = 'assets/images/shopImage.png';
 }

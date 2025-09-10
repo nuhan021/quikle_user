@@ -1,8 +1,8 @@
-import '../../../cart/data/models/cart_item_model.dart';
-import '../../../profile/data/models/shipping_address_model.dart';
-import '../../../../core/utils/constants/enums/order_enums.dart';
-import 'delivery_option_model.dart';
-import 'payment_method_model.dart';
+import 'package:quikle_user/core/utils/constants/enums/order_enums.dart';
+import 'package:quikle_user/features/cart/data/models/cart_item_model.dart';
+import 'package:quikle_user/features/payout/data/models/delivery_option_model.dart';
+import 'package:quikle_user/features/payout/data/models/payment_method_model.dart';
+import 'package:quikle_user/features/profile/data/models/shipping_address_model.dart';
 
 class OrderModel {
   final String orderId;
@@ -97,7 +97,7 @@ class OrderModel {
   String get statusDisplayName {
     switch (status) {
       case OrderStatus.pending:
-        return 'Order Placed';
+        return 'Pending';
       case OrderStatus.processing:
         return 'Processing';
       case OrderStatus.confirmed:
