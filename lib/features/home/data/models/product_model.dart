@@ -13,6 +13,7 @@ class ProductModel {
   final String? weight;
   final bool isOTC;
   final bool hasPrescriptionUploaded;
+  final String? productType; // appetizer, main_course, dessert, beverage, etc.
 
   const ProductModel({
     required this.id,
@@ -29,6 +30,7 @@ class ProductModel {
     this.weight,
     this.isOTC = false,
     this.hasPrescriptionUploaded = false,
+    this.productType,
   });
   ProductModel copyWith({
     String? id,
@@ -45,6 +47,7 @@ class ProductModel {
     String? weight,
     bool? isOTC,
     bool? hasPrescriptionUploaded,
+    String? productType,
   }) {
     return ProductModel(
       id: id ?? this.id,
@@ -62,6 +65,7 @@ class ProductModel {
       isOTC: isOTC ?? this.isOTC,
       hasPrescriptionUploaded:
           hasPrescriptionUploaded ?? this.hasPrescriptionUploaded,
+      productType: productType ?? this.productType,
     );
   }
 
@@ -80,7 +84,8 @@ class ProductModel {
         other.rating == rating &&
         other.weight == weight &&
         other.isOTC == isOTC &&
-        other.hasPrescriptionUploaded == hasPrescriptionUploaded;
+        other.hasPrescriptionUploaded == hasPrescriptionUploaded &&
+        other.productType == productType;
   }
 
   @override
@@ -96,7 +101,8 @@ class ProductModel {
         rating.hashCode ^
         weight.hashCode ^
         isOTC.hashCode ^
-        hasPrescriptionUploaded.hashCode;
+        hasPrescriptionUploaded.hashCode ^
+        productType.hashCode;
   }
 
   // Helper methods

@@ -8,28 +8,23 @@ import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 import 'package:quikle_user/core/utils/constants/image_path.dart';
 import 'package:quikle_user/features/home/data/models/product_model.dart';
 import 'package:quikle_user/features/home/data/models/shop_model.dart';
+import 'package:quikle_user/features/profile/controllers/favorites_controller.dart';
 
-enum ProductCardVariant {
-  home, // Home screen grid
-  category, // Category screen grid
-  youMayLike, // You may like section
-  cart, // Cart item (horizontal layout)
-  horizontal, // Horizontal list view
-}
+enum ProductCardVariant { home, category, youMayLike, cart, horizontal }
 
 class UnifiedProductCard extends StatefulWidget {
   final ProductModel product;
   final VoidCallback onTap;
   final VoidCallback? onAddToCart;
   final VoidCallback? onFavoriteToggle;
-  final VoidCallback? onRemove; // For cart items
-  final VoidCallback? onIncrease; // For cart items
-  final VoidCallback? onDecrease; // For cart items
+  final VoidCallback? onRemove;
+  final VoidCallback? onIncrease;
+  final VoidCallback? onDecrease;
   final ProductCardVariant variant;
   final bool isGroceryCategory;
   final ShopModel? shop;
-  final int? quantity; // For cart items
-  final bool enableCartAnimation; // Enable cart animation
+  final int? quantity;
+  final bool enableCartAnimation;
 
   const UnifiedProductCard({
     super.key,
@@ -57,17 +52,12 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
 
   void _handleAddToCart() {
     if (widget.onAddToCart != null) {
-      // Trigger cart animation if enabled
       if (widget.enableCartAnimation) {
         try {
           Get.find<CartAnimationController>();
           _triggerCartAnimation();
-        } catch (e) {
-          // Cart animation controller not found, just proceed with normal add to cart
-        }
+        } catch (e) {}
       }
-
-      // Call the original onAddToCart callback
       widget.onAddToCart!();
     }
   }
@@ -103,6 +93,13 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
     );
   }
 
+  double _cardAspectRatio(BuildContext context) {
+    final h = MediaQuery.of(context).size.height;
+    if (h >= 900) return 0.75;
+    if (h >= 780) return 0.70;
+    return 0.65;
+  }
+
   @override
   Widget build(BuildContext context) {
     switch (widget.variant) {
@@ -118,36 +115,42 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
   Widget _buildVerticalCard() {
     return GestureDetector(
       onTap: widget.onTap,
-      child: Container(
-        decoration: ShapeDecoration(
-          color: AppColors.textWhite,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(
-              widget.variant == ProductCardVariant.youMayLike ? 12.r : 8.r,
+      child: AspectRatio(
+        aspectRatio: _cardAspectRatio(context),
+        child: Container(
+          decoration: ShapeDecoration(
+            color: AppColors.textWhite,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(
+                widget.variant == ProductCardVariant.youMayLike ? 12.r : 8.r,
+              ),
             ),
+            shadows: [
+              BoxShadow(
+                color: AppColors.cardColor,
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+                spreadRadius: 0,
+              ),
+            ],
           ),
-          shadows: [
-            BoxShadow(
-              color: AppColors.cardColor,
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-              spreadRadius: 0,
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildImageSection(),
-            Expanded(
-              child: Padding(
-                padding: EdgeInsets.all(
+          child: Column(
+            //mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _buildImageSection(),
+              Padding(
+                padding: EdgeInsets.fromLTRB(
                   widget.variant == ProductCardVariant.youMayLike ? 12.sp : 8.w,
+                  widget.variant == ProductCardVariant.youMayLike ? 12.sp : 8.w,
+                  widget.variant == ProductCardVariant.youMayLike ? 12.sp : 8.w,
+                  6.w, // tighter bottom padding
                 ),
                 child: _buildProductInfo(),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -182,7 +185,7 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
               widget.product.imagePath,
               width: imageSize,
               height: imageSize,
-              fit: BoxFit.contain,
+              fit: BoxFit.cover,
               filterQuality: FilterQuality.high,
             ),
           ),
@@ -224,15 +227,16 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
                 width: 20.w,
                 height: 20.w,
                 child: Center(
-                  child: Icon(
-                    widget.product.isFavorite
-                        ? Icons.favorite
-                        : Icons.favorite_border,
-                    size: 20.sp,
-                    color: widget.product.isFavorite
-                        ? Colors.red
-                        : Colors.black54,
-                  ),
+                  child: Obx(() {
+                    final isFavorite = FavoritesController.isProductFavorite(
+                      widget.product.id,
+                    );
+                    return Icon(
+                      isFavorite ? Icons.favorite : Icons.favorite_border,
+                      size: 20.sp,
+                      color: isFavorite ? Colors.red : Colors.black54,
+                    );
+                  }),
                 ),
               ),
             ),
@@ -244,9 +248,8 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
   Widget _buildProductInfo() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.start,
+      mainAxisSize: MainAxisSize.max,
       children: [
-        // Product title
         Text(
           widget.product.title,
           style: getTextStyle(
@@ -281,9 +284,7 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
             ],
           ),
         ],
-
-        const Spacer(),
-
+        SizedBox(height: 6.h),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -304,7 +305,7 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
             ),
             if (widget.onAddToCart != null)
               GestureDetector(
-                key: _cartButtonKey, // Add GlobalKey for animation
+                key: _cartButtonKey,
                 onTap: widget.product.canAddToCart ? _handleAddToCart : null,
                 child: Container(
                   width: widget.variant == ProductCardVariant.youMayLike
@@ -397,7 +398,6 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
       ),
       child: Row(
         children: [
-          // Product Image
           GestureDetector(
             onTap: widget.onTap,
             child: Container(
@@ -418,8 +418,6 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
             ),
           ),
           SizedBox(width: 12.w),
-
-          // Product Details
           Expanded(
             child: GestureDetector(
               onTap: widget.onTap,
@@ -461,8 +459,6 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
               ),
             ),
           ),
-
-          // Quantity Controls
           if (widget.onIncrease != null &&
               widget.onDecrease != null &&
               widget.onRemove != null)
@@ -544,7 +540,6 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
   }
 
   double _getNumericPrice() {
-    // Extract numeric value from price string (assumes format like "₹50" or "50")
     final priceString = widget.product.price.replaceAll(RegExp(r'[^\d.]'), '');
     return double.tryParse(priceString) ?? 0.0;
   }

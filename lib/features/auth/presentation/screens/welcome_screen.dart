@@ -20,7 +20,7 @@ class WelcomeScreen extends StatelessWidget {
         statusBarIconBrightness: Brightness.light,
       ),
       child: Scaffold(
-        backgroundColor: Colors.transparent,
+        backgroundColor: AppColors.ebonyBlack,
         body: Center(
           child: SizedBox(
             width: 392.w,

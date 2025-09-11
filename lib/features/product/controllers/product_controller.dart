@@ -1,7 +1,9 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:quikle_user/features/cart/controllers/cart_controller.dart';
 import 'package:quikle_user/features/home/data/models/product_model.dart';
 import 'package:quikle_user/features/home/data/models/shop_model.dart';
+import 'package:quikle_user/features/profile/controllers/favorites_controller.dart';
 import '../data/models/review_model.dart';
 import '../data/models/question_model.dart';
 import '../data/services/product_service.dart';
@@ -18,6 +20,11 @@ class ProductController extends GetxController {
   final _description = ''.obs;
   final _ratingDistribution = <String, dynamic>{}.obs;
 
+  // Controllers for user input
+  final reviewController = TextEditingController();
+  final questionController = TextEditingController();
+  final _userRating = 5.0.obs;
+
   // Getters
   bool get isLoading => _isLoading.value;
   ProductModel? get product => _product.value;
@@ -26,6 +33,7 @@ class ProductController extends GetxController {
   ShopModel? get shop => _shop.value;
   String get description => _description.value;
   Map<String, dynamic> get ratingDistribution => _ratingDistribution;
+  double get userRating => _userRating.value;
 
   @override
   void onInit() {
@@ -33,13 +41,30 @@ class ProductController extends GetxController {
     _cartController = Get.find<CartController>();
   }
 
+  @override
+  void onClose() {
+    reviewController.dispose();
+    questionController.dispose();
+    super.onClose();
+  }
+
+  void setUserRating(double rating) {
+    _userRating.value = rating;
+  }
+
   void loadProductDetails(ProductModel productModel) {
     _isLoading.value = true;
 
     try {
       _product.value = productModel;
-      _reviews.value = _productService.getProductReviews(productModel);
-      _questions.value = _productService.getProductQuestions(productModel);
+
+      // Clear and populate lists to maintain reactivity
+      _reviews.clear();
+      _reviews.addAll(_productService.getProductReviews(productModel));
+
+      _questions.clear();
+      _questions.addAll(_productService.getProductQuestions(productModel));
+
       _shop.value = _productService.getShopInfo(productModel);
       _description.value = _productService.getProductDescription(productModel);
       _ratingDistribution.value = _productService.getRatingDistribution(
@@ -105,16 +130,23 @@ class ProductController extends GetxController {
 
   void onFavoriteToggle() {
     if (_product.value != null) {
-      final updatedProduct = _product.value!.copyWith(
-        isFavorite: !_product.value!.isFavorite,
+      // Update global favorites
+      if (FavoritesController.isProductFavorite(_product.value!.id)) {
+        FavoritesController.removeFromGlobalFavorites(_product.value!.id);
+      } else {
+        FavoritesController.addToGlobalFavorites(_product.value!.id);
+      }
+
+      // Update local product to reflect the change
+      final isFavorite = FavoritesController.isProductFavorite(
+        _product.value!.id,
       );
+      final updatedProduct = _product.value!.copyWith(isFavorite: isFavorite);
       _product.value = updatedProduct;
 
       Get.snackbar(
-        updatedProduct.isFavorite
-            ? 'Added to Favorites'
-            : 'Removed from Favorites',
-        updatedProduct.isFavorite
+        isFavorite ? 'Added to Favorites' : 'Removed from Favorites',
+        isFavorite
             ? '${updatedProduct.title} has been added to your favorites.'
             : '${updatedProduct.title} has been removed from your favorites.',
         duration: const Duration(seconds: 2),
@@ -127,19 +159,80 @@ class ProductController extends GetxController {
   }
 
   void onWriteReview() {
-    // Handle write review action
+    if (reviewController.text.trim().isEmpty) {
+      Get.snackbar(
+        'Error',
+        'Please write a review before submitting',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        duration: const Duration(seconds: 2),
+      );
+      return;
+    }
+
+    // Create new review
+    final newReview = ReviewModel(
+      id: 'review_${DateTime.now().millisecondsSinceEpoch}',
+      productId: _product.value?.id ?? '',
+      userId: 'current_user',
+      userName: 'You',
+      userImage: 'assets/icons/profile.png',
+      rating: _userRating.value,
+      comment: reviewController.text.trim(),
+      date: DateTime.now(),
+    );
+
+    // Add to the beginning of the list
+    _reviews.insert(0, newReview);
+
+    // Clear the input
+    reviewController.clear();
+    _userRating.value = 5.0;
+
     Get.snackbar(
-      'Write Review',
-      'Review functionality will be implemented',
+      'Review Added',
+      'Your review has been added successfully!',
+      backgroundColor: Colors.green,
+      colorText: Colors.white,
       duration: const Duration(seconds: 2),
     );
   }
 
   void onAskQuestion() {
-    // Handle ask question action
+    if (questionController.text.trim().isEmpty) {
+      Get.snackbar(
+        'Error',
+        'Please write a question before submitting',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        duration: const Duration(seconds: 2),
+      );
+      return;
+    }
+
+    // Create new question
+    final newQuestion = QuestionModel(
+      id: 'question_${DateTime.now().millisecondsSinceEpoch}',
+      productId: _product.value?.id ?? '',
+      userId: 'current_user',
+      userName: 'You',
+      userImage: 'assets/icons/profile.png',
+      question: questionController.text.trim(),
+      answer: '', // Empty initially, can be answered later
+      date: DateTime.now(),
+    );
+
+    // Add to the beginning of the list
+    _questions.insert(0, newQuestion);
+
+    // Clear the input
+    questionController.clear();
+
     Get.snackbar(
-      'Ask Question',
-      'Question functionality will be implemented',
+      'Question Added',
+      'Your question has been posted successfully!',
+      backgroundColor: Colors.green,
+      colorText: Colors.white,
       duration: const Duration(seconds: 2),
     );
   }

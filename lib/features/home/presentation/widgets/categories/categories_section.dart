@@ -43,7 +43,7 @@ class CategoriesSection extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 16),
           decoration: const BoxDecoration(color: Color(0x33CFCFCF)),
           child: SizedBox(
-            height: 96,
+            height: 90,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 16),

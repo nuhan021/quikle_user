@@ -24,9 +24,10 @@ class ProductDataService {
       imagePath: ImagePath.foodIcon,
       categoryId: '1',
       subcategoryId: 'food_biryani',
-      shopId: 'shop_1',
+      shopId: 'restaurant_1', // Masala Mandir
       rating: 4.8,
       weight: '2 portions',
+      productType: 'main_course',
     ),
     const ProductModel(
       id: 'food_biryani_2',
@@ -36,10 +37,80 @@ class ProductDataService {
       imagePath: ImagePath.foodIcon,
       categoryId: '1',
       subcategoryId: 'food_biryani',
-      shopId: 'shop_2',
+      shopId: 'restaurant_2', // Spice Garden
       rating: 4.9,
       weight: '2 portions',
+      productType: 'main_course',
     ),
+    const ProductModel(
+      id: 'food_biryani_3',
+      title: 'Vegetable Biryani',
+      description: 'Fragrant rice with mixed vegetables and spices',
+      price: '\$15',
+      imagePath: ImagePath.foodIcon,
+      categoryId: '1',
+      subcategoryId: 'food_biryani',
+      shopId: 'restaurant_3', // Royal Kitchen
+      rating: 4.6,
+      weight: '2 portions',
+      productType: 'main_course',
+    ),
+    const ProductModel(
+      id: 'food_biryani_4',
+      title: 'Fish Biryani',
+      description: 'Delicious fish biryani with aromatic spices',
+      price: '\$20',
+      imagePath: ImagePath.foodIcon,
+      categoryId: '1',
+      subcategoryId: 'food_biryani',
+      shopId: 'restaurant_4', // Curry House
+      rating: 4.7,
+      weight: '2 portions',
+      productType: 'main_course',
+    ),
+
+    // Appetizers
+    const ProductModel(
+      id: 'food_appetizer_1',
+      title: 'Chicken Wings',
+      description: 'Crispy chicken wings with spicy sauce',
+      price: '\$12',
+      imagePath: ImagePath.foodIcon,
+      categoryId: '1',
+      subcategoryId: 'food_appetizer',
+      shopId: 'restaurant_1', // Masala Mandir
+      rating: 4.5,
+      weight: '6 pieces',
+      productType: 'appetizer',
+    ),
+    const ProductModel(
+      id: 'food_appetizer_2',
+      title: 'Vegetable Samosa',
+      description: 'Crispy pastry filled with spiced vegetables',
+      price: '\$8',
+      imagePath: ImagePath.foodIcon,
+      categoryId: '1',
+      subcategoryId: 'food_appetizer',
+      shopId: 'restaurant_2', // Spice Garden
+      rating: 4.4,
+      weight: '4 pieces',
+      productType: 'appetizer',
+    ),
+    const ProductModel(
+      id: 'food_appetizer_3',
+      title: 'Paneer Tikka',
+      description: 'Grilled cottage cheese with mint chutney',
+      price: '\$10',
+      imagePath: ImagePath.foodIcon,
+      categoryId: '1',
+      subcategoryId: 'food_appetizer',
+      shopId: 'restaurant_3', // Royal Kitchen
+      rating: 4.6,
+      weight: '8 pieces',
+      productType: 'appetizer',
+    ),
+
+    // Main Course - Pasta
     const ProductModel(
       id: 'food_pasta_1',
       title: 'Spaghetti Carbonara',
@@ -48,9 +119,10 @@ class ProductDataService {
       imagePath: ImagePath.foodIcon,
       categoryId: '1',
       subcategoryId: 'food_pasta',
-      shopId: 'shop_1',
+      shopId: 'restaurant_5', // Italian Corner
       rating: 4.7,
       weight: '1 portion',
+      productType: 'main_course',
     ),
     const ProductModel(
       id: 'food_pasta_2',
@@ -60,9 +132,10 @@ class ProductDataService {
       imagePath: ImagePath.foodIcon,
       categoryId: '1',
       subcategoryId: 'food_pasta',
-      shopId: 'shop_2',
+      shopId: 'restaurant_5', // Italian Corner
       rating: 4.5,
       weight: '1 portion',
+      productType: 'main_course',
     ),
     const ProductModel(
       id: 'food_pizza_1',
@@ -72,9 +145,10 @@ class ProductDataService {
       imagePath: ImagePath.foodIcon,
       categoryId: '1',
       subcategoryId: 'food_pizza',
-      shopId: 'shop_2',
+      shopId: 'restaurant_6', // Pizza Palace
       rating: 4.7,
       weight: 'Medium size',
+      productType: 'main_course',
     ),
     const ProductModel(
       id: 'food_pizza_2',
@@ -84,9 +158,10 @@ class ProductDataService {
       imagePath: ImagePath.foodIcon,
       categoryId: '1',
       subcategoryId: 'food_pizza',
-      shopId: 'shop_2',
+      shopId: 'restaurant_6', // Pizza Palace
       rating: 4.6,
       weight: 'Medium size',
+      productType: 'main_course',
     ),
     const ProductModel(
       id: 'food_burger_1',
@@ -96,22 +171,110 @@ class ProductDataService {
       imagePath: ImagePath.foodIcon,
       categoryId: '1',
       subcategoryId: 'food_burger',
-      shopId: 'shop_1',
+      shopId: 'restaurant_7', // Burger House
       rating: 4.5,
       weight: '1 burger',
+      productType: 'main_course',
     ),
     const ProductModel(
       id: 'food_burger_2',
       title: 'Chicken Burger',
       description: 'Grilled chicken breast with special sauce',
-      price: '\$16',
+      price: '\$12',
       imagePath: ImagePath.foodIcon,
       categoryId: '1',
       subcategoryId: 'food_burger',
-      shopId: 'shop_1',
-      rating: 4.6,
+      shopId: 'restaurant_7', // Burger House
+      rating: 4.4,
       weight: '1 burger',
+      productType: 'main_course',
     ),
+
+    // Breads
+    const ProductModel(
+      id: 'food_bread_1',
+      title: 'Garlic Naan',
+      description: 'Fresh baked garlic naan bread',
+      price: '\$4',
+      imagePath: ImagePath.foodIcon,
+      categoryId: '1',
+      subcategoryId: 'food_bread',
+      shopId: 'restaurant_1', // Masala Mandir
+      rating: 4.6,
+      weight: '2 pieces',
+      productType: 'bread',
+    ),
+    const ProductModel(
+      id: 'food_bread_2',
+      title: 'Butter Roti',
+      description: 'Soft whole wheat bread with butter',
+      price: '\$3',
+      imagePath: ImagePath.foodIcon,
+      categoryId: '1',
+      subcategoryId: 'food_bread',
+      shopId: 'restaurant_2', // Spice Garden
+      rating: 4.3,
+      weight: '3 pieces',
+      productType: 'bread',
+    ),
+
+    // Desserts
+    const ProductModel(
+      id: 'food_dessert_1',
+      title: 'Chocolate Ice Cream',
+      description: 'Rich chocolate ice cream with nuts',
+      price: '\$6',
+      imagePath: ImagePath.foodIcon,
+      categoryId: '1',
+      subcategoryId: 'food_dessert',
+      shopId: 'restaurant_8', // Sweet Corner
+      rating: 4.7,
+      weight: '2 scoops',
+      productType: 'dessert',
+    ),
+    const ProductModel(
+      id: 'food_dessert_2',
+      title: 'Gulab Jamun',
+      description: 'Traditional Indian sweet in sugar syrup',
+      price: '\$5',
+      imagePath: ImagePath.foodIcon,
+      categoryId: '1',
+      subcategoryId: 'food_dessert',
+      shopId: 'restaurant_1', // Masala Mandir
+      rating: 4.8,
+      weight: '4 pieces',
+      productType: 'dessert',
+    ),
+
+    // Beverages
+    const ProductModel(
+      id: 'food_beverage_1',
+      title: 'Fresh Lime Soda',
+      description: 'Refreshing lime soda with mint',
+      price: '\$4',
+      imagePath: ImagePath.foodIcon,
+      categoryId: '1',
+      subcategoryId: 'food_beverage',
+      shopId: 'restaurant_9', // Drinks Hub
+      rating: 4.2,
+      weight: '300ml',
+      productType: 'beverage',
+    ),
+    const ProductModel(
+      id: 'food_beverage_2',
+      title: 'Mango Lassi',
+      description: 'Creamy yogurt drink with mango flavor',
+      price: '\$5',
+      imagePath: ImagePath.foodIcon,
+      categoryId: '1',
+      subcategoryId: 'food_beverage',
+      shopId: 'restaurant_2', // Spice Garden
+      rating: 4.5,
+      weight: '250ml',
+      productType: 'beverage',
+    ),
+
+    // ===================== GROCERIES CATEGORY (Category ID: 2) =====================
     const ProductModel(
       id: 'food_sandwich_1',
       title: 'Club Sandwich',
@@ -120,9 +283,10 @@ class ProductDataService {
       imagePath: ImagePath.foodIcon,
       categoryId: '1',
       subcategoryId: 'food_sandwich',
-      shopId: 'shop_1',
+      shopId: 'restaurant_10', // Sandwich Station
       rating: 4.4,
       weight: '1 sandwich',
+      productType: 'main_course',
     ),
     const ProductModel(
       id: 'food_salad_1',
@@ -132,9 +296,10 @@ class ProductDataService {
       imagePath: ImagePath.foodIcon,
       categoryId: '1',
       subcategoryId: 'food_salad',
-      shopId: 'shop_2',
+      shopId: 'restaurant_11', // Fresh Greens
       rating: 4.3,
       weight: 'Large bowl',
+      productType: 'appetizer',
     ),
 
     // ===================== GROCERY CATEGORY (Category ID: 2) =====================
@@ -151,6 +316,7 @@ class ProductDataService {
       shopId: 'shop_2',
       rating: 4.5,
       weight: '1kg',
+      productType: 'vegetable',
     ),
     const ProductModel(
       id: 'produce_vegetables_2',
@@ -163,6 +329,7 @@ class ProductDataService {
       shopId: 'shop_2',
       rating: 4.6,
       weight: '500g',
+      productType: 'vegetable',
     ),
     const ProductModel(
       id: 'produce_vegetables_3',
@@ -175,6 +342,7 @@ class ProductDataService {
       shopId: 'shop_2',
       rating: 4.4,
       weight: '1kg',
+      productType: 'vegetable',
     ),
     const ProductModel(
       id: 'produce_vegetables_4',

@@ -20,7 +20,7 @@ class VerificationScreen extends StatelessWidget {
         statusBarIconBrightness: Brightness.light,
       ),
       child: Scaffold(
-        backgroundColor: Colors.transparent,
+        backgroundColor: AppColors.ebonyBlack,
         body: SafeArea(
           child: Center(
             child: SizedBox(
@@ -46,22 +46,20 @@ class VerificationScreen extends StatelessWidget {
                     ),
                   ),
 
-                  // ===== Top bar: back icon space – title – invisible right icon =====
-                  // ===== Top bar: back button + title =====
                   Positioned(
-                    left: 16.w,
+                    left: 0,
+                    right: 0, // make it stretch full width
                     top: 24.5.h,
                     child: SizedBox(
-                      width: 360.w,
+                      width: double.infinity,
                       child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          // Back button
                           GestureDetector(
                             onTap: () => Get.back(),
                             child: Container(
-                              width: 24.w,
-                              height: 24.w,
+                              width: 40.w,
+                              height: 40.w,
                               alignment: Alignment.center,
                               child: Icon(
                                 Icons.arrow_back_ios_new,
@@ -70,23 +68,24 @@ class VerificationScreen extends StatelessWidget {
                               ),
                             ),
                           ),
-                          SizedBox(width: 135.w),
-                          // Title
-                          Text(
-                            'Verification',
-                            style: getTextStyle(
-                              font: CustomFonts.obviously,
-                              color: const Color(0xFFF8F8F8),
-                              fontSize: 18.sp,
-                              fontWeight: FontWeight.w500,
+
+                          Expanded(
+                            child: Text(
+                              'Verification',
+                              textAlign: TextAlign.center,
+                              style: getTextStyle(
+                                font: CustomFonts.obviously,
+                                color: const Color(0xFFF8F8F8),
+                                fontSize: 18.sp,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                           ),
+                          SizedBox(width: 40.w, height: 40.w),
                         ],
                       ),
                     ),
                   ),
-
-                  // ===== Header block (logo + texts) =====
                   Positioned(
                     left: 20.w,
                     top: 202.h,

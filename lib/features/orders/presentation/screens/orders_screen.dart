@@ -15,31 +15,23 @@ class OrdersScreen extends StatelessWidget {
     final OrdersController controller = Get.put(OrdersController());
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: AppColors.homeGrey,
       body: Column(
         children: [
           Container(
-            color: Colors.white,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: const BorderRadius.vertical(
+                bottom: Radius.circular(20),
+              ),
+              border: Border(
+                bottom: BorderSide(color: AppColors.gradientColor, width: 2),
+              ),
+            ),
             child: SafeArea(
+              bottom: false,
               child: Container(
                 padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(20.r),
-                    bottomRight: Radius.circular(20.r),
-                  ),
-                  border: Border(
-                    bottom: BorderSide(color: AppColors.beakYellow, width: 1.h),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withValues(alpha: 0.04),
-                      blurRadius: 8.r,
-                      offset: Offset(0, 2.h),
-                    ),
-                  ],
-                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

@@ -13,6 +13,7 @@ import 'package:quikle_user/features/categories/presentation/widgets/product_gri
 import 'package:quikle_user/features/categories/presentation/widgets/sort_bottom_sheet.dart';
 import 'package:quikle_user/features/categories/presentation/widgets/filter_bottom_sheet.dart';
 import 'package:quikle_user/features/categories/presentation/widgets/category_product_item.dart';
+import 'package:quikle_user/features/restaurants/presentation/widgets/top_restaurants_section.dart';
 import 'package:quikle_user/features/home/presentation/widgets/banners/offer_banner.dart';
 
 class UnifiedCategoryScreen extends StatelessWidget {
@@ -79,6 +80,18 @@ class UnifiedCategoryScreen extends StatelessWidget {
                                   ? controller.selectedMainCategory.value
                                   : controller.selectedSubcategory.value,
                             ),
+
+                            // Top Restaurants section - only for food category
+                            if (controller.isFoodCategory &&
+                                controller.showRestaurants.value &&
+                                controller.topRestaurants.isNotEmpty) ...[
+                              SizedBox(height: 24.h),
+                              TopRestaurantsSection(
+                                restaurants: controller.topRestaurants,
+                                onRestaurantTap: controller.onRestaurantTap,
+                                title: 'Top 25 Restaurants',
+                              ),
+                            ],
 
                             // Subcategories section - show for grocery when main category is selected
                             if (controller.isGroceryCategory &&
@@ -262,7 +275,6 @@ class UnifiedCategoryScreen extends StatelessWidget {
           ),
           SizedBox(height: 16.h),
 
-          // Direct GridView without ProductGridSection wrapper to avoid border issues
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -270,7 +282,7 @@ class UnifiedCategoryScreen extends StatelessWidget {
               crossAxisCount: 2,
               crossAxisSpacing: 12.w,
               mainAxisSpacing: 12.h,
-              childAspectRatio: 1.h,
+              childAspectRatio: 0.95.h,
             ),
             itemCount: controller.displayProducts.length,
             itemBuilder: (context, index) {

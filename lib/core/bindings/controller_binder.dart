@@ -10,6 +10,11 @@ import 'package:quikle_user/features/auth/controllers/welcome_controller.dart';
 import 'package:quikle_user/features/auth/data/services/auth_service.dart';
 import 'package:quikle_user/features/home/controllers/home_controller.dart';
 import 'package:quikle_user/features/product/controllers/product_controller.dart';
+import 'package:quikle_user/features/profile/controllers/favorites_controller.dart';
+import 'package:quikle_user/features/profile/controllers/address_controller.dart';
+import 'package:quikle_user/features/profile/controllers/help_support_controller.dart';
+import 'package:quikle_user/features/profile/data/services/address_service.dart';
+import 'package:quikle_user/features/profile/data/services/help_support_service.dart';
 import 'package:quikle_user/features/splash/controllers/splash_controller.dart';
 import 'package:quikle_user/features/cart/controllers/cart_controller.dart';
 
@@ -19,6 +24,8 @@ class ControllerBinder extends Bindings {
     // Services
     Get.put<UserService>(UserService(), permanent: true);
     Get.put<AuthService>(AuthService(), permanent: true);
+    Get.put<AddressService>(AddressService(), permanent: true);
+    Get.put<HelpSupportService>(HelpSupportService(), permanent: true);
     Get.put<UserController>(UserController(), permanent: true);
     Get.put<AuthController>(AuthController(), permanent: true);
 
@@ -35,5 +42,8 @@ class ControllerBinder extends Bindings {
       CartAnimationController(),
       permanent: true,
     );
+    Get.put<FavoritesController>(FavoritesController(), permanent: true);
+    Get.put<AddressController>(AddressController(), permanent: true);
+    Get.put<HelpSupportController>(HelpSupportController(), permanent: true);
   }
 }
