@@ -69,9 +69,10 @@ class HelpSupportService extends GetxController {
   }) async {
     try {
       await Future.delayed(const Duration(seconds: 2));
+
       final newTicket = SupportTicketModel(
         id: 'ticket_${DateTime.now().millisecondsSinceEpoch}',
-        title: '$issueType.label',
+        title: issueType.label, // fixed
         description: description,
         issueType: issueType,
         status: SupportTicketStatus.pending,
@@ -80,7 +81,6 @@ class HelpSupportService extends GetxController {
       );
 
       _submittedTickets.add(newTicket);
-
       return true;
     } catch (e) {
       print('Error submitting support ticket: $e');

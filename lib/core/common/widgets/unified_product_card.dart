@@ -198,7 +198,7 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.h),
               decoration: BoxDecoration(
-                color: AppColors.otcLabelColor,
+                color: AppColors.grocery,
                 borderRadius: BorderRadius.circular(
                   widget.variant == ProductCardVariant.youMayLike ? 4.r : 3.r,
                 ),
