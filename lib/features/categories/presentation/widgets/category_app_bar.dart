@@ -23,17 +23,16 @@ class CategoryAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: const BorderRadius.vertical(
-            bottom: Radius.circular(20),
-          ),
-          border: Border(
-            bottom: BorderSide(color: AppColors.gradientColor, width: 2),
-          ),
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(20)),
+        border: Border(
+          bottom: BorderSide(color: AppColors.gradientColor, width: 2),
         ),
+      ),
+      child: SafeArea(
+        bottom: false,
         child: Padding(
           padding: EdgeInsets.symmetric(
             horizontal: showBackButton ? 8.w : 16.w,

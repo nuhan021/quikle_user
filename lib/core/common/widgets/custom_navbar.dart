@@ -146,7 +146,6 @@ class _NavItem extends StatelessWidget {
                           : AppColors.eggshellWhite,
                     ),
               if (showText) SizedBox(height: 8.h),
-              // Label
               if (showText)
                 Text(
                   label,

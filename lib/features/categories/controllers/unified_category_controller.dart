@@ -4,11 +4,15 @@ import 'package:quikle_user/features/home/data/models/product_model.dart';
 import 'package:quikle_user/features/home/data/models/shop_model.dart';
 import 'package:quikle_user/features/categories/data/models/subcategory_model.dart';
 import 'package:quikle_user/features/categories/data/services/category_service.dart';
+import 'package:quikle_user/features/restaurants/data/models/restaurant_model.dart';
+import 'package:quikle_user/features/restaurants/data/services/restaurant_service.dart';
 import 'package:quikle_user/features/cart/controllers/cart_controller.dart';
+import 'package:quikle_user/features/profile/controllers/favorites_controller.dart';
 import 'package:quikle_user/routes/app_routes.dart';
 
 class UnifiedCategoryController extends GetxController {
   final CategoryService _categoryService = CategoryService();
+  final RestaurantService _restaurantService = RestaurantService();
   final CartController _cartController = Get.find<CartController>();
 
   // Observables
@@ -29,6 +33,11 @@ class UnifiedCategoryController extends GetxController {
       <ProductModel>[].obs; // Recommended products for non-grocery categories
   final shops = <String, ShopModel>{}.obs; // Shop data cache
 
+  // Restaurant management (for food category)
+  final topRestaurants = <RestaurantModel>[].obs;
+  final categoryRestaurants = <RestaurantModel>[].obs;
+  final showRestaurants = false.obs;
+
   // Selection state
   final selectedMainCategory = Rxn<SubcategoryModel>();
   final selectedSubcategory = Rxn<SubcategoryModel>();
@@ -46,6 +55,7 @@ class UnifiedCategoryController extends GetxController {
   late CategoryModel currentCategory;
   bool get isGroceryCategory =>
       currentCategory.id == '2'; // Grocery category ID
+  bool get isFoodCategory => currentCategory.id == '1'; // Food category ID
 
   // Check if any subcategory is selected - if yes, show combined section
   bool get shouldShowCombinedSection => selectedSubcategory.value != null;
@@ -114,6 +124,9 @@ class UnifiedCategoryController extends GetxController {
       if (isGroceryCategory) {
         // For groceries: Load main categories first
         await _loadGroceryMainCategories();
+      } else if (isFoodCategory) {
+        // For food: Load subcategories and top restaurants
+        await _loadFoodCategoryData();
       } else {
         // For other categories: Load subcategories directly
         await _loadCategorySubcategories();
@@ -123,6 +136,16 @@ class UnifiedCategoryController extends GetxController {
     } finally {
       isLoading.value = false;
     }
+  }
+
+  Future<void> _loadFoodCategoryData() async {
+    // Load food subcategories
+    await _loadCategorySubcategories();
+
+    // Load top restaurants
+    final restaurants = await _restaurantService.getTopRestaurants(limit: 25);
+    topRestaurants.value = restaurants;
+    showRestaurants.value = true;
   }
 
   Future<void> _loadGroceryMainCategories() async {
@@ -230,6 +253,18 @@ class UnifiedCategoryController extends GetxController {
           selectedSubcategory.value = subcategory;
           applyFilter(subcategory.id);
         }
+      } else if (isFoodCategory) {
+        // For food categories: Select subcategory and filter products (like biryani items)
+        selectedSubcategory.value = subcategory;
+        final filteredProducts = allProducts
+            .where(
+              (product) =>
+                  product.subcategoryId != null &&
+                  product.subcategoryId == subcategory.id,
+            )
+            .toList();
+        displayProducts.value = filteredProducts;
+        productsTitle.value = '${subcategory.title} Items';
       } else {
         // For non-grocery categories: Select subcategory and filter products
         selectedSubcategory.value = subcategory;
@@ -316,16 +351,21 @@ class UnifiedCategoryController extends GetxController {
   }
 
   void onFavoriteToggle(ProductModel product) {
-    final updatedProduct = product.copyWith(isFavorite: !product.isFavorite);
+    // Update global favorites
+    if (FavoritesController.isProductFavorite(product.id)) {
+      FavoritesController.removeFromGlobalFavorites(product.id);
+    } else {
+      FavoritesController.addToGlobalFavorites(product.id);
+    }
 
-    // Update in all lists
+    // Update local product lists to reflect the change
+    final isFavorite = FavoritesController.isProductFavorite(product.id);
+    final updatedProduct = product.copyWith(isFavorite: isFavorite);
     _updateProductInLists(updatedProduct);
 
     Get.snackbar(
-      updatedProduct.isFavorite
-          ? 'Added to Favorites'
-          : 'Removed from Favorites',
-      '${updatedProduct.title} ${updatedProduct.isFavorite ? 'added to' : 'removed from'} favorites',
+      isFavorite ? 'Added to Favorites' : 'Removed from Favorites',
+      '${updatedProduct.title} ${isFavorite ? 'added to' : 'removed from'} favorites',
       snackPosition: SnackPosition.BOTTOM,
       duration: const Duration(seconds: 2),
     );
@@ -551,5 +591,17 @@ class UnifiedCategoryController extends GetxController {
     } else {
       displayProducts.value = allProducts;
     }
+  }
+
+  void onRestaurantTap(RestaurantModel restaurant) {
+    // Navigate to restaurant menu
+    Get.toNamed(
+      '/restaurant-menu',
+      arguments: {
+        'restaurant': restaurant,
+        'categoryId': '',
+        'categoryName': '',
+      },
+    );
   }
 }

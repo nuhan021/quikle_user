@@ -17,6 +17,7 @@ class ImagePath {
   static const String customIcon = 'assets/icons/customIcon.png';
   static const String cartIcon = 'assets/icons/add_cart.png';
   static const String favoriteIcon = 'assets/icons/favourite.png';
+  static const String favoriteFilledIcon = 'assets/icons/myFavourite.png';
 
   static const String cartImage = 'assets/icons/cart.png';
   static const String emptyCart = 'assets/icons/empty_cart.png';
@@ -34,4 +35,22 @@ class ImagePath {
 
   static const String map = 'assets/images/map.png';
   static const String shopImage = 'assets/images/shopImage.png';
+
+  //Profile menus
+  static const String addressIcon = 'assets/icons/addressBookIcon.png';
+  static const String homeAddressIcon = 'assets/icons/homeAdressIcon.png';
+  static const String officeAddressIcon = 'assets/icons/officeAddressIcon.png';
+  static const String myOrdersIcon = 'assets/icons/myOrderIcon.png';
+  static const String myProfileIcon = 'assets/icons/myprofileIcon.png';
+  static const String notificationIcon = 'assets/icons/notificationIcon.png';
+  static const String languageIcon = 'assets/icons/languageIcon.png';
+  static const String paymentIcon = 'assets/icons/paymentIcon.png';
+  static const String helpIcon = 'assets/icons/supportIcon.png';
+  static const String signOutIcon = 'assets/icons/signOutIcon.png';
+
+  //Product icons
+  static const String drinksIcon = 'assets/icons/drinks.png';
+  static const String lightIcon = 'assets/icons/light.png';
+  static const String pondIcon = 'assets/icons/pond.png';
+  static const String riceIcon = 'assets/icons/rice.png';
 }

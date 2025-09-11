@@ -16,157 +16,134 @@ class CategoriesScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.find<HomeController>();
 
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: const SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.light,
+    return Scaffold(
+      backgroundColor: AppColors.homeGrey,
+      appBar: CategoryAppBar(
+        onNotificationTap: controller.onNotificationPressed,
+        title: 'All Categories',
+        showBackButton: false,
       ),
-      child: SafeArea(
-        child: Scaffold(
-          backgroundColor: AppColors.homeGrey,
-          appBar: CategoryAppBar(
-            onNotificationTap: controller.onNotificationPressed,
-            title: 'All Categories',
-            showBackButton: false,
-          ),
-          body: Obx(
-            () => controller.isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(height: 20.h),
-                        CategoriesSection(
-                          categories: controller.categories,
-                          onCategoryTap: controller.onCategoryPressed,
-                          selectedCategoryId: controller.selectedCategoryId,
-                          showTitle: false,
-                        ),
-
-                        const SizedBox(height: 20),
-
-                        if (controller.isShowingAllCategories) ...[
-                          Column(
-                            children: controller.productSections
-                                .map(
-                                  (section) => ProductSection(
-                                    section: section,
-                                    onProductTap: controller.onProductPressed,
-                                    onAddToCart: controller.onAddToCartPressed,
-                                    onViewAllTap: () => controller
-                                        .onViewAllPressed(section.categoryId),
-                                    categoryIconPath: controller
-                                        .getCategoryIconPath(
-                                          section.categoryId,
-                                        ),
-                                    categoryTitle: controller.getCategoryTitle(
-                                      section.categoryId,
-                                    ),
-                                    onFavoriteToggle:
-                                        controller.onFavoriteToggle,
-                                  ),
-                                )
-                                .toList(),
-                          ),
-                        ] else ...[
-                          Container(
-                            padding: EdgeInsets.symmetric(horizontal: 16.sp),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                if (controller.filteredProducts.isNotEmpty) ...[
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        controller.categories
-                                            .firstWhere(
-                                              (cat) =>
-                                                  cat.id ==
-                                                  controller.selectedCategoryId,
-                                            )
-                                            .title,
-                                        style: const TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                      GestureDetector(
-                                        onTap: () =>
-                                            controller.onViewAllPressed(
+      body: Obx(
+        () => controller.isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 20.h),
+                    CategoriesSection(
+                      categories: controller.categories,
+                      onCategoryTap: controller.onCategoryPressed,
+                      selectedCategoryId: controller.selectedCategoryId,
+                      showTitle: false,
+                    ),
+                    const SizedBox(height: 20),
+                    if (controller.isShowingAllCategories) ...[
+                      Column(
+                        children: controller.productSections
+                            .map(
+                              (section) => ProductSection(
+                                section: section,
+                                onProductTap: controller.onProductPressed,
+                                onAddToCart: controller.onAddToCartPressed,
+                                onViewAllTap: () => controller.onViewAllPressed(
+                                  section.categoryId,
+                                ),
+                                categoryIconPath: controller
+                                    .getCategoryIconPath(section.categoryId),
+                                categoryTitle: controller.getCategoryTitle(
+                                  section.categoryId,
+                                ),
+                                onFavoriteToggle: controller.onFavoriteToggle,
+                              ),
+                            )
+                            .toList(),
+                      ),
+                    ] else ...[
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 16.sp),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (controller.filteredProducts.isNotEmpty) ...[
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    controller.categories
+                                        .firstWhere(
+                                          (cat) =>
+                                              cat.id ==
                                               controller.selectedCategoryId,
-                                            ),
-                                        child: const Text(
-                                          'View all',
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w500,
-                                            color: Color(0xFFFF6B35),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
+                                        )
+                                        .title,
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.black,
+                                    ),
                                   ),
-                                  const SizedBox(height: 16),
-                                  GridView.builder(
-                                    shrinkWrap: true,
-                                    physics:
-                                        const NeverScrollableScrollPhysics(),
-                                    gridDelegate:
-                                        const SliverGridDelegateWithFixedCrossAxisCount(
-                                          crossAxisCount: 3,
-                                          childAspectRatio: 0.65,
-                                          crossAxisSpacing: 12,
-                                          mainAxisSpacing: 12,
-                                        ),
-                                    itemCount:
-                                        controller.filteredProducts.length,
-                                    itemBuilder: (context, index) =>
-                                        ProductItem(
-                                          product: controller
-                                              .filteredProducts[index],
-                                          onTap: () =>
-                                              controller.onProductPressed(
-                                                controller
-                                                    .filteredProducts[index],
-                                              ),
-                                          onAddToCart: () =>
-                                              controller.onAddToCartPressed(
-                                                controller
-                                                    .filteredProducts[index],
-                                              ),
-                                          onFavoriteToggle: () =>
-                                              controller.onFavoriteToggle(
-                                                controller
-                                                    .filteredProducts[index],
-                                              ),
-                                        ),
-                                  ),
-                                ] else ...[
-                                  const Center(
-                                    child: Text(
-                                      'No products found for this category',
+                                  GestureDetector(
+                                    onTap: () => controller.onViewAllPressed(
+                                      controller.selectedCategoryId,
+                                    ),
+                                    child: const Text(
+                                      'View all',
                                       style: TextStyle(
-                                        fontSize: 16,
-                                        color: Colors.grey,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                        color: Color(0xFFFF6B35),
                                       ),
                                     ),
                                   ),
                                 ],
-                              ],
-                            ),
-                          ),
-                        ],
-
-                        //const SizedBox(height: 100),
-                      ],
-                    ),
-                  ),
-          ),
-        ),
+                              ),
+                              const SizedBox(height: 16),
+                              GridView.builder(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                gridDelegate:
+                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 3,
+                                      childAspectRatio: 0.65,
+                                      crossAxisSpacing: 12,
+                                      mainAxisSpacing: 12,
+                                    ),
+                                itemCount: controller.filteredProducts.length,
+                                itemBuilder: (context, index) => ProductItem(
+                                  product: controller.filteredProducts[index],
+                                  onTap: () => controller.onProductPressed(
+                                    controller.filteredProducts[index],
+                                  ),
+                                  onAddToCart: () =>
+                                      controller.onAddToCartPressed(
+                                        controller.filteredProducts[index],
+                                      ),
+                                  onFavoriteToggle: () =>
+                                      controller.onFavoriteToggle(
+                                        controller.filteredProducts[index],
+                                      ),
+                                ),
+                              ),
+                            ] else ...[
+                              const Center(
+                                child: Text(
+                                  'No products found for this category',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
       ),
     );
   }

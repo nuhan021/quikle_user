@@ -4,6 +4,7 @@ import 'package:quikle_user/features/categories/data/models/subcategory_model.da
 import 'package:quikle_user/features/categories/data/services/category_service.dart';
 import 'package:quikle_user/features/home/data/models/category_model.dart';
 import 'package:quikle_user/features/home/data/models/product_model.dart';
+import 'package:quikle_user/features/profile/controllers/favorites_controller.dart';
 import 'package:quikle_user/routes/app_routes.dart';
 
 class CategoryDetailController extends GetxController {
@@ -169,8 +170,16 @@ class CategoryDetailController extends GetxController {
   }
 
   void onFavoriteToggle(ProductModel product) {
-    // Handle favorite toggle
-    final updatedProduct = product.copyWith(isFavorite: !product.isFavorite);
+    // Update global favorites
+    if (FavoritesController.isProductFavorite(product.id)) {
+      FavoritesController.removeFromGlobalFavorites(product.id);
+    } else {
+      FavoritesController.addToGlobalFavorites(product.id);
+    }
+
+    // Update local product lists to reflect the change
+    final isFavorite = FavoritesController.isProductFavorite(product.id);
+    final updatedProduct = product.copyWith(isFavorite: isFavorite);
 
     // Update in featured products
     final featuredIndex = featuredProducts.indexWhere(
@@ -189,10 +198,8 @@ class CategoryDetailController extends GetxController {
     }
 
     Get.snackbar(
-      updatedProduct.isFavorite
-          ? 'Added to Favorites'
-          : 'Removed from Favorites',
-      updatedProduct.isFavorite
+      isFavorite ? 'Added to Favorites' : 'Removed from Favorites',
+      isFavorite
           ? '${product.title} has been added to your favorites.'
           : '${product.title} has been removed from your favorites.',
       duration: const Duration(seconds: 2),

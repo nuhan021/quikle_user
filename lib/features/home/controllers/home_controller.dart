@@ -1,7 +1,11 @@
 import 'package:get/get.dart';
+import 'package:speech_to_text/speech_to_text.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:quikle_user/features/home/data/services/home_services.dart';
 import 'package:quikle_user/features/cart/controllers/cart_controller.dart';
+import 'package:quikle_user/features/profile/controllers/favorites_controller.dart';
 import 'package:quikle_user/routes/app_routes.dart';
+import 'package:quikle_user/features/search/controllers/search_controller.dart';
 import '../data/models/category_model.dart';
 import '../data/models/product_model.dart';
 
@@ -92,7 +96,70 @@ class HomeController extends GetxController {
   }
 
   void onSearchPressed() {
-    // Handle search tap
+    // Navigate to search screen
+    Get.toNamed(AppRoute.getSearch());
+  }
+
+  Future<void> onVoiceSearchPressed() async {
+    final speechToText = SpeechToText();
+
+    try {
+      // Request microphone permission
+      final permissionStatus = await Permission.microphone.request();
+
+      if (permissionStatus != PermissionStatus.granted) {
+        Get.snackbar(
+          'Permission Denied',
+          'Microphone permission is required for voice search.',
+          snackPosition: SnackPosition.BOTTOM,
+          duration: const Duration(seconds: 3),
+        );
+        return;
+      }
+
+      // Initialize speech recognition
+      final available = await speechToText.initialize(
+        onError: (errorNotification) {
+          Get.snackbar(
+            'Voice Recognition Error',
+            'Could not recognize speech. Please try again.',
+            snackPosition: SnackPosition.BOTTOM,
+            duration: const Duration(seconds: 2),
+          );
+        },
+      );
+
+      if (!available) {
+        Get.snackbar(
+          'Voice Search Unavailable',
+          'Speech recognition is not available on this device.',
+          snackPosition: SnackPosition.BOTTOM,
+          duration: const Duration(seconds: 2),
+        );
+        return;
+      }
+
+      // Navigate to search screen with voice recognition
+      Get.toNamed(AppRoute.getSearch());
+
+      // Give some time for the screen transition, then start voice recognition
+      await Future.delayed(const Duration(milliseconds: 500));
+
+      // Find the search controller and start voice recognition
+      await Future.delayed(const Duration(milliseconds: 300));
+      final searchController = ProductSearchController.currentInstance;
+      if (searchController != null) {
+        await searchController.toggleVoiceRecognition();
+      }
+    } catch (e) {
+      print('Error in voice search: $e');
+      Get.snackbar(
+        'Voice Search Error',
+        'An error occurred while starting voice search.',
+        snackPosition: SnackPosition.BOTTOM,
+        duration: const Duration(seconds: 2),
+      );
+    }
   }
 
   Future<void> onCategoryPressed(CategoryModel category) async {
@@ -120,16 +187,24 @@ class HomeController extends GetxController {
   }
 
   void onFavoriteToggle(ProductModel product) {
-    final updatedProduct = product.copyWith(isFavorite: !product.isFavorite);
+    // Update global favorites
+    if (FavoritesController.isProductFavorite(product.id)) {
+      FavoritesController.removeFromGlobalFavorites(product.id);
+    } else {
+      FavoritesController.addToGlobalFavorites(product.id);
+    }
+
+    // Update local product lists to reflect the change
+    final isFavorite = FavoritesController.isProductFavorite(product.id);
+    final updatedProduct = product.copyWith(isFavorite: isFavorite);
     _updateProductInLists(product, updatedProduct);
 
     Get.snackbar(
-      updatedProduct.isFavorite
-          ? 'Added to Favorites'
-          : 'Removed from Favorites',
-      updatedProduct.isFavorite
+      isFavorite ? 'Added to Favorites' : 'Removed from Favorites',
+      isFavorite
           ? '${product.title} has been added to your favorites.'
           : '${product.title} has been removed from your favorites.',
+      snackPosition: SnackPosition.BOTTOM,
       duration: const Duration(seconds: 2),
     );
   }

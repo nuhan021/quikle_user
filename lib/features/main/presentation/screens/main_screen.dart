@@ -8,14 +8,16 @@ import 'package:quikle_user/features/categories/presentation/screens/categories_
 import 'package:quikle_user/features/profile/presentation/screens/profile_screen.dart';
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
+  final int initialIndex;
+
+  const MainScreen({super.key, this.initialIndex = 0});
 
   @override
   _MainScreenState createState() => _MainScreenState();
 }
 
 class _MainScreenState extends State<MainScreen> {
-  int _currentIndex = 0;
+  late int _currentIndex;
 
   final List<Widget> _screens = [
     HomeContentScreen(),
@@ -23,6 +25,12 @@ class _MainScreenState extends State<MainScreen> {
     CategoriesScreen(),
     ProfileScreen(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _currentIndex = widget.initialIndex;
+  }
 
   void _onNavItemTapped(int index) {
     setState(() {

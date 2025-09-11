@@ -12,8 +12,18 @@ import 'package:quikle_user/features/categories/presentation/screens/subcategory
 import 'package:quikle_user/features/categories/presentation/screens/main_category_products_screen.dart';
 import 'package:quikle_user/features/categories/presentation/screens/grocery_navigation_screen.dart';
 import 'package:quikle_user/features/categories/presentation/screens/unified_category_screen.dart';
+import 'package:quikle_user/features/restaurants/presentation/screens/category_restaurants_screen.dart';
+import 'package:quikle_user/features/restaurants/presentation/screens/restaurant_page_screen.dart';
 import 'package:quikle_user/features/payout/presentation/screens/checkout_screen.dart';
+import 'package:quikle_user/features/profile/presentation/screens/favorites_screen.dart';
+import 'package:quikle_user/features/profile/presentation/screens/address_book_screen.dart';
+import 'package:quikle_user/features/profile/presentation/screens/add_address_screen.dart';
+import 'package:quikle_user/features/profile/presentation/screens/payment_method_screen.dart';
+import 'package:quikle_user/features/profile/presentation/screens/notification_settings_screen.dart';
+import 'package:quikle_user/features/profile/presentation/screens/language_settings_screen.dart';
+import 'package:quikle_user/features/profile/presentation/screens/help_support_screen.dart';
 import 'package:quikle_user/features/home/data/models/product_model.dart';
+import 'package:quikle_user/features/search/presentation/screens/search_screen.dart';
 
 class AppRoute {
   static const String _splash = '/';
@@ -31,6 +41,17 @@ class AppRoute {
   static const String _mainCategoryProducts = '/main-category-products';
   static const String _groceryNavigation = '/grocery-navigation';
   static const String _checkout = '/checkout';
+  static const String _favorites = '/favorites';
+  static const String _addressBook = '/address-book';
+  static const String _addAddress = '/add-address';
+  static const String _paymentMethods = '/payment-methods';
+  static const String _notificationSettings = '/notification-settings';
+  static const String _languageSettings = '/language-settings';
+  static const String _helpSupport = '/help-support';
+  static const String _aboutUs = '/about-us';
+  static const String _search = '/search';
+  static const String _categoryRestaurants = '/category-restaurants';
+  static const String _restaurantMenu = '/restaurant-menu';
 
   static String getSplashScreen() => _splash;
   static String getLoginScreen() => _login;
@@ -47,6 +68,17 @@ class AppRoute {
   static String getMainCategoryProducts() => _mainCategoryProducts;
   static String getGroceryNavigation() => _groceryNavigation;
   static String getCheckout() => _checkout;
+  static String getFavorites() => _favorites;
+  static String getAddressBook() => _addressBook;
+  static String getAddAddress() => _addAddress;
+  static String getPaymentMethods() => _paymentMethods;
+  static String getNotificationSettings() => _notificationSettings;
+  static String getLanguageSettings() => _languageSettings;
+  static String getHelpSupport() => _helpSupport;
+  static String getAboutUs() => _aboutUs;
+  static String getSearch() => _search;
+  static String getCategoryRestaurants() => _categoryRestaurants;
+  static String getRestaurantMenu() => _restaurantMenu;
 
   static final List<GetPage<dynamic>> routes = <GetPage>[
     GetPage(name: _splash, page: () => const SplashScreen()),
@@ -76,6 +108,21 @@ class AppRoute {
       page: () => const GroceryNavigationScreen(),
     ),
     GetPage(name: _checkout, page: () => const CheckoutScreen()),
+    GetPage(name: _favorites, page: () => const FavoritesScreen()),
+    GetPage(name: _addressBook, page: () => const AddressBookScreen()),
+    GetPage(name: _addAddress, page: () => const AddAddressScreen()),
+    GetPage(name: _paymentMethods, page: () => const PaymentMethodScreen()),
+    GetPage(
+      name: _notificationSettings,
+      page: () => const NotificationSettingsScreen(),
+    ),
+    GetPage(name: _helpSupport, page: () => const HelpSupportScreen()),
+    GetPage(name: _search, page: () => const SearchScreen()),
+    GetPage(
+      name: _categoryRestaurants,
+      page: () => const CategoryRestaurantsScreen(),
+    ),
+    GetPage(name: _restaurantMenu, page: () => const RestaurantPageScreen()),
 
     // GetPage(
     //   name: _home,
