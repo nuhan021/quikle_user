@@ -154,25 +154,17 @@ class UnifiedCategoryController extends GetxController {
     availableSubcategories.value = mainCategories;
     sectionTitle.value = 'Select Category';
 
-    // Auto-select first category if available
-    if (mainCategories.isNotEmpty) {
-      selectedMainCategory.value = mainCategories.first;
+    // Load all grocery products without auto-selecting any main category
+    final products = await _categoryService.fetchAllProductsByCategory(
+      currentCategory.id,
+    );
+    allProducts.value = products;
+    displayProducts.value = products;
+    productsTitle.value = 'All ${currentCategory.title}';
 
-      // Load subcategories for the first category
-      final subCategories = await _categoryService.fetchSubcategories(
-        currentCategory.id,
-        parentSubcategoryId: mainCategories.first.id,
-      );
-      filterSubcategories.value = subCategories;
-
-      // Load products for the first category
-      final products = await _categoryService.fetchProductsByMainCategory(
-        mainCategories.first.id,
-      );
-      allProducts.value = products;
-      displayProducts.value = products;
-      productsTitle.value = 'All ${mainCategories.first.title}';
-    }
+    // Don't auto-select any main category - let user choose
+    selectedMainCategory.value = null;
+    filterSubcategories.clear();
   }
 
   Future<void> _loadCategorySubcategories() async {
@@ -183,27 +175,18 @@ class UnifiedCategoryController extends GetxController {
     availableSubcategories.value = subcategories;
     sectionTitle.value = 'Popular Items';
 
-    // Auto-select first subcategory if available
-    if (subcategories.isNotEmpty) {
-      selectedSubcategory.value = subcategories.first;
+    // Load all products for the category without auto-selecting any subcategory
+    final products = await _categoryService.fetchAllProductsByCategory(
+      currentCategory.id,
+    );
+    allProducts.value = products;
 
-      // Load products for the first subcategory
-      final products = await _categoryService.fetchAllProductsByCategory(
-        currentCategory.id,
-      );
-      allProducts.value = products;
+    // Show all products initially (no subcategory selected)
+    displayProducts.value = products;
+    productsTitle.value = 'All ${currentCategory.title}';
 
-      // Filter products by first subcategory
-      final filteredProducts = products
-          .where(
-            (product) =>
-                product.subcategoryId != null &&
-                product.subcategoryId == subcategories.first.id,
-          )
-          .toList();
-      displayProducts.value = filteredProducts;
-      productsTitle.value = '${subcategories.first.title} Items';
-    }
+    // Don't auto-select any subcategory - let user choose
+    selectedSubcategory.value = null;
 
     // Load recommended products for non-grocery categories
     if (!isGroceryCategory) {
@@ -233,6 +216,8 @@ class UnifiedCategoryController extends GetxController {
           selectedMainCategory.value = subcategory;
           selectedSubcategory.value = null;
           selectedFilter.value = null;
+          showingAllProducts.value =
+              false; // Reset to show limited view initially
 
           // Load subcategories for the selected main category
           final subCategories = await _categoryService.fetchSubcategories(
@@ -251,11 +236,15 @@ class UnifiedCategoryController extends GetxController {
         } else {
           // Subcategory selection (from the second row)
           selectedSubcategory.value = subcategory;
+          showingAllProducts.value =
+              false; // Reset to show limited view initially
           applyFilter(subcategory.id);
         }
       } else if (isFoodCategory) {
         // For food categories: Select subcategory and filter products (like biryani items)
         selectedSubcategory.value = subcategory;
+        showingAllProducts.value =
+            false; // Reset to show limited view initially
         final filteredProducts = allProducts
             .where(
               (product) =>
@@ -268,6 +257,8 @@ class UnifiedCategoryController extends GetxController {
       } else {
         // For non-grocery categories: Select subcategory and filter products
         selectedSubcategory.value = subcategory;
+        showingAllProducts.value =
+            false; // Reset to show limited view initially
         final filteredProducts = allProducts
             .where(
               (product) =>
@@ -397,11 +388,25 @@ class UnifiedCategoryController extends GetxController {
 
   // Navigation helper for back button
   void onBackPressed() {
-    if (isGroceryCategory && selectedMainCategory.value != null) {
-      // Go back to main categories
-      resetToMainCategories();
+    if (isGroceryCategory) {
+      if (selectedSubcategory.value != null) {
+        // Go back from subcategory to main category
+        clearSubcategorySelection();
+      } else if (selectedMainCategory.value != null) {
+        // Go back from main category to all grocery products
+        clearMainCategorySelection();
+      } else {
+        // Go back to previous screen
+        Get.back();
+      }
     } else {
-      Get.back();
+      if (selectedSubcategory.value != null) {
+        // Go back from subcategory to all category products
+        clearSubcategorySelection();
+      } else {
+        // Go back to previous screen
+        Get.back();
+      }
     }
   }
 
@@ -409,26 +414,114 @@ class UnifiedCategoryController extends GetxController {
   void showAllProducts() {
     showingAllProducts.value = !showingAllProducts.value;
     if (showingAllProducts.value) {
-      // Reset any subcategory filter to show all products
-      selectedSubcategory.value = null;
-      displayProducts.value = allProducts;
-      productsTitle.value = '${currentCategory.title} - All Items';
-    } else {
-      if (selectedSubcategory.value != null) {
-        final filteredProducts = allProducts
-            .where(
-              (product) =>
-                  product.subcategoryId != null &&
-                  product.subcategoryId == selectedSubcategory.value!.id,
-            )
-            .toList();
-        displayProducts.value = filteredProducts;
-        productsTitle.value = selectedSubcategory.value!.title;
+      // When showing all products, check category type and selection state
+      if (isGroceryCategory) {
+        if (selectedSubcategory.value != null) {
+          // Show all products of the selected subcategory (e.g., all rice items)
+          final filteredProducts = allProducts
+              .where(
+                (product) =>
+                    product.subcategoryId != null &&
+                    product.subcategoryId == selectedSubcategory.value!.id,
+              )
+              .toList();
+          displayProducts.value = filteredProducts;
+          productsTitle.value =
+              '${selectedSubcategory.value!.title} - All Items';
+        } else if (selectedMainCategory.value != null) {
+          // Show all products of the selected main category (e.g., all fruits & vegetables)
+          displayProducts.value = allProducts;
+          productsTitle.value =
+              '${selectedMainCategory.value!.title} - All Items';
+        } else {
+          // Show all grocery products
+          displayProducts.value = allProducts;
+          productsTitle.value = '${currentCategory.title} - All Items';
+        }
       } else {
-        displayProducts.value = allProducts;
-        productsTitle.value = '${currentCategory.title} Items';
+        // For non-grocery categories (food, etc.)
+        if (selectedSubcategory.value != null) {
+          // Show all products of the selected subcategory (e.g., all biryani items)
+          final filteredProducts = allProducts
+              .where(
+                (product) =>
+                    product.subcategoryId != null &&
+                    product.subcategoryId == selectedSubcategory.value!.id,
+              )
+              .toList();
+          displayProducts.value = filteredProducts;
+          productsTitle.value =
+              '${selectedSubcategory.value!.title} - All Items';
+        } else {
+          // Show all products of the main category
+          displayProducts.value = allProducts;
+          productsTitle.value = '${currentCategory.title} - All Items';
+        }
+      }
+    } else {
+      // Go back to the limited view
+      if (isGroceryCategory) {
+        if (selectedSubcategory.value != null) {
+          final filteredProducts = allProducts
+              .where(
+                (product) =>
+                    product.subcategoryId != null &&
+                    product.subcategoryId == selectedSubcategory.value!.id,
+              )
+              .toList();
+          displayProducts.value = filteredProducts;
+          productsTitle.value = '${selectedSubcategory.value!.title} Items';
+        } else if (selectedMainCategory.value != null) {
+          displayProducts.value = allProducts;
+          productsTitle.value = 'All ${selectedMainCategory.value!.title}';
+        } else {
+          displayProducts.value = allProducts;
+          productsTitle.value = 'All ${currentCategory.title}';
+        }
+      } else {
+        // For non-grocery categories
+        if (selectedSubcategory.value != null) {
+          final filteredProducts = allProducts
+              .where(
+                (product) =>
+                    product.subcategoryId != null &&
+                    product.subcategoryId == selectedSubcategory.value!.id,
+              )
+              .toList();
+          displayProducts.value = filteredProducts;
+          productsTitle.value = '${selectedSubcategory.value!.title} Items';
+        } else {
+          displayProducts.value = allProducts;
+          productsTitle.value = 'All ${currentCategory.title}';
+        }
       }
     }
+  }
+
+  // Clear subcategory selection and show all products
+  void clearSubcategorySelection() {
+    selectedSubcategory.value = null;
+    showingAllProducts.value = false;
+
+    if (isGroceryCategory && selectedMainCategory.value != null) {
+      // For grocery: go back to main category view
+      displayProducts.value = allProducts;
+      productsTitle.value = 'All ${selectedMainCategory.value!.title}';
+    } else {
+      // For other categories: show all category products
+      displayProducts.value = allProducts;
+      productsTitle.value = 'All ${currentCategory.title}';
+    }
+  }
+
+  // Clear main category selection and show all products (for grocery)
+  void clearMainCategorySelection() {
+    selectedMainCategory.value = null;
+    selectedSubcategory.value = null;
+    showingAllProducts.value = false;
+    filterSubcategories.clear();
+    displayProducts.value = allProducts;
+    productsTitle.value = 'All ${currentCategory.title}';
   }
 
   // Search functionality
