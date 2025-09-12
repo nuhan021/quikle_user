@@ -119,17 +119,17 @@ class VerificationController extends GetxController {
   }
 
   bool _validateOtp(String otp) {
-    // if (otp.length != 6) {
-    //   errorMessage.value = 'Please enter complete 6-digit OTP';
-    //   Get.snackbar(
-    //     'Validation Error',
-    //     'Please enter complete 6-digit OTP',
-    //     snackPosition: SnackPosition.TOP,
-    //     backgroundColor: Colors.orange.withValues(alpha: 0.1),
-    //     colorText: Colors.orange,
-    //   );
-    //   return false;
-    // }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
     return true;
   }

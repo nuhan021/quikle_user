@@ -26,7 +26,7 @@ class NotificationSettingsScreen extends StatelessWidget {
                   'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy',
               initialValue: true,
               onChanged: (value) {
-                // Handle the toggle state change
+                
               },
             ),
             SizedBox(height: 18.h),
@@ -36,7 +36,7 @@ class NotificationSettingsScreen extends StatelessWidget {
                   'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy',
               initialValue: false,
               onChanged: (value) {
-                // Handle the toggle state change
+                
               },
             ),
             SizedBox(height: 15.h),
@@ -46,7 +46,7 @@ class NotificationSettingsScreen extends StatelessWidget {
                   'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy',
               initialValue: false,
               onChanged: (value) {
-                // Handle the toggle state change
+                
               },
             ),
             SizedBox(height: 15.h),
@@ -56,7 +56,7 @@ class NotificationSettingsScreen extends StatelessWidget {
                   'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy',
               initialValue: true,
               onChanged: (value) {
-                // Handle the toggle state change
+                
               },
             ),
           ],

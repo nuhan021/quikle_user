@@ -31,7 +31,7 @@ class OrderSuccessDialog extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Green circle with check icon
+            
             Container(
               width: 80,
               height: 80,
@@ -44,7 +44,7 @@ class OrderSuccessDialog extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            // Title
+            
             Text(
               "Your order is confirmed",
               style: getTextStyle(
@@ -58,7 +58,7 @@ class OrderSuccessDialog extends StatelessWidget {
 
             const SizedBox(height: 12),
 
-            // Subtitle text
+            
             Text(
               "Thank you for shopping with us.\n"
               "Your order will reach you soon.",
@@ -72,7 +72,7 @@ class OrderSuccessDialog extends StatelessWidget {
 
             const SizedBox(height: 24),
 
-            // Continue button
+            
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(

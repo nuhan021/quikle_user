@@ -3,20 +3,20 @@ import 'package:quikle_user/features/home/data/models/product_model.dart';
 import 'package:quikle_user/core/data/services/product_data_service.dart';
 
 class FavoritesController extends GetxController {
-  // Static set to track favorite product IDs across the app
+  
   static final RxSet<String> _globalFavoriteIds = <String>{}.obs;
 
-  // Observable list of favorite products
+  
   final RxList<ProductModel> _favoriteProducts = <ProductModel>[].obs;
 
-  // Getter for favorite products
+  
   List<ProductModel> get favoriteProducts => _favoriteProducts;
 
-  // Loading state
+  
   final RxBool _isLoading = false.obs;
   bool get isLoading => _isLoading.value;
 
-  // Static methods to manage favorites globally
+  
   static bool isProductFavorite(String productId) {
     return _globalFavoriteIds.contains(productId);
   }
@@ -36,48 +36,48 @@ class FavoritesController extends GetxController {
     super.onInit();
     loadFavorites();
 
-    // Listen to global favorites changes
+    
     ever(_globalFavoriteIds, (Set<String> favoriteIds) {
       refreshFavorites();
     });
   }
 
-  // Load favorites from available products in the app
+  
   void loadFavorites() {
     try {
       _isLoading.value = true;
 
-      // Initialize with some sample favorites if none exist
+      
       if (_globalFavoriteIds.isEmpty) {
         _initializeSampleFavorites();
       }
 
-      // Load favorite products based on global favorite IDs
+      
       refreshFavorites();
     } catch (e) {
       print('Error loading favorites: $e');
-      // Fallback to empty list
+      
       _favoriteProducts.clear();
     } finally {
       _isLoading.value = false;
     }
   }
 
-  // Initialize some sample favorites for demo purposes
+  
   void _initializeSampleFavorites() {
     final sampleFavoriteIds = [
-      'produce_fruits_1', // Fresh Bananas
-      'dairy_yogurt_1', // Greek Yogurt
-      'produce_fruits_2', // Fresh Apples
-      'food_pizza_1', // Margherita Pizza
-      'produce_fruits_6', // Avocados
-      'dairy_milk_1', // Whole Milk
+      'produce_fruits_1', 
+      'dairy_yogurt_1', 
+      'produce_fruits_2', 
+      'food_pizza_1', 
+      'produce_fruits_6', 
+      'dairy_milk_1', 
     ];
 
     _globalFavoriteIds.addAll(sampleFavoriteIds);
   }
 
-  // Create some sample favorite products for demonstration
+  
   void _createSampleFavorites() {
     final List<ProductModel> sampleFavorites = [
       const ProductModel(
@@ -163,13 +163,13 @@ class FavoritesController extends GetxController {
     _favoriteProducts.assignAll(sampleFavorites);
   }
 
-  // Refresh favorites from the global favorite IDs and product data service
+  
   void refreshFavorites() {
     try {
       final ProductDataService productService = ProductDataService();
       final allProducts = productService.allProducts;
 
-      // Filter products based on global favorite IDs
+      
       final favoriteList = allProducts
           .where((product) => _globalFavoriteIds.contains(product.id))
           .map((product) => product.copyWith(isFavorite: true))
@@ -178,24 +178,24 @@ class FavoritesController extends GetxController {
       _favoriteProducts.assignAll(favoriteList);
     } catch (e) {
       print('Error refreshing favorites: $e');
-      // Fallback to sample favorites
+      
       _createSampleFavorites();
     }
   }
 
-  // Add product to favorites
+  
   void addToFavorites(ProductModel product) {
     addToGlobalFavorites(product.id);
     refreshFavorites();
   }
 
-  // Remove product from favorites
+  
   void removeFromFavorites(String productId) {
     removeFromGlobalFavorites(productId);
     refreshFavorites();
   }
 
-  // Toggle favorite status
+  
   void toggleFavorite(ProductModel product) {
     if (isProductFavorite(product.id)) {
       removeFromFavorites(product.id);
@@ -204,13 +204,13 @@ class FavoritesController extends GetxController {
     }
   }
 
-  // Clear all favorites
+  
   void clearAllFavorites() {
     _globalFavoriteIds.clear();
     _favoriteProducts.clear();
   }
 
-  // Check if product is favorite
+  
   bool isFavorite(String productId) {
     return isProductFavorite(productId);
   }

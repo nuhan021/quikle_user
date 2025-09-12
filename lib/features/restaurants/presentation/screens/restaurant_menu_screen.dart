@@ -46,12 +46,12 @@ class _RestaurantMenuScreenState extends State<RestaurantMenuScreen> {
   void _loadProducts() {
     setState(() => _isLoading = true);
 
-    // Get all products from this restaurant
+    
     _allRestaurantProducts = _productService.allProducts
         .where((product) => product.shopId == restaurant.id)
         .toList();
 
-    // Filter products by category if specified
+    
     if (categoryId.isNotEmpty) {
       _categoryProducts = _allRestaurantProducts
           .where((product) => product.subcategoryId == categoryId)
@@ -76,7 +76,7 @@ class _RestaurantMenuScreenState extends State<RestaurantMenuScreen> {
           children: [
             Column(
               children: [
-                // Custom App Bar with Restaurant Info
+                
                 Container(
                   color: Colors.white,
                   padding: EdgeInsets.only(
@@ -109,12 +109,12 @@ class _RestaurantMenuScreenState extends State<RestaurantMenuScreen> {
                               textAlign: TextAlign.center,
                             ),
                           ),
-                          SizedBox(width: 48.w), // Balance the back button
+                          SizedBox(width: 48.w), 
                         ],
                       ),
                       SizedBox(height: 8.h),
 
-                      // Restaurant details
+                      
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -178,7 +178,7 @@ class _RestaurantMenuScreenState extends State<RestaurantMenuScreen> {
                   ),
                 ),
 
-                // Content
+                
                 Expanded(
                   child: _isLoading
                       ? const Center(child: CircularProgressIndicator())
@@ -221,7 +221,7 @@ class _RestaurantMenuScreenState extends State<RestaurantMenuScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              // Section title
+                              
                               Text(
                                 categoryName.isNotEmpty
                                     ? '$categoryName Menu (${_categoryProducts.length} items)'
@@ -235,7 +235,7 @@ class _RestaurantMenuScreenState extends State<RestaurantMenuScreen> {
                               ),
                               SizedBox(height: 16.h),
 
-                              // Products grid
+                              
                               Expanded(
                                 child: GridView.builder(
                                   gridDelegate:
@@ -251,14 +251,14 @@ class _RestaurantMenuScreenState extends State<RestaurantMenuScreen> {
                                     return CategoryProductItem(
                                       product: product,
                                       onTap: () {
-                                        // Navigate to product details
+                                        
                                         Get.toNamed(
                                           '/product-details',
                                           arguments: {'product': product},
                                         );
                                       },
                                       onAddToCart: () {
-                                        // Add to cart logic
+                                        
                                         Get.snackbar(
                                           'Added to Cart',
                                           '${product.title} added to your cart',
@@ -267,7 +267,7 @@ class _RestaurantMenuScreenState extends State<RestaurantMenuScreen> {
                                         );
                                       },
                                       onFavoriteToggle: () {
-                                        // Toggle favorite logic
+                                        
                                       },
                                     );
                                   },
@@ -280,7 +280,7 @@ class _RestaurantMenuScreenState extends State<RestaurantMenuScreen> {
               ],
             ),
 
-            // Floating Cart Button
+            
             const FloatingCartButton(),
           ],
         ),

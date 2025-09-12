@@ -169,8 +169,8 @@ class AddressCard extends StatelessWidget {
         return ImagePath.homeAddressIcon;
       case AddressType.office:
         return ImagePath.officeAddressIcon;
-      // case AddressType.other:
-      //   return 'assets/icons/other_icon.png';
+      
+      
       default:
         return ImagePath.homeAddressIcon;
     }

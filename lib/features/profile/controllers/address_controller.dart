@@ -92,7 +92,7 @@ class AddressController extends GetxController {
       final index = _addresses.indexWhere((addr) => addr.id == addressId);
       if (index != -1) {
         _addresses[index] = _addresses[index].copyWith(isDefault: true);
-        // Force UI update immediately
+        
         update();
         Get.snackbar(
           'Success',

@@ -41,7 +41,7 @@ class FreeGiftAndProgressSection extends StatelessWidget {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // Icon box
+                    
                     Container(
                       width: 80.w,
                       decoration: BoxDecoration(
@@ -59,16 +59,16 @@ class FreeGiftAndProgressSection extends StatelessWidget {
 
                     SizedBox(width: 12.w),
 
-                    // Vertical divider
+                    
                     VerticalDivider(
-                      width: 1.w + 12.w, // keeps spacing
+                      width: 1.w + 12.w, 
                       thickness: 1,
                       color: Colors.grey[400],
                     ),
 
                     SizedBox(width: 12.w),
 
-                    // Details + Add
+                    
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -115,7 +115,7 @@ class FreeGiftAndProgressSection extends StatelessWidget {
                                 ),
                               ),
                               const Spacer(),
-                              // Button
+                              
                               TextButton(
                                 style: TextButton.styleFrom(
                                   padding: EdgeInsets.symmetric(
@@ -128,7 +128,7 @@ class FreeGiftAndProgressSection extends StatelessWidget {
                                   ),
                                 ),
                                 onPressed: () {
-                                  /* add action */
+                                  
                                 },
                                 child: Text(
                                   'Add',
@@ -152,7 +152,7 @@ class FreeGiftAndProgressSection extends StatelessWidget {
 
             SizedBox(height: 16.h),
 
-            // Progress area (kept inside same card)
+            
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

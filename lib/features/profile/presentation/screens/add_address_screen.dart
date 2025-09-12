@@ -54,7 +54,7 @@ class AddAddressScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Handle bar
+                  
                   Center(
                     child: Container(
                       width: 40.w,

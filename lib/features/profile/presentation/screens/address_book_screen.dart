@@ -178,7 +178,7 @@ class AddressBookScreen extends StatelessWidget {
 
             SizedBox(height: 24.h),
 
-            // Options
+            
             if (!address.isDefault)
               _buildBottomSheetOption(
                 icon: Iconsax.tick_circle,
@@ -241,7 +241,7 @@ class AddressBookScreen extends StatelessWidget {
   }
 
   void _navigateToEditAddress(address) {
-    // TODO: Navigate to edit address screen
+    
     Get.snackbar(
       'Coming Soon',
       'Edit address functionality will be implemented next',

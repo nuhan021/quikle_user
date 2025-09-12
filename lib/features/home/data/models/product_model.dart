@@ -105,14 +105,14 @@ class ProductModel {
         productType.hashCode;
   }
 
-  // Helper methods
+  
   bool get isMedicine => categoryId == '3';
 
   bool get canAddToCart {
     if (!isMedicine) return true;
     if (isOTC)
-      return hasPrescriptionUploaded; // OTC medicines need prescription
-    return true; // Normal medicines can be added directly
+      return hasPrescriptionUploaded; 
+    return true; 
   }
 }
 

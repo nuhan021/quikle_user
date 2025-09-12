@@ -13,7 +13,7 @@ class CategoryRestaurantsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Get the arguments passed to this screen
+    
     final arguments = Get.arguments as Map<String, dynamic>;
     final String categoryName = arguments['categoryName'] ?? 'Restaurants';
     final String categoryId = arguments['categoryId'] ?? '';
@@ -86,7 +86,7 @@ class CategoryRestaurantsScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Results count
+                    
                     Text(
                       '${restaurants.length} restaurants serving $categoryName',
                       style: getTextStyle(
@@ -98,14 +98,14 @@ class CategoryRestaurantsScreen extends StatelessWidget {
                     ),
                     SizedBox(height: 16.h),
 
-                    // Restaurant Grid
+                    
                     Expanded(
                       child: GridView.builder(
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
                           crossAxisSpacing: 12.w,
                           mainAxisSpacing: 12.h,
-                          childAspectRatio: 0.75, // Adjust for restaurant cards
+                          childAspectRatio: 0.75, 
                         ),
                         itemCount: restaurants.length,
                         itemBuilder: (context, index) {
@@ -113,7 +113,7 @@ class CategoryRestaurantsScreen extends StatelessWidget {
                           return RestaurantCard(
                             restaurant: restaurant,
                             onTap: () {
-                              // Navigate to restaurant menu with category filter
+                              
                               Get.toNamed(
                                 '/restaurant-menu',
                                 arguments: {

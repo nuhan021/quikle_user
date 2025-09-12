@@ -37,7 +37,7 @@ class RestaurantCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Restaurant Image
+            
             Container(
               height: 100.h,
               width: double.infinity,
@@ -70,14 +70,14 @@ class RestaurantCard extends StatelessWidget {
               ),
             ),
 
-            // Restaurant Details
+            
             Expanded(
               child: Padding(
                 padding: EdgeInsets.all(12.w),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Restaurant Name
+                    
                     Text(
                       restaurant.name,
                       maxLines: 1,
@@ -91,7 +91,7 @@ class RestaurantCard extends StatelessWidget {
                     ),
                     SizedBox(height: 4.h),
 
-                    // Cuisines
+                    
                     Text(
                       restaurant.cuisines.join(', '),
                       maxLines: 1,
@@ -105,11 +105,11 @@ class RestaurantCard extends StatelessWidget {
                     ),
                     SizedBox(height: 8.h),
 
-                    // Rating and Delivery Time
+                    
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        // Rating
+                        
                         Row(
                           children: [
                             Icon(
@@ -130,7 +130,7 @@ class RestaurantCard extends StatelessWidget {
                           ],
                         ),
 
-                        // Delivery Time
+                        
                         Text(
                           restaurant.deliveryTime,
                           style: getTextStyle(
@@ -143,7 +143,7 @@ class RestaurantCard extends StatelessWidget {
                       ],
                     ),
 
-                    // Open/Closed Status
+                    
                     if (!restaurant.isOpen) ...[
                       SizedBox(height: 4.h),
                       Container(

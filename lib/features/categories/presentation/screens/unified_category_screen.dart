@@ -69,7 +69,6 @@ class UnifiedCategoryScreen extends StatelessWidget {
                             ),
                             SizedBox(height: 24.h),
 
-                            // Main categories section - always visible
                             PopularItemsSection(
                               subcategories: controller.isGroceryCategory
                                   ? controller.allCategories
@@ -85,7 +84,6 @@ class UnifiedCategoryScreen extends StatelessWidget {
                                   : controller.selectedSubcategory.value,
                             ),
 
-                            // Top Restaurants section - only for food category
                             if (controller.isFoodCategory &&
                                 controller.showRestaurants.value &&
                                 controller.topRestaurants.isNotEmpty) ...[
@@ -97,7 +95,6 @@ class UnifiedCategoryScreen extends StatelessWidget {
                               ),
                             ],
 
-                            // Subcategories section - show for grocery when main category is selected
                             if (controller.isGroceryCategory &&
                                 controller.selectedMainCategory.value != null &&
                                 controller.filterSubcategories.isNotEmpty) ...[
@@ -124,7 +121,7 @@ class UnifiedCategoryScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              // Floating Cart Button
+
               const FloatingCartButton(),
             ],
           ),
@@ -148,7 +145,6 @@ class UnifiedCategoryScreen extends StatelessWidget {
   Widget _buildDefaultCategoryView(UnifiedCategoryController controller) {
     return Column(
       children: [
-        // Show main product grid if products are available
         if (controller.displayProducts.isNotEmpty)
           ProductGridSection(
             title: controller.productsTitle.value,
@@ -157,13 +153,12 @@ class UnifiedCategoryScreen extends StatelessWidget {
             onAddToCart: controller.onAddToCart,
             onFavoriteToggle: controller.onFavoriteToggle,
             onViewAllTap: controller.showAllProducts,
-            maxItems: 12,
-            crossAxisCount: 2,
+            maxItems: 9,
+            crossAxisCount: 3,
             isGroceryCategory: controller.isGroceryCategory,
             shops: controller.shops,
           ),
 
-        // Show recommended products section for non-grocery categories
         if (!controller.isGroceryCategory &&
             controller.recommendedProducts.isNotEmpty) ...[
           SizedBox(height: 24.h),
@@ -180,7 +175,6 @@ class UnifiedCategoryScreen extends StatelessWidget {
           ),
         ],
 
-        // Show message if no products available
         if (controller.displayProducts.isEmpty)
           Center(
             child: Padding(
@@ -197,7 +191,6 @@ class UnifiedCategoryScreen extends StatelessWidget {
   }
 
   Widget _buildGroceryContentView(UnifiedCategoryController controller) {
-    // Show products - either for selected main category or all grocery products
     if (controller.displayProducts.isNotEmpty) {
       return ProductGridSection(
         title: controller.productsTitle.value,
@@ -206,14 +199,13 @@ class UnifiedCategoryScreen extends StatelessWidget {
         onAddToCart: controller.onAddToCart,
         onFavoriteToggle: controller.onFavoriteToggle,
         onViewAllTap: controller.showAllProducts,
-        maxItems: 12,
+        maxItems: 9,
         crossAxisCount: 2,
         isGroceryCategory: controller.isGroceryCategory,
         shops: controller.shops,
       );
     }
 
-    // Show message if no products available
     return Center(
       child: Padding(
         padding: EdgeInsets.symmetric(vertical: 40.h),
@@ -232,7 +224,6 @@ class UnifiedCategoryScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Custom header without the ProductGridSection border issue
           Container(
             width: double.infinity,
             padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 12.w),
@@ -282,10 +273,10 @@ class UnifiedCategoryScreen extends StatelessWidget {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
+              crossAxisCount: 3,
               crossAxisSpacing: 12.w,
               mainAxisSpacing: 12.h,
-              childAspectRatio: 0.95.h,
+              childAspectRatio: 0.55.h,
             ),
             itemCount: controller.displayProducts.length,
             itemBuilder: (context, index) {

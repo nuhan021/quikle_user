@@ -34,7 +34,7 @@ class PaymentMethodListItem extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // Payment method icon
+          
           if (paymentMethod.type.iconPath != null)
             Image.asset(paymentMethod.type.iconPath!, width: 24.w, height: 24.w)
           else
@@ -54,7 +54,7 @@ class PaymentMethodListItem extends StatelessWidget {
 
           SizedBox(width: 12.w),
 
-          // Payment method name
+          
           Expanded(
             child: Text(
               paymentMethod.type.displayName,
@@ -67,7 +67,7 @@ class PaymentMethodListItem extends StatelessWidget {
             ),
           ),
 
-          // Remove button (only for removable payment methods)
+          
           if (paymentMethod.isRemovable && onRemove != null)
             GestureDetector(
               onTap: onRemove,

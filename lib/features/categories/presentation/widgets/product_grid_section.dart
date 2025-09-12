@@ -44,7 +44,6 @@ class ProductGridSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Only show title section if title is not empty
         if (title.isNotEmpty)
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 8.w),

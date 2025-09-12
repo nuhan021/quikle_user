@@ -7,9 +7,9 @@ class RestaurantModel {
   final String address;
   final bool isOpen;
   final List<String> cuisines;
-  final List<String> specialties; // Food categories they serve
+  final List<String> specialties; 
   final int reviewCount;
-  final double popularity; // Score for ranking
+  final double popularity; 
   final bool isTopRated;
 
   const RestaurantModel({
@@ -27,12 +27,12 @@ class RestaurantModel {
     this.isTopRated = false,
   });
 
-  // Helper method to check if restaurant serves a specific food category
+  
   bool servesCategory(String categoryId) {
     return specialties.contains(categoryId);
   }
 
-  // Calculate popularity score based on rating and review count
+  
   double get popularityScore {
     return (rating * 0.7) + (reviewCount / 100 * 0.3);
   }

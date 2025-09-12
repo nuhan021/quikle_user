@@ -27,7 +27,7 @@ class TopRestaurantsSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Section Title
+        
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 16.w),
           child: Text(
@@ -43,7 +43,7 @@ class TopRestaurantsSection extends StatelessWidget {
         SizedBox(height: 16.h),
 
         SizedBox(
-          height: 200.h, // Adjusted height for restaurant cards
+          height: 200.h, 
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             padding: EdgeInsets.symmetric(horizontal: 16.w),

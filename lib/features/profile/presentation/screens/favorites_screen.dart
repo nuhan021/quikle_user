@@ -125,7 +125,7 @@ class FavoritesScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header with count
+          
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [

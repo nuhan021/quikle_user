@@ -48,7 +48,7 @@ class VerificationScreen extends StatelessWidget {
 
                   Positioned(
                     left: 0,
-                    right: 0, // make it stretch full width
+                    right: 0, 
                     top: 24.5.h,
                     child: SizedBox(
                       width: double.infinity,
@@ -126,7 +126,7 @@ class VerificationScreen extends StatelessWidget {
                             ),
                           ),
                           SizedBox(height: 16.h),
-                          // Enter Code
+                          
                           SizedBox(
                             width: 352.w,
                             child: Text(
@@ -175,7 +175,7 @@ class VerificationScreen extends StatelessWidget {
                     ),
                   ),
 
-                  // ===== OTP + Verify + Resend block =====
+                  
                   Positioned(
                     left: 20.w,
                     top: 495.h,
@@ -185,7 +185,7 @@ class VerificationScreen extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // OTP row (6 boxes) – first 2 yellow per Figma, others grey
+                          
                           SizedBox(
                             width: double.infinity,
                             height: 52.h,
@@ -269,7 +269,7 @@ class VerificationScreen extends StatelessWidget {
 
                           SizedBox(height: 16.h),
 
-                          // Resend text (Container -> RichText)
+                          
                           SizedBox(
                             width: 352.w,
                             child: Obx(() {

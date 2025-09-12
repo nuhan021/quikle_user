@@ -20,12 +20,12 @@ class ProductController extends GetxController {
   final _description = ''.obs;
   final _ratingDistribution = <String, dynamic>{}.obs;
 
-  // Controllers for user input
+  
   final reviewController = TextEditingController();
   final questionController = TextEditingController();
   final _userRating = 5.0.obs;
 
-  // Getters
+  
   bool get isLoading => _isLoading.value;
   ProductModel? get product => _product.value;
   List<ReviewModel> get reviews => _reviews;
@@ -58,7 +58,7 @@ class ProductController extends GetxController {
     try {
       _product.value = productModel;
 
-      // Clear and populate lists to maintain reactivity
+      
       _reviews.clear();
       _reviews.addAll(_productService.getProductReviews(productModel));
 
@@ -102,10 +102,10 @@ class ProductController extends GetxController {
   }
 
   void onUploadPrescription() {
-    // Handle prescription upload
+    
     if (_product.value != null) {
-      // In a real app, this would open a file picker or camera
-      // For now, we'll simulate successful upload
+      
+      
       final updatedProduct = _product.value!.copyWith(
         hasPrescriptionUploaded: true,
       );
@@ -120,7 +120,7 @@ class ProductController extends GetxController {
   }
 
   void onViewPrescription() {
-    // Handle view prescription
+    
     Get.snackbar(
       'View Prescription',
       'Prescription viewer will open here.',
@@ -130,14 +130,14 @@ class ProductController extends GetxController {
 
   void onFavoriteToggle() {
     if (_product.value != null) {
-      // Update global favorites
+      
       if (FavoritesController.isProductFavorite(_product.value!.id)) {
         FavoritesController.removeFromGlobalFavorites(_product.value!.id);
       } else {
         FavoritesController.addToGlobalFavorites(_product.value!.id);
       }
 
-      // Update local product to reflect the change
+      
       final isFavorite = FavoritesController.isProductFavorite(
         _product.value!.id,
       );
@@ -170,7 +170,7 @@ class ProductController extends GetxController {
       return;
     }
 
-    // Create new review
+    
     final newReview = ReviewModel(
       id: 'review_${DateTime.now().millisecondsSinceEpoch}',
       productId: _product.value?.id ?? '',
@@ -182,10 +182,10 @@ class ProductController extends GetxController {
       date: DateTime.now(),
     );
 
-    // Add to the beginning of the list
+    
     _reviews.insert(0, newReview);
 
-    // Clear the input
+    
     reviewController.clear();
     _userRating.value = 5.0;
 
@@ -210,7 +210,7 @@ class ProductController extends GetxController {
       return;
     }
 
-    // Create new question
+    
     final newQuestion = QuestionModel(
       id: 'question_${DateTime.now().millisecondsSinceEpoch}',
       productId: _product.value?.id ?? '',
@@ -218,14 +218,14 @@ class ProductController extends GetxController {
       userName: 'You',
       userImage: 'assets/icons/profile.png',
       question: questionController.text.trim(),
-      answer: '', // Empty initially, can be answered later
+      answer: '', 
       date: DateTime.now(),
     );
 
-    // Add to the beginning of the list
+    
     _questions.insert(0, newQuestion);
 
-    // Clear the input
+    
     questionController.clear();
 
     Get.snackbar(
@@ -238,7 +238,7 @@ class ProductController extends GetxController {
   }
 
   void onReplyToQuestion(QuestionModel question) {
-    // Handle reply to question
+    
     Get.snackbar(
       'Reply',
       'Reply functionality will be implemented',
@@ -247,7 +247,7 @@ class ProductController extends GetxController {
   }
 
   void onSeeAllReviews() {
-    // Handle see all reviews
+    
     Get.snackbar(
       'All Reviews',
       'All reviews functionality will be implemented',
@@ -256,7 +256,7 @@ class ProductController extends GetxController {
   }
 
   void onShareProduct() {
-    // Handle share product
+    
     Get.snackbar(
       'Share',
       'Share functionality will be implemented',
@@ -274,7 +274,7 @@ class ProductController extends GetxController {
   }
 
   void onFavoriteToggleFromSimilar(ProductModel product) {
-    // Handle favorite toggle for similar products
+    
     Get.snackbar(
       'Favorite',
       '${product.title} ${product.isFavorite ? 'removed from' : 'added to'} favorites.',

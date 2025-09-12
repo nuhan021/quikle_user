@@ -369,12 +369,14 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
           Icon(Icons.access_time, color: AppColors.featherGrey, size: 10.w),
           SizedBox(width: 2.w),
           Text(
-            widget.shop?.deliveryTime ?? 'Fast delivery',
+            widget.shop?.deliveryTime ?? '30 Min',
             style: getTextStyle(
               font: CustomFonts.inter,
               fontSize: 10.sp,
               color: AppColors.featherGrey,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       );

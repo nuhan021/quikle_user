@@ -170,7 +170,7 @@ class OrdersScreen extends StatelessWidget {
                       return OrderCard(
                         order: order,
                         onTap: () {
-                          // Get.toNamed('/order-details', arguments: order);
+                          
                         },
                       );
                     },

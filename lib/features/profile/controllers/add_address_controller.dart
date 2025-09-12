@@ -7,32 +7,32 @@ import 'package:quikle_user/features/profile/controllers/address_controller.dart
 import 'package:quikle_user/core/utils/constants/enums/address_type_enums.dart';
 
 class AddAddressController extends GetxController {
-  // Services
+  
   final _addressService = Get.find<AddressService>();
   final _addressController = Get.find<AddressController>();
 
-  // Text Controllers
+  
   final nameController = TextEditingController();
   final addressController = TextEditingController();
   final zipCodeController = TextEditingController();
   final phoneController = TextEditingController();
 
-  // Observable variables
+  
   final isLoading = false.obs;
   final isDefault = false.obs;
 
-  // Dropdown selections
+  
   final selectedCountry = Rxn<String>();
   final selectedCity = Rxn<String>();
   final selectedAddressType = Rxn<AddressType>();
 
-  // Error messages
+  
   final nameError = ''.obs;
   final addressError = ''.obs;
   final zipCodeError = ''.obs;
   final phoneError = ''.obs;
 
-  // Data lists
+  
   final countries = <String>[].obs;
   final cities = <String>[].obs;
 
@@ -54,16 +54,16 @@ class AddAddressController extends GetxController {
 
   void _loadInitialData() {
     countries.assignAll(_addressService.getCountries());
-    // Set default country
+    
     selectedCountry.value = 'United States';
     _loadCitiesForCountry('United States');
 
-    // Set default address type
+    
     selectedAddressType.value = AddressType.home;
   }
 
   void _setupListeners() {
-    // Clear errors when user starts typing
+    
     nameController.addListener(() {
       if (nameError.value.isNotEmpty) nameError.value = '';
     });
@@ -84,7 +84,7 @@ class AddAddressController extends GetxController {
   void setCountry(String? country) {
     if (country != null) {
       selectedCountry.value = country;
-      selectedCity.value = null; // Reset city when country changes
+      selectedCity.value = null; 
       _loadCitiesForCountry(country);
     }
   }
@@ -124,13 +124,13 @@ class AddAddressController extends GetxController {
       country: selectedCountry.value,
     );
 
-    // Set error messages
+    
     nameError.value = validationErrors['name'] ?? '';
     addressError.value = validationErrors['address'] ?? '';
     zipCodeError.value = validationErrors['zipCode'] ?? '';
     phoneError.value = validationErrors['phoneNumber'] ?? '';
 
-    // Check dropdown validations
+    
     if (selectedCity.value == null || selectedCity.value!.isEmpty) {
       Get.snackbar('Validation Error', 'Please select a city');
       isValid = false;
@@ -158,14 +158,14 @@ class AddAddressController extends GetxController {
     try {
       isLoading.value = true;
 
-      // Create new address model
+      
       final newAddress = ShippingAddressModel(
-        id: '', // Will be set by service
-        userId: 'user123', // In real app, get from auth service
+        id: '', 
+        userId: 'user123', 
         name: nameController.text.trim(),
         address: addressController.text.trim(),
         city: selectedCity.value!,
-        state: selectedCountry.value!, // Using country as state for simplicity
+        state: selectedCountry.value!, 
         zipCode: zipCodeController.text.trim(),
         phoneNumber: phoneController.text.trim(),
         type: selectedAddressType.value!,
@@ -173,13 +173,13 @@ class AddAddressController extends GetxController {
         createdAt: DateTime.now(),
       );
 
-      // Add address through service
+      
       final addedAddress = await _addressService.addAddress(newAddress);
 
-      // Add to address controller
+      
       await _addressController.addAddress(addedAddress);
 
-      // Close modal and show success message
+      
       clearForm();
       Get.back();
       Get.snackbar(

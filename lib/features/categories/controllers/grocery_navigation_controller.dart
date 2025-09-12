@@ -10,24 +10,24 @@ class GroceryNavigationController extends GetxController {
   final CategoryService _categoryService = CategoryService();
   late final CartController _cartController;
 
-  // Arguments from navigation
+  
   late final CategoryModel category;
 
-  // Navigation state
+  
   final currentLevel =
-      0.obs; // 0: main categories, 1: subcategories, 2: products
+      0.obs; 
   final currentParentId = ''.obs;
   final currentTitle = 'Groceries'.obs;
   final breadcrumb = ''.obs;
   final canGoBack = false.obs;
 
-  // Observables
+  
   final isLoading = false.obs;
   final popularSubcategories = <SubcategoryModel>[].obs;
   final currentSubcategories = <SubcategoryModel>[].obs;
   final currentProducts = <ProductModel>[].obs;
 
-  // Navigation history
+  
   final List<NavigationLevel> _history = [];
 
   @override
@@ -35,7 +35,7 @@ class GroceryNavigationController extends GetxController {
     super.onInit();
     _cartController = Get.find<CartController>();
 
-    // Get category from arguments
+    
     category = Get.arguments as CategoryModel;
     currentTitle.value = category.title;
 
@@ -45,18 +45,18 @@ class GroceryNavigationController extends GetxController {
   Future<void> _loadMainCategories() async {
     isLoading.value = true;
     try {
-      // Load grocery main categories
+      
       final mainCategories = await _categoryService
           .fetchGroceryMainCategories();
       currentSubcategories.value = mainCategories;
 
-      // Load popular subcategories
+      
       final popular = await _categoryService.fetchPopularSubcategories(
         category.id,
       );
       popularSubcategories.value = popular;
 
-      // Reset navigation state
+      
       currentLevel.value = 0;
       canGoBack.value = false;
       breadcrumb.value = '';
@@ -72,14 +72,14 @@ class GroceryNavigationController extends GetxController {
     isLoading.value = true;
 
     try {
-      // Check if this subcategory has children
+      
       final children = await _categoryService.fetchSubcategories(
         category.id,
         parentSubcategoryId: subcategory.id,
       );
 
       if (children.isNotEmpty) {
-        // Navigate to subcategories
+        
         _pushLevel(
           NavigationLevel(
             title: subcategory.title,
@@ -96,12 +96,12 @@ class GroceryNavigationController extends GetxController {
         _updateBreadcrumb();
         canGoBack.value = true;
 
-        // Hide popular items for deeper levels
+        
         if (currentLevel.value > 0) {
           popularSubcategories.clear();
         }
       } else {
-        // Navigate to products
+        
         final products = await _categoryService.fetchProductsBySubcategory(
           subcategory.id,
         );
@@ -119,7 +119,7 @@ class GroceryNavigationController extends GetxController {
           currentProducts.value = products;
           currentSubcategories.clear();
           popularSubcategories.clear();
-          currentLevel.value = 2; // Products level
+          currentLevel.value = 2; 
           currentTitle.value = subcategory.title;
           _updateBreadcrumb();
           canGoBack.value = true;
@@ -154,7 +154,7 @@ class GroceryNavigationController extends GetxController {
       _updateBreadcrumb();
       canGoBack.value = _history.isNotEmpty;
 
-      // Restore popular items for main level
+      
       if (currentLevel.value == 0) {
         _loadPopularSubcategories();
       }
@@ -162,12 +162,12 @@ class GroceryNavigationController extends GetxController {
   }
 
   void onProductTap(ProductModel product) {
-    // Navigate to product details screen
+    
     Get.toNamed(AppRoute.getProductDetails(), arguments: product);
   }
 
   void onAddToCart(ProductModel product) {
-    // Add product to cart
+    
     _cartController.addToCart(product);
   }
 
@@ -181,7 +181,7 @@ class GroceryNavigationController extends GetxController {
     } else if (currentLevel.value == 1) {
       breadcrumb.value = 'Groceries';
     } else {
-      // Build full breadcrumb path
+      
       final parts = ['Groceries'];
       if (_history.isNotEmpty) {
         parts.add(_history.last.title);

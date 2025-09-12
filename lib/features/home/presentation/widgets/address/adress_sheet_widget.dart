@@ -1,4 +1,4 @@
-// lib/features/profile/widgets/address_selection_sheet.dart
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:quikle_user/core/common/styles/global_text_style.dart';
@@ -8,10 +8,10 @@ import 'package:quikle_user/core/utils/constants/enums/address_type_enums.dart';
 import 'package:quikle_user/features/profile/controllers/address_controller.dart';
 import 'package:quikle_user/routes/app_routes.dart';
 
-/// Call this from anywhere to open the bottom sheet.
-/// Example: showAddressSelectionSheet(addressController);
+
+
 void showAddressSelectionSheet(AddressController addressController) {
-  // Track the selected address in this sheet (defaults to current default)
+  
   final selectedAddressId = (addressController.defaultAddress?.id ?? '').obs;
 
   Get.bottomSheet(
@@ -66,7 +66,7 @@ class _AddressSelectionSheet extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Handle bar
+            
             Container(
               margin: const EdgeInsets.only(top: 12),
               width: 40,
@@ -107,7 +107,7 @@ class _AddressSelectionSheet extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
 
-                  // Address list
+                  
                   Obx(() {
                     final items = addressController.addresses;
                     if (items.isEmpty) {
@@ -137,7 +137,7 @@ class _AddressSelectionSheet extends StatelessWidget {
                             ),
                             child: Row(
                               children: [
-                                // Address type icon
+                                
                                 Container(
                                   padding: const EdgeInsets.all(8),
                                   decoration: BoxDecoration(
@@ -216,7 +216,7 @@ class _AddressSelectionSheet extends StatelessWidget {
                                     ],
                                   ),
                                 ),
-                                // Selection indicator
+                                
                                 AnimatedContainer(
                                   duration: const Duration(milliseconds: 200),
                                   child: Icon(
@@ -239,7 +239,7 @@ class _AddressSelectionSheet extends StatelessWidget {
 
                   const SizedBox(height: 24),
 
-                  // Bottom actions
+                  
                   Obx(() {
                     final hasAddresses = addressController.addresses.isNotEmpty;
                     if (!hasAddresses) return const SizedBox.shrink();
@@ -250,7 +250,7 @@ class _AddressSelectionSheet extends StatelessWidget {
 
                     return Row(
                       children: [
-                        // Cancel
+                        
                         Expanded(
                           child: OutlinedButton(
                             onPressed: () => Get.back(),
@@ -273,7 +273,7 @@ class _AddressSelectionSheet extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 12),
-                        // Save
+                        
                         Expanded(
                           flex: 2,
                           child: ElevatedButton(

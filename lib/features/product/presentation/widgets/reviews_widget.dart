@@ -57,10 +57,10 @@ class ReviewsWidget extends StatelessWidget {
         ),
         SizedBox(height: 16.h),
 
-        // Rating summary
+        
         Row(
           children: [
-            // Overall rating
+            
             Column(
               children: [
                 Text(
@@ -89,7 +89,7 @@ class ReviewsWidget extends StatelessWidget {
             ),
             SizedBox(width: 32.w),
 
-            // Rating distribution
+            
             Expanded(
               child: Column(
                 children: [
@@ -127,7 +127,7 @@ class ReviewsWidget extends StatelessWidget {
 
         SizedBox(height: 16.h),
 
-        // Rating selector for new review
+        
         Container(
           padding: EdgeInsets.all(12.w),
           decoration: BoxDecoration(
@@ -225,7 +225,7 @@ class ReviewsWidget extends StatelessWidget {
 
         SizedBox(height: 20.h),
 
-        // Reviews header
+        
         Obx(
           () => reviews.isNotEmpty
               ? Column(
@@ -256,7 +256,7 @@ class ReviewsWidget extends StatelessWidget {
     return Container(
       margin: EdgeInsets.only(bottom: 12.h),
       decoration: BoxDecoration(
-        color: AppColors.textWhite, // keep your current bg
+        color: AppColors.textWhite, 
         borderRadius: BorderRadius.circular(8.r),
         border: Border.all(color: Colors.white, width: 1),
       ),
@@ -328,7 +328,7 @@ class ReviewsWidget extends StatelessWidget {
                 font: CustomFonts.inter,
                 fontSize: 14.sp,
                 color: AppColors.ebonyBlack,
-                //height: 1.4,
+                
               ),
             ),
 

@@ -1,4 +1,4 @@
-// SearchScreen.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -42,7 +42,7 @@ class SearchScreen extends StatelessWidget {
         children: [
           Column(
             children: [
-              // Search Bar Section
+              
               Container(
                 padding: EdgeInsets.all(16.w),
                 child: Row(
@@ -116,7 +116,7 @@ class SearchScreen extends StatelessWidget {
                 ),
               ),
 
-              // Recent Searches or Search Results
+              
               Expanded(
                 child: Obx(() {
                   if (controller.isLoading) {
@@ -137,7 +137,7 @@ class SearchScreen extends StatelessWidget {
             ],
           ),
 
-          // Listening popup overlay
+          
           Obx(() {
             if (!controller.isListening) return const SizedBox.shrink();
             return Container(

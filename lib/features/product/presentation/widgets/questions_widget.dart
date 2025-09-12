@@ -26,7 +26,7 @@ class QuestionsWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Section Title
+        
         Text(
           'Question & Answer',
           style: TextStyle(
@@ -37,7 +37,7 @@ class QuestionsWidget extends StatelessWidget {
         ),
         SizedBox(height: 16.h),
 
-        // Input box to ask a question
+        
         Container(
           padding: EdgeInsets.all(12.w),
           decoration: BoxDecoration(
@@ -117,7 +117,7 @@ class QuestionsWidget extends StatelessWidget {
 
         SizedBox(height: 20.h),
 
-        // Questions header and list
+        
         Obx(
           () => controller.questions.isNotEmpty
               ? Column(
@@ -214,7 +214,7 @@ class QuestionsWidget extends StatelessWidget {
               ),
             ),
 
-            // Show answer if available
+            
             if (question.answer.isNotEmpty) ...[
               SizedBox(height: 12.h),
               Container(

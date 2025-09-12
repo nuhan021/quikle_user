@@ -16,7 +16,7 @@ class OrderTrackingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Try to find existing controller first, create if not found
+    
     OrderTrackingController controller;
     if (Get.isRegistered<OrderTrackingController>()) {
       controller = Get.find<OrderTrackingController>();
@@ -24,7 +24,7 @@ class OrderTrackingScreen extends StatelessWidget {
       controller = Get.put(OrderTrackingController());
     }
 
-    // Initialize with order (safe for hot reload)
+    
     controller.initializeWithOrder(order);
 
     return Scaffold(

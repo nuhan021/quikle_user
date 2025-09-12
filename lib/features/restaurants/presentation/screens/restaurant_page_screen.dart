@@ -62,12 +62,12 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen> {
   void _loadProducts() {
     setState(() => _isLoading = true);
 
-    // Get all products from this restaurant
+    
     _restaurantProducts = _productService.allProducts
         .where((product) => product.shopId == restaurant.id)
         .toList();
 
-    // Apply initial filter
+    
     _filterProducts(_selectedCategory);
 
     setState(() => _isLoading = false);
@@ -103,25 +103,25 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen> {
             .where((product) => product.productType == 'beverage')
             .toList();
       } else {
-        // For any other category, show all products
+        
         _filteredProducts = _restaurantProducts;
       }
     });
   }
 
   void _onFavoriteToggle(ProductModel product) {
-    // Update global favorites
+    
     if (FavoritesController.isProductFavorite(product.id)) {
       FavoritesController.removeFromGlobalFavorites(product.id);
     } else {
       FavoritesController.addToGlobalFavorites(product.id);
     }
 
-    // Update local product lists to reflect the change
+    
     final isFavorite = FavoritesController.isProductFavorite(product.id);
     final updatedProduct = product.copyWith(isFavorite: isFavorite);
 
-    // Update in restaurant products list
+    
     final restaurantIndex = _restaurantProducts.indexWhere(
       (p) => p.id == product.id,
     );
@@ -131,7 +131,7 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen> {
       });
     }
 
-    // Update in filtered products list
+    
     final filteredIndex = _filteredProducts.indexWhere(
       (p) => p.id == product.id,
     );
@@ -150,7 +150,7 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen> {
   }
 
   void _onAddToCart(ProductModel product) {
-    // Use the cart controller to add the product to cart
+    
     try {
       final cartController = Get.find<CartController>();
       cartController.addToCart(product);
@@ -162,7 +162,7 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen> {
         duration: const Duration(seconds: 2),
       );
     } catch (e) {
-      // If cart controller is not found, show a fallback message
+      
       Get.snackbar(
         'Added to Cart',
         '${product.title} added to your cart',
@@ -173,7 +173,7 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen> {
   }
 
   void _onProductTap(ProductModel product) {
-    // Navigate to product details screen
+    
     Get.toNamed(AppRoute.getProductDetails(), arguments: product);
   }
 
@@ -191,7 +191,7 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen> {
             children: [
               Column(
                 children: [
-                  // Category App Bar with back button
+                  
                   CommonAppBar(
                     title: restaurant.name,
                     showBackButton: true,
@@ -218,7 +218,7 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen> {
                     ),
                     child: Row(
                       children: [
-                        // Restaurant Image
+                        
                         Container(
                           width: 64.w,
                           height: 64.w,
@@ -251,7 +251,7 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen> {
 
                         SizedBox(width: 16.w),
 
-                        // Restaurant Details
+                        
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -282,12 +282,12 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen> {
                     ),
                   ),
 
-                  // Search Bar and Filters
+                  
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16.w),
                     child: Column(
                       children: [
-                        // Search Bar
+                        
                         Container(
                           height: 48.h,
                           decoration: BoxDecoration(
@@ -329,10 +329,10 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen> {
 
                         SizedBox(height: 16.h),
 
-                        // Sort and Filter Buttons
+                        
                         Row(
                           children: [
-                            // Sort Button
+                            
                             Container(
                               padding: EdgeInsets.symmetric(
                                 horizontal: 16.w,
@@ -373,7 +373,7 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen> {
 
                             SizedBox(width: 8.w),
 
-                            // Filter Button
+                            
                             Container(
                               padding: EdgeInsets.symmetric(
                                 horizontal: 16.w,
@@ -419,7 +419,7 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen> {
 
                   SizedBox(height: 24.h),
 
-                  // Category Tabs
+                  
                   SizedBox(
                     height: 30.h,
                     child: ListView.builder(
@@ -468,7 +468,7 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen> {
 
                   SizedBox(height: 24.h),
 
-                  // Popular Foods Section
+                  
                   Expanded(
                     child: _isLoading
                         ? const Center(child: CircularProgressIndicator())
@@ -500,7 +500,7 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                // Section Title
+                                
                                 Container(
                                   width: double.infinity,
                                   padding: EdgeInsets.only(bottom: 8.h),
@@ -542,12 +542,12 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen> {
                                       onFavoriteToggle: () =>
                                           _onFavoriteToggle(product),
                                       variant: ProductCardVariant.category,
-                                      isGroceryCategory: false, // Food category
+                                      isGroceryCategory: false, 
                                     );
                                   },
                                 ),
 
-                                SizedBox(height: 120.h), // Space for bottom nav
+                                SizedBox(height: 120.h), 
                               ],
                             ),
                           ),
@@ -555,7 +555,7 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen> {
                 ],
               ),
 
-              // Floating Cart Button
+              
               const FloatingCartButton(),
             ],
           ),

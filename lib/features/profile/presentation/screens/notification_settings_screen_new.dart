@@ -16,13 +16,13 @@ class NotificationSettingsScreen extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            // Profile App Bar
+            
             const UnifiedProfileAppBar(
               title: 'Notification Settings',
               showActionButton: false,
             ),
 
-            // Content
+            
             Expanded(
               child: Center(
                 child: Padding(
