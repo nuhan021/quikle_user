@@ -19,43 +19,37 @@ class CheckoutScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     Get.put(PayoutController());
 
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light.copyWith(
-        statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.dark,
-      ),
-      child: Scaffold(
-        backgroundColor: AppColors.homeGrey,
-        body: SafeArea(
-          child: Column(
-            children: [
-              const CheckoutAppBar(),
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: EdgeInsets.all(16.w),
-                  child: Column(
-                    children: [
-                      SizedBox(height: 16.h),
-                      const OrderSummarySection(),
+    return Scaffold(
+      appBar: CheckoutAppBar(onBackTap: () => Navigator.pop(context)),
+      backgroundColor: AppColors.homeGrey,
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.all(16.w),
+                child: Column(
+                  children: [
+                    SizedBox(height: 16.h),
+                    const OrderSummarySection(),
 
-                      SizedBox(height: 19.h),
-                      const ShippingAddressSection(),
+                    SizedBox(height: 19.h),
+                    const ShippingAddressSection(),
 
-                      SizedBox(height: 19.h),
-                      const DeliveryOptionsSection(),
+                    SizedBox(height: 19.h),
+                    const DeliveryOptionsSection(),
 
-                      SizedBox(height: 19.h),
-                      PaymentMethodSection(),
+                    SizedBox(height: 19.h),
+                    PaymentMethodSection(),
 
-                      SizedBox(height: 19.h),
-                      const CouponSection(),
-                    ],
-                  ),
+                    SizedBox(height: 19.h),
+                    const CouponSection(),
+                  ],
                 ),
               ),
-              const PlaceOrderButton(),
-            ],
-          ),
+            ),
+            const PlaceOrderButton(),
+          ],
         ),
       ),
     );

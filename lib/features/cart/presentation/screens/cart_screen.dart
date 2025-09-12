@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
@@ -20,63 +19,41 @@ class CartScreen extends StatelessWidget {
     final cartController = Get.find<CartController>();
     final homeController = Get.find<HomeController>();
 
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light.copyWith(
-        statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.dark,
+    return Scaffold(
+      backgroundColor: AppColors.homeGrey,
+      appBar: CartAppBar(
+        onClearAll: () => _showClearCartDialog(cartController),
       ),
-      child: Obx(() {
-        if (!cartController.hasItems) {
-          return const EmptyCartScreen();
-        }
-        return Scaffold(
-          backgroundColor: AppColors.homeGrey,
-          body: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  CartAppBar(
-                    onClearAll: () => _showClearCartDialog(cartController),
-                  ),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          SizedBox(height: 16.h),
-                          const FreeGiftAndProgressSection(),
-
-                          SizedBox(height: 19.h),
-                          const CartItemsSection(),
-
-                          SizedBox(height: 19.h),
-                          YouMayLikeSection(
-                            onAddToCart: (product) =>
-                                cartController.addToCart(product),
-                            onFavoriteToggle: (product) =>
-                                homeController.onFavoriteToggle(product),
-                            onProductTap: (product) {
-                              // Navigate to product details if needed
-                              Get.toNamed(
-                                '/product-details',
-                                arguments: product,
-                              );
-                            },
-                          ),
-
-                          SizedBox(height: 100.h),
-                        ],
-                      ),
+      body: Obx(() {
+        if (!cartController.hasItems) return const EmptyCartScreen();
+        return Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                child: Column(
+                  children: [
+                    SizedBox(height: 16.h),
+                    const FreeGiftAndProgressSection(),
+                    SizedBox(height: 19.h),
+                    const CartItemsSection(),
+                    SizedBox(height: 19.h),
+                    YouMayLikeSection(
+                      onAddToCart: cartController.addToCart,
+                      onFavoriteToggle: homeController.onFavoriteToggle,
+                      onProductTap: (p) =>
+                          Get.toNamed('/product-details', arguments: p),
                     ),
-                  ),
-                  CartBottomSection(
-                    onPlaceOrder: () => _handlePlaceOrder(cartController),
-                    onPaymentMethodTap: () => _showPaymentMethods(),
-                  ),
-                ],
+                    SizedBox(height: 100.h),
+                  ],
+                ),
               ),
             ),
-          ),
+            CartBottomSection(
+              onPlaceOrder: () => _handlePlaceOrder(cartController),
+              onPaymentMethodTap: _showPaymentMethods,
+            ),
+          ],
         );
       }),
     );

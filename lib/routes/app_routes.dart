@@ -3,6 +3,7 @@ import 'package:quikle_user/features/auth/presentation/screens/resgiter_screen.d
 import 'package:quikle_user/features/auth/presentation/screens/verification_scree.dart';
 import 'package:quikle_user/features/auth/presentation/screens/welcome_screen.dart';
 import 'package:quikle_user/features/main/presentation/screens/main_screen.dart';
+import 'package:quikle_user/features/profile/presentation/screens/my_profile_screen.dart';
 import 'package:quikle_user/features/splash/presentation/screens/splash_screen.dart';
 import 'package:quikle_user/features/auth/presentation/screens/login_screen.dart';
 import 'package:quikle_user/features/cart/presentation/screens/cart_screen.dart';
@@ -52,6 +53,7 @@ class AppRoute {
   static const String _search = '/search';
   static const String _categoryRestaurants = '/category-restaurants';
   static const String _restaurantMenu = '/restaurant-menu';
+  static const String _myProfile = '/my-profile';
 
   static String getSplashScreen() => _splash;
   static String getLoginScreen() => _login;
@@ -79,6 +81,7 @@ class AppRoute {
   static String getSearch() => _search;
   static String getCategoryRestaurants() => _categoryRestaurants;
   static String getRestaurantMenu() => _restaurantMenu;
+  static String getMyProfile() => _myProfile;
 
   static final List<GetPage<dynamic>> routes = <GetPage>[
     GetPage(name: _splash, page: () => const SplashScreen()),
@@ -123,6 +126,7 @@ class AppRoute {
       page: () => const CategoryRestaurantsScreen(),
     ),
     GetPage(name: _restaurantMenu, page: () => const RestaurantPageScreen()),
+    GetPage(name: _myProfile, page: () => const MyProfileScreen()),
 
     // GetPage(
     //   name: _home,

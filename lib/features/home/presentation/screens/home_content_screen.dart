@@ -32,7 +32,6 @@ class HomeContentScreen extends StatelessWidget {
             ? const Center(child: CircularProgressIndicator())
             : Column(
                 children: [
-                  // Fixed header with search bar and categories
                   Container(
                     color: AppColors.homeGrey,
                     child: Column(
