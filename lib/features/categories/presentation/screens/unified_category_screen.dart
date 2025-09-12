@@ -197,29 +197,28 @@ class UnifiedCategoryScreen extends StatelessWidget {
   }
 
   Widget _buildGroceryContentView(UnifiedCategoryController controller) {
-    // Show products if main category is selected
-    if (controller.selectedMainCategory.value != null &&
-        controller.displayProducts.isNotEmpty) {
+    // Show products - either for selected main category or all grocery products
+    if (controller.displayProducts.isNotEmpty) {
       return ProductGridSection(
         title: controller.productsTitle.value,
         products: controller.displayProducts,
         onProductTap: controller.onProductTap,
         onAddToCart: controller.onAddToCart,
         onFavoriteToggle: controller.onFavoriteToggle,
-        showViewAll: false,
-        maxItems: controller.displayProducts.length,
+        onViewAllTap: controller.showAllProducts,
+        maxItems: 12,
         crossAxisCount: 2,
         isGroceryCategory: controller.isGroceryCategory,
         shops: controller.shops,
       );
     }
 
-    // Show message if no main category selected
+    // Show message if no products available
     return Center(
       child: Padding(
         padding: EdgeInsets.symmetric(vertical: 40.h),
         child: Text(
-          'Please select a category above',
+          'No products available',
           style: TextStyle(color: AppColors.featherGrey, fontSize: 16.sp),
           textAlign: TextAlign.center,
         ),
@@ -246,7 +245,7 @@ class UnifiedCategoryScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '${controller.categoryTitle.value} - All Items',
+                  controller.productsTitle.value,
                   style: TextStyle(
                     fontSize: 18.sp,
                     fontWeight: FontWeight.w500,
