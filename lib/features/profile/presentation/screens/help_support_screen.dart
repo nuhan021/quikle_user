@@ -65,7 +65,7 @@ class HelpSupportScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header
+          
           Text(
             'Report an Issue',
             style: getTextStyle(
@@ -197,7 +197,7 @@ class HelpSupportScreen extends StatelessWidget {
 
           SizedBox(height: 16.h),
 
-          // Attachment Section
+          
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -294,7 +294,7 @@ class HelpSupportScreen extends StatelessWidget {
 
           SizedBox(height: 24.h),
 
-          // Submit Button
+          
           Obx(
             () => GestureDetector(
               onTap: controller.isSubmitting.value
@@ -365,7 +365,7 @@ class HelpSupportScreen extends StatelessWidget {
           Container(height: 1.h, color: const Color(0xFFEEEEEE)),
           SizedBox(height: 12.h),
 
-          // FAQ Items
+          
           Obx(
             () => Column(
               children: controller.faqs.asMap().entries.map((entry) {
@@ -458,7 +458,7 @@ class HelpSupportScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Header
+        
         Text(
           'Recent Support History',
           style: getTextStyle(

@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:quikle_user/core/utils/constants/image_path.dart';
 
-/// Product category icons for carousels
+
 class ProductIcons {
   static const List<AssetImage> items = [
     AssetImage(ImagePath.allIcon),
@@ -18,6 +18,6 @@ class ProductIcons {
     AssetImage(ImagePath.riceIcon),
   ];
 
-  /// If a List<ImageProvider> is needed
+  
   static List<ImageProvider> asProviders() => List<ImageProvider>.from(items);
 }

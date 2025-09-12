@@ -92,7 +92,7 @@ class SubcategoryProductsScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Header with subcategory info
+                    
                     Container(
                       width: double.infinity,
                       margin: EdgeInsets.all(16.w),
@@ -144,7 +144,7 @@ class SubcategoryProductsScreen extends StatelessWidget {
                       ),
                     ),
 
-                    // Products Grid
+                    
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 16.w),
                       child: GridView.builder(
@@ -226,7 +226,7 @@ class SubcategoryProductsScreen extends StatelessWidget {
                                             ),
                                           ),
                                         ),
-                                        // Rating badge
+                                        
                                         Positioned(
                                           top: 8.h,
                                           left: 8.w,
@@ -352,7 +352,7 @@ class SubcategoryProductsScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              // Floating Cart Button
+              
               const FloatingCartButton(),
             ],
           );

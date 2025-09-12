@@ -104,11 +104,11 @@ class CategoriesScreen extends StatelessWidget {
                                 shrinkWrap: true,
                                 physics: const NeverScrollableScrollPhysics(),
                                 gridDelegate:
-                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                    SliverGridDelegateWithFixedCrossAxisCount(
                                       crossAxisCount: 3,
-                                      childAspectRatio: 0.65,
-                                      crossAxisSpacing: 12,
-                                      mainAxisSpacing: 12,
+                                      childAspectRatio: 0.65.h,
+                                      crossAxisSpacing: 12.w,
+                                      mainAxisSpacing: 12.w,
                                     ),
                                 itemCount: controller.filteredProducts.length,
                                 itemBuilder: (context, index) => ProductItem(

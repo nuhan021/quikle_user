@@ -5,7 +5,7 @@ import '../models/review_model.dart';
 import '../models/question_model.dart';
 
 class ProductService {
-  // Mock data for reviews
+  
   List<ReviewModel> getProductReviews(ProductModel product) {
     return [
       ReviewModel(
@@ -44,7 +44,7 @@ class ProductService {
     ];
   }
 
-  // Mock data for questions
+  
   List<QuestionModel> getProductQuestions(ProductModel product) {
     return [
       QuestionModel(
@@ -61,9 +61,9 @@ class ProductService {
     ];
   }
 
-  // Mock shop information - now gets the actual shop data
+  
   ShopModel getShopInfo(ProductModel product) {
-    // Define all available shops
+    
     final shops = {
       'shop_1': ShopModel(
         id: 'shop_1',
@@ -94,7 +94,7 @@ class ProductService {
       ),
     };
 
-    // Return the correct shop based on product's shopId
+    
     return shops[product.shopId] ?? shops['shop_1']!;
   }
 

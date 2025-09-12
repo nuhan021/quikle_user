@@ -105,8 +105,8 @@ class SearchAndFiltersSection extends StatelessWidget {
                     size: 24,
                   ),
                   onPressed: () {
-                    // Search functionality can be triggered here if needed
-                    // For now, the search is handled by onChanged in TextField
+                    
+                    
                   },
                 ),
               ),

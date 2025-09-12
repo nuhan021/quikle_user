@@ -49,7 +49,7 @@ class HomeContentScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                  // Scrollable content
+                  
                   Expanded(
                     child: SingleChildScrollView(
                       child: Column(

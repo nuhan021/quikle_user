@@ -77,7 +77,6 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
           ),
           SizedBox(height: 20.h),
 
-          // Price Range Section
           Text(
             'Price Range',
             style: getTextStyle(
@@ -128,7 +127,6 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
           ),
           SizedBox(height: 20.h),
 
-          // Other Filters Section
           Text(
             'Other Filters',
             style: getTextStyle(
@@ -167,7 +165,6 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
             );
           }).toList(),
 
-          // In Stock Filter
           CheckboxListTile(
             contentPadding: EdgeInsets.zero,
             value: _showOnlyInStock,
@@ -190,7 +187,6 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
 
           SizedBox(height: 30.h),
 
-          // Action Buttons
           Row(
             children: [
               Expanded(

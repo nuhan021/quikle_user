@@ -10,7 +10,6 @@ import 'package:quikle_user/features/cart/presentation/screens/cart_screen.dart'
 import 'package:quikle_user/features/product/presentation/screens/product_details_screen.dart';
 import 'package:quikle_user/features/categories/presentation/screens/category_detail_screen.dart';
 import 'package:quikle_user/features/categories/presentation/screens/subcategory_products_screen.dart';
-import 'package:quikle_user/features/categories/presentation/screens/main_category_products_screen.dart';
 import 'package:quikle_user/features/categories/presentation/screens/grocery_navigation_screen.dart';
 import 'package:quikle_user/features/categories/presentation/screens/unified_category_screen.dart';
 import 'package:quikle_user/features/restaurants/presentation/screens/category_restaurants_screen.dart';
@@ -21,7 +20,6 @@ import 'package:quikle_user/features/profile/presentation/screens/address_book_s
 import 'package:quikle_user/features/profile/presentation/screens/add_address_screen.dart';
 import 'package:quikle_user/features/profile/presentation/screens/payment_method_screen.dart';
 import 'package:quikle_user/features/profile/presentation/screens/notification_settings_screen.dart';
-import 'package:quikle_user/features/profile/presentation/screens/language_settings_screen.dart';
 import 'package:quikle_user/features/profile/presentation/screens/help_support_screen.dart';
 import 'package:quikle_user/features/home/data/models/product_model.dart';
 import 'package:quikle_user/features/search/presentation/screens/search_screen.dart';
@@ -39,7 +37,6 @@ class AppRoute {
   static const String _categoryDetail = '/category-detail';
   static const String _unifiedCategory = '/unified-category';
   static const String _subcategoryProducts = '/subcategory-products';
-  static const String _mainCategoryProducts = '/main-category-products';
   static const String _groceryNavigation = '/grocery-navigation';
   static const String _checkout = '/checkout';
   static const String _favorites = '/favorites';
@@ -67,7 +64,6 @@ class AppRoute {
   static String getCategoryDetail() => _categoryDetail;
   static String getUnifiedCategory() => _unifiedCategory;
   static String getSubcategoryProducts() => _subcategoryProducts;
-  static String getMainCategoryProducts() => _mainCategoryProducts;
   static String getGroceryNavigation() => _groceryNavigation;
   static String getCheckout() => _checkout;
   static String getFavorites() => _favorites;
@@ -101,10 +97,6 @@ class AppRoute {
     GetPage(
       name: _subcategoryProducts,
       page: () => const SubcategoryProductsScreen(),
-    ),
-    GetPage(
-      name: _mainCategoryProducts,
-      page: () => const MainCategoryProductsScreen(),
     ),
     GetPage(
       name: _groceryNavigation,

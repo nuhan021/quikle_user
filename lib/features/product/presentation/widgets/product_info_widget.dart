@@ -27,7 +27,7 @@ class ProductInfoWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Product title
+        
         Text(
           title,
           style: getTextStyle(
@@ -39,7 +39,7 @@ class ProductInfoWidget extends StatelessWidget {
         ),
         SizedBox(height: 8.h),
 
-        // Rating + reviews
+        
         Row(
           children: [
             Icon(Icons.star, color: Colors.orange, size: 16.sp),
@@ -64,7 +64,7 @@ class ProductInfoWidget extends StatelessWidget {
         ),
         SizedBox(height: 16.h),
 
-        // Pricing section
+        
         Row(
           children: [
             Text(

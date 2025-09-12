@@ -22,7 +22,7 @@ class GroceryNavigationSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Back to All Categories button
+        
         GestureDetector(
           onTap: onBackToCategories,
           child: Container(
@@ -51,7 +51,7 @@ class GroceryNavigationSection extends StatelessWidget {
         ),
         SizedBox(height: 16.h),
 
-        // Subcategories horizontal scroll
+        
         if (subcategories.isNotEmpty) ...[
           Text(
             'Sub Categories',

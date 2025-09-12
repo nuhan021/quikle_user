@@ -124,7 +124,7 @@ class ProductDetailsScreen extends StatelessWidget {
 
                             SizedBox(height: 24.h),
 
-                            // Description
+                            
                             DescriptionWidget(
                               description: controller.description,
                             ),
@@ -388,7 +388,7 @@ class ProductDetailsScreen extends StatelessWidget {
                       ),
               ),
 
-              // Floating cart CTA remains
+              
               const FloatingCartButton(),
             ],
           ),

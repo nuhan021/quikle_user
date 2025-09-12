@@ -30,7 +30,7 @@ class PaymentMethodSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Title
+          
           Text(
             'Choose Payment Method',
             style: getTextStyle(
@@ -40,12 +40,12 @@ class PaymentMethodSection extends StatelessWidget {
               color: const Color(0xFF333333),
             ),
           ),
-          // Thin divider like in the UI
+          
           SizedBox(height: 8.h),
           const Divider(height: 1, thickness: 1, color: Color(0xFFE8E9E9)),
           SizedBox(height: 12.h),
 
-          // Dropdown
+          
           Obx(() {
             final controller = payoutController;
             final methods = controller.paymentMethods;
@@ -67,7 +67,7 @@ class PaymentMethodSection extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8.r),
                   borderSide: const BorderSide(
                     color: Color(0xFFE8E9E9),
-                  ), // keep subtle like screenshot
+                  ), 
                 ),
                 filled: true,
                 fillColor: Colors.white,
@@ -78,7 +78,7 @@ class PaymentMethodSection extends StatelessWidget {
                 color: Colors.grey[600],
               ),
 
-              // Ensures the selected (closed) look shows icon + text like the list items
+              
               selectedItemBuilder: (ctx) => methods.map((m) {
                 return Row(
                   children: [

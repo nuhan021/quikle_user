@@ -116,7 +116,7 @@ class HelpSupportController extends GetxController {
       if (pickedFile != null) {
         attachmentFile.value = pickedFile;
 
-        // Upload the file
+        
         final uploadedUrl = await _helpSupportService.uploadAttachment(
           pickedFile.path,
         );
@@ -163,7 +163,7 @@ class HelpSupportController extends GetxController {
       if (pickedFile != null) {
         attachmentFile.value = pickedFile;
 
-        // Upload the file
+        
         final uploadedUrl = await _helpSupportService.uploadAttachment(
           pickedFile.path,
         );

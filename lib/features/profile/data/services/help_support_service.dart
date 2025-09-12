@@ -72,7 +72,7 @@ class HelpSupportService extends GetxController {
 
       final newTicket = SupportTicketModel(
         id: 'ticket_${DateTime.now().millisecondsSinceEpoch}',
-        title: issueType.label, // fixed
+        title: issueType.label,
         description: description,
         issueType: issueType,
         status: SupportTicketStatus.pending,
@@ -91,7 +91,7 @@ class HelpSupportService extends GetxController {
   Future<String?> uploadAttachment(String filePath) async {
     try {
       await Future.delayed(const Duration(seconds: 1));
-      return 'https://example.com/uploads/${DateTime.now().millisecondsSinceEpoch}.jpg';
+      //return 'https:
     } catch (e) {
       print('Error uploading attachment: $e');
       return null;

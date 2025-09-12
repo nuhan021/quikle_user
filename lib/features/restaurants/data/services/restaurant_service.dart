@@ -2,9 +2,9 @@ import 'package:quikle_user/core/utils/constants/image_path.dart';
 import 'package:quikle_user/features/restaurants/data/models/restaurant_model.dart';
 
 class RestaurantService {
-  // Mock data for restaurants
+  
   static List<RestaurantModel> _restaurants = [
-    // Top-rated restaurants serving multiple categories
+    
     const RestaurantModel(
       id: 'restaurant_1',
       name: 'Tandoori Tarang',
@@ -357,21 +357,21 @@ class RestaurantService {
     ),
   ];
 
-  // Get all restaurants
+  
   Future<List<RestaurantModel>> getAllRestaurants() async {
     return _restaurants;
   }
 
-  // Get top restaurants sorted by popularity/rating
+  
   Future<List<RestaurantModel>> getTopRestaurants({int limit = 25}) async {
     final restaurants = await getAllRestaurants();
     restaurants.sort(
       (a, b) => b.rating.compareTo(a.rating),
-    ); // Sort by rating (highest first)
+    ); 
     return restaurants.take(limit).toList();
   }
 
-  // Get restaurants that serve a specific food category
+  
   Future<List<RestaurantModel>> getRestaurantsByCategory(
     String categoryId,
   ) async {
@@ -380,7 +380,7 @@ class RestaurantService {
         .toList();
   }
 
-  // Get restaurant by ID
+  
   Future<RestaurantModel?> getRestaurantById(String restaurantId) async {
     try {
       return _restaurants.firstWhere(
@@ -391,7 +391,7 @@ class RestaurantService {
     }
   }
 
-  // Get top-rated restaurants
+  
   Future<List<RestaurantModel>> getTopRatedRestaurants({int limit = 10}) async {
     final topRated = _restaurants
         .where((restaurant) => restaurant.isTopRated)
@@ -400,7 +400,7 @@ class RestaurantService {
     return topRated.take(limit).toList();
   }
 
-  // Search restaurants by name or cuisine
+  
   Future<List<RestaurantModel>> searchRestaurants(String query) async {
     final lowercaseQuery = query.toLowerCase();
     return _restaurants.where((restaurant) {

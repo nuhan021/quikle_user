@@ -15,7 +15,7 @@ class PaymentMethodScreen extends StatefulWidget {
 }
 
 class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
-  // Sample payment methods based on the Figma design
+  
   List<PaymentMethodModel> paymentMethods = [
     const PaymentMethodModel(
       id: '1',
@@ -45,7 +45,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
     const PaymentMethodModel(
       id: '6',
       type: PaymentMethodType.cashOnDelivery,
-      isRemovable: false, // COD cannot be removed
+      isRemovable: false, 
     ),
   ];
 
@@ -78,7 +78,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
               padding: EdgeInsets.symmetric(horizontal: 16.w),
               child: Column(
                 children: [
-                  //SizedBox(height: 4.h),
+                  
                   Expanded(
                     child: ListView.builder(
                       itemCount: paymentMethods.length,

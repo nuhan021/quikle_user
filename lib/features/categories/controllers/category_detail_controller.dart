@@ -11,15 +11,12 @@ class CategoryDetailController extends GetxController {
   final CategoryService _categoryService = CategoryService();
   late final CartController _cartController;
 
-  // Arguments from navigation
   late final CategoryModel category;
 
-  // Observables
   final isLoading = false.obs;
   final categoryTitle = ''.obs;
   final popularSubcategories = <SubcategoryModel>[].obs;
-  final allSubcategories =
-      <SubcategoryModel>[].obs; // All subcategories of selected category
+  final allSubcategories = <SubcategoryModel>[].obs;
   final featuredProducts = <ProductModel>[].obs;
   final recommendedProducts = <ProductModel>[].obs;
 
@@ -28,7 +25,6 @@ class CategoryDetailController extends GetxController {
     super.onInit();
     _cartController = Get.find<CartController>();
 
-    // Get category from arguments
     category = Get.arguments as CategoryModel;
     categoryTitle.value = category.title;
 
@@ -38,7 +34,6 @@ class CategoryDetailController extends GetxController {
   Future<void> _loadCategoryData() async {
     isLoading.value = true;
     try {
-      // Load data in parallel
       await Future.wait([
         _loadPopularSubcategories(),
         _loadAllSubcategories(),
@@ -53,12 +48,10 @@ class CategoryDetailController extends GetxController {
   Future<void> _loadPopularSubcategories() async {
     try {
       if (category.id == '2') {
-        // For groceries, load main categories as popular items
         final subcategories = await _categoryService
             .fetchGroceryMainCategories();
         popularSubcategories.value = subcategories;
       } else {
-        // For food, load popular subcategories
         final subcategories = await _categoryService.fetchPopularSubcategories(
           category.id,
         );
@@ -72,14 +65,10 @@ class CategoryDetailController extends GetxController {
   Future<void> _loadAllSubcategories() async {
     try {
       if (category.id == '2') {
-        // For groceries, load all subcategories (vegetables, fruits, etc.)
         final produceSubcategories = await _categoryService
             .fetchProduceSubcategories();
         allSubcategories.value = produceSubcategories;
-
-        // TODO: Add subcategories for other main categories like Cooking, Meats, etc.
       } else {
-        // For food, this might be empty or contain additional subcategories
         allSubcategories.clear();
       }
     } catch (e) {
@@ -90,23 +79,14 @@ class CategoryDetailController extends GetxController {
   Future<void> _loadFeaturedProducts() async {
     try {
       if (category.id == '2') {
-        // For groceries, load all subcategories of main categories
         final allSubcategories = <SubcategoryModel>[];
 
-        // Load subcategories for each main category
         final produceSubcategories = await _categoryService
             .fetchProduceSubcategories();
         allSubcategories.addAll(produceSubcategories);
 
-        // You can add more subcategories for other main categories here
-        // final cookingSubcategories = await _categoryService.fetchCookingSubcategories();
-        // allSubcategories.addAll(cookingSubcategories);
-
-        // Convert subcategories to show as "featured" section
         featuredProducts.clear();
-        // We'll use the subcategories in a different way - see the modified screen
       } else {
-        // For food, load featured products
         final products = await _categoryService.fetchFeaturedProducts(
           category.id,
         );
@@ -129,59 +109,30 @@ class CategoryDetailController extends GetxController {
   }
 
   void onSubcategoryTap(SubcategoryModel subcategory) {
-    if (category.id == '2') {
-      // For groceries
-      if (subcategory.parentSubcategoryId == null) {
-        // This is a main category (Produce, Cooking, Meats)
-        // Navigate to show all products of this main category
-        Get.toNamed(
-          AppRoute.getMainCategoryProducts(),
-          arguments: {
-            'subcategory': subcategory,
-            'category': category,
-            'showAllProducts': true, // Show all products from all subcategories
-          },
-        );
-      } else {
-        // This is a specific subcategory (Vegetables, Fruits)
-        // Navigate to show products of this specific subcategory
-        Get.toNamed(
-          AppRoute.getSubcategoryProducts(),
-          arguments: {'subcategory': subcategory, 'category': category},
-        );
-      }
-    } else {
-      // For food categories, go directly to products
-      Get.toNamed(
-        AppRoute.getSubcategoryProducts(),
-        arguments: {'subcategory': subcategory, 'category': category},
-      );
-    }
+    Get.toNamed(
+      AppRoute.getSubcategoryProducts(),
+      arguments: {'subcategory': subcategory, 'category': category},
+    );
   }
 
   void onProductTap(ProductModel product) {
-    // Navigate to product details screen
     Get.toNamed(AppRoute.getProductDetails(), arguments: product);
   }
 
   void onAddToCart(ProductModel product) {
-    // Add product to cart
     _cartController.addToCart(product);
   }
 
   void onFavoriteToggle(ProductModel product) {
-    // Update global favorites
     if (FavoritesController.isProductFavorite(product.id)) {
       FavoritesController.removeFromGlobalFavorites(product.id);
     } else {
       FavoritesController.addToGlobalFavorites(product.id);
     }
 
-    // Update local product lists to reflect the change
     final isFavorite = FavoritesController.isProductFavorite(product.id);
     final updatedProduct = product.copyWith(isFavorite: isFavorite);
 
-    // Update in featured products
     final featuredIndex = featuredProducts.indexWhere(
       (p) => p.id == product.id,
     );
@@ -189,7 +140,6 @@ class CategoryDetailController extends GetxController {
       featuredProducts[featuredIndex] = updatedProduct;
     }
 
-    // Update in recommended products
     final recommendedIndex = recommendedProducts.indexWhere(
       (p) => p.id == product.id,
     );

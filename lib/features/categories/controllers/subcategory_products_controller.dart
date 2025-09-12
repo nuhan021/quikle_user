@@ -11,11 +11,11 @@ class SubcategoryProductsController extends GetxController {
   final CategoryService _categoryService = CategoryService();
   late final CartController _cartController;
 
-  // Arguments from navigation
+  
   late final SubcategoryModel subcategory;
   late final CategoryModel category;
 
-  // Observables
+  
   final isLoading = false.obs;
   final subcategoryTitle = ''.obs;
   final subcategoryDescription = ''.obs;
@@ -26,7 +26,7 @@ class SubcategoryProductsController extends GetxController {
     super.onInit();
     _cartController = Get.find<CartController>();
 
-    // Get arguments from navigation
+    
     final arguments = Get.arguments as Map<String, dynamic>;
     subcategory = arguments['subcategory'] as SubcategoryModel;
     category = arguments['category'] as CategoryModel;
@@ -52,28 +52,28 @@ class SubcategoryProductsController extends GetxController {
   }
 
   void onProductTap(ProductModel product) {
-    // Navigate to product details screen
+    
     Get.toNamed(AppRoute.getProductDetails(), arguments: product);
   }
 
   void onAddToCart(ProductModel product) {
-    // Add product to cart
+    
     _cartController.addToCart(product);
   }
 
   void onFavoriteToggle(ProductModel product) {
-    // Update global favorites
+    
     if (FavoritesController.isProductFavorite(product.id)) {
       FavoritesController.removeFromGlobalFavorites(product.id);
     } else {
       FavoritesController.addToGlobalFavorites(product.id);
     }
 
-    // Update local product lists to reflect the change
+    
     final isFavorite = FavoritesController.isProductFavorite(product.id);
     final updatedProduct = product.copyWith(isFavorite: isFavorite);
 
-    // Update in products list
+    
     final productIndex = products.indexWhere((p) => p.id == product.id);
     if (productIndex != -1) {
       products[productIndex] = updatedProduct;

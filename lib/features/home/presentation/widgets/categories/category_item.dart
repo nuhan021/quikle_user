@@ -22,7 +22,7 @@ class CategoryItem extends StatelessWidget {
       onTap: onTap,
       child: SizedBox(
         height: 70.h,
-        //width: 70.w,
+        
         child: Column(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.start,

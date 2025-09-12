@@ -102,17 +102,17 @@ class RegisterController extends GetxController {
       return false;
     }
 
-    // if (phone.length < 10) {
-    //   errorMessage.value = 'Please enter a valid phone number';
-    //   Get.snackbar(
-    //     'Validation Error',
-    //     'Please enter a valid phone number',
-    //     snackPosition: SnackPosition.TOP,
-    //     backgroundColor: Colors.orange.withValues(alpha: 0.1),
-    //     colorText: Colors.orange,
-    //   );
-    //   return false;
-    // }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
     return true;
   }

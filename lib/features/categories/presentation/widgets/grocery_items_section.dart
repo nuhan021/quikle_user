@@ -28,7 +28,7 @@ class GroceryItemsSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Main Categories Section
+        
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 16.w),
           child: Container(
@@ -52,7 +52,7 @@ class GroceryItemsSection extends StatelessWidget {
         ),
         SizedBox(height: 16.h),
 
-        // Main Categories Horizontal List
+        
         SizedBox(
           height: 83.h,
           child: ListView.builder(
@@ -146,7 +146,7 @@ class GroceryItemsSection extends StatelessWidget {
           ),
           SizedBox(height: 16.h),
 
-          // Subcategories Horizontal List
+          
           SizedBox(
             height: 83.h,
             child: ListView.builder(

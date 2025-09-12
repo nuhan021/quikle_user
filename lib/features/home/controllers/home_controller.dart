@@ -92,11 +92,11 @@ class HomeController extends GetxController {
   }
 
   void onNotificationPressed() {
-    // Handle notification tap
+    
   }
 
   void onSearchPressed() {
-    // Navigate to search screen
+    
     Get.toNamed(AppRoute.getSearch());
   }
 
@@ -104,7 +104,7 @@ class HomeController extends GetxController {
     final speechToText = SpeechToText();
 
     try {
-      // Request microphone permission
+      
       final permissionStatus = await Permission.microphone.request();
 
       if (permissionStatus != PermissionStatus.granted) {
@@ -117,7 +117,7 @@ class HomeController extends GetxController {
         return;
       }
 
-      // Initialize speech recognition
+      
       final available = await speechToText.initialize(
         onError: (errorNotification) {
           Get.snackbar(
@@ -139,13 +139,13 @@ class HomeController extends GetxController {
         return;
       }
 
-      // Navigate to search screen with voice recognition
+      
       Get.toNamed(AppRoute.getSearch());
 
-      // Give some time for the screen transition, then start voice recognition
+      
       await Future.delayed(const Duration(milliseconds: 500));
 
-      // Find the search controller and start voice recognition
+      
       await Future.delayed(const Duration(milliseconds: 300));
       final searchController = ProductSearchController.currentInstance;
       if (searchController != null) {
@@ -163,38 +163,38 @@ class HomeController extends GetxController {
   }
 
   Future<void> onCategoryPressed(CategoryModel category) async {
-    // Navigate to unified category screen for all categories except "All"
+    
     if (category.id != '0') {
       Get.toNamed(
         AppRoute.getUnifiedCategory(),
         arguments: {'category': category},
       );
     } else {
-      // For "All" category, filter on the home page
+      
       _selectedCategoryId.value = category.id;
       await _loadContent();
     }
   }
 
   void onProductPressed(ProductModel product) {
-    // Navigate to product details screen
+    
     Get.toNamed(AppRoute.getProductDetails(), arguments: product);
   }
 
   void onAddToCartPressed(ProductModel product) {
-    // Handle add to cart using cart controller
+    
     _cartController.addToCart(product);
   }
 
   void onFavoriteToggle(ProductModel product) {
-    // Update global favorites
+    
     if (FavoritesController.isProductFavorite(product.id)) {
       FavoritesController.removeFromGlobalFavorites(product.id);
     } else {
       FavoritesController.addToGlobalFavorites(product.id);
     }
 
-    // Update local product lists to reflect the change
+    
     final isFavorite = FavoritesController.isProductFavorite(product.id);
     final updatedProduct = product.copyWith(isFavorite: isFavorite);
     _updateProductInLists(product, updatedProduct);
@@ -249,19 +249,19 @@ class HomeController extends GetxController {
   void onViewAllPressed(String categoryId) {
     final category = _categories.firstWhere((cat) => cat.id == categoryId);
 
-    // Navigate to unified category screen for all categories except "All"
+    
     if (categoryId != '0') {
       Get.toNamed(
         AppRoute.getUnifiedCategory(),
         arguments: {'category': category},
       );
     } else {
-      // For "All" category, just filter on the home page
+      
       onCategoryPressed(category);
     }
   }
 
   void onShopNowPressed() {
-    // Handle shop now tap
+    
   }
 }
