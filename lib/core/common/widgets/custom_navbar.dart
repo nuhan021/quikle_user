@@ -30,14 +30,6 @@ class CustomNavBar extends StatelessWidget {
         border: Border(
           top: BorderSide(width: 1.w, color: AppColors.gradientColor),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0x0A000000),
-            blurRadius: 20.r,
-            offset: Offset(0, -2.h),
-            spreadRadius: 0.r,
-          ),
-        ],
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -51,21 +43,19 @@ class CustomNavBar extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Home button
                 _NavItem(
                   icon: Iconsax.home_2,
                   label: 'Home',
                   isSelected: currentIndex == 0,
                   onTap: () => onTap(0),
                 ),
-                // All Orders button
                 _NavItem(
                   icon: Iconsax.bag_2,
                   label: 'All Orders',
                   isSelected: currentIndex == 1,
                   onTap: () => onTap(1),
                 ),
-                // Categories button
+
                 _NavItem(
                   iconAsset: ImagePath.categoryIcon,
                   label: 'Categories',

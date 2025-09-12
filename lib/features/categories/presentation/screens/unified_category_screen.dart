@@ -6,7 +6,7 @@ import 'package:quikle_user/core/common/widgets/cart_animation_overlay.dart';
 import 'package:quikle_user/core/common/widgets/floating_cart_button.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/features/categories/controllers/unified_category_controller.dart';
-import 'package:quikle_user/features/categories/presentation/widgets/category_app_bar.dart';
+import 'package:quikle_user/core/common/widgets/common_app_bar.dart';
 import 'package:quikle_user/features/categories/presentation/widgets/search_and_filters_section.dart';
 import 'package:quikle_user/features/categories/presentation/widgets/popular_items_section.dart';
 import 'package:quikle_user/features/categories/presentation/widgets/product_grid_section.dart';
@@ -15,6 +15,7 @@ import 'package:quikle_user/features/categories/presentation/widgets/filter_bott
 import 'package:quikle_user/features/categories/presentation/widgets/category_product_item.dart';
 import 'package:quikle_user/features/restaurants/presentation/widgets/top_restaurants_section.dart';
 import 'package:quikle_user/features/home/presentation/widgets/banners/offer_banner.dart';
+import 'package:quikle_user/routes/app_routes.dart';
 
 class UnifiedCategoryScreen extends StatelessWidget {
   const UnifiedCategoryScreen({super.key});
@@ -37,12 +38,15 @@ class UnifiedCategoryScreen extends StatelessWidget {
               Column(
                 children: [
                   Obx(
-                    () => CategoryAppBar(
+                    () => CommonAppBar(
                       title: controller.categoryTitle.value,
-                      onNotificationTap: () {},
-                      onProfileTap: () {},
+                      onNotificationTap: () =>
+                          Get.toNamed(AppRoute.getNotificationSettings()),
+                      onProfileTap: () => Get.toNamed(AppRoute.getMyProfile()),
+                      onBackTap: () => Get.back(),
                     ),
                   ),
+
                   Expanded(
                     child: Obx(() {
                       if (controller.isLoading.value) {

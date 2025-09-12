@@ -13,7 +13,7 @@ class ProductModel {
   final String? weight;
   final bool isOTC;
   final bool hasPrescriptionUploaded;
-  final String? productType; // appetizer, main_course, dessert, beverage, etc.
+  final String? productType;
 
   const ProductModel({
     required this.id,

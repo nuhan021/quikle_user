@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:quikle_user/core/common/styles/global_text_style.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 import '../../../data/models/category_model.dart';
@@ -43,7 +44,7 @@ class CategoriesSection extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 16),
           decoration: const BoxDecoration(color: Color(0x33CFCFCF)),
           child: SizedBox(
-            height: 90,
+            height: 70.h,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 16),

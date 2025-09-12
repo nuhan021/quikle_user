@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:iconsax/iconsax.dart';
 import 'package:quikle_user/core/common/styles/global_text_style.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
@@ -23,13 +22,7 @@ class ProfileScreen extends StatelessWidget {
       backgroundColor: AppColors.homeGrey,
       body: Column(
         children: [
-          const UnifiedProfileAppBar(
-            title: 'Profile',
-            showBackButton: false,
-            showActionButton: true,
-            actionText: 'Clear all',
-            onActionPressed: null,
-          ),
+          const UnifiedProfileAppBar(title: 'Profile', showBackButton: false),
           Expanded(
             child: SingleChildScrollView(
               padding: EdgeInsets.symmetric(horizontal: 16.w),

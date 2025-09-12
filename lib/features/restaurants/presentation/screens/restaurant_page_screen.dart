@@ -9,7 +9,7 @@ import 'package:quikle_user/core/common/widgets/unified_product_card.dart';
 import 'package:quikle_user/core/data/services/product_data_service.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
-import 'package:quikle_user/features/categories/presentation/widgets/category_app_bar.dart';
+import 'package:quikle_user/core/common/widgets/common_app_bar.dart';
 import 'package:quikle_user/features/cart/controllers/cart_controller.dart';
 import 'package:quikle_user/features/home/data/models/product_model.dart';
 import 'package:quikle_user/features/profile/controllers/favorites_controller.dart';
@@ -192,12 +192,12 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen> {
               Column(
                 children: [
                   // Category App Bar with back button
-                  CategoryAppBar(
+                  CommonAppBar(
                     title: restaurant.name,
                     showBackButton: true,
+                    showNotification: false,
+                    showProfile: false,
                     onBackTap: () => Get.back(),
-                    onNotificationTap: () {},
-                    onProfileTap: () {},
                   ),
                   Container(
                     margin: EdgeInsets.symmetric(

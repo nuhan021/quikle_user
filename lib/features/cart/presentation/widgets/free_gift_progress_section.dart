@@ -10,136 +10,150 @@ class FreeGiftAndProgressSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      //margin: EdgeInsets.symmetric(horizontal: 16.w),
-      //padding: EdgeInsets.all(16.w),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Free gift for you!',
-            style: getTextStyle(
-              font: CustomFonts.obviously,
-              fontSize: 16.sp,
-              fontWeight: FontWeight.w500,
-              color: AppColors.ebonyBlack,
+    return Material(
+      color: Colors.white,
+      elevation: 0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+      clipBehavior: Clip.antiAlias,
+      child: Padding(
+        padding: EdgeInsets.all(16.w),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Free gift for you!',
+              style: getTextStyle(
+                font: CustomFonts.obviously,
+                fontSize: 16.sp,
+                fontWeight: FontWeight.w500,
+                color: AppColors.ebonyBlack,
+              ),
             ),
-          ),
-          SizedBox(height: 12.h),
-          Container(
-            padding: EdgeInsets.all(12.w),
-            decoration: BoxDecoration(
-              color: AppColors.homeGrey,
-              borderRadius: BorderRadius.circular(8.r),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: 80.w,
-                  height: 80.w,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8.r),
-                  ),
-                  child: Center(
-                    child: Icon(
-                      Icons.card_giftcard,
-                      color: Colors.red,
-                      size: 40.sp,
+
+            SizedBox(height: 12.h),
+            Container(
+              padding: EdgeInsets.all(12.w),
+              decoration: BoxDecoration(
+                color: AppColors.homeGrey,
+                borderRadius: BorderRadius.circular(8.r),
+              ),
+              child: IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Icon box
+                    Container(
+                      width: 80.w,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(8.r),
+                      ),
+                      child: Center(
+                        child: Icon(
+                          Icons.card_giftcard,
+                          color: Colors.red,
+                          size: 40.sp,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
 
-                SizedBox(width: 12.w),
-                Container(width: 1.w, height: 80.h, color: Colors.grey[400]),
+                    SizedBox(width: 12.w),
 
-                SizedBox(width: 12.w),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'District Movie Voucher',
-                        style: getTextStyle(
-                          font: CustomFonts.inter,
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.w500,
-                          color: AppColors.ebonyBlack,
-                        ),
-                      ),
-                      SizedBox(height: 6.h),
-                      Text(
-                        '\$12.00',
-                        style: getTextStyle(
-                          font: CustomFonts.inter,
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.ebonyBlack,
-                        ),
-                      ),
-                      SizedBox(height: 6.h),
-                      Text(
-                        '1 unit',
-                        style: getTextStyle(
-                          font: CustomFonts.inter,
-                          fontSize: 14.sp,
-                          fontWeight: FontWeight.w500,
-                          color: AppColors.ebonyBlack,
-                        ),
-                      ),
-                      SizedBox(height: 6.h),
-                      Row(
+                    // Vertical divider
+                    VerticalDivider(
+                      width: 1.w + 12.w, // keeps spacing
+                      thickness: 1,
+                      color: Colors.grey[400],
+                    ),
+
+                    SizedBox(width: 12.w),
+
+                    // Details + Add
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Free',
+                            'District Movie Voucher',
+                            style: getTextStyle(
+                              font: CustomFonts.inter,
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.ebonyBlack,
+                            ),
+                          ),
+                          SizedBox(height: 6.h),
+                          Text(
+                            '\$12.00',
                             style: getTextStyle(
                               font: CustomFonts.inter,
                               fontSize: 16.sp,
                               fontWeight: FontWeight.w600,
-                              color: AppColors.freeColor,
+                              color: AppColors.ebonyBlack,
                             ),
                           ),
-                          Spacer(),
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 16.w,
-                              vertical: 8.h,
-                            ),
-                            decoration: BoxDecoration(
+                          SizedBox(height: 6.h),
+                          Text(
+                            '1 unit',
+                            style: getTextStyle(
+                              font: CustomFonts.inter,
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.w500,
                               color: AppColors.ebonyBlack,
-                              borderRadius: BorderRadius.circular(6.r),
                             ),
-                            child: Text(
-                              'Add',
-                              style: getTextStyle(
-                                font: CustomFonts.inter,
-                                fontSize: 16.sp,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.beakYellow,
+                          ),
+                          SizedBox(height: 6.h),
+                          Row(
+                            children: [
+                              Text(
+                                'Free',
+                                style: getTextStyle(
+                                  font: CustomFonts.inter,
+                                  fontSize: 16.sp,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.freeColor,
+                                ),
                               ),
-                            ),
+                              const Spacer(),
+                              // Button
+                              TextButton(
+                                style: TextButton.styleFrom(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 16.w,
+                                    vertical: 8.h,
+                                  ),
+                                  backgroundColor: AppColors.ebonyBlack,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(6.r),
+                                  ),
+                                ),
+                                onPressed: () {
+                                  /* add action */
+                                },
+                                child: Text(
+                                  'Add',
+                                  style: getTextStyle(
+                                    font: CustomFonts.inter,
+                                    fontSize: 16.sp,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.beakYellow,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
-          ),
 
-          SizedBox(height: 16.h),
-          Container(
-            padding: EdgeInsets.all(16.w),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8.r),
-            ),
-            child: Column(
+            SizedBox(height: 16.h),
+
+            // Progress area (kept inside same card)
+            Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SizedBox(
@@ -161,21 +175,25 @@ class FreeGiftAndProgressSection extends StatelessWidget {
                       height: 20.sp,
                     ),
                     SizedBox(width: 8.w),
-                    Text(
-                      'Add items worth more.',
-                      style: getTextStyle(
-                        font: CustomFonts.inter,
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w400,
-                        color: AppColors.ebonyBlack,
+                    Expanded(
+                      child: Text(
+                        'Add items worth more.',
+                        style: getTextStyle(
+                          font: CustomFonts.inter,
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w400,
+                          color: AppColors.ebonyBlack,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],
                 ),
               ],
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

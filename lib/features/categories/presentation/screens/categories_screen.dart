@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
-import 'package:quikle_user/features/categories/presentation/widgets/category_app_bar.dart';
+import 'package:quikle_user/core/common/widgets/common_app_bar.dart';
 import 'package:quikle_user/features/home/controllers/home_controller.dart';
 import 'package:quikle_user/features/home/presentation/widgets/categories/categories_section.dart';
 import 'package:quikle_user/features/home/presentation/widgets/products/product_item.dart';
@@ -18,7 +18,7 @@ class CategoriesScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: AppColors.homeGrey,
-      appBar: CategoryAppBar(
+      appBar: CommonAppBar(
         onNotificationTap: controller.onNotificationPressed,
         title: 'All Categories',
         showBackButton: false,

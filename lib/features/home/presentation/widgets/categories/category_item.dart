@@ -21,7 +21,8 @@ class CategoryItem extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: SizedBox(
-        width: 70.w,
+        height: 70.h,
+        //width: 70.w,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.start,
@@ -63,7 +64,7 @@ class CategoryItem extends StatelessWidget {
                           : const Color(0xFFFF6B35),
                     ),
             ),
-            const SizedBox(height: 6), // Reduced from 8 to 6
+            const SizedBox(height: 6),
             Flexible(
               child: Text(
                 category.title,
@@ -73,7 +74,7 @@ class CategoryItem extends StatelessWidget {
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                 ),
                 textAlign: TextAlign.center,
-                maxLines: 2,
+                maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
             ),
