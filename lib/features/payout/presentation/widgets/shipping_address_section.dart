@@ -21,7 +21,7 @@ class ShippingAddressSection extends StatelessWidget {
         borderRadius: BorderRadius.circular(8.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.04),
+            color: Colors.grey.withValues(alpha: 0.04),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -40,7 +40,7 @@ class ShippingAddressSection extends StatelessWidget {
             ),
           ),
           SizedBox(height: 8.h),
-          Divider(height: 1, color: Colors.grey.withOpacity(0.3)),
+          Divider(height: 1, color: Colors.grey.withValues(alpha: 0.3)),
           SizedBox(height: 12.h),
 
           Obx(() {

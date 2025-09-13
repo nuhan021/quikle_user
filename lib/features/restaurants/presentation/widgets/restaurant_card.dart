@@ -27,7 +27,7 @@ class RestaurantCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(12.r),
           boxShadow: [
             BoxShadow(
-              color: AppColors.ebonyBlack.withOpacity(0.08),
+              color: AppColors.ebonyBlack.withValues(alpha: 0.08),
               offset: const Offset(0, 2),
               blurRadius: 8,
               spreadRadius: 0,
@@ -37,7 +37,6 @@ class RestaurantCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            
             Container(
               height: 100.h,
               width: double.infinity,
@@ -70,14 +69,12 @@ class RestaurantCard extends StatelessWidget {
               ),
             ),
 
-            
             Expanded(
               child: Padding(
                 padding: EdgeInsets.all(12.w),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    
                     Text(
                       restaurant.name,
                       maxLines: 1,
@@ -91,7 +88,6 @@ class RestaurantCard extends StatelessWidget {
                     ),
                     SizedBox(height: 4.h),
 
-                    
                     Text(
                       restaurant.cuisines.join(', '),
                       maxLines: 1,
@@ -105,11 +101,9 @@ class RestaurantCard extends StatelessWidget {
                     ),
                     SizedBox(height: 8.h),
 
-                    
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        
                         Row(
                           children: [
                             Icon(
@@ -130,7 +124,6 @@ class RestaurantCard extends StatelessWidget {
                           ],
                         ),
 
-                        
                         Text(
                           restaurant.deliveryTime,
                           style: getTextStyle(
@@ -143,7 +136,6 @@ class RestaurantCard extends StatelessWidget {
                       ],
                     ),
 
-                    
                     if (!restaurant.isOpen) ...[
                       SizedBox(height: 4.h),
                       Container(
@@ -152,7 +144,7 @@ class RestaurantCard extends StatelessWidget {
                           vertical: 2.h,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.red.withOpacity(0.1),
+                          color: Colors.red.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(4.r),
                         ),
                         child: Text(

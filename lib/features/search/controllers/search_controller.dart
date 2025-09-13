@@ -1,4 +1,3 @@
-
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
@@ -39,7 +38,7 @@ class ProductSearchController extends GetxController {
   late Timer _placeholderTimer;
   Timer? _debounceTimer;
 
-  final List<String> _placeholderItems = [
+  final List<String> placeholderItems = [
     'biryani',
     'pizza',
     'burger',
@@ -99,8 +98,8 @@ class ProductSearchController extends GetxController {
 
   void _startPlaceholderRotation() {
     _placeholderTimer = Timer.periodic(const Duration(seconds: 4), (timer) {
-      final randomIndex = Random().nextInt(_placeholderItems.length);
-      final randomItem = _placeholderItems[randomIndex];
+      final randomIndex = Random().nextInt(placeholderItems.length);
+      final randomItem = placeholderItems[randomIndex];
       _currentPlaceholder.value = "Search for '$randomItem'";
     });
   }
@@ -173,8 +172,8 @@ class ProductSearchController extends GetxController {
         },
         listenFor: const Duration(seconds: 10),
         pauseFor: const Duration(seconds: 3),
-        partialResults: true,
         localeId: 'en_US',
+        listenOptions: SpeechListenOptions(partialResults: true),
       );
     }
   }
@@ -288,4 +287,6 @@ class ProductSearchController extends GetxController {
       duration: const Duration(seconds: 2),
     );
   }
+
+  List<String> get _placeholderItems => placeholderItems;
 }

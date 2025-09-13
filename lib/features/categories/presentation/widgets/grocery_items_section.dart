@@ -28,7 +28,6 @@ class GroceryItemsSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 16.w),
           child: Container(
@@ -52,7 +51,6 @@ class GroceryItemsSection extends StatelessWidget {
         ),
         SizedBox(height: 16.h),
 
-        
         SizedBox(
           height: 83.h,
           child: ListView.builder(
@@ -76,7 +74,7 @@ class GroceryItemsSection extends StatelessWidget {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(12.r),
                           color: isSelected
-                              ? AppColors.beakYellow.withOpacity(0.3)
+                              ? AppColors.beakYellow.withValues(alpha: 0.3)
                               : null,
                           border: isSelected
                               ? Border.all(
@@ -86,7 +84,7 @@ class GroceryItemsSection extends StatelessWidget {
                               : null,
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.grey.withOpacity(0.04),
+                              color: Colors.grey.withValues(alpha: 0.04),
                               blurRadius: 16,
                               offset: const Offset(0, 4),
                             ),
@@ -146,7 +144,6 @@ class GroceryItemsSection extends StatelessWidget {
           ),
           SizedBox(height: 16.h),
 
-          
           SizedBox(
             height: 83.h,
             child: ListView.builder(
@@ -170,7 +167,7 @@ class GroceryItemsSection extends StatelessWidget {
                             borderRadius: BorderRadius.circular(12.r),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.grey.withOpacity(0.04),
+                                color: Colors.grey.withValues(alpha: 0.04),
                                 blurRadius: 16,
                                 offset: const Offset(0, 4),
                               ),

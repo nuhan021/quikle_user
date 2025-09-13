@@ -50,7 +50,6 @@ class _SortBottomSheetState extends State<SortBottomSheet> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          
           Center(
             child: Text(
               'Sort By',
@@ -64,7 +63,6 @@ class _SortBottomSheetState extends State<SortBottomSheet> {
           ),
           SizedBox(height: 20.h),
 
-          
           ...sortOptions.map((option) {
             return ListTile(
               visualDensity: const VisualDensity(horizontal: 0, vertical: -4),
@@ -93,7 +91,6 @@ class _SortBottomSheetState extends State<SortBottomSheet> {
 
           SizedBox(height: 20.h),
 
-          
           Row(
             children: [
               Expanded(

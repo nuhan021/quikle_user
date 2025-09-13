@@ -92,6 +92,7 @@ class HelpSupportService extends GetxController {
     try {
       await Future.delayed(const Duration(seconds: 1));
       //return 'https:
+      return 'https://example.com/uploads/${filePath.split('/').last}';
     } catch (e) {
       print('Error uploading attachment: $e');
       return null;

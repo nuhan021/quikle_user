@@ -35,7 +35,7 @@ class AddAddressScreen extends StatelessWidget {
             borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withValues(alpha: 0.1),
                 blurRadius: 16.r,
                 offset: Offset(0, -4.h),
               ),
@@ -54,13 +54,12 @@ class AddAddressScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  
                   Center(
                     child: Container(
                       width: 40.w,
                       height: 4.h,
                       decoration: BoxDecoration(
-                        color: AppColors.textSecondary.withOpacity(0.3),
+                        color: AppColors.textSecondary.withValues(alpha: 0.3),
                         borderRadius: BorderRadius.circular(2.r),
                       ),
                     ),

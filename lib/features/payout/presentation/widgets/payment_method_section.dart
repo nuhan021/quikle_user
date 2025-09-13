@@ -21,7 +21,7 @@ class PaymentMethodSection extends StatelessWidget {
         borderRadius: BorderRadius.circular(8.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.04),
+            color: Colors.grey.withValues(alpha: 0.04),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -30,7 +30,6 @@ class PaymentMethodSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          
           Text(
             'Choose Payment Method',
             style: getTextStyle(
@@ -40,19 +39,19 @@ class PaymentMethodSection extends StatelessWidget {
               color: const Color(0xFF333333),
             ),
           ),
-          
+
           SizedBox(height: 8.h),
           const Divider(height: 1, thickness: 1, color: Color(0xFFE8E9E9)),
           SizedBox(height: 12.h),
 
-          
           Obx(() {
             final controller = payoutController;
             final methods = controller.paymentMethods;
             final selected = controller.selectedPaymentMethod;
 
             return DropdownButtonFormField<PaymentMethodModel>(
-              value: selected ?? (methods.isNotEmpty ? methods.first : null),
+              initialValue:
+                  selected ?? (methods.isNotEmpty ? methods.first : null),
               isExpanded: true,
               decoration: InputDecoration(
                 contentPadding: EdgeInsets.symmetric(
@@ -65,9 +64,7 @@ class PaymentMethodSection extends StatelessWidget {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8.r),
-                  borderSide: const BorderSide(
-                    color: Color(0xFFE8E9E9),
-                  ), 
+                  borderSide: const BorderSide(color: Color(0xFFE8E9E9)),
                 ),
                 filled: true,
                 fillColor: Colors.white,
@@ -78,7 +75,6 @@ class PaymentMethodSection extends StatelessWidget {
                 color: Colors.grey[600],
               ),
 
-              
               selectedItemBuilder: (ctx) => methods.map((m) {
                 return Row(
                   children: [
