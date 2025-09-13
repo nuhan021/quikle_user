@@ -78,7 +78,7 @@ class PopularItemsSection extends StatelessWidget {
                               : null,
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.grey.withOpacity(0.04),
+                              color: Colors.grey.withValues(alpha: .04),
                               blurRadius: 16,
                               offset: const Offset(0, 4),
                             ),

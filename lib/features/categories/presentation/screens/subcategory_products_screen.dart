@@ -92,7 +92,6 @@ class SubcategoryProductsScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    
                     Container(
                       width: double.infinity,
                       margin: EdgeInsets.all(16.w),
@@ -100,8 +99,8 @@ class SubcategoryProductsScreen extends StatelessWidget {
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: [
-                            AppColors.beakYellow.withOpacity(0.1),
-                            AppColors.beakYellow.withOpacity(0.05),
+                            AppColors.beakYellow.withValues(alpha: 0.1),
+                            AppColors.beakYellow.withValues(alpha: 0.05),
                           ],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
@@ -144,7 +143,6 @@ class SubcategoryProductsScreen extends StatelessWidget {
                       ),
                     ),
 
-                    
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 16.w),
                       child: GridView.builder(
@@ -226,7 +224,7 @@ class SubcategoryProductsScreen extends StatelessWidget {
                                             ),
                                           ),
                                         ),
-                                        
+
                                         Positioned(
                                           top: 8.h,
                                           left: 8.w,
@@ -352,7 +350,7 @@ class SubcategoryProductsScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              
+
               const FloatingCartButton(),
             ],
           );

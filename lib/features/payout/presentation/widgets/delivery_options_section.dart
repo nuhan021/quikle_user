@@ -56,7 +56,7 @@ class DeliveryOptionsSection extends StatelessWidget {
           borderRadius: BorderRadius.circular(8.r),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.04),
+              color: Colors.grey.withValues(alpha: 0.04),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -72,7 +72,7 @@ class DeliveryOptionsSection extends StatelessWidget {
                 border: Border.all(
                   color: option.isSelected
                       ? Colors.black
-                      : Colors.grey.withOpacity(0.5),
+                      : Colors.grey.withValues(alpha: 0.5),
                   width: 2,
                 ),
               ),
@@ -141,7 +141,7 @@ class DeliveryOptionsSection extends StatelessWidget {
         borderRadius: BorderRadius.circular(8.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.04),
+            color: Colors.grey.withValues(alpha: 0.04),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),

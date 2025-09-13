@@ -22,7 +22,7 @@ class CategoryItem extends StatelessWidget {
       onTap: onTap,
       child: SizedBox(
         height: 70.h,
-        
+
         child: Column(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.start,
@@ -32,7 +32,7 @@ class CategoryItem extends StatelessWidget {
               height: 48.h,
               decoration: isSelected
                   ? BoxDecoration(
-                      color: const Color(0xFFFF6B35).withOpacity(0.1),
+                      color: const Color(0xFFFF6B35).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
                         color: const Color(0xFFFF6B35),

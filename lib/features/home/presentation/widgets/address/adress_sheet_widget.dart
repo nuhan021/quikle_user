@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:quikle_user/core/common/styles/global_text_style.dart';
@@ -8,10 +7,7 @@ import 'package:quikle_user/core/utils/constants/enums/address_type_enums.dart';
 import 'package:quikle_user/features/profile/controllers/address_controller.dart';
 import 'package:quikle_user/routes/app_routes.dart';
 
-
-
 void showAddressSelectionSheet(AddressController addressController) {
-  
   final selectedAddressId = (addressController.defaultAddress?.id ?? '').obs;
 
   Get.bottomSheet(
@@ -30,7 +26,6 @@ class _AddressSelectionSheet extends StatelessWidget {
   final RxString selectedAddressId;
 
   const _AddressSelectionSheet({
-    super.key,
     required this.addressController,
     required this.selectedAddressId,
   });
@@ -66,7 +61,6 @@ class _AddressSelectionSheet extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            
             Container(
               margin: const EdgeInsets.only(top: 12),
               width: 40,
@@ -107,7 +101,6 @@ class _AddressSelectionSheet extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
 
-                  
                   Obx(() {
                     final items = addressController.addresses;
                     if (items.isEmpty) {
@@ -125,7 +118,9 @@ class _AddressSelectionSheet extends StatelessWidget {
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
                               color: isSelected
-                                  ? AppColors.gradientColor.withOpacity(0.15)
+                                  ? AppColors.gradientColor.withValues(
+                                      alpha: 0.15,
+                                    )
                                   : Colors.grey[50],
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
@@ -137,7 +132,6 @@ class _AddressSelectionSheet extends StatelessWidget {
                             ),
                             child: Row(
                               children: [
-                                
                                 Container(
                                   padding: const EdgeInsets.all(8),
                                   decoration: BoxDecoration(
@@ -216,7 +210,7 @@ class _AddressSelectionSheet extends StatelessWidget {
                                     ],
                                   ),
                                 ),
-                                
+
                                 AnimatedContainer(
                                   duration: const Duration(milliseconds: 200),
                                   child: Icon(
@@ -239,7 +233,6 @@ class _AddressSelectionSheet extends StatelessWidget {
 
                   const SizedBox(height: 24),
 
-                  
                   Obx(() {
                     final hasAddresses = addressController.addresses.isNotEmpty;
                     if (!hasAddresses) return const SizedBox.shrink();
@@ -250,7 +243,6 @@ class _AddressSelectionSheet extends StatelessWidget {
 
                     return Row(
                       children: [
-                        
                         Expanded(
                           child: OutlinedButton(
                             onPressed: () => Get.back(),
@@ -273,7 +265,7 @@ class _AddressSelectionSheet extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 12),
-                        
+
                         Expanded(
                           flex: 2,
                           child: ElevatedButton(

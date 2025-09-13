@@ -40,7 +40,7 @@ class SearchAndFiltersSection extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8.r),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.grey.withOpacity(0.04),
+                        color: Colors.grey.withValues(alpha: 0.04),
                         blurRadius: 16,
                         offset: const Offset(0, 4),
                       ),
@@ -92,7 +92,7 @@ class SearchAndFiltersSection extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8.r),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.grey.withOpacity(0.04),
+                      color: Colors.grey.withValues(alpha: 0.04),
                       blurRadius: 16,
                       offset: const Offset(0, 4),
                     ),
@@ -104,10 +104,7 @@ class SearchAndFiltersSection extends StatelessWidget {
                     color: Colors.white,
                     size: 24,
                   ),
-                  onPressed: () {
-                    
-                    
-                  },
+                  onPressed: () {},
                 ),
               ),
             ],
@@ -149,7 +146,7 @@ class _FilterButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(8.r),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.04),
+              color: Colors.grey.withValues(alpha: 0.04),
               blurRadius: 16,
               offset: const Offset(0, 4),
             ),

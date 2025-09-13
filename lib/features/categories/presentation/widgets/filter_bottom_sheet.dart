@@ -102,7 +102,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
               });
             },
             activeColor: AppColors.beakYellow,
-            inactiveColor: AppColors.featherGrey.withOpacity(0.3),
+            inactiveColor: AppColors.featherGrey.withValues(alpha: 0.3),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,

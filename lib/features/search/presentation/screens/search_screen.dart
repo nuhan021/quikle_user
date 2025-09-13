@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -42,7 +41,6 @@ class SearchScreen extends StatelessWidget {
         children: [
           Column(
             children: [
-              
               Container(
                 padding: EdgeInsets.all(16.w),
                 child: Row(
@@ -92,7 +90,9 @@ class SearchScreen extends StatelessWidget {
                                   padding: EdgeInsets.all(8.w),
                                   decoration: BoxDecoration(
                                     color: controller.isListening
-                                        ? AppColors.primary.withOpacity(0.1)
+                                        ? AppColors.primary.withValues(
+                                            alpha: 0.1,
+                                          )
                                         : Colors.transparent,
                                     borderRadius: BorderRadius.circular(6.r),
                                   ),
@@ -116,7 +116,6 @@ class SearchScreen extends StatelessWidget {
                 ),
               ),
 
-              
               Expanded(
                 child: Obx(() {
                   if (controller.isLoading) {
@@ -137,11 +136,10 @@ class SearchScreen extends StatelessWidget {
             ],
           ),
 
-          
           Obx(() {
             if (!controller.isListening) return const SizedBox.shrink();
             return Container(
-              color: Colors.black.withOpacity(0.25),
+              color: Colors.black.withValues(alpha: 0.25),
               alignment: Alignment.center,
               child: _ListeningPopup(
                 soundLevel: controller.soundLevel.value,
@@ -373,13 +371,13 @@ class _ListeningPopupState extends State<_ListeningPopup>
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: AppColors.primary.withOpacity(0.35),
+              color: AppColors.primary.withValues(alpha: 0.35),
               blurRadius: 28,
               spreadRadius: 8,
             ),
           ],
           border: Border.all(
-            color: AppColors.primary.withOpacity(0.15),
+            color: AppColors.primary.withValues(alpha: 0.15),
             width: 1,
           ),
         ),
@@ -392,9 +390,9 @@ class _ListeningPopupState extends State<_ListeningPopup>
               height: dynamicSize,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppColors.primary.withOpacity(0.18),
+                color: AppColors.primary.withValues(alpha: 0.18),
                 border: Border.all(
-                  color: AppColors.primary.withOpacity(0.25),
+                  color: AppColors.primary.withValues(alpha: 0.25),
                   width: 1,
                 ),
               ),

@@ -4,7 +4,6 @@ import 'package:quikle_user/core/common/styles/global_text_style.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 import 'package:quikle_user/core/common/widgets/common_app_bar.dart';
-import 'package:flutter/widgets.dart'; 
 
 class UnifiedProfileAppBar extends StatelessWidget
     implements PreferredSizeWidget {

@@ -67,15 +67,15 @@ class LoginScreen extends StatelessWidget {
 
             IconRowMarquee(
               images: ProductIcons.asProviders(),
-              speed: 60,
+              speed: 10,
               offsetSlots: 0.0,
             ),
             SizedBox(height: 12.h),
             IconRowMarquee(
               images: ProductIcons.asProviders(),
-              speed: 60,
-              offsetSlots: 0.5,
-              reverse: true,
+              speed: 30,
+              //offsetSlots: 50.0,
+              //reverse: true,
             ),
             SizedBox(height: 76.h),
 

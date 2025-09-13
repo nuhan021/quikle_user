@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'package:quikle_user/core/common/styles/global_text_style.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
-import 'package:quikle_user/core/common/widgets/common_app_bar.dart';
 import 'package:quikle_user/features/orders/controllers/orders_controller.dart';
 import 'package:quikle_user/features/orders/presentation/widgets/order_card.dart';
 import 'package:quikle_user/features/profile/presentation/widgets/unified_profile_app_bar.dart';
@@ -167,12 +166,7 @@ class OrdersScreen extends StatelessWidget {
                     itemCount: controller.orders.length,
                     itemBuilder: (context, index) {
                       final order = controller.orders[index];
-                      return OrderCard(
-                        order: order,
-                        onTap: () {
-                          
-                        },
-                      );
+                      return OrderCard(order: order, onTap: () {});
                     },
                   ),
                 );

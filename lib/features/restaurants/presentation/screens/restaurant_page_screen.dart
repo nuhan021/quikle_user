@@ -62,12 +62,10 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen> {
   void _loadProducts() {
     setState(() => _isLoading = true);
 
-    
     _restaurantProducts = _productService.allProducts
         .where((product) => product.shopId == restaurant.id)
         .toList();
 
-    
     _filterProducts(_selectedCategory);
 
     setState(() => _isLoading = false);
@@ -103,25 +101,21 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen> {
             .where((product) => product.productType == 'beverage')
             .toList();
       } else {
-        
         _filteredProducts = _restaurantProducts;
       }
     });
   }
 
   void _onFavoriteToggle(ProductModel product) {
-    
     if (FavoritesController.isProductFavorite(product.id)) {
       FavoritesController.removeFromGlobalFavorites(product.id);
     } else {
       FavoritesController.addToGlobalFavorites(product.id);
     }
 
-    
     final isFavorite = FavoritesController.isProductFavorite(product.id);
     final updatedProduct = product.copyWith(isFavorite: isFavorite);
 
-    
     final restaurantIndex = _restaurantProducts.indexWhere(
       (p) => p.id == product.id,
     );
@@ -131,7 +125,6 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen> {
       });
     }
 
-    
     final filteredIndex = _filteredProducts.indexWhere(
       (p) => p.id == product.id,
     );
@@ -150,7 +143,6 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen> {
   }
 
   void _onAddToCart(ProductModel product) {
-    
     try {
       final cartController = Get.find<CartController>();
       cartController.addToCart(product);
@@ -162,7 +154,6 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen> {
         duration: const Duration(seconds: 2),
       );
     } catch (e) {
-      
       Get.snackbar(
         'Added to Cart',
         '${product.title} added to your cart',
@@ -173,7 +164,6 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen> {
   }
 
   void _onProductTap(ProductModel product) {
-    
     Get.toNamed(AppRoute.getProductDetails(), arguments: product);
   }
 
@@ -191,7 +181,6 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen> {
             children: [
               Column(
                 children: [
-                  
                   CommonAppBar(
                     title: restaurant.name,
                     showBackButton: true,
@@ -210,7 +199,7 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen> {
                       borderRadius: BorderRadius.circular(8.r),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.grey.withOpacity(0.1),
+                          color: Colors.grey.withValues(alpha: 0.1),
                           blurRadius: 8,
                           offset: const Offset(0, 2),
                         ),
@@ -218,7 +207,6 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen> {
                     ),
                     child: Row(
                       children: [
-                        
                         Container(
                           width: 64.w,
                           height: 64.w,
@@ -227,7 +215,7 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen> {
                             borderRadius: BorderRadius.circular(32.r),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.15),
+                                color: Colors.black.withValues(alpha: 0.15),
                                 blurRadius: 10,
                                 offset: const Offset(0, 2),
                               ),
@@ -251,7 +239,6 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen> {
 
                         SizedBox(width: 16.w),
 
-                        
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -282,12 +269,10 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen> {
                     ),
                   ),
 
-                  
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16.w),
                     child: Column(
                       children: [
-                        
                         Container(
                           height: 48.h,
                           decoration: BoxDecoration(
@@ -329,10 +314,8 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen> {
 
                         SizedBox(height: 16.h),
 
-                        
                         Row(
                           children: [
-                            
                             Container(
                               padding: EdgeInsets.symmetric(
                                 horizontal: 16.w,
@@ -343,7 +326,7 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen> {
                                 borderRadius: BorderRadius.circular(8.r),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black.withOpacity(0.04),
+                                    color: Colors.black.withValues(alpha: 0.04),
                                     blurRadius: 16,
                                     offset: const Offset(0, 4),
                                   ),
@@ -373,7 +356,6 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen> {
 
                             SizedBox(width: 8.w),
 
-                            
                             Container(
                               padding: EdgeInsets.symmetric(
                                 horizontal: 16.w,
@@ -384,7 +366,7 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen> {
                                 borderRadius: BorderRadius.circular(8.r),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black.withOpacity(0.04),
+                                    color: Colors.black.withValues(alpha: 0.04),
                                     blurRadius: 16,
                                     offset: const Offset(0, 4),
                                   ),
@@ -419,7 +401,6 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen> {
 
                   SizedBox(height: 24.h),
 
-                  
                   SizedBox(
                     height: 30.h,
                     child: ListView.builder(
@@ -445,7 +426,7 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen> {
                               borderRadius: BorderRadius.circular(4.r),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.grey.withOpacity(0.1),
+                                  color: Colors.grey.withValues(alpha: 0.1),
                                   blurRadius: 8,
                                   offset: const Offset(0, 2),
                                 ),
@@ -468,7 +449,6 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen> {
 
                   SizedBox(height: 24.h),
 
-                  
                   Expanded(
                     child: _isLoading
                         ? const Center(child: CircularProgressIndicator())
@@ -500,7 +480,6 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                
                                 Container(
                                   width: double.infinity,
                                   padding: EdgeInsets.only(bottom: 8.h),
@@ -542,12 +521,12 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen> {
                                       onFavoriteToggle: () =>
                                           _onFavoriteToggle(product),
                                       variant: ProductCardVariant.category,
-                                      isGroceryCategory: false, 
+                                      isGroceryCategory: false,
                                     );
                                   },
                                 ),
 
-                                SizedBox(height: 120.h), 
+                                SizedBox(height: 120.h),
                               ],
                             ),
                           ),
@@ -555,7 +534,6 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen> {
                 ],
               ),
 
-              
               const FloatingCartButton(),
             ],
           ),
