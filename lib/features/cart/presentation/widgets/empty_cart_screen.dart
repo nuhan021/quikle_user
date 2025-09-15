@@ -85,7 +85,7 @@ class EmptyCartScreen extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Cart image
+                    
                     SizedBox(
                       width: 225.w,
                       height: 120.w,

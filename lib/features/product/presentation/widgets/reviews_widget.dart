@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:quikle_user/core/common/styles/global_text_style.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 import '../../data/models/review_model.dart';
+import '../../controllers/product_controller.dart';
 
 class ReviewsWidget extends StatelessWidget {
   final double rating;
@@ -23,6 +25,8 @@ class ReviewsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.find<ProductController>();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -53,10 +57,10 @@ class ReviewsWidget extends StatelessWidget {
         ),
         SizedBox(height: 16.h),
 
-        // Rating summary
+        
         Row(
           children: [
-            // Overall rating
+            
             Column(
               children: [
                 Text(
@@ -85,7 +89,7 @@ class ReviewsWidget extends StatelessWidget {
             ),
             SizedBox(width: 32.w),
 
-            // Rating distribution
+            
             Expanded(
               child: Column(
                 children: [
@@ -122,57 +126,128 @@ class ReviewsWidget extends StatelessWidget {
         ),
 
         SizedBox(height: 16.h),
-        TextField(
-          maxLines: 3,
-          decoration: InputDecoration(
-            hintText: "Write your review here...",
-            hintStyle: getTextStyle(
-              font: CustomFonts.inter,
-              fontSize: 14.sp,
-              color: AppColors.featherGrey,
-            ),
-            filled: true,
-            fillColor: AppColors.homeGrey,
-            contentPadding: EdgeInsets.all(12.w),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8.r),
-              borderSide: BorderSide(color: Colors.grey.shade300, width: 1),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8.r),
-              borderSide: const BorderSide(color: Colors.black, width: 1.5),
-            ),
+
+        
+        Container(
+          padding: EdgeInsets.all(12.w),
+          decoration: BoxDecoration(
+            color: AppColors.homeGrey,
+            borderRadius: BorderRadius.circular(8.r),
+            border: Border.all(color: Colors.grey.shade300, width: 1),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Rate this product:',
+                style: getTextStyle(
+                  font: CustomFonts.inter,
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.ebonyBlack,
+                ),
+              ),
+              SizedBox(height: 8.h),
+              Obx(
+                () => Row(
+                  children: List.generate(5, (index) {
+                    return GestureDetector(
+                      onTap: () =>
+                          controller.setUserRating((index + 1).toDouble()),
+                      child: Icon(
+                        index < controller.userRating.floor()
+                            ? Icons.star
+                            : Icons.star_border,
+                        color: Colors.orange,
+                        size: 24.sp,
+                      ),
+                    );
+                  }),
+                ),
+              ),
+              SizedBox(height: 12.h),
+              TextField(
+                controller: controller.reviewController,
+                maxLines: 3,
+                decoration: InputDecoration(
+                  hintText: "Write your review here...",
+                  hintStyle: getTextStyle(
+                    font: CustomFonts.inter,
+                    fontSize: 14.sp,
+                    color: AppColors.featherGrey,
+                  ),
+                  filled: true,
+                  fillColor: Colors.white,
+                  contentPadding: EdgeInsets.all(12.w),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.r),
+                    borderSide: BorderSide(
+                      color: Colors.grey.shade300,
+                      width: 1,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.r),
+                    borderSide: const BorderSide(
+                      color: Colors.black,
+                      width: 1.5,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 12.h),
+              SizedBox(
+                height: 48.h,
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: onWriteReview,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.black,
+                    padding: EdgeInsets.symmetric(vertical: 12.h),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.r),
+                    ),
+                  ),
+                  child: Text(
+                    'Submit Review',
+                    style: getTextStyle(
+                      font: CustomFonts.inter,
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.eggshellWhite,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
 
-        SizedBox(height: 12.h),
-        SizedBox(
-          height: 48.h,
-          width: double.infinity,
-          child: ElevatedButton(
-            onPressed: onWriteReview,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.black,
-              padding: EdgeInsets.symmetric(vertical: 12.h),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8.r),
-              ),
-            ),
-            child: Text(
-              'Write A Review',
-              style: getTextStyle(
-                font: CustomFonts.inter,
-                fontSize: 18.sp,
-                fontWeight: FontWeight.w600,
-                color: AppColors.eggshellWhite,
-              ),
-            ),
-          ),
+        SizedBox(height: 20.h),
+
+        
+        Obx(
+          () => reviews.isNotEmpty
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Customer Reviews (${controller.reviews.length})',
+                      style: getTextStyle(
+                        font: CustomFonts.inter,
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.ebonyBlack,
+                      ),
+                    ),
+                    SizedBox(height: 16.h),
+                    ...controller.reviews.map(
+                      (review) => _buildReviewCard(review),
+                    ),
+                  ],
+                )
+              : const SizedBox.shrink(),
         ),
-
-        SizedBox(height: 16.h),
-
-        ...reviews.map((review) => _buildReviewCard(review)),
       ],
     );
   }
@@ -181,7 +256,7 @@ class ReviewsWidget extends StatelessWidget {
     return Container(
       margin: EdgeInsets.only(bottom: 12.h),
       decoration: BoxDecoration(
-        color: AppColors.textWhite, // keep your current bg
+        color: AppColors.textWhite, 
         borderRadius: BorderRadius.circular(8.r),
         border: Border.all(color: Colors.white, width: 1),
       ),
@@ -253,7 +328,7 @@ class ReviewsWidget extends StatelessWidget {
                 font: CustomFonts.inter,
                 fontSize: 14.sp,
                 color: AppColors.ebonyBlack,
-                //height: 1.4,
+                
               ),
             ),
 

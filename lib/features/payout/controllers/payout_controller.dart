@@ -33,7 +33,7 @@ class PayoutController extends GetxController {
   bool get isProcessingPayment => _isProcessingPayment.value;
   TextEditingController get couponController => _couponController;
 
-  // Expose simple flag for enabling/disabling the "Apply" button
+  
   bool get canApplyCoupon => _couponCode.value.trim().isNotEmpty;
 
   DeliveryOptionModel? get selectedDeliveryOption =>
@@ -93,7 +93,7 @@ class PayoutController extends GetxController {
     super.onInit();
     _loadInitialData();
 
-    // Minimal sync so typing updates button state via Obx(canApplyCoupon)
+    
     _couponController.addListener(_syncCouponText);
   }
 

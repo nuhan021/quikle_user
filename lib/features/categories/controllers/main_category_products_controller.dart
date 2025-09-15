@@ -4,32 +4,33 @@ import 'package:quikle_user/features/categories/data/models/subcategory_model.da
 import 'package:quikle_user/features/categories/data/services/category_service.dart';
 import 'package:quikle_user/features/home/data/models/category_model.dart';
 import 'package:quikle_user/features/home/data/models/product_model.dart';
+import 'package:quikle_user/features/profile/controllers/favorites_controller.dart';
 import 'package:quikle_user/routes/app_routes.dart';
 
 class MainCategoryProductsController extends GetxController {
   final CategoryService _categoryService = CategoryService();
   late final CartController _cartController;
 
-  // Arguments from navigation
+  
   late final SubcategoryModel subcategory;
   late final CategoryModel category;
   late final bool showAllProducts;
 
-  // Observables
+  
   final isLoading = false.obs;
   final subcategoryTitle = ''.obs;
   final subcategoryDescription = ''.obs;
   final products = <ProductModel>[].obs;
   final filteredProducts = <ProductModel>[].obs;
   final availableSubcategories = <SubcategoryModel>[].obs;
-  final selectedFilter = Rxn<String>(); // null means "All"
+  final selectedFilter = Rxn<String>(); 
 
   @override
   void onInit() {
     super.onInit();
     _cartController = Get.find<CartController>();
 
-    // Get arguments from navigation
+    
     final arguments = Get.arguments as Map<String, dynamic>;
     subcategory = arguments['subcategory'] as SubcategoryModel;
     category = arguments['category'] as CategoryModel;
@@ -45,10 +46,10 @@ class MainCategoryProductsController extends GetxController {
     isLoading.value = true;
     try {
       if (showAllProducts) {
-        // Load all products from all subcategories of this main category
+        
         await _loadAllProductsFromMainCategory();
       } else {
-        // Load products from specific subcategory
+        
         final productList = await _categoryService.fetchProductsBySubcategory(
           subcategory.id,
         );
@@ -64,17 +65,17 @@ class MainCategoryProductsController extends GetxController {
 
   Future<void> _loadAllProductsFromMainCategory() async {
     try {
-      // Use the service method to get all products for this main category
+      
       final allProducts = await _categoryService.fetchProductsByMainCategory(
         subcategory.id,
       );
 
-      // Also load the subcategories for filtering
+      
       List<SubcategoryModel> subcategories = [];
       if (subcategory.id == 'grocery_produce') {
         subcategories = await _categoryService.fetchProduceSubcategories();
       }
-      // TODO: Add other main categories (cooking, meats, oils, etc.)
+      
 
       products.value = allProducts;
       filteredProducts.value = allProducts;
@@ -88,10 +89,10 @@ class MainCategoryProductsController extends GetxController {
     selectedFilter.value = subcategoryId;
 
     if (subcategoryId == null) {
-      // Show all products
+      
       filteredProducts.value = products;
     } else {
-      // Filter by specific subcategory
+      
       filteredProducts.value = products
           .where((product) => product.subcategoryId == subcategoryId)
           .toList();
@@ -99,26 +100,34 @@ class MainCategoryProductsController extends GetxController {
   }
 
   void onProductTap(ProductModel product) {
-    // Navigate to product details screen
+    
     Get.toNamed(AppRoute.getProductDetails(), arguments: product);
   }
 
   void onAddToCart(ProductModel product) {
-    // Add product to cart
+    
     _cartController.addToCart(product);
   }
 
   void onFavoriteToggle(ProductModel product) {
-    // Handle favorite toggle
-    final updatedProduct = product.copyWith(isFavorite: !product.isFavorite);
+    
+    if (FavoritesController.isProductFavorite(product.id)) {
+      FavoritesController.removeFromGlobalFavorites(product.id);
+    } else {
+      FavoritesController.addToGlobalFavorites(product.id);
+    }
 
-    // Update in products list
+    
+    final isFavorite = FavoritesController.isProductFavorite(product.id);
+    final updatedProduct = product.copyWith(isFavorite: isFavorite);
+
+    
     final productIndex = products.indexWhere((p) => p.id == product.id);
     if (productIndex != -1) {
       products[productIndex] = updatedProduct;
     }
 
-    // Update in filtered products list
+    
     final filteredIndex = filteredProducts.indexWhere(
       (p) => p.id == product.id,
     );
@@ -127,10 +136,8 @@ class MainCategoryProductsController extends GetxController {
     }
 
     Get.snackbar(
-      updatedProduct.isFavorite
-          ? 'Added to Favorites'
-          : 'Removed from Favorites',
-      updatedProduct.isFavorite
+      isFavorite ? 'Added to Favorites' : 'Removed from Favorites',
+      isFavorite
           ? '${product.title} has been added to your favorites.'
           : '${product.title} has been removed from your favorites.',
       duration: const Duration(seconds: 2),

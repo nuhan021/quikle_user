@@ -1,6 +1,6 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:quikle_user/core/common/styles/global_text_style.dart';
-import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../data/models/category_model.dart';
 import 'category_item.dart';
 
@@ -20,30 +20,22 @@ class CategoriesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (showTitle) ...[
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Text(
-              'All Categories',
-              style: getTextStyle(
-                font: CustomFonts.obviously,
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-                color: Colors.black,
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-        ],
-        Container(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final hasBounded =
+            constraints.hasBoundedHeight && constraints.maxHeight.isFinite;
+        final double verticalPad = 16.0 * 2;
+        final double fallbackListHeight = 63.h;
+        final double listHeight = hasBounded
+            ? math.max(0.0, constraints.maxHeight - verticalPad)
+            : fallbackListHeight;
+
+        return Container(
           width: double.infinity,
           padding: const EdgeInsets.symmetric(vertical: 16),
           decoration: const BoxDecoration(color: Color(0x33CFCFCF)),
           child: SizedBox(
-            height: 96,
+            height: listHeight,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -62,8 +54,8 @@ class CategoriesSection extends StatelessWidget {
               },
             ),
           ),
-        ),
-      ],
+        );
+      },
     );
   }
 }

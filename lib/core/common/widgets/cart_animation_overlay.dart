@@ -140,7 +140,7 @@ class _AnimatedCartImageState extends State<AnimatedCartImage>
                   borderRadius: BorderRadius.circular(10.r),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.10),
+                      color: Colors.black.withValues(alpha: 0.10),
                       blurRadius: 12.r,
                       spreadRadius: 2.r,
                       offset: const Offset(0, 6),

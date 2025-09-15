@@ -46,7 +46,7 @@ class SplashController extends GetxController {
     final v = video.value;
     if (v.isInitialized && v.position >= v.duration && !v.isPlaying) {
       showLogin.value = true;
-      // Remove: Get.offAllNamed(AppRoute.getLoginScreen());
+      
     }
   }
 

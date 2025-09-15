@@ -1,7 +1,11 @@
 import 'package:get/get.dart';
+import 'package:speech_to_text/speech_to_text.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:quikle_user/features/home/data/services/home_services.dart';
 import 'package:quikle_user/features/cart/controllers/cart_controller.dart';
+import 'package:quikle_user/features/profile/controllers/favorites_controller.dart';
 import 'package:quikle_user/routes/app_routes.dart';
+import 'package:quikle_user/features/search/controllers/search_controller.dart';
 import '../data/models/category_model.dart';
 import '../data/models/product_model.dart';
 
@@ -88,48 +92,119 @@ class HomeController extends GetxController {
   }
 
   void onNotificationPressed() {
-    // Handle notification tap
+    
   }
 
   void onSearchPressed() {
-    // Handle search tap
+    
+    Get.toNamed(AppRoute.getSearch());
+  }
+
+  Future<void> onVoiceSearchPressed() async {
+    final speechToText = SpeechToText();
+
+    try {
+      
+      final permissionStatus = await Permission.microphone.request();
+
+      if (permissionStatus != PermissionStatus.granted) {
+        Get.snackbar(
+          'Permission Denied',
+          'Microphone permission is required for voice search.',
+          snackPosition: SnackPosition.BOTTOM,
+          duration: const Duration(seconds: 3),
+        );
+        return;
+      }
+
+      
+      final available = await speechToText.initialize(
+        onError: (errorNotification) {
+          Get.snackbar(
+            'Voice Recognition Error',
+            'Could not recognize speech. Please try again.',
+            snackPosition: SnackPosition.BOTTOM,
+            duration: const Duration(seconds: 2),
+          );
+        },
+      );
+
+      if (!available) {
+        Get.snackbar(
+          'Voice Search Unavailable',
+          'Speech recognition is not available on this device.',
+          snackPosition: SnackPosition.BOTTOM,
+          duration: const Duration(seconds: 2),
+        );
+        return;
+      }
+
+      
+      Get.toNamed(AppRoute.getSearch());
+
+      
+      await Future.delayed(const Duration(milliseconds: 500));
+
+      
+      await Future.delayed(const Duration(milliseconds: 300));
+      final searchController = ProductSearchController.currentInstance;
+      if (searchController != null) {
+        await searchController.toggleVoiceRecognition();
+      }
+    } catch (e) {
+      print('Error in voice search: $e');
+      Get.snackbar(
+        'Voice Search Error',
+        'An error occurred while starting voice search.',
+        snackPosition: SnackPosition.BOTTOM,
+        duration: const Duration(seconds: 2),
+      );
+    }
   }
 
   Future<void> onCategoryPressed(CategoryModel category) async {
-    // Navigate to unified category screen for all categories except "All"
+    
     if (category.id != '0') {
       Get.toNamed(
         AppRoute.getUnifiedCategory(),
         arguments: {'category': category},
       );
     } else {
-      // For "All" category, filter on the home page
+      
       _selectedCategoryId.value = category.id;
       await _loadContent();
     }
   }
 
   void onProductPressed(ProductModel product) {
-    // Navigate to product details screen
+    
     Get.toNamed(AppRoute.getProductDetails(), arguments: product);
   }
 
   void onAddToCartPressed(ProductModel product) {
-    // Handle add to cart using cart controller
+    
     _cartController.addToCart(product);
   }
 
   void onFavoriteToggle(ProductModel product) {
-    final updatedProduct = product.copyWith(isFavorite: !product.isFavorite);
+    
+    if (FavoritesController.isProductFavorite(product.id)) {
+      FavoritesController.removeFromGlobalFavorites(product.id);
+    } else {
+      FavoritesController.addToGlobalFavorites(product.id);
+    }
+
+    
+    final isFavorite = FavoritesController.isProductFavorite(product.id);
+    final updatedProduct = product.copyWith(isFavorite: isFavorite);
     _updateProductInLists(product, updatedProduct);
 
     Get.snackbar(
-      updatedProduct.isFavorite
-          ? 'Added to Favorites'
-          : 'Removed from Favorites',
-      updatedProduct.isFavorite
+      isFavorite ? 'Added to Favorites' : 'Removed from Favorites',
+      isFavorite
           ? '${product.title} has been added to your favorites.'
           : '${product.title} has been removed from your favorites.',
+      snackPosition: SnackPosition.BOTTOM,
       duration: const Duration(seconds: 2),
     );
   }
@@ -174,19 +249,19 @@ class HomeController extends GetxController {
   void onViewAllPressed(String categoryId) {
     final category = _categories.firstWhere((cat) => cat.id == categoryId);
 
-    // Navigate to unified category screen for all categories except "All"
+    
     if (categoryId != '0') {
       Get.toNamed(
         AppRoute.getUnifiedCategory(),
         arguments: {'category': category},
       );
     } else {
-      // For "All" category, just filter on the home page
+      
       onCategoryPressed(category);
     }
   }
 
   void onShopNowPressed() {
-    // Handle shop now tap
+    
   }
 }

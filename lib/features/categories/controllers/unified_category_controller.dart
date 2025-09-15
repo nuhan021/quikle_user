@@ -4,57 +4,56 @@ import 'package:quikle_user/features/home/data/models/product_model.dart';
 import 'package:quikle_user/features/home/data/models/shop_model.dart';
 import 'package:quikle_user/features/categories/data/models/subcategory_model.dart';
 import 'package:quikle_user/features/categories/data/services/category_service.dart';
+import 'package:quikle_user/features/restaurants/data/models/restaurant_model.dart';
+import 'package:quikle_user/features/restaurants/data/services/restaurant_service.dart';
 import 'package:quikle_user/features/cart/controllers/cart_controller.dart';
+import 'package:quikle_user/features/profile/controllers/favorites_controller.dart';
 import 'package:quikle_user/routes/app_routes.dart';
 
 class UnifiedCategoryController extends GetxController {
   final CategoryService _categoryService = CategoryService();
+  final RestaurantService _restaurantService = RestaurantService();
   final CartController _cartController = Get.find<CartController>();
 
-  // Observables
   final isLoading = false.obs;
   final categoryTitle = ''.obs;
   final productsTitle = 'All Products'.obs;
-  final sectionTitle = ''.obs; // Dynamic title for the selection section
+  final sectionTitle = ''.obs;
 
-  // Category management
   final availableSubcategories = <SubcategoryModel>[].obs;
   final filterSubcategories = <SubcategoryModel>[].obs;
-  final allCategories =
-      <SubcategoryModel>[].obs; // Always shows main categories
+  final allCategories = <SubcategoryModel>[].obs;
   final allProducts = <ProductModel>[].obs;
   final displayProducts = <ProductModel>[].obs;
-  final filteredProducts = <ProductModel>[].obs; // For search/filter results
-  final recommendedProducts =
-      <ProductModel>[].obs; // Recommended products for non-grocery categories
-  final shops = <String, ShopModel>{}.obs; // Shop data cache
+  final filteredProducts = <ProductModel>[].obs;
+  final recommendedProducts = <ProductModel>[].obs;
+  final shops = <String, ShopModel>{}.obs;
 
-  // Selection state
+  final topRestaurants = <RestaurantModel>[].obs;
+  final categoryRestaurants = <RestaurantModel>[].obs;
+  final showRestaurants = false.obs;
+
   final selectedMainCategory = Rxn<SubcategoryModel>();
   final selectedSubcategory = Rxn<SubcategoryModel>();
   final selectedFilter = Rxn<String>();
   final showingAllProducts = false.obs;
 
-  // Search and filter state
   final searchQuery = ''.obs;
   final selectedSortOption = 'relevance'.obs;
   final selectedFilters = <String>[].obs;
   final priceRange = RxList<double>([0.0, 100.0]);
   final showOnlyInStock = false.obs;
 
-  // Category type
   late CategoryModel currentCategory;
-  bool get isGroceryCategory =>
-      currentCategory.id == '2'; // Grocery category ID
+  bool get isGroceryCategory => currentCategory.id == '2';
+  bool get isFoodCategory => currentCategory.id == '1';
 
-  // Check if any subcategory is selected - if yes, show combined section
   bool get shouldShowCombinedSection => selectedSubcategory.value != null;
 
   @override
   void onInit() {
     super.onInit();
 
-    // Get category from arguments
     final args = Get.arguments as Map<String, dynamic>?;
     if (args != null && args['category'] != null) {
       currentCategory = args['category'] as CategoryModel;
@@ -63,14 +62,12 @@ class UnifiedCategoryController extends GetxController {
     }
   }
 
-  // Get shop data for a product
   ShopModel? getShopForProduct(ProductModel product) {
     return shops[product.shopId];
   }
 
   Future<void> _loadShopData() async {
     try {
-      // Create a map of static shop data for now
       shops.clear();
       shops['shop_1'] = const ShopModel(
         id: 'shop_1',
@@ -108,14 +105,13 @@ class UnifiedCategoryController extends GetxController {
     try {
       isLoading.value = true;
 
-      // Load shop data first
       await _loadShopData();
 
       if (isGroceryCategory) {
-        // For groceries: Load main categories first
         await _loadGroceryMainCategories();
+      } else if (isFoodCategory) {
+        await _loadFoodCategoryData();
       } else {
-        // For other categories: Load subcategories directly
         await _loadCategorySubcategories();
       }
     } catch (e) {
@@ -125,64 +121,49 @@ class UnifiedCategoryController extends GetxController {
     }
   }
 
+  Future<void> _loadFoodCategoryData() async {
+    await _loadCategorySubcategories();
+
+    final restaurants = await _restaurantService.getTopRestaurants(limit: 25);
+    topRestaurants.value = restaurants;
+    showRestaurants.value = true;
+  }
+
   Future<void> _loadGroceryMainCategories() async {
     final mainCategories = await _categoryService.fetchGroceryMainCategories();
-    allCategories.value = mainCategories; // Always keep main categories
+    allCategories.value = mainCategories;
     availableSubcategories.value = mainCategories;
     sectionTitle.value = 'Select Category';
 
-    // Auto-select first category if available
-    if (mainCategories.isNotEmpty) {
-      selectedMainCategory.value = mainCategories.first;
+    final products = await _categoryService.fetchAllProductsByCategory(
+      currentCategory.id,
+    );
+    allProducts.value = products;
+    displayProducts.value = products;
+    productsTitle.value = 'All ${currentCategory.title}';
 
-      // Load subcategories for the first category
-      final subCategories = await _categoryService.fetchSubcategories(
-        currentCategory.id,
-        parentSubcategoryId: mainCategories.first.id,
-      );
-      filterSubcategories.value = subCategories;
-
-      // Load products for the first category
-      final products = await _categoryService.fetchProductsByMainCategory(
-        mainCategories.first.id,
-      );
-      allProducts.value = products;
-      displayProducts.value = products;
-      productsTitle.value = 'All ${mainCategories.first.title}';
-    }
+    selectedMainCategory.value = null;
+    filterSubcategories.clear();
   }
 
   Future<void> _loadCategorySubcategories() async {
     final subcategories = await _categoryService.fetchSubcategories(
       currentCategory.id,
     );
-    allCategories.value = subcategories; // Always keep main categories
+    allCategories.value = subcategories;
     availableSubcategories.value = subcategories;
     sectionTitle.value = 'Popular Items';
 
-    // Auto-select first subcategory if available
-    if (subcategories.isNotEmpty) {
-      selectedSubcategory.value = subcategories.first;
+    final products = await _categoryService.fetchAllProductsByCategory(
+      currentCategory.id,
+    );
+    allProducts.value = products;
 
-      // Load products for the first subcategory
-      final products = await _categoryService.fetchAllProductsByCategory(
-        currentCategory.id,
-      );
-      allProducts.value = products;
+    displayProducts.value = products;
+    productsTitle.value = 'All ${currentCategory.title}';
 
-      // Filter products by first subcategory
-      final filteredProducts = products
-          .where(
-            (product) =>
-                product.subcategoryId != null &&
-                product.subcategoryId == subcategories.first.id,
-          )
-          .toList();
-      displayProducts.value = filteredProducts;
-      productsTitle.value = '${subcategories.first.title} Items';
-    }
+    selectedSubcategory.value = null;
 
-    // Load recommended products for non-grocery categories
     if (!isGroceryCategory) {
       await _loadRecommendedProducts();
     }
@@ -204,21 +185,18 @@ class UnifiedCategoryController extends GetxController {
       isLoading.value = true;
 
       if (isGroceryCategory) {
-        // Check if this is a main category selection (from the first row)
         if (allCategories.contains(subcategory)) {
-          // Main category selection
           selectedMainCategory.value = subcategory;
           selectedSubcategory.value = null;
           selectedFilter.value = null;
+          showingAllProducts.value = false;
 
-          // Load subcategories for the selected main category
           final subCategories = await _categoryService.fetchSubcategories(
             currentCategory.id,
             parentSubcategoryId: subcategory.id,
           );
           filterSubcategories.value = subCategories;
 
-          // Load all products for this main category
           final products = await _categoryService.fetchProductsByMainCategory(
             subcategory.id,
           );
@@ -226,13 +204,25 @@ class UnifiedCategoryController extends GetxController {
           displayProducts.value = products;
           productsTitle.value = 'All ${subcategory.title}';
         } else {
-          // Subcategory selection (from the second row)
           selectedSubcategory.value = subcategory;
+          showingAllProducts.value = false;
           applyFilter(subcategory.id);
         }
-      } else {
-        // For non-grocery categories: Select subcategory and filter products
+      } else if (isFoodCategory) {
         selectedSubcategory.value = subcategory;
+        showingAllProducts.value = false;
+        final filteredProducts = allProducts
+            .where(
+              (product) =>
+                  product.subcategoryId != null &&
+                  product.subcategoryId == subcategory.id,
+            )
+            .toList();
+        displayProducts.value = filteredProducts;
+        productsTitle.value = '${subcategory.title} Items';
+      } else {
+        selectedSubcategory.value = subcategory;
+        showingAllProducts.value = false;
         final filteredProducts = allProducts
             .where(
               (product) =>
@@ -254,13 +244,11 @@ class UnifiedCategoryController extends GetxController {
     selectedFilter.value = subcategoryId;
 
     if (subcategoryId == null) {
-      // Show all products for the main category
       displayProducts.value = allProducts;
       productsTitle.value = selectedMainCategory.value != null
           ? 'All ${selectedMainCategory.value!.title}'
           : 'All Products';
     } else {
-      // Filter products by subcategory
       final filteredProducts = allProducts
           .where(
             (product) =>
@@ -270,7 +258,6 @@ class UnifiedCategoryController extends GetxController {
           .toList();
       displayProducts.value = filteredProducts;
 
-      // Update title
       final selectedSubcat = filterSubcategories.firstWhereOrNull(
         (subcat) => subcat.id == subcategoryId,
       );
@@ -291,7 +278,6 @@ class UnifiedCategoryController extends GetxController {
       selectedFilter.value = null;
       filterSubcategories.clear();
 
-      // Reload main categories and auto-select first one
       await _loadGroceryMainCategories();
     } catch (e) {
       print('Error resetting to main categories: $e');
@@ -301,7 +287,6 @@ class UnifiedCategoryController extends GetxController {
   }
 
   void onProductTap(ProductModel product) {
-    // Navigate to product details
     Get.toNamed(AppRoute.getProductDetails(), arguments: product);
   }
 
@@ -316,29 +301,30 @@ class UnifiedCategoryController extends GetxController {
   }
 
   void onFavoriteToggle(ProductModel product) {
-    final updatedProduct = product.copyWith(isFavorite: !product.isFavorite);
+    if (FavoritesController.isProductFavorite(product.id)) {
+      FavoritesController.removeFromGlobalFavorites(product.id);
+    } else {
+      FavoritesController.addToGlobalFavorites(product.id);
+    }
 
-    // Update in all lists
+    final isFavorite = FavoritesController.isProductFavorite(product.id);
+    final updatedProduct = product.copyWith(isFavorite: isFavorite);
     _updateProductInLists(updatedProduct);
 
     Get.snackbar(
-      updatedProduct.isFavorite
-          ? 'Added to Favorites'
-          : 'Removed from Favorites',
-      '${updatedProduct.title} ${updatedProduct.isFavorite ? 'added to' : 'removed from'} favorites',
+      isFavorite ? 'Added to Favorites' : 'Removed from Favorites',
+      '${updatedProduct.title} ${isFavorite ? 'added to' : 'removed from'} favorites',
       snackPosition: SnackPosition.BOTTOM,
       duration: const Duration(seconds: 2),
     );
   }
 
   void _updateProductInLists(ProductModel updatedProduct) {
-    // Update in all products list
     final allIndex = allProducts.indexWhere((p) => p.id == updatedProduct.id);
     if (allIndex != -1) {
       allProducts[allIndex] = updatedProduct;
     }
 
-    // Update in display products list
     final displayIndex = displayProducts.indexWhere(
       (p) => p.id == updatedProduct.id,
     );
@@ -346,7 +332,6 @@ class UnifiedCategoryController extends GetxController {
       displayProducts[displayIndex] = updatedProduct;
     }
 
-    // Update in recommended products list
     final recommendedIndex = recommendedProducts.indexWhere(
       (p) => p.id == updatedProduct.id,
     );
@@ -355,55 +340,134 @@ class UnifiedCategoryController extends GetxController {
     }
   }
 
-  // Navigation helper for back button
   void onBackPressed() {
-    if (isGroceryCategory && selectedMainCategory.value != null) {
-      // Go back to main categories
-      resetToMainCategories();
-    } else {
-      Get.back();
-    }
-  }
-
-  // Show all products functionality
-  void showAllProducts() {
-    showingAllProducts.value = !showingAllProducts.value;
-    if (showingAllProducts.value) {
-      // Reset any subcategory filter to show all products
-      selectedSubcategory.value = null;
-      displayProducts.value = allProducts;
-      productsTitle.value = '${currentCategory.title} - All Items';
+    if (isGroceryCategory) {
+      if (selectedSubcategory.value != null) {
+        clearSubcategorySelection();
+      } else if (selectedMainCategory.value != null) {
+        clearMainCategorySelection();
+      } else {
+        Get.back();
+      }
     } else {
       if (selectedSubcategory.value != null) {
-        final filteredProducts = allProducts
-            .where(
-              (product) =>
-                  product.subcategoryId != null &&
-                  product.subcategoryId == selectedSubcategory.value!.id,
-            )
-            .toList();
-        displayProducts.value = filteredProducts;
-        productsTitle.value = selectedSubcategory.value!.title;
+        clearSubcategorySelection();
       } else {
-        displayProducts.value = allProducts;
-        productsTitle.value = '${currentCategory.title} Items';
+        Get.back();
       }
     }
   }
 
-  // Search functionality
+  void showAllProducts() {
+    showingAllProducts.value = !showingAllProducts.value;
+    if (showingAllProducts.value) {
+      if (isGroceryCategory) {
+        if (selectedSubcategory.value != null) {
+          final filteredProducts = allProducts
+              .where(
+                (product) =>
+                    product.subcategoryId != null &&
+                    product.subcategoryId == selectedSubcategory.value!.id,
+              )
+              .toList();
+          displayProducts.value = filteredProducts;
+          productsTitle.value =
+              '${selectedSubcategory.value!.title} - All Items';
+        } else if (selectedMainCategory.value != null) {
+          displayProducts.value = allProducts;
+          productsTitle.value =
+              '${selectedMainCategory.value!.title} - All Items';
+        } else {
+          displayProducts.value = allProducts;
+          productsTitle.value = '${currentCategory.title} - All Items';
+        }
+      } else {
+        if (selectedSubcategory.value != null) {
+          final filteredProducts = allProducts
+              .where(
+                (product) =>
+                    product.subcategoryId != null &&
+                    product.subcategoryId == selectedSubcategory.value!.id,
+              )
+              .toList();
+          displayProducts.value = filteredProducts;
+          productsTitle.value =
+              '${selectedSubcategory.value!.title} - All Items';
+        } else {
+          displayProducts.value = allProducts;
+          productsTitle.value = '${currentCategory.title} - All Items';
+        }
+      }
+    } else {
+      if (isGroceryCategory) {
+        if (selectedSubcategory.value != null) {
+          final filteredProducts = allProducts
+              .where(
+                (product) =>
+                    product.subcategoryId != null &&
+                    product.subcategoryId == selectedSubcategory.value!.id,
+              )
+              .toList();
+          displayProducts.value = filteredProducts;
+          productsTitle.value = '${selectedSubcategory.value!.title} Items';
+        } else if (selectedMainCategory.value != null) {
+          displayProducts.value = allProducts;
+          productsTitle.value = 'All ${selectedMainCategory.value!.title}';
+        } else {
+          displayProducts.value = allProducts;
+          productsTitle.value = 'All ${currentCategory.title}';
+        }
+      } else {
+        if (selectedSubcategory.value != null) {
+          final filteredProducts = allProducts
+              .where(
+                (product) =>
+                    product.subcategoryId != null &&
+                    product.subcategoryId == selectedSubcategory.value!.id,
+              )
+              .toList();
+          displayProducts.value = filteredProducts;
+          productsTitle.value = '${selectedSubcategory.value!.title} Items';
+        } else {
+          displayProducts.value = allProducts;
+          productsTitle.value = 'All ${currentCategory.title}';
+        }
+      }
+    }
+  }
+
+  void clearSubcategorySelection() {
+    selectedSubcategory.value = null;
+    showingAllProducts.value = false;
+
+    if (isGroceryCategory && selectedMainCategory.value != null) {
+      displayProducts.value = allProducts;
+      productsTitle.value = 'All ${selectedMainCategory.value!.title}';
+    } else {
+      displayProducts.value = allProducts;
+      productsTitle.value = 'All ${currentCategory.title}';
+    }
+  }
+
+  void clearMainCategorySelection() {
+    selectedMainCategory.value = null;
+    selectedSubcategory.value = null;
+    showingAllProducts.value = false;
+    filterSubcategories.clear();
+    displayProducts.value = allProducts;
+    productsTitle.value = 'All ${currentCategory.title}';
+  }
+
   void onSearchChanged(String query) {
     searchQuery.value = query;
     _applyFiltersAndSearch();
   }
 
-  // Sort functionality
   void onSortChanged(String sortOption) {
     selectedSortOption.value = sortOption;
     _applySorting();
   }
 
-  // Filter functionality
   void onFilterChanged(List<String> filters) {
     selectedFilters.value = filters;
     _applyFiltersAndSearch();
@@ -422,7 +486,6 @@ class UnifiedCategoryController extends GetxController {
   void _applyFiltersAndSearch() {
     List<ProductModel> products = allProducts.toList();
 
-    // Apply search query
     if (searchQuery.value.isNotEmpty) {
       products = products.where((product) {
         return product.title.toLowerCase().contains(
@@ -434,7 +497,6 @@ class UnifiedCategoryController extends GetxController {
       }).toList();
     }
 
-    // Apply category/subcategory filter
     if (isGroceryCategory) {
       if (selectedMainCategory.value != null &&
           selectedSubcategory.value != null) {
@@ -466,13 +528,11 @@ class UnifiedCategoryController extends GetxController {
       }
     }
 
-    // Apply price range filter
     products = products.where((product) {
       final price = double.tryParse(product.price.replaceAll('\$', '')) ?? 0.0;
       return price >= priceRange[0] && price <= priceRange[1];
     }).toList();
 
-    // Apply additional filters based on selectedFilters
     for (String filter in selectedFilters) {
       switch (filter) {
         case 'rating_4_plus':
@@ -481,10 +541,8 @@ class UnifiedCategoryController extends GetxController {
               .toList();
           break;
         case 'fast_delivery':
-          // This would require shop data integration
           break;
         case 'discount':
-          // This would require discount data in product model
           break;
       }
     }
@@ -523,14 +581,12 @@ class UnifiedCategoryController extends GetxController {
         break;
       case 'relevance':
       default:
-        // Keep original order for relevance
         break;
     }
 
     displayProducts.value = products;
   }
 
-  // Clear all filters
   void clearFilters() {
     searchQuery.value = '';
     selectedSortOption.value = 'relevance';
@@ -538,7 +594,6 @@ class UnifiedCategoryController extends GetxController {
     priceRange.value = [0.0, 100.0];
     showOnlyInStock.value = false;
 
-    // Reset to show products based on current category/subcategory selection
     if (selectedSubcategory.value != null) {
       final filteredProducts = allProducts
           .where(
@@ -551,5 +606,16 @@ class UnifiedCategoryController extends GetxController {
     } else {
       displayProducts.value = allProducts;
     }
+  }
+
+  void onRestaurantTap(RestaurantModel restaurant) {
+    Get.toNamed(
+      '/restaurant-menu',
+      arguments: {
+        'restaurant': restaurant,
+        'categoryId': '',
+        'categoryName': '',
+      },
+    );
   }
 }

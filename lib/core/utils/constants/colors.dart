@@ -82,4 +82,5 @@ class AppColors {
 
   //Otc label color
   static const Color otcLabelColor = Color(0xFFFF0000);
+  static const Color grocery = Color(0xFF4CAF50);
 }

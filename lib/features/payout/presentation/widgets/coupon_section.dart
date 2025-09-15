@@ -44,7 +44,7 @@ class CouponSection extends StatelessWidget {
       decoration: BoxDecoration(
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
@@ -129,7 +129,7 @@ class CouponSection extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(12.w),
       decoration: BoxDecoration(
-        color: const Color(0xFF26A969).withOpacity(0.10),
+        color: const Color(0xFF26A969).withValues(alpha: 0.10),
         border: Border.all(color: const Color(0xFF26A969)),
         borderRadius: BorderRadius.circular(8.r),
       ),

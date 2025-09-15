@@ -5,7 +5,7 @@ class SubcategoryModel {
   final String iconPath;
   final String categoryId;
   final String?
-  parentSubcategoryId; // For nested subcategories like Vegetables under Produce
+  parentSubcategoryId; 
   final bool isPopular;
 
   const SubcategoryModel({

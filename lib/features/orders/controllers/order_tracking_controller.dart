@@ -7,7 +7,7 @@ import 'package:quikle_user/features/orders/data/services/order_tracking_service
 class OrderTrackingController extends GetxController {
   final OrderTrackingService _trackingService = OrderTrackingService();
 
-  // Reactive variables
+  
   final isLoading = true.obs;
   final hasError = false.obs;
   final errorMessage = ''.obs;
@@ -17,17 +17,17 @@ class OrderTrackingController extends GetxController {
   final estimatedTime = ''.obs;
   final deliveryPersonLocation = Rx<Map<String, dynamic>?>(null);
 
-  // Order reference
+  
   OrderModel? _order;
   OrderModel get order => _order!;
 
-  // Timer for real-time updates
+  
   Timer? _locationTimer;
 
   @override
   void onInit() {
     super.onInit();
-    // Initialize with order from arguments
+    
     if (Get.arguments != null && Get.arguments is OrderModel) {
       _order = Get.arguments as OrderModel;
       loadTrackingData();
@@ -41,9 +41,9 @@ class OrderTrackingController extends GetxController {
     super.onClose();
   }
 
-  // Initialize with order (alternative method)
+  
   void initializeWithOrder(OrderModel orderModel) {
-    // Only initialize if not already set, to avoid hot reload issues
+    
     if (_order == null) {
       _order = orderModel;
       loadTrackingData();
@@ -51,16 +51,16 @@ class OrderTrackingController extends GetxController {
     }
   }
 
-  // Load all tracking data
+  
   Future<void> loadTrackingData() async {
-    // Don't load if order is not initialized
+    
     if (_order == null) return;
 
     try {
       isLoading.value = true;
       hasError.value = false;
 
-      // Load tracking data in parallel
+      
       await Future.wait([
         _loadOrderTrackingData(),
         _loadDeliverySteps(),
@@ -75,7 +75,7 @@ class OrderTrackingController extends GetxController {
     }
   }
 
-  // Refresh tracking data
+  
   Future<void> refreshTrackingData() async {
     await loadTrackingData();
     Get.snackbar(
@@ -86,27 +86,27 @@ class OrderTrackingController extends GetxController {
     );
   }
 
-  // Load main tracking data
+  
   Future<void> _loadOrderTrackingData() async {
     final data = await _trackingService.getOrderTrackingData(order.orderId);
     trackingData.value = data;
   }
 
-  // Load delivery steps
+  
   Future<void> _loadDeliverySteps() async {
     final steps = await _trackingService.getDeliverySteps(order);
     deliverySteps.value = steps;
   }
 
-  // Load estimated delivery time
+  
   Future<void> _loadEstimatedTime() async {
     final time = await _trackingService.getEstimatedDeliveryTime(order);
     estimatedTime.value = time;
   }
 
-  // Start real-time location updates
+  
   void _startLocationUpdates() {
-    // Only track location for active deliveries
+    
     if (_order != null && order.status == OrderStatus.outForDelivery) {
       _locationTimer = Timer.periodic(
         const Duration(seconds: 30),
@@ -115,7 +115,7 @@ class OrderTrackingController extends GetxController {
     }
   }
 
-  // Update delivery person location
+  
   Future<void> _updateDeliveryPersonLocation() async {
     try {
       final location = await _trackingService.getDeliveryPersonLocation(
@@ -129,7 +129,7 @@ class OrderTrackingController extends GetxController {
     }
   }
 
-  // Get current progress percentage
+  
   double get progressPercentage {
     if (_order == null) return 0.0;
 
@@ -149,7 +149,7 @@ class OrderTrackingController extends GetxController {
     }
   }
 
-  // Get status display text
+  
   String get statusText {
     if (_order == null) return 'Processing';
 
@@ -169,7 +169,7 @@ class OrderTrackingController extends GetxController {
     }
   }
 
-  // Get primary order item name
+  
   String get primaryItemName {
     if (_order == null) return 'Order Items';
 
@@ -179,13 +179,13 @@ class OrderTrackingController extends GetxController {
     return 'Order Items';
   }
 
-  // Check if order is actively being delivered
+  
   bool get isActiveDelivery {
     if (_order == null) return false;
     return order.status == OrderStatus.outForDelivery;
   }
 
-  // Check if order can be tracked
+  
   bool get isTrackable {
     if (_order == null) return false;
 
@@ -197,7 +197,7 @@ class OrderTrackingController extends GetxController {
     ].contains(order.status);
   }
 
-  // Get next expected step
+  
   String? get nextStepTitle {
     if (_order == null) return null;
 
@@ -229,7 +229,7 @@ class OrderTrackingController extends GetxController {
     return null;
   }
 
-  // Contact delivery person
+  
   void contactDeliveryPerson() {
     if (trackingData.value != null) {
       final deliveryPerson = trackingData.value!['deliveryPerson'];
@@ -239,18 +239,18 @@ class OrderTrackingController extends GetxController {
           'Calling ${deliveryPerson['name']}...',
           snackPosition: SnackPosition.BOTTOM,
         );
-        // Here you would integrate with phone calling functionality
+        
       }
     }
   }
 
-  // Share tracking info
+  
   void shareTrackingInfo() {
     Get.snackbar(
       'Sharing',
       'Tracking info shared',
       snackPosition: SnackPosition.BOTTOM,
     );
-    // Here you would integrate with sharing functionality
+    
   }
 }

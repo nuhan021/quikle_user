@@ -19,7 +19,7 @@ class QuestionModel {
     required this.date,
   });
 
-  // Helper method to get time ago string
+  
   String get timeAgo {
     final now = DateTime.now();
     final difference = now.difference(date);

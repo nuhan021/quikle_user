@@ -111,7 +111,7 @@ class CommonWidgets {
         padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 14.h),
         clipBehavior: Clip.antiAlias,
         decoration: ShapeDecoration(
-          color: Colors.white.withOpacity(0.05),
+          color: Colors.white.withValues(alpha: 0.05),
           shape: RoundedRectangleBorder(
             side: BorderSide(width: 1.w, color: const Color(0xFFF8F8F8)),
             borderRadius: BorderRadius.circular(8.r),

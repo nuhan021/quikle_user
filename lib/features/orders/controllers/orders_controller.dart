@@ -20,7 +20,7 @@ class OrdersController extends GetxController {
       isLoading.value = true;
       error.value = '';
 
-      // Get current user ID (replace with actual user ID from auth)
+      
       const String userId = 'user123';
 
       final List<OrderModel> fetchedOrders = await _orderService.getUserOrders(

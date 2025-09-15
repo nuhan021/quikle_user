@@ -88,7 +88,7 @@ class OrderTrackingService {
       'lat': 23.8103 + (DateTime.now().millisecond % 100) * 0.001,
       'lng': 90.4125 + (DateTime.now().millisecond % 100) * 0.001,
       'heading': 45.0,
-      'speed': 25.0, // km/h
+      'speed': 25.0, 
       'lastUpdated': DateTime.now(),
     };
   }

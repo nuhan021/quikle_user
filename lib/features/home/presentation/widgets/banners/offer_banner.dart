@@ -13,11 +13,10 @@ class OfferBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 360.w,
-      height: 180.h,
+      height: 150.h,
       child: CarouselSlider(
         options: CarouselOptions(
-          height: 180.h,
+          height: 150.h,
           autoPlay: true,
           autoPlayInterval: const Duration(seconds: 3),
           autoPlayAnimationDuration: const Duration(milliseconds: 800),
@@ -29,12 +28,7 @@ class OfferBanner extends StatelessWidget {
             builder: (BuildContext context) {
               return ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                child: Image.asset(
-                  path,
-                  fit: BoxFit.cover,
-                  width: 360.w,
-                  height: 180.h,
-                ),
+                child: Image.asset(path, fit: BoxFit.cover, width: 360.w),
               );
             },
           );

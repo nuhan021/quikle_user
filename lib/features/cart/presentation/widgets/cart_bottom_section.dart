@@ -30,7 +30,7 @@ class CartBottomSection extends StatelessWidget {
                   ImagePath.homeIcon,
                   width: 40.w,
                   height: 40.h,
-                  // fit: BoxFit.contain,
+                  
                 ),
               ),
               SizedBox(width: 8.w),

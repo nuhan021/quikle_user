@@ -62,100 +62,6 @@ class CategoryDetailScreen extends StatelessWidget {
                       SizedBox(height: 24.h),
                     ],
 
-                    if (controller.allSubcategories.isNotEmpty) ...[
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16.w),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'All Categories',
-                              style: getTextStyle(
-                                font: CustomFonts.obviously,
-                                fontSize: 16.sp,
-                                fontWeight: FontWeight.w500,
-                                color: AppColors.ebonyBlack,
-                              ),
-                            ),
-                            SizedBox(height: 16.h),
-                            GridView.builder(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              gridDelegate:
-                                  SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 2,
-                                    crossAxisSpacing: 12.w,
-                                    mainAxisSpacing: 12.h,
-                                    childAspectRatio: 2.5,
-                                  ),
-                              itemCount: controller.allSubcategories.length,
-                              itemBuilder: (context, index) {
-                                final subcategory =
-                                    controller.allSubcategories[index];
-                                return GestureDetector(
-                                  onTap: () =>
-                                      controller.onSubcategoryTap(subcategory),
-                                  child: Container(
-                                    padding: EdgeInsets.all(12.w),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(8.r),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.grey.withValues(
-                                            alpha: 0.1,
-                                          ),
-                                          blurRadius: 4,
-                                          offset: const Offset(0, 2),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Image.asset(
-                                          subcategory.iconPath,
-                                          width: 24.w,
-                                          height: 24.h,
-                                        ),
-                                        SizedBox(width: 8.w),
-                                        Expanded(
-                                          child: Text(
-                                            subcategory.title,
-                                            style: getTextStyle(
-                                              font: CustomFonts.inter,
-                                              fontSize: 14.sp,
-                                              fontWeight: FontWeight.w500,
-                                              color: AppColors.ebonyBlack,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 24.h),
-                    ],
-
-                    // Featured Products Section
-                    if (controller.featuredProducts.isNotEmpty) ...[
-                      ProductGridSection(
-                        title: 'Featured Products',
-                        products: controller.featuredProducts,
-                        onProductTap: controller.onProductTap,
-                        onAddToCart: controller.onAddToCart,
-                        onFavoriteToggle: controller.onFavoriteToggle,
-                        maxItems: 6,
-                        crossAxisCount: 3,
-                      ),
-                      SizedBox(height: 24.h),
-                    ],
-
-                    // Recommended Products Section
                     if (controller.recommendedProducts.isNotEmpty) ...[
                       ProductGridSection(
                         title: 'Recommended for You',
@@ -172,7 +78,7 @@ class CategoryDetailScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              // Floating Cart Button
+
               const FloatingCartButton(),
             ],
           );

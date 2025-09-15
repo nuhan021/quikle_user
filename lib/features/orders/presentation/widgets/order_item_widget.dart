@@ -29,7 +29,7 @@ class OrderItemWidget extends StatelessWidget {
                   return SizedBox(
                     width: 60.w,
                     height: 60.h,
-                    //color: const Color(0xFFC23737),
+                    
                     child: Icon(Icons.image, color: Colors.white, size: 24.r),
                   );
                 },

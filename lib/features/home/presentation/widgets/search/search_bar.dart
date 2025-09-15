@@ -1,41 +1,104 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:quikle_user/core/common/styles/global_text_style.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
+import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/image_path.dart';
+import 'package:quikle_user/features/search/controllers/search_controller.dart';
 
 class SearchBar extends StatelessWidget {
   final VoidCallback onTap;
+  final VoidCallback? onVoiceTap;
 
-  const SearchBar({super.key, required this.onTap});
+  const SearchBar({super.key, required this.onTap, this.onVoiceTap});
 
   @override
   Widget build(BuildContext context) {
+    final ProductSearchController controller =
+        ProductSearchController.currentInstance ??
+        Get.put(ProductSearchController());
+
     return Container(
-      padding: const EdgeInsets.all(16),
+      decoration: const BoxDecoration(color: Color(0x33CFCFCF)),
+      padding: EdgeInsets.only(top: 12.h, left: 16.w, right: 16.w),
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.h),
           decoration: BoxDecoration(
             color: const Color(0xFFF8F9FA),
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(8.r),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                "Search for 'biryani'",
-                style: getTextStyle(
-                  font: CustomFonts.inter,
-                  color: Colors.grey,
-                  fontSize: 16,
-                ),
-              ),
-              Image.asset(ImagePath.voiceIcon, height: 24, width: 24),
+              Obx(() {
+                final hint = controller.currentPlaceholder.value;
+                return Row(
+                  children: [
+                    Text(
+                      "Search for '",
+                      style: getTextStyle(
+                        font: CustomFonts.inter,
+                        color: Colors.grey,
+                        fontSize: 14.sp,
+                      ),
+                    ),
+                    Text(
+                      _extractKeyword(hint),
+                      key: ValueKey(hint),
+                      style: getTextStyle(
+                        font: CustomFonts.inter,
+                        color: Colors.grey,
+                        fontSize: 14.sp,
+                      ),
+                    ),
+                    Text(
+                      "'",
+                      style: getTextStyle(
+                        font: CustomFonts.inter,
+                        color: Colors.grey,
+                        fontSize: 14.sp,
+                      ),
+                    ),
+                  ],
+                );
+              }),
+              Obx(() {
+                final isListening = controller.isListening;
+                return GestureDetector(
+                  onTap: onVoiceTap ?? controller.toggleVoiceRecognition,
+                  child: Container(
+                    padding: EdgeInsets.all(8.w),
+                    decoration: BoxDecoration(
+                      color: isListening
+                          ? AppColors.primary.withValues(alpha: 0.10)
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(6.r),
+                    ),
+                    child: Image.asset(
+                      ImagePath.voiceIcon,
+                      height: 16.w,
+                      width: 16.w,
+                      color: isListening ? AppColors.primary : Colors.grey,
+                    ),
+                  ),
+                );
+              }),
             ],
           ),
         ),
       ),
     );
+  }
+
+  String _extractKeyword(String hint) {
+    final start = hint.indexOf("'");
+    final end = hint.lastIndexOf("'");
+    if (start != -1 && end != -1 && end > start) {
+      return hint.substring(start + 1, end);
+    }
+    return hint;
   }
 }

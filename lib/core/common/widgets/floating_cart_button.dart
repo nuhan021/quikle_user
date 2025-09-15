@@ -6,7 +6,8 @@ import 'package:quikle_user/features/cart/controllers/cart_controller.dart';
 import 'package:quikle_user/features/cart/presentation/screens/cart_screen.dart';
 
 class FloatingCartButton extends StatelessWidget {
-  const FloatingCartButton({super.key});
+  const FloatingCartButton({super.key, this.bottomInset = 16.0});
+  final double bottomInset;
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +19,7 @@ class FloatingCartButton extends StatelessWidget {
       }
 
       return Positioned(
-        bottom: 16.h,
+        bottom: bottomInset,
         right: 16.w,
         child: GestureDetector(
           onTap: () => Get.to(() => const CartScreen()),
@@ -29,11 +30,7 @@ class FloatingCartButton extends StatelessWidget {
               children: [
                 // Cart Icon
                 Center(
-                  child: Image.asset(
-                    ImagePath.cartImage,
-                    fit: BoxFit.cover,
-                    // color: Colors.white,
-                  ),
+                  child: Image.asset(ImagePath.cartImage, fit: BoxFit.cover),
                 ),
                 // Badge
                 Positioned(

@@ -30,7 +30,7 @@ class OrderSummarySection extends StatelessWidget {
         borderRadius: BorderRadius.circular(8.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -40,15 +40,11 @@ class OrderSummarySection extends StatelessWidget {
         final cartController = Get.find<CartController>();
         final cartItems = cartController.cartItems;
 
-        // Dynamic parts from controller
         final subtotal = payoutController.subtotal;
-        final deliveryFee =
-            payoutController.deliveryFee; // <-- selected option + urgent
-        final discount = payoutController.discountAmount; // 0 if none
-        final total =
-            payoutController.totalAmount; // subtotal - discount + deliveryFee
+        final deliveryFee = payoutController.deliveryFee;
+        final discount = payoutController.discountAmount;
+        final total = payoutController.totalAmount;
 
-        // Label for delivery row (e.g., "Combined Delivery", "+ Urgent")
         final deliveryLabel = () {
           final opt = payoutController.selectedDeliveryOption;
           final base = opt?.title ?? 'Delivery';
@@ -59,7 +55,6 @@ class OrderSummarySection extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header
             Text(
               'Order Summary',
               style: getTextStyle(
@@ -74,7 +69,6 @@ class OrderSummarySection extends StatelessWidget {
               child: Divider(height: 1, color: dividerColor),
             ),
 
-            // Line items
             if (cartItems.isNotEmpty)
               ListView.separated(
                 shrinkWrap: true,
@@ -127,18 +121,15 @@ class OrderSummarySection extends StatelessWidget {
               Divider(height: 1, color: dividerColor),
               SizedBox(height: 10.h),
 
-              // Subtotal row
               _summaryRow(label: 'Subtotal', value: _formatItemPrice(subtotal)),
 
               SizedBox(height: 8.h),
 
-              // Delivery row (from selected option)
               _summaryRow(
                 label: deliveryLabel,
                 value: deliveryFee > 0 ? _formatItemPrice(deliveryFee) : 'Free',
               ),
 
-              // Discount row (if any)
               if (discount > 0) ...[
                 SizedBox(height: 8.h),
                 _summaryRow(
@@ -152,7 +143,6 @@ class OrderSummarySection extends StatelessWidget {
               Divider(height: 1, color: dividerColor),
               SizedBox(height: 10.h),
 
-              // Total row
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
