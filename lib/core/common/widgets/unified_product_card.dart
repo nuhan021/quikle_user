@@ -158,11 +158,11 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
 
   Widget _buildImageSection() {
     final imageHeight = widget.variant == ProductCardVariant.youMayLike
-        ? 120.h
-        : 90.h;
+        ? 60.h
+        : 40.h;
     final imageSize = widget.variant == ProductCardVariant.youMayLike
-        ? 64.w
-        : 56.w;
+        ? 48.w
+        : 38.w;
 
     return Stack(
       children: [
@@ -180,7 +180,8 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
             ),
           ),
           clipBehavior: Clip.antiAlias,
-          child: Center(
+          child: Align(
+            alignment: Alignment.topCenter,
             child: Image.asset(
               widget.product.imagePath,
               width: imageSize,
@@ -191,9 +192,10 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
           ),
         ),
 
+        // OTC Badge
         if (widget.product.isMedicine && widget.product.isOTC)
           Positioned(
-            top: widget.variant == ProductCardVariant.youMayLike ? 8.h : 6.h,
+            top: widget.variant == ProductCardVariant.youMayLike ? 8.h : 0.h,
             left: widget.variant == ProductCardVariant.youMayLike ? 8.w : 6.w,
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.h),
@@ -216,29 +218,22 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
               ),
             ),
           ),
-
         if (widget.onFavoriteToggle != null)
           Positioned(
-            top: 8.h,
-            right: 8.w,
+            top: 0.h,
+            right: 6.w,
             child: GestureDetector(
               onTap: widget.onFavoriteToggle,
-              child: SizedBox(
-                width: 20.w,
-                height: 20.w,
-                child: Center(
-                  child: Obx(() {
-                    final isFavorite = FavoritesController.isProductFavorite(
-                      widget.product.id,
-                    );
-                    return Icon(
-                      isFavorite ? Icons.favorite : Icons.favorite_border,
-                      size: 20.sp,
-                      color: isFavorite ? Colors.red : Colors.black54,
-                    );
-                  }),
-                ),
-              ),
+              child: Obx(() {
+                final isFavorite = FavoritesController.isProductFavorite(
+                  widget.product.id,
+                );
+                return Icon(
+                  isFavorite ? Icons.favorite : Icons.favorite_border,
+                  size: 20.sp,
+                  color: isFavorite ? Colors.red : Colors.black54,
+                );
+              }),
             ),
           ),
       ],

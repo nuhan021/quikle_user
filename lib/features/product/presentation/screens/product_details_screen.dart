@@ -3,10 +3,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:quikle_user/core/common/widgets/cart_animation_overlay.dart';
+import 'package:quikle_user/core/common/widgets/custom_navbar.dart';
 import 'package:quikle_user/core/common/widgets/floating_cart_button.dart';
 import 'package:quikle_user/core/common/styles/global_text_style.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
+import 'package:quikle_user/core/utils/navigation/navbar_navigation_helper.dart';
 import 'package:quikle_user/features/cart/presentation/widgets/you_may_like_section.dart';
 import 'package:quikle_user/features/home/data/models/product_model.dart';
 import '../../controllers/product_controller.dart';
@@ -17,16 +19,59 @@ import '../widgets/description_widget.dart';
 import '../widgets/reviews_widget.dart';
 import '../widgets/questions_widget.dart';
 
-class ProductDetailsScreen extends StatelessWidget {
+class ProductDetailsScreen extends StatefulWidget {
   final ProductModel product;
 
   const ProductDetailsScreen({super.key, required this.product});
 
   @override
+  State<ProductDetailsScreen> createState() => _ProductDetailsScreenState();
+}
+
+class _ProductDetailsScreenState extends State<ProductDetailsScreen>
+    with TickerProviderStateMixin {
+  late AnimationController _navController;
+  final GlobalKey _navKey = GlobalKey();
+  double _navBarHeight = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+    _navController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 260),
+      value: 1.0,
+    );
+  }
+
+  @override
+  void dispose() {
+    _navController.dispose();
+    super.dispose();
+  }
+
+  void _measureNavBarHeight() {
+    final ctx = _navKey.currentContext;
+    if (ctx == null) return;
+    final box = ctx.findRenderObject() as RenderBox?;
+    if (box == null) return;
+    final h = box.size.height;
+    if (h > 0 && (h - _navBarHeight).abs() > 0.5) {
+      setState(() => _navBarHeight = h);
+    }
+  }
+
+  void _onNavItemTapped(int index) {
+    NavbarNavigationHelper.navigateToTab(index);
+  }
+
+  @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) => _measureNavBarHeight());
+    const double cartMargin = 16.0;
     final controller = Get.put(ProductController());
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      controller.loadProductDetails(product);
+      controller.loadProductDetails(widget.product);
     });
 
     return CartAnimationWrapper(
@@ -90,306 +135,403 @@ class ProductDetailsScreen extends StatelessWidget {
           ),
           body: Stack(
             children: [
-              Obx(
-                () => controller.isLoading
-                    ? const Center(child: CircularProgressIndicator())
-                    : SingleChildScrollView(
-                        padding: EdgeInsets.all(16.sp),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            if (controller.product != null)
-                              ProductImageWidget(
-                                imagePath: controller.product!.imagePath,
-                                isFavorite: controller.product!.isFavorite,
-                                onFavoriteToggle: controller.onFavoriteToggle,
-                              ),
-
-                            SizedBox(height: 24.h),
-
-                            if (controller.product != null)
-                              ProductInfoWidget(
-                                title: controller.product!.title,
-                                rating: controller.product!.rating,
-                                reviewCount: 500,
-                                price: controller.product!.price,
-                                originalPrice: '\$3.99',
-                                discount: '26% OFF',
-                              ),
-
-                            SizedBox(height: 16.h),
-
-                            if (controller.shop != null)
-                              StoreInfoWidget(shop: controller.shop!),
-
-                            SizedBox(height: 24.h),
-
-                            
-                            DescriptionWidget(
-                              description: controller.description,
-                            ),
-
-                            SizedBox(height: 16.h),
-                            if (!(controller.product?.isMedicine == true &&
-                                controller.product!.isOTC))
-                              _buildAddToCartButton(
-                                enabled:
-                                    (controller.product?.canAddToCart ?? true),
-                                onPressed: controller.onAddToCart,
-                              ),
-
-                            if (controller.product?.isMedicine == true &&
-                                controller.product!.isOTC)
-                              Column(
-                                children: [
-                                  SizedBox(height: 24.h),
-                                  Container(
+              Column(
+                children: [
+                  Expanded(
+                    child: AnimatedBuilder(
+                      animation: _navController,
+                      builder: (context, _) {
+                        final inset = _navController.value * _navBarHeight;
+                        return Padding(
+                          padding: EdgeInsets.only(bottom: inset),
+                          child: Obx(
+                            () => controller.isLoading
+                                ? const Center(
+                                    child: CircularProgressIndicator(),
+                                  )
+                                : SingleChildScrollView(
                                     padding: EdgeInsets.all(16.sp),
-                                    decoration: BoxDecoration(
-                                      color:
-                                          controller
-                                              .product!
-                                              .hasPrescriptionUploaded
-                                          ? Colors.green.shade50
-                                          : Colors.orange.shade50,
-                                      borderRadius: BorderRadius.circular(12.r),
-                                      border: Border.all(
-                                        color:
-                                            controller
-                                                .product!
-                                                .hasPrescriptionUploaded
-                                            ? Colors.green
-                                            : Colors.orange,
-                                        width: 1,
-                                      ),
-                                    ),
                                     child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        Row(
-                                          children: [
-                                            Icon(
-                                              controller
-                                                      .product!
-                                                      .hasPrescriptionUploaded
-                                                  ? Icons.check_circle
-                                                  : Icons.warning,
-                                              color:
-                                                  controller
-                                                      .product!
-                                                      .hasPrescriptionUploaded
-                                                  ? Colors.green
-                                                  : Colors.orange,
-                                              size: 20.sp,
-                                            ),
-                                            SizedBox(width: 8.w),
-                                            Expanded(
-                                              child: Text(
-                                                controller
-                                                        .product!
-                                                        .hasPrescriptionUploaded
-                                                    ? 'Prescription Uploaded'
-                                                    : 'OTC Medicine - Prescription Required',
-                                                style: getTextStyle(
-                                                  font: CustomFonts.inter,
-                                                  fontSize: 14.sp,
-                                                  fontWeight: FontWeight.w600,
+                                        if (controller.product != null)
+                                          ProductImageWidget(
+                                            imagePath:
+                                                controller.product!.imagePath,
+                                            isFavorite:
+                                                controller.product!.isFavorite,
+                                            onFavoriteToggle:
+                                                controller.onFavoriteToggle,
+                                          ),
+
+                                        SizedBox(height: 24.h),
+
+                                        if (controller.product != null)
+                                          ProductInfoWidget(
+                                            title: controller.product!.title,
+                                            rating: controller.product!.rating,
+                                            reviewCount: 500,
+                                            price: controller.product!.price,
+                                            originalPrice: '\$3.99',
+                                            discount: '26% OFF',
+                                          ),
+
+                                        SizedBox(height: 16.h),
+
+                                        if (controller.shop != null)
+                                          StoreInfoWidget(
+                                            shop: controller.shop!,
+                                          ),
+
+                                        SizedBox(height: 24.h),
+
+                                        DescriptionWidget(
+                                          description: controller.description,
+                                        ),
+
+                                        SizedBox(height: 16.h),
+                                        if (!(controller.product?.isMedicine ==
+                                                true &&
+                                            controller.product!.isOTC))
+                                          _buildAddToCartButton(
+                                            enabled:
+                                                (controller
+                                                    .product
+                                                    ?.canAddToCart ??
+                                                true),
+                                            onPressed: controller.onAddToCart,
+                                          ),
+
+                                        if (controller.product?.isMedicine ==
+                                                true &&
+                                            controller.product!.isOTC)
+                                          Column(
+                                            children: [
+                                              SizedBox(height: 24.h),
+                                              Container(
+                                                padding: EdgeInsets.all(16.sp),
+                                                decoration: BoxDecoration(
                                                   color:
                                                       controller
                                                           .product!
                                                           .hasPrescriptionUploaded
-                                                      ? Colors.green.shade700
-                                                      : Colors.orange.shade700,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        SizedBox(height: 8.h),
-                                        Text(
-                                          controller
-                                                  .product!
-                                                  .hasPrescriptionUploaded
-                                              ? 'Your prescription has been uploaded and verified. You can now add this OTC medicine to your cart.'
-                                              : 'This is an Over-The-Counter (OTC) medicine that requires a valid prescription. Please upload your prescription to add this item to your cart.',
-                                          style: getTextStyle(
-                                            font: CustomFonts.inter,
-                                            fontSize: 12.sp,
-                                            fontWeight: FontWeight.w400,
-                                            color: AppColors.ebonyBlack
-                                                .withValues(alpha: 0.7),
-                                          ),
-                                        ),
-                                        SizedBox(height: 12.h),
-                                        if (!controller
-                                            .product!
-                                            .hasPrescriptionUploaded)
-                                          SizedBox(
-                                            width: double.infinity,
-                                            child: ElevatedButton.icon(
-                                              onPressed: controller
-                                                  .onUploadPrescription,
-                                              icon: Icon(
-                                                Icons.upload_file,
-                                                size: 16.sp,
-                                                color: Colors.white,
-                                              ),
-                                              label: Text(
-                                                'Upload Prescription',
-                                                style: getTextStyle(
-                                                  font: CustomFonts.inter,
-                                                  fontSize: 12.sp,
-                                                  fontWeight: FontWeight.w600,
-                                                  color: Colors.white,
-                                                ),
-                                              ),
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor: Colors.orange,
-                                                padding: EdgeInsets.symmetric(
-                                                  vertical: 8.h,
-                                                ),
-                                                shape: RoundedRectangleBorder(
+                                                      ? Colors.green.shade50
+                                                      : Colors.orange.shade50,
                                                   borderRadius:
                                                       BorderRadius.circular(
-                                                        6.r,
+                                                        12.r,
                                                       ),
-                                                ),
-                                              ),
-                                            ),
-                                          )
-                                        else
-                                          Row(
-                                            children: [
-                                              Expanded(
-                                                child: OutlinedButton.icon(
-                                                  onPressed: controller
-                                                      .onViewPrescription,
-                                                  icon: Icon(
-                                                    Icons.visibility,
-                                                    size: 16.sp,
+                                                  border: Border.all(
                                                     color:
-                                                        Colors.green.shade700,
+                                                        controller
+                                                            .product!
+                                                            .hasPrescriptionUploaded
+                                                        ? Colors.green
+                                                        : Colors.orange,
+                                                    width: 1,
                                                   ),
-                                                  label: Text(
-                                                    'View Prescription',
-                                                    style: getTextStyle(
-                                                      font: CustomFonts.inter,
-                                                      fontSize: 12.sp,
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                      color:
-                                                          Colors.green.shade700,
-                                                    ),
-                                                  ),
-                                                  style: OutlinedButton.styleFrom(
-                                                    side: const BorderSide(
-                                                      color: Colors.green,
-                                                    ),
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                          vertical: 8.h,
+                                                ),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Row(
+                                                      children: [
+                                                        Icon(
+                                                          controller
+                                                                  .product!
+                                                                  .hasPrescriptionUploaded
+                                                              ? Icons
+                                                                    .check_circle
+                                                              : Icons.warning,
+                                                          color:
+                                                              controller
+                                                                  .product!
+                                                                  .hasPrescriptionUploaded
+                                                              ? Colors.green
+                                                              : Colors.orange,
+                                                          size: 20.sp,
                                                         ),
-                                                    shape: RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                            6.r,
+                                                        SizedBox(width: 8.w),
+                                                        Expanded(
+                                                          child: Text(
+                                                            controller
+                                                                    .product!
+                                                                    .hasPrescriptionUploaded
+                                                                ? 'Prescription Uploaded'
+                                                                : 'OTC Medicine - Prescription Required',
+                                                            style: getTextStyle(
+                                                              font: CustomFonts
+                                                                  .inter,
+                                                              fontSize: 14.sp,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                              color:
+                                                                  controller
+                                                                      .product!
+                                                                      .hasPrescriptionUploaded
+                                                                  ? Colors
+                                                                        .green
+                                                                        .shade700
+                                                                  : Colors
+                                                                        .orange
+                                                                        .shade700,
+                                                            ),
                                                           ),
+                                                        ),
+                                                      ],
                                                     ),
-                                                  ),
+                                                    SizedBox(height: 8.h),
+                                                    Text(
+                                                      controller
+                                                              .product!
+                                                              .hasPrescriptionUploaded
+                                                          ? 'Your prescription has been uploaded and verified. You can now add this OTC medicine to your cart.'
+                                                          : 'This is an Over-The-Counter (OTC) medicine that requires a valid prescription. Please upload your prescription to add this item to your cart.',
+                                                      style: getTextStyle(
+                                                        font: CustomFonts.inter,
+                                                        fontSize: 12.sp,
+                                                        fontWeight:
+                                                            FontWeight.w400,
+                                                        color: AppColors
+                                                            .ebonyBlack
+                                                            .withValues(
+                                                              alpha: 0.7,
+                                                            ),
+                                                      ),
+                                                    ),
+                                                    SizedBox(height: 12.h),
+                                                    if (!controller
+                                                        .product!
+                                                        .hasPrescriptionUploaded)
+                                                      SizedBox(
+                                                        width: double.infinity,
+                                                        child: ElevatedButton.icon(
+                                                          onPressed: controller
+                                                              .onUploadPrescription,
+                                                          icon: Icon(
+                                                            Icons.upload_file,
+                                                            size: 16.sp,
+                                                            color: Colors.white,
+                                                          ),
+                                                          label: Text(
+                                                            'Upload Prescription',
+                                                            style: getTextStyle(
+                                                              font: CustomFonts
+                                                                  .inter,
+                                                              fontSize: 12.sp,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                              color:
+                                                                  Colors.white,
+                                                            ),
+                                                          ),
+                                                          style: ElevatedButton.styleFrom(
+                                                            backgroundColor:
+                                                                Colors.orange,
+                                                            padding:
+                                                                EdgeInsets.symmetric(
+                                                                  vertical: 8.h,
+                                                                ),
+                                                            shape: RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius.circular(
+                                                                    6.r,
+                                                                  ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      )
+                                                    else
+                                                      Row(
+                                                        children: [
+                                                          Expanded(
+                                                            child: OutlinedButton.icon(
+                                                              onPressed: controller
+                                                                  .onViewPrescription,
+                                                              icon: Icon(
+                                                                Icons
+                                                                    .visibility,
+                                                                size: 16.sp,
+                                                                color: Colors
+                                                                    .green
+                                                                    .shade700,
+                                                              ),
+                                                              label: Text(
+                                                                'View Prescription',
+                                                                style: getTextStyle(
+                                                                  font:
+                                                                      CustomFonts
+                                                                          .inter,
+                                                                  fontSize:
+                                                                      12.sp,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600,
+                                                                  color: Colors
+                                                                      .green
+                                                                      .shade700,
+                                                                ),
+                                                              ),
+                                                              style: OutlinedButton.styleFrom(
+                                                                side: const BorderSide(
+                                                                  color: Colors
+                                                                      .green,
+                                                                ),
+                                                                padding:
+                                                                    EdgeInsets.symmetric(
+                                                                      vertical:
+                                                                          8.h,
+                                                                    ),
+                                                                shape: RoundedRectangleBorder(
+                                                                  borderRadius:
+                                                                      BorderRadius.circular(
+                                                                        6.r,
+                                                                      ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          SizedBox(width: 8.w),
+                                                          OutlinedButton.icon(
+                                                            onPressed: controller
+                                                                .onUploadPrescription,
+                                                            icon: Icon(
+                                                              Icons.edit,
+                                                              size: 16.sp,
+                                                              color: Colors
+                                                                  .green
+                                                                  .shade700,
+                                                            ),
+                                                            label: Text(
+                                                              'Update',
+                                                              style: getTextStyle(
+                                                                font:
+                                                                    CustomFonts
+                                                                        .inter,
+                                                                fontSize: 12.sp,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w600,
+                                                                color: Colors
+                                                                    .green
+                                                                    .shade700,
+                                                              ),
+                                                            ),
+                                                            style: OutlinedButton.styleFrom(
+                                                              side:
+                                                                  const BorderSide(
+                                                                    color: Colors
+                                                                        .green,
+                                                                  ),
+                                                              padding:
+                                                                  EdgeInsets.symmetric(
+                                                                    vertical:
+                                                                        8.h,
+                                                                    horizontal:
+                                                                        12.w,
+                                                                  ),
+                                                              shape: RoundedRectangleBorder(
+                                                                borderRadius:
+                                                                    BorderRadius.circular(
+                                                                      6.r,
+                                                                    ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                  ],
                                                 ),
                                               ),
-                                              SizedBox(width: 8.w),
-                                              OutlinedButton.icon(
-                                                onPressed: controller
-                                                    .onUploadPrescription,
-                                                icon: Icon(
-                                                  Icons.edit,
-                                                  size: 16.sp,
-                                                  color: Colors.green.shade700,
-                                                ),
-                                                label: Text(
-                                                  'Update',
-                                                  style: getTextStyle(
-                                                    font: CustomFonts.inter,
-                                                    fontSize: 12.sp,
-                                                    fontWeight: FontWeight.w600,
-                                                    color:
-                                                        Colors.green.shade700,
-                                                  ),
-                                                ),
-                                                style: OutlinedButton.styleFrom(
-                                                  side: const BorderSide(
-                                                    color: Colors.green,
-                                                  ),
-                                                  padding: EdgeInsets.symmetric(
-                                                    vertical: 8.h,
-                                                    horizontal: 12.w,
-                                                  ),
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          6.r,
-                                                        ),
-                                                  ),
-                                                ),
+
+                                              SizedBox(height: 12.h),
+                                              _buildAddToCartButton(
+                                                enabled:
+                                                    (controller
+                                                            .product
+                                                            ?.hasPrescriptionUploaded ==
+                                                        true) &&
+                                                    (controller
+                                                            .product
+                                                            ?.canAddToCart ??
+                                                        true),
+                                                onPressed:
+                                                    controller.onAddToCart,
                                               ),
                                             ],
                                           ),
+
+                                        SizedBox(height: 24.h),
+
+                                        ReviewsWidget(
+                                          rating:
+                                              controller.product?.rating ?? 4.8,
+                                          reviews: controller.reviews,
+                                          ratingDistribution:
+                                              controller.ratingDistribution,
+                                          onSeeAll: controller.onSeeAllReviews,
+                                          onWriteReview:
+                                              controller.onWriteReview,
+                                        ),
+
+                                        SizedBox(height: 24.h),
+
+                                        QuestionsWidget(
+                                          questions: controller.questions,
+                                          onAskQuestion:
+                                              controller.onAskQuestion,
+                                          onReply: controller.onReplyToQuestion,
+                                        ),
+
+                                        SizedBox(height: 24.h),
+                                        YouMayLikeSection(
+                                          onAddToCart: (p) => controller
+                                              .addToCartFromSimilar(p),
+                                          onFavoriteToggle: (p) => controller
+                                              .onFavoriteToggleFromSimilar(p),
+                                          onProductTap: (p) =>
+                                              controller.onSimilarProductTap(p),
+                                        ),
+
+                                        SizedBox(height: 24.h),
                                       ],
                                     ),
                                   ),
-
-                                  SizedBox(height: 12.h),
-                                  _buildAddToCartButton(
-                                    enabled:
-                                        (controller
-                                                .product
-                                                ?.hasPrescriptionUploaded ==
-                                            true) &&
-                                        (controller.product?.canAddToCart ??
-                                            true),
-                                    onPressed: controller.onAddToCart,
-                                  ),
-                                ],
-                              ),
-
-                            SizedBox(height: 24.h),
-
-                            ReviewsWidget(
-                              rating: controller.product?.rating ?? 4.8,
-                              reviews: controller.reviews,
-                              ratingDistribution: controller.ratingDistribution,
-                              onSeeAll: controller.onSeeAllReviews,
-                              onWriteReview: controller.onWriteReview,
-                            ),
-
-                            SizedBox(height: 24.h),
-
-                            QuestionsWidget(
-                              questions: controller.questions,
-                              onAskQuestion: controller.onAskQuestion,
-                              onReply: controller.onReplyToQuestion,
-                            ),
-
-                            SizedBox(height: 24.h),
-                            YouMayLikeSection(
-                              onAddToCart: (p) =>
-                                  controller.addToCartFromSimilar(p),
-                              onFavoriteToggle: (p) =>
-                                  controller.onFavoriteToggleFromSimilar(p),
-                              onProductTap: (p) =>
-                                  controller.onSimilarProductTap(p),
-                            ),
-
-                            SizedBox(height: 24.h),
-                          ],
-                        ),
-                      ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ),
 
-              
-              const FloatingCartButton(),
+              // Navigation bar
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: KeyedSubtree(
+                  key: _navKey,
+                  child: CustomNavBar(
+                    currentIndex: -1, // No active tab for product details
+                    onTap: _onNavItemTapped,
+                  ),
+                ),
+              ),
+
+              // Floating cart button
+              AnimatedBuilder(
+                animation: _navController,
+                builder: (context, _) {
+                  final inset =
+                      (_navController.value * _navBarHeight) + cartMargin;
+                  return FloatingCartButton(bottomInset: inset);
+                },
+              ),
             ],
           ),
         ),

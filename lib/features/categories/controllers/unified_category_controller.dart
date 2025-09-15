@@ -15,56 +15,45 @@ class UnifiedCategoryController extends GetxController {
   final RestaurantService _restaurantService = RestaurantService();
   final CartController _cartController = Get.find<CartController>();
 
-  
   final isLoading = false.obs;
   final categoryTitle = ''.obs;
   final productsTitle = 'All Products'.obs;
-  final sectionTitle = ''.obs; 
+  final sectionTitle = ''.obs;
 
-  
   final availableSubcategories = <SubcategoryModel>[].obs;
   final filterSubcategories = <SubcategoryModel>[].obs;
-  final allCategories =
-      <SubcategoryModel>[].obs; 
+  final allCategories = <SubcategoryModel>[].obs;
   final allProducts = <ProductModel>[].obs;
   final displayProducts = <ProductModel>[].obs;
-  final filteredProducts = <ProductModel>[].obs; 
-  final recommendedProducts =
-      <ProductModel>[].obs; 
-  final shops = <String, ShopModel>{}.obs; 
+  final filteredProducts = <ProductModel>[].obs;
+  final recommendedProducts = <ProductModel>[].obs;
+  final shops = <String, ShopModel>{}.obs;
 
-  
   final topRestaurants = <RestaurantModel>[].obs;
   final categoryRestaurants = <RestaurantModel>[].obs;
   final showRestaurants = false.obs;
 
-  
   final selectedMainCategory = Rxn<SubcategoryModel>();
   final selectedSubcategory = Rxn<SubcategoryModel>();
   final selectedFilter = Rxn<String>();
   final showingAllProducts = false.obs;
 
-  
   final searchQuery = ''.obs;
   final selectedSortOption = 'relevance'.obs;
   final selectedFilters = <String>[].obs;
   final priceRange = RxList<double>([0.0, 100.0]);
   final showOnlyInStock = false.obs;
 
-  
   late CategoryModel currentCategory;
-  bool get isGroceryCategory =>
-      currentCategory.id == '2'; 
-  bool get isFoodCategory => currentCategory.id == '1'; 
+  bool get isGroceryCategory => currentCategory.id == '2';
+  bool get isFoodCategory => currentCategory.id == '1';
 
-  
   bool get shouldShowCombinedSection => selectedSubcategory.value != null;
 
   @override
   void onInit() {
     super.onInit();
 
-    
     final args = Get.arguments as Map<String, dynamic>?;
     if (args != null && args['category'] != null) {
       currentCategory = args['category'] as CategoryModel;
@@ -73,14 +62,12 @@ class UnifiedCategoryController extends GetxController {
     }
   }
 
-  
   ShopModel? getShopForProduct(ProductModel product) {
     return shops[product.shopId];
   }
 
   Future<void> _loadShopData() async {
     try {
-      
       shops.clear();
       shops['shop_1'] = const ShopModel(
         id: 'shop_1',
@@ -118,17 +105,13 @@ class UnifiedCategoryController extends GetxController {
     try {
       isLoading.value = true;
 
-      
       await _loadShopData();
 
       if (isGroceryCategory) {
-        
         await _loadGroceryMainCategories();
       } else if (isFoodCategory) {
-        
         await _loadFoodCategoryData();
       } else {
-        
         await _loadCategorySubcategories();
       }
     } catch (e) {
@@ -139,10 +122,8 @@ class UnifiedCategoryController extends GetxController {
   }
 
   Future<void> _loadFoodCategoryData() async {
-    
     await _loadCategorySubcategories();
 
-    
     final restaurants = await _restaurantService.getTopRestaurants(limit: 25);
     topRestaurants.value = restaurants;
     showRestaurants.value = true;
@@ -150,11 +131,10 @@ class UnifiedCategoryController extends GetxController {
 
   Future<void> _loadGroceryMainCategories() async {
     final mainCategories = await _categoryService.fetchGroceryMainCategories();
-    allCategories.value = mainCategories; 
+    allCategories.value = mainCategories;
     availableSubcategories.value = mainCategories;
     sectionTitle.value = 'Select Category';
 
-    
     final products = await _categoryService.fetchAllProductsByCategory(
       currentCategory.id,
     );
@@ -162,7 +142,6 @@ class UnifiedCategoryController extends GetxController {
     displayProducts.value = products;
     productsTitle.value = 'All ${currentCategory.title}';
 
-    
     selectedMainCategory.value = null;
     filterSubcategories.clear();
   }
@@ -171,24 +150,20 @@ class UnifiedCategoryController extends GetxController {
     final subcategories = await _categoryService.fetchSubcategories(
       currentCategory.id,
     );
-    allCategories.value = subcategories; 
+    allCategories.value = subcategories;
     availableSubcategories.value = subcategories;
     sectionTitle.value = 'Popular Items';
 
-    
     final products = await _categoryService.fetchAllProductsByCategory(
       currentCategory.id,
     );
     allProducts.value = products;
 
-    
     displayProducts.value = products;
     productsTitle.value = 'All ${currentCategory.title}';
 
-    
     selectedSubcategory.value = null;
 
-    
     if (!isGroceryCategory) {
       await _loadRecommendedProducts();
     }
@@ -210,23 +185,18 @@ class UnifiedCategoryController extends GetxController {
       isLoading.value = true;
 
       if (isGroceryCategory) {
-        
         if (allCategories.contains(subcategory)) {
-          
           selectedMainCategory.value = subcategory;
           selectedSubcategory.value = null;
           selectedFilter.value = null;
-          showingAllProducts.value =
-              false; 
+          showingAllProducts.value = false;
 
-          
           final subCategories = await _categoryService.fetchSubcategories(
             currentCategory.id,
             parentSubcategoryId: subcategory.id,
           );
           filterSubcategories.value = subCategories;
 
-          
           final products = await _categoryService.fetchProductsByMainCategory(
             subcategory.id,
           );
@@ -234,17 +204,13 @@ class UnifiedCategoryController extends GetxController {
           displayProducts.value = products;
           productsTitle.value = 'All ${subcategory.title}';
         } else {
-          
           selectedSubcategory.value = subcategory;
-          showingAllProducts.value =
-              false; 
+          showingAllProducts.value = false;
           applyFilter(subcategory.id);
         }
       } else if (isFoodCategory) {
-        
         selectedSubcategory.value = subcategory;
-        showingAllProducts.value =
-            false; 
+        showingAllProducts.value = false;
         final filteredProducts = allProducts
             .where(
               (product) =>
@@ -255,10 +221,8 @@ class UnifiedCategoryController extends GetxController {
         displayProducts.value = filteredProducts;
         productsTitle.value = '${subcategory.title} Items';
       } else {
-        
         selectedSubcategory.value = subcategory;
-        showingAllProducts.value =
-            false; 
+        showingAllProducts.value = false;
         final filteredProducts = allProducts
             .where(
               (product) =>
@@ -280,13 +244,11 @@ class UnifiedCategoryController extends GetxController {
     selectedFilter.value = subcategoryId;
 
     if (subcategoryId == null) {
-      
       displayProducts.value = allProducts;
       productsTitle.value = selectedMainCategory.value != null
           ? 'All ${selectedMainCategory.value!.title}'
           : 'All Products';
     } else {
-      
       final filteredProducts = allProducts
           .where(
             (product) =>
@@ -296,7 +258,6 @@ class UnifiedCategoryController extends GetxController {
           .toList();
       displayProducts.value = filteredProducts;
 
-      
       final selectedSubcat = filterSubcategories.firstWhereOrNull(
         (subcat) => subcat.id == subcategoryId,
       );
@@ -317,7 +278,6 @@ class UnifiedCategoryController extends GetxController {
       selectedFilter.value = null;
       filterSubcategories.clear();
 
-      
       await _loadGroceryMainCategories();
     } catch (e) {
       print('Error resetting to main categories: $e');
@@ -327,7 +287,6 @@ class UnifiedCategoryController extends GetxController {
   }
 
   void onProductTap(ProductModel product) {
-    
     Get.toNamed(AppRoute.getProductDetails(), arguments: product);
   }
 
@@ -342,14 +301,12 @@ class UnifiedCategoryController extends GetxController {
   }
 
   void onFavoriteToggle(ProductModel product) {
-    
     if (FavoritesController.isProductFavorite(product.id)) {
       FavoritesController.removeFromGlobalFavorites(product.id);
     } else {
       FavoritesController.addToGlobalFavorites(product.id);
     }
 
-    
     final isFavorite = FavoritesController.isProductFavorite(product.id);
     final updatedProduct = product.copyWith(isFavorite: isFavorite);
     _updateProductInLists(updatedProduct);
@@ -363,13 +320,11 @@ class UnifiedCategoryController extends GetxController {
   }
 
   void _updateProductInLists(ProductModel updatedProduct) {
-    
     final allIndex = allProducts.indexWhere((p) => p.id == updatedProduct.id);
     if (allIndex != -1) {
       allProducts[allIndex] = updatedProduct;
     }
 
-    
     final displayIndex = displayProducts.indexWhere(
       (p) => p.id == updatedProduct.id,
     );
@@ -377,7 +332,6 @@ class UnifiedCategoryController extends GetxController {
       displayProducts[displayIndex] = updatedProduct;
     }
 
-    
     final recommendedIndex = recommendedProducts.indexWhere(
       (p) => p.id == updatedProduct.id,
     );
@@ -386,38 +340,29 @@ class UnifiedCategoryController extends GetxController {
     }
   }
 
-  
   void onBackPressed() {
     if (isGroceryCategory) {
       if (selectedSubcategory.value != null) {
-        
         clearSubcategorySelection();
       } else if (selectedMainCategory.value != null) {
-        
         clearMainCategorySelection();
       } else {
-        
         Get.back();
       }
     } else {
       if (selectedSubcategory.value != null) {
-        
         clearSubcategorySelection();
       } else {
-        
         Get.back();
       }
     }
   }
 
-  
   void showAllProducts() {
     showingAllProducts.value = !showingAllProducts.value;
     if (showingAllProducts.value) {
-      
       if (isGroceryCategory) {
         if (selectedSubcategory.value != null) {
-          
           final filteredProducts = allProducts
               .where(
                 (product) =>
@@ -429,19 +374,15 @@ class UnifiedCategoryController extends GetxController {
           productsTitle.value =
               '${selectedSubcategory.value!.title} - All Items';
         } else if (selectedMainCategory.value != null) {
-          
           displayProducts.value = allProducts;
           productsTitle.value =
               '${selectedMainCategory.value!.title} - All Items';
         } else {
-          
           displayProducts.value = allProducts;
           productsTitle.value = '${currentCategory.title} - All Items';
         }
       } else {
-        
         if (selectedSubcategory.value != null) {
-          
           final filteredProducts = allProducts
               .where(
                 (product) =>
@@ -453,13 +394,11 @@ class UnifiedCategoryController extends GetxController {
           productsTitle.value =
               '${selectedSubcategory.value!.title} - All Items';
         } else {
-          
           displayProducts.value = allProducts;
           productsTitle.value = '${currentCategory.title} - All Items';
         }
       }
     } else {
-      
       if (isGroceryCategory) {
         if (selectedSubcategory.value != null) {
           final filteredProducts = allProducts
@@ -479,7 +418,6 @@ class UnifiedCategoryController extends GetxController {
           productsTitle.value = 'All ${currentCategory.title}';
         }
       } else {
-        
         if (selectedSubcategory.value != null) {
           final filteredProducts = allProducts
               .where(
@@ -498,23 +436,19 @@ class UnifiedCategoryController extends GetxController {
     }
   }
 
-  
   void clearSubcategorySelection() {
     selectedSubcategory.value = null;
     showingAllProducts.value = false;
 
     if (isGroceryCategory && selectedMainCategory.value != null) {
-      
       displayProducts.value = allProducts;
       productsTitle.value = 'All ${selectedMainCategory.value!.title}';
     } else {
-      
       displayProducts.value = allProducts;
       productsTitle.value = 'All ${currentCategory.title}';
     }
   }
 
-  
   void clearMainCategorySelection() {
     selectedMainCategory.value = null;
     selectedSubcategory.value = null;
@@ -524,19 +458,16 @@ class UnifiedCategoryController extends GetxController {
     productsTitle.value = 'All ${currentCategory.title}';
   }
 
-  
   void onSearchChanged(String query) {
     searchQuery.value = query;
     _applyFiltersAndSearch();
   }
 
-  
   void onSortChanged(String sortOption) {
     selectedSortOption.value = sortOption;
     _applySorting();
   }
 
-  
   void onFilterChanged(List<String> filters) {
     selectedFilters.value = filters;
     _applyFiltersAndSearch();
@@ -555,7 +486,6 @@ class UnifiedCategoryController extends GetxController {
   void _applyFiltersAndSearch() {
     List<ProductModel> products = allProducts.toList();
 
-    
     if (searchQuery.value.isNotEmpty) {
       products = products.where((product) {
         return product.title.toLowerCase().contains(
@@ -567,7 +497,6 @@ class UnifiedCategoryController extends GetxController {
       }).toList();
     }
 
-    
     if (isGroceryCategory) {
       if (selectedMainCategory.value != null &&
           selectedSubcategory.value != null) {
@@ -599,13 +528,11 @@ class UnifiedCategoryController extends GetxController {
       }
     }
 
-    
     products = products.where((product) {
       final price = double.tryParse(product.price.replaceAll('\$', '')) ?? 0.0;
       return price >= priceRange[0] && price <= priceRange[1];
     }).toList();
 
-    
     for (String filter in selectedFilters) {
       switch (filter) {
         case 'rating_4_plus':
@@ -614,10 +541,8 @@ class UnifiedCategoryController extends GetxController {
               .toList();
           break;
         case 'fast_delivery':
-          
           break;
         case 'discount':
-          
           break;
       }
     }
@@ -656,14 +581,12 @@ class UnifiedCategoryController extends GetxController {
         break;
       case 'relevance':
       default:
-        
         break;
     }
 
     displayProducts.value = products;
   }
 
-  
   void clearFilters() {
     searchQuery.value = '';
     selectedSortOption.value = 'relevance';
@@ -671,7 +594,6 @@ class UnifiedCategoryController extends GetxController {
     priceRange.value = [0.0, 100.0];
     showOnlyInStock.value = false;
 
-    
     if (selectedSubcategory.value != null) {
       final filteredProducts = allProducts
           .where(
@@ -687,7 +609,6 @@ class UnifiedCategoryController extends GetxController {
   }
 
   void onRestaurantTap(RestaurantModel restaurant) {
-    
     Get.toNamed(
       '/restaurant-menu',
       arguments: {

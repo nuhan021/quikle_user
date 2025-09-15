@@ -4,12 +4,14 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:quikle_user/core/common/styles/global_text_style.dart';
 import 'package:quikle_user/core/common/widgets/cart_animation_overlay.dart';
+import 'package:quikle_user/core/common/widgets/custom_navbar.dart';
 import 'package:quikle_user/core/common/widgets/floating_cart_button.dart';
 import 'package:quikle_user/core/common/widgets/unified_product_card.dart';
 import 'package:quikle_user/core/data/services/product_data_service.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 import 'package:quikle_user/core/common/widgets/common_app_bar.dart';
+import 'package:quikle_user/core/utils/navigation/navbar_navigation_helper.dart';
 import 'package:quikle_user/features/cart/controllers/cart_controller.dart';
 import 'package:quikle_user/features/home/data/models/product_model.dart';
 import 'package:quikle_user/features/profile/controllers/favorites_controller.dart';
@@ -23,7 +25,13 @@ class RestaurantPageScreen extends StatefulWidget {
   State<RestaurantPageScreen> createState() => _RestaurantPageScreenState();
 }
 
-class _RestaurantPageScreenState extends State<RestaurantPageScreen> {
+class _RestaurantPageScreenState extends State<RestaurantPageScreen>
+    with TickerProviderStateMixin {
+  // Animation controller for navbar
+  late AnimationController _navController;
+  final GlobalKey _navKey = GlobalKey();
+  double _navBarHeight = 0.0;
+
   final ProductDataService _productService = ProductDataService();
   List<ProductModel> _restaurantProducts = [];
   List<ProductModel> _filteredProducts = [];
@@ -47,7 +55,33 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen> {
   @override
   void initState() {
     super.initState();
+    _navController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 260),
+      value: 1.0,
+    );
     _initializeData();
+  }
+
+  @override
+  void dispose() {
+    _navController.dispose();
+    super.dispose();
+  }
+
+  void _measureNavBarHeight() {
+    final ctx = _navKey.currentContext;
+    if (ctx == null) return;
+    final box = ctx.findRenderObject() as RenderBox?;
+    if (box == null) return;
+    final h = box.size.height;
+    if (h > 0 && (h - _navBarHeight).abs() > 0.5) {
+      setState(() => _navBarHeight = h);
+    }
+  }
+
+  void _onNavItemTapped(int index) {
+    NavbarNavigationHelper.navigateToTab(index);
   }
 
   void _initializeData() {
@@ -169,6 +203,9 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen> {
 
   @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) => _measureNavBarHeight());
+    const double cartMargin = 16.0;
+
     return CartAnimationWrapper(
       child: AnnotatedRegion<SystemUiOverlayStyle>(
         value: const SystemUiOverlayStyle(
@@ -450,91 +487,129 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen> {
                   SizedBox(height: 24.h),
 
                   Expanded(
-                    child: _isLoading
-                        ? const Center(child: CircularProgressIndicator())
-                        : _filteredProducts.isEmpty
-                        ? Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.restaurant_menu,
-                                  size: 64.sp,
-                                  color: const Color(0xFFB8B8B8),
-                                ),
-                                SizedBox(height: 16.h),
-                                Text(
-                                  'No items found',
-                                  style: getTextStyle(
-                                    font: CustomFonts.obviously,
-                                    fontSize: 16.sp,
-                                    fontWeight: FontWeight.w500,
-                                    color: const Color(0xFFB8B8B8),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-                        : SingleChildScrollView(
-                            padding: EdgeInsets.symmetric(horizontal: 16.w),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  width: double.infinity,
-                                  padding: EdgeInsets.only(bottom: 8.h),
-                                  decoration: const BoxDecoration(
-                                    border: Border(
-                                      bottom: BorderSide(
-                                        color: Color(0xFFEDEDED),
-                                        width: 1,
+                    child: AnimatedBuilder(
+                      animation: _navController,
+                      builder: (context, _) {
+                        final inset = _navController.value * _navBarHeight;
+                        return Padding(
+                          padding: EdgeInsets.only(bottom: inset),
+                          child: _isLoading
+                              ? const Center(child: CircularProgressIndicator())
+                              : _filteredProducts.isEmpty
+                              ? Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.restaurant_menu,
+                                        size: 64.sp,
+                                        color: const Color(0xFFB8B8B8),
                                       ),
-                                    ),
-                                  ),
-                                  child: Text(
-                                    'Popular Foods From This Restaurant',
-                                    style: getTextStyle(
-                                      font: CustomFonts.obviously,
-                                      fontSize: 16.sp,
-                                      fontWeight: FontWeight.w600,
-                                      color: const Color(0xFF211F1F),
-                                    ),
-                                  ),
-                                ),
-                                GridView.builder(
-                                  shrinkWrap: true,
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  gridDelegate:
-                                      SliverGridDelegateWithFixedCrossAxisCount(
-                                        crossAxisCount: 2,
-                                        crossAxisSpacing: 12.w,
-                                        mainAxisSpacing: 12.h,
-                                        childAspectRatio: 0.78,
+                                      SizedBox(height: 16.h),
+                                      Text(
+                                        'No items found',
+                                        style: getTextStyle(
+                                          font: CustomFonts.obviously,
+                                          fontSize: 16.sp,
+                                          fontWeight: FontWeight.w500,
+                                          color: const Color(0xFFB8B8B8),
+                                        ),
                                       ),
-                                  itemCount: _filteredProducts.length,
-                                  itemBuilder: (context, index) {
-                                    final product = _filteredProducts[index];
-                                    return UnifiedProductCard(
-                                      product: product,
-                                      onTap: () => _onProductTap(product),
-                                      onAddToCart: () => _onAddToCart(product),
-                                      onFavoriteToggle: () =>
-                                          _onFavoriteToggle(product),
-                                      variant: ProductCardVariant.category,
-                                      isGroceryCategory: false,
-                                    );
-                                  },
-                                ),
+                                    ],
+                                  ),
+                                )
+                              : SingleChildScrollView(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 16.w,
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        width: double.infinity,
+                                        padding: EdgeInsets.only(bottom: 8.h),
+                                        decoration: const BoxDecoration(
+                                          border: Border(
+                                            bottom: BorderSide(
+                                              color: Color(0xFFEDEDED),
+                                              width: 1,
+                                            ),
+                                          ),
+                                        ),
+                                        child: Text(
+                                          'Popular Foods From This Restaurant',
+                                          style: getTextStyle(
+                                            font: CustomFonts.obviously,
+                                            fontSize: 16.sp,
+                                            fontWeight: FontWeight.w600,
+                                            color: const Color(0xFF211F1F),
+                                          ),
+                                        ),
+                                      ),
+                                      GridView.builder(
+                                        shrinkWrap: true,
+                                        physics:
+                                            const NeverScrollableScrollPhysics(),
+                                        gridDelegate:
+                                            SliverGridDelegateWithFixedCrossAxisCount(
+                                              crossAxisCount: 2,
+                                              crossAxisSpacing: 12.w,
+                                              mainAxisSpacing: 12.h,
+                                              childAspectRatio: 0.78,
+                                            ),
+                                        itemCount: _filteredProducts.length,
+                                        itemBuilder: (context, index) {
+                                          final product =
+                                              _filteredProducts[index];
+                                          return UnifiedProductCard(
+                                            product: product,
+                                            onTap: () => _onProductTap(product),
+                                            onAddToCart: () =>
+                                                _onAddToCart(product),
+                                            onFavoriteToggle: () =>
+                                                _onFavoriteToggle(product),
+                                            variant:
+                                                ProductCardVariant.category,
+                                            isGroceryCategory: false,
+                                          );
+                                        },
+                                      ),
 
-                                SizedBox(height: 120.h),
-                              ],
-                            ),
-                          ),
+                                      SizedBox(height: 120.h),
+                                    ],
+                                  ),
+                                ),
+                        );
+                      },
+                    ),
                   ),
                 ],
               ),
 
-              const FloatingCartButton(),
+              // Navigation bar
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: KeyedSubtree(
+                  key: _navKey,
+                  child: CustomNavBar(
+                    currentIndex: -1, // No active tab for restaurant details
+                    onTap: _onNavItemTapped,
+                  ),
+                ),
+              ),
+
+              // Floating cart button
+              AnimatedBuilder(
+                animation: _navController,
+                builder: (context, _) {
+                  final inset =
+                      (_navController.value * _navBarHeight) + cartMargin;
+                  return FloatingCartButton(bottomInset: inset);
+                },
+              ),
             ],
           ),
         ),
