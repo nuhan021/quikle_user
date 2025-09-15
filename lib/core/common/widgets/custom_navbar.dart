@@ -18,9 +18,16 @@ class CustomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final media = MediaQuery.of(context);
+    final systemBottom = media.systemGestureInsets.bottom;
+
     return Container(
-      height: 86.h,
-      padding: EdgeInsets.only(top: 14.h, left: 12.w, right: 12.w),
+      padding: EdgeInsets.only(
+        top: 14.h,
+        left: 12.w,
+        right: 12.w,
+        bottom: systemBottom > 0 ? systemBottom : 12.h,
+      ),
       decoration: BoxDecoration(
         color: Colors.black.withValues(alpha: 0.80),
         borderRadius: BorderRadius.only(
@@ -31,45 +38,33 @@ class CustomNavBar extends StatelessWidget {
           top: BorderSide(width: 1.w, color: AppColors.gradientColor),
         ),
       ),
-      child: Column(
+      child: Row(
         mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          SizedBox(
-            width: double.infinity,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                _NavItem(
-                  icon: Iconsax.home_2,
-                  label: 'Home',
-                  isSelected: currentIndex == 0,
-                  onTap: () => onTap(0),
-                ),
-                _NavItem(
-                  icon: Iconsax.bag_2,
-                  label: 'All Orders',
-                  isSelected: currentIndex == 1,
-                  onTap: () => onTap(1),
-                ),
-
-                _NavItem(
-                  iconAsset: ImagePath.categoryIcon,
-                  label: 'Categories',
-                  isSelected: currentIndex == 2,
-                  onTap: () => onTap(2),
-                ),
-                _NavItem(
-                  icon: Iconsax.user,
-                  label: 'Ananya',
-                  isSelected: currentIndex == 3,
-                  onTap: () => onTap(3),
-                ),
-              ],
-            ),
+          _NavItem(
+            icon: Iconsax.home_2,
+            label: 'Home',
+            isSelected: currentIndex == 0,
+            onTap: () => onTap(0),
+          ),
+          _NavItem(
+            icon: Iconsax.bag_2,
+            label: 'All Orders',
+            isSelected: currentIndex == 1,
+            onTap: () => onTap(1),
+          ),
+          _NavItem(
+            iconAsset: ImagePath.categoryIcon,
+            label: 'Categories',
+            isSelected: currentIndex == 2,
+            onTap: () => onTap(2),
+          ),
+          _NavItem(
+            icon: Iconsax.user,
+            label: 'Ananya',
+            isSelected: currentIndex == 3,
+            onTap: () => onTap(3),
           ),
         ],
       ),
@@ -106,11 +101,10 @@ class _NavItem extends StatelessWidget {
     return Expanded(
       child: GestureDetector(
         onTap: onTap,
-        child: Container(
+        child: Padding(
           padding: EdgeInsets.symmetric(vertical: 6.h),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               iconAsset != null
                   ? Image.asset(

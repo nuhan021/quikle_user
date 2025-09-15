@@ -5,7 +5,7 @@ import 'package:quikle_user/core/common/styles/global_text_style.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/image_path.dart';
-import 'package:quikle_user/features/search/controllers/search_controller.dart'; // ProductSearchController
+import 'package:quikle_user/features/search/controllers/search_controller.dart';
 
 class SearchBar extends StatelessWidget {
   final VoidCallback onTap;
@@ -20,7 +20,8 @@ class SearchBar extends StatelessWidget {
         Get.put(ProductSearchController());
 
     return Container(
-      padding: EdgeInsets.all(16.w),
+      decoration: const BoxDecoration(color: Color(0x33CFCFCF)),
+      padding: EdgeInsets.only(top: 12.h, left: 16.w, right: 16.w),
       child: GestureDetector(
         onTap: onTap,
         child: Container(
@@ -41,7 +42,7 @@ class SearchBar extends StatelessWidget {
                       style: getTextStyle(
                         font: CustomFonts.inter,
                         color: Colors.grey,
-                        fontSize: 16.sp,
+                        fontSize: 14.sp,
                       ),
                     ),
                     Text(
@@ -50,7 +51,7 @@ class SearchBar extends StatelessWidget {
                       style: getTextStyle(
                         font: CustomFonts.inter,
                         color: Colors.grey,
-                        fontSize: 16.sp,
+                        fontSize: 14.sp,
                       ),
                     ),
                     Text(
@@ -58,7 +59,7 @@ class SearchBar extends StatelessWidget {
                       style: getTextStyle(
                         font: CustomFonts.inter,
                         color: Colors.grey,
-                        fontSize: 16.sp,
+                        fontSize: 14.sp,
                       ),
                     ),
                   ],
@@ -78,8 +79,8 @@ class SearchBar extends StatelessWidget {
                     ),
                     child: Image.asset(
                       ImagePath.voiceIcon,
-                      height: 24.w,
-                      width: 24.w,
+                      height: 16.w,
+                      width: 16.w,
                       color: isListening ? AppColors.primary : Colors.grey,
                     ),
                   ),

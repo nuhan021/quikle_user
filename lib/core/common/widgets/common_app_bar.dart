@@ -17,6 +17,8 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool showNotification;
   final bool showProfile;
   final Color backgroundColor;
+  final Widget? addressWidget;
+  final bool isFromHome;
 
   const CommonAppBar({
     super.key,
@@ -30,6 +32,8 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.showNotification = true,
     this.showProfile = true,
     this.backgroundColor = Colors.white,
+    this.addressWidget,
+    this.isFromHome = false,
   });
 
   bool get _useCustomActions => actions != null && actions!.isNotEmpty;
@@ -46,6 +50,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
         ? Brightness.light
         : Brightness.dark,
   );
+
   Widget _buildTrailing() {
     if (_useCustomActions) {
       return Row(mainAxisSize: MainAxisSize.min, children: actions!);
@@ -67,6 +72,10 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
           onPressed: onProfileTap,
         ),
       );
+    }
+
+    if (addressWidget != null && !isFromHome) {
+      items.add(addressWidget!);
     }
 
     if (items.isEmpty) {
@@ -100,28 +109,31 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
                     icon: Icon(
                       Icons.arrow_back,
                       color: _iconColor,
-                      size: 24.sp,
+                      size: 22.sp,
                     ),
                     onPressed: onBackTap ?? () => Navigator.pop(context),
                   )
                 else
                   SizedBox(width: 12.w),
-
-                Expanded(
-                  child:
-                      titleWidget ??
-                      Text(
-                        title,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: getTextStyle(
-                          font: CustomFonts.obviously,
-                          fontSize: 18.sp,
-                          fontWeight: FontWeight.w500,
-                          color: _iconColor,
+                if (isFromHome && addressWidget != null)
+                  Expanded(child: addressWidget!)
+                else
+                  Expanded(
+                    child:
+                        titleWidget ??
+                        Text(
+                          title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: getTextStyle(
+                            font: CustomFonts.obviously,
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w500,
+                            color: _iconColor,
+                          ),
                         ),
-                      ),
-                ),
+                  ),
+
                 _buildTrailing(),
               ],
             ),

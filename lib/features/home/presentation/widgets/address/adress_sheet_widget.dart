@@ -7,14 +7,9 @@ import 'package:quikle_user/core/utils/constants/enums/address_type_enums.dart';
 import 'package:quikle_user/features/profile/controllers/address_controller.dart';
 import 'package:quikle_user/routes/app_routes.dart';
 
-void showAddressSelectionSheet(AddressController addressController) {
-  final selectedAddressId = (addressController.defaultAddress?.id ?? '').obs;
-
-  Get.bottomSheet(
-    _AddressSelectionSheet(
-      addressController: addressController,
-      selectedAddressId: selectedAddressId,
-    ),
+Future<String?> showAddressSelectionSheet(AddressController addressController) {
+  return Get.bottomSheet<String>(
+    _AddressSelectionSheet(addressController: addressController),
     isScrollControlled: true,
     enableDrag: true,
     isDismissible: true,
@@ -23,12 +18,8 @@ void showAddressSelectionSheet(AddressController addressController) {
 
 class _AddressSelectionSheet extends StatelessWidget {
   final AddressController addressController;
-  final RxString selectedAddressId;
 
-  const _AddressSelectionSheet({
-    required this.addressController,
-    required this.selectedAddressId,
-  });
+  const _AddressSelectionSheet({required this.addressController});
 
   String _getAddressTypeLabel(AddressType type) {
     switch (type) {
@@ -100,19 +91,20 @@ class _AddressSelectionSheet extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 16),
-
                   Obx(() {
                     final items = addressController.addresses;
                     if (items.isEmpty) {
                       return _EmptyAddresses();
                     }
-
+                    final currentDefaultId =
+                        addressController.defaultAddress?.id;
                     return Column(
                       children: items.map((address) {
-                        final isSelected =
-                            selectedAddressId.value == address.id;
+                        final isSelected = currentDefaultId == address.id;
                         return GestureDetector(
-                          onTap: () => selectedAddressId.value = address.id,
+                          onTap: () {
+                            Get.back(result: address.id);
+                          },
                           child: Container(
                             margin: const EdgeInsets.only(bottom: 12),
                             padding: const EdgeInsets.all(16),
@@ -210,7 +202,6 @@ class _AddressSelectionSheet extends StatelessWidget {
                                     ],
                                   ),
                                 ),
-
                                 AnimatedContainer(
                                   duration: const Duration(milliseconds: 200),
                                   child: Icon(
@@ -228,84 +219,6 @@ class _AddressSelectionSheet extends StatelessWidget {
                           ),
                         );
                       }).toList(),
-                    );
-                  }),
-
-                  const SizedBox(height: 24),
-
-                  Obx(() {
-                    final hasAddresses = addressController.addresses.isNotEmpty;
-                    if (!hasAddresses) return const SizedBox.shrink();
-
-                    final hasSelectionChanged =
-                        selectedAddressId.value !=
-                        addressController.defaultAddress?.id;
-
-                    return Row(
-                      children: [
-                        Expanded(
-                          child: OutlinedButton(
-                            onPressed: () => Get.back(),
-                            style: OutlinedButton.styleFrom(
-                              side: BorderSide(color: Colors.grey[400]!),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                            ),
-                            child: Text(
-                              'Cancel',
-                              style: getTextStyle(
-                                font: CustomFonts.inter,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.grey[600]!,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-
-                        Expanded(
-                          flex: 2,
-                          child: ElevatedButton(
-                            onPressed: hasSelectionChanged
-                                ? () async {
-                                    if (selectedAddressId.value.isNotEmpty) {
-                                      await addressController.setAsDefault(
-                                        selectedAddressId.value,
-                                      );
-                                      Get.back();
-                                    }
-                                  }
-                                : null,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: hasSelectionChanged
-                                  ? AppColors.gradientColor
-                                  : Colors.grey[300],
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              elevation: hasSelectionChanged ? 2 : 0,
-                            ),
-                            child: Text(
-                              hasSelectionChanged
-                                  ? 'Save Changes'
-                                  : 'No Changes',
-                              style: getTextStyle(
-                                font: CustomFonts.inter,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: hasSelectionChanged
-                                    ? Colors.white
-                                    : Colors.grey[600]!,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
                     );
                   }),
                 ],

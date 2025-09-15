@@ -92,11 +92,11 @@ class AddressController extends GetxController {
       final index = _addresses.indexWhere((addr) => addr.id == addressId);
       if (index != -1) {
         _addresses[index] = _addresses[index].copyWith(isDefault: true);
-        
+
         update();
         Get.snackbar(
           'Success',
-          '✓ Default address updated',
+          'Default address updated',
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.green[600],
           colorText: Colors.white,

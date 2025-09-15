@@ -34,14 +34,8 @@ class ProductSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: double.infinity,
-            padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 12.w),
-            decoration: const BoxDecoration(
-              border: Border(
-                bottom: BorderSide(width: 3, color: Color(0xFFEDEDED)),
-              ),
-            ),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 12.w),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -49,13 +43,13 @@ class ProductSection extends StatelessWidget {
                   children: [
                     if (categoryIconPath != null) ...[
                       Image.asset(categoryIconPath!, width: 28.w, height: 26.h),
-                      SizedBox(width: 8.w),
+                      SizedBox(width: 6.w),
                     ],
                     Text(
                       categoryTitle ?? 'Unknown Category',
                       style: getTextStyle(
                         font: CustomFonts.obviously,
-                        fontSize: 18,
+                        fontSize: 16.sp,
                         fontWeight: FontWeight.w500,
                         color: AppColors.ebonyBlack,
                       ),
@@ -77,32 +71,33 @@ class ProductSection extends StatelessWidget {
             ),
           ),
 
-          SizedBox(height: 16.h),
+          Divider(thickness: 3.h, height: 3.h, color: const Color(0xFFEDEDED)),
 
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
-              crossAxisSpacing: 12.w,
-              mainAxisSpacing: 12.h,
-              childAspectRatio: 0.6.h,
+          SizedBox(
+            height: 330.h,
+            child: GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                crossAxisSpacing: 12.w,
+                mainAxisSpacing: 12.h,
+                childAspectRatio: 0.80,
+              ),
+              itemCount: math.min(section.products.length, 6),
+              itemBuilder: (context, index) {
+                final product = section.products[index];
+                return ProductItem(
+                  product: product,
+                  onTap: () => onProductTap(product),
+                  onAddToCart: () => onAddToCart(product),
+                  onFavoriteToggle: onFavoriteToggle != null
+                      ? () => onFavoriteToggle!(product)
+                      : null,
+                );
+              },
             ),
-            itemCount: math.min(section.products.length, 6),
-            itemBuilder: (context, index) {
-              final product = section.products[index];
-              return ProductItem(
-                product: product,
-                onTap: () => onProductTap(product),
-                onAddToCart: () => onAddToCart(product),
-                onFavoriteToggle: onFavoriteToggle != null
-                    ? () => onFavoriteToggle!(product)
-                    : null,
-              );
-            },
           ),
-
-          SizedBox(height: 24.h),
         ],
       ),
     );

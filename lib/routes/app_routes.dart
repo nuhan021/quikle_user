@@ -85,8 +85,20 @@ class AppRoute {
     GetPage(name: _register, page: () => const RegisterScreen()),
     GetPage(name: _verify, page: () => const VerificationScreen()),
     GetPage(name: _welcome, page: () => const WelcomeScreen()),
-    GetPage(name: _home, page: () => const MainScreen()),
-    GetPage(name: _main, page: () => const MainScreen()),
+    GetPage(
+      name: _home,
+      page: () {
+        final args = Get.arguments as Map<String, dynamic>?;
+        return MainScreen(initialIndex: args?['initialIndex'] ?? 0);
+      },
+    ),
+    GetPage(
+      name: _main,
+      page: () {
+        final args = Get.arguments as Map<String, dynamic>?;
+        return MainScreen(initialIndex: args?['initialIndex'] ?? 0);
+      },
+    ),
     GetPage(name: _cart, page: () => const CartScreen()),
     GetPage(
       name: _productDetails,

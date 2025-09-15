@@ -127,9 +127,8 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final bottomSafe = MediaQuery.of(context).padding.bottom;
     WidgetsBinding.instance.addPostFrameCallback((_) => _measureNavBarHeight());
-    final double cartMargin = 16.0;
+    const double cartMargin = 16.0;
 
     return CartAnimationWrapper(
       child: Scaffold(
@@ -162,7 +161,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                     builder: (context, child) {
                       final dy = 1.0 - _navController.value;
                       return Transform.translate(
-                        offset: Offset(0, dy * (_navBarHeight + bottomSafe)),
+                        offset: Offset(0, dy * _navBarHeight),
                         child: Opacity(
                           opacity: _navController.value.clamp(0.0, 1.0),
                           child: child,
@@ -183,9 +182,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                 animation: _navController,
                 builder: (context, _) {
                   final inset =
-                      (_navController.value * _navBarHeight) +
-                      bottomSafe +
-                      cartMargin;
+                      (_navController.value * _navBarHeight) + cartMargin;
                   return FloatingCartButton(bottomInset: inset);
                 },
               ),
