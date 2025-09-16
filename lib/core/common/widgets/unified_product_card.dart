@@ -348,12 +348,16 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
         children: [
           Icon(Icons.scale_outlined, color: AppColors.featherGrey, size: 10.w),
           SizedBox(width: 2.w),
-          Text(
-            widget.product.weight ?? '1 piece',
-            style: getTextStyle(
-              font: CustomFonts.inter,
-              fontSize: 10.sp,
-              color: AppColors.featherGrey,
+          Flexible(
+            child: Text(
+              widget.product.weight ?? '1 piece',
+              style: getTextStyle(
+                font: CustomFonts.inter,
+                fontSize: 10.sp,
+                color: AppColors.featherGrey,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],
@@ -363,15 +367,17 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
         children: [
           Icon(Icons.access_time, color: AppColors.featherGrey, size: 10.w),
           SizedBox(width: 2.w),
-          Text(
-            widget.shop?.deliveryTime ?? '30 Min',
-            style: getTextStyle(
-              font: CustomFonts.inter,
-              fontSize: 10.sp,
-              color: AppColors.featherGrey,
+          Flexible(
+            child: Text(
+              widget.shop?.deliveryTime ?? '30 Min',
+              style: getTextStyle(
+                font: CustomFonts.inter,
+                fontSize: 10.sp,
+                color: AppColors.featherGrey,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
           ),
         ],
       );

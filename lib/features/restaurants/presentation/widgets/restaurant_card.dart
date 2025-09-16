@@ -20,16 +20,16 @@ class RestaurantCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 160.w,
-        margin: EdgeInsets.only(right: 12.w),
+        width: 120.w,
+        margin: EdgeInsets.only(right: 8.w),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12.r),
+          borderRadius: BorderRadius.circular(8.r),
           boxShadow: [
             BoxShadow(
               color: AppColors.ebonyBlack.withValues(alpha: 0.08),
-              offset: const Offset(0, 2),
-              blurRadius: 8,
+              offset: const Offset(0, 1),
+              blurRadius: 4,
               spreadRadius: 0,
             ),
           ],
@@ -38,128 +38,123 @@ class RestaurantCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              height: 100.h,
+              height: 70.h,
               width: double.infinity,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(12.r),
-                  topRight: Radius.circular(12.r),
+                  topLeft: Radius.circular(8.r),
+                  topRight: Radius.circular(8.r),
                 ),
                 color: AppColors.homeGrey,
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(12.r),
-                  topRight: Radius.circular(12.r),
+                  topLeft: Radius.circular(8.r),
+                  topRight: Radius.circular(8.r),
                 ),
                 child: Image.asset(
-                  restaurant.image,
+                  restaurant.getDisplayImage(),
                   fit: BoxFit.cover,
+                  width: double.infinity,
+                  height: double.infinity,
                   errorBuilder: (context, error, stackTrace) {
                     return Container(
                       color: AppColors.homeGrey,
                       child: const Icon(
                         Icons.restaurant,
                         color: AppColors.featherGrey,
-                        size: 40,
+                        size: 24,
                       ),
                     );
                   },
                 ),
               ),
             ),
-
-            Expanded(
-              child: Padding(
-                padding: EdgeInsets.all(12.w),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      restaurant.name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: getTextStyle(
-                        font: CustomFonts.obviously,
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.ebonyBlack,
-                      ),
+            Padding(
+              padding: EdgeInsets.all(8.w),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    restaurant.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: getTextStyle(
+                      font: CustomFonts.obviously,
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.ebonyBlack,
                     ),
-                    SizedBox(height: 4.h),
-
-                    Text(
-                      restaurant.cuisines.join(', '),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: getTextStyle(
-                        font: CustomFonts.inter,
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w400,
-                        color: AppColors.featherGrey,
-                      ),
+                  ),
+                  SizedBox(height: 2.h),
+                  Text(
+                    restaurant.cuisines.join(', '),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: getTextStyle(
+                      font: CustomFonts.inter,
+                      fontSize: 10.sp,
+                      fontWeight: FontWeight.w400,
+                      color: AppColors.featherGrey,
                     ),
-                    SizedBox(height: 8.h),
-
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.star,
-                              size: 14.sp,
-                              color: AppColors.beakYellow,
-                            ),
-                            SizedBox(width: 2.w),
-                            Text(
-                              restaurant.rating.toString(),
-                              style: getTextStyle(
-                                font: CustomFonts.inter,
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.w500,
-                                color: AppColors.ebonyBlack,
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        Text(
-                          restaurant.deliveryTime,
-                          style: getTextStyle(
-                            font: CustomFonts.inter,
-                            fontSize: 10.sp,
-                            fontWeight: FontWeight.w400,
-                            color: AppColors.featherGrey,
+                  ),
+                  SizedBox(height: 4.h),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.star,
+                            size: 12.sp,
+                            color: AppColors.beakYellow,
                           ),
-                        ),
-                      ],
-                    ),
-
-                    if (!restaurant.isOpen) ...[
-                      SizedBox(height: 4.h),
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 6.w,
-                          vertical: 2.h,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.red.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(4.r),
-                        ),
-                        child: Text(
-                          'Closed',
-                          style: getTextStyle(
-                            font: CustomFonts.inter,
-                            fontSize: 10.sp,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.red,
+                          SizedBox(width: 2.w),
+                          Text(
+                            restaurant.rating.toString(),
+                            style: getTextStyle(
+                              font: CustomFonts.inter,
+                              fontSize: 10.sp,
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.ebonyBlack,
+                            ),
                           ),
+                        ],
+                      ),
+                      Text(
+                        restaurant.deliveryTime,
+                        style: getTextStyle(
+                          font: CustomFonts.inter,
+                          fontSize: 9.sp,
+                          fontWeight: FontWeight.w400,
+                          color: AppColors.featherGrey,
                         ),
                       ),
                     ],
+                  ),
+                  if (!restaurant.isOpen) ...[
+                    SizedBox(height: 2.h),
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 4.w,
+                        vertical: 1.5.h,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.red.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(3.r),
+                      ),
+                      child: Text(
+                        'Closed',
+                        style: getTextStyle(
+                          font: CustomFonts.inter,
+                          fontSize: 8.sp,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.red,
+                        ),
+                      ),
+                    ),
                   ],
-                ),
+                ],
               ),
             ),
           ],

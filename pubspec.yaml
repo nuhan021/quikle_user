@@ -86,6 +86,7 @@ flutter:
     - assets/images/
     - assets/icons/
     - assets/fonts/
+    - assets/images/signature_dishes/
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 

@@ -27,14 +27,13 @@ class TopRestaurantsSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 16.w),
           child: Text(
             title,
             style: getTextStyle(
               font: CustomFonts.obviously,
-              fontSize: 16.sp,
+              fontSize: 14.sp,
               fontWeight: FontWeight.w600,
               color: AppColors.ebonyBlack,
             ),
@@ -43,7 +42,7 @@ class TopRestaurantsSection extends StatelessWidget {
         SizedBox(height: 16.h),
 
         SizedBox(
-          height: 200.h, 
+          height: 140.h,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             padding: EdgeInsets.symmetric(horizontal: 16.w),

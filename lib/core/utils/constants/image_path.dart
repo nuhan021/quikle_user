@@ -53,4 +53,23 @@ class ImagePath {
   static const String lightIcon = 'assets/icons/light.png';
   static const String pondIcon = 'assets/icons/pond.png';
   static const String riceIcon = 'assets/icons/rice.png';
+
+  // Signature Dish Images
+  static const String biryaniDish =
+      'assets/images/signature_dishes/biryani.png';
+  static const String pizzaDish = 'assets/images/signature_dishes/pizza.png';
+  static const String burgerDish = 'assets/images/signature_dishes/burger.png';
+  static const String pastaDish = 'assets/images/signature_dishes/pasta.png';
+  static const String chineseDish =
+      'assets/images/signature_dishes/chinese.png';
+  static const String sandwichDish =
+      'assets/images/signature_dishes/sandwich.png';
+  static const String grilledChicken =
+      'assets/images/signature_dishes/grilled_chicken.png';
+  static const String noodlesDish =
+      'assets/images/signature_dishes/noodles.png';
+  static const String tandooriDish =
+      'assets/images/signature_dishes/tandoori.png';
+  static const String friedRice =
+      'assets/images/signature_dishes/fried_rice.png';
 }
