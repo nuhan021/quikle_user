@@ -86,7 +86,7 @@ class ProductGridSection extends StatelessWidget {
           ),
         //if (title.isNotEmpty) SizedBox(height: 16.h),
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.w),
+          padding: EdgeInsets.symmetric(horizontal: 18.w),
           child: GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -94,7 +94,7 @@ class ProductGridSection extends StatelessWidget {
               crossAxisCount: crossAxisCount,
               crossAxisSpacing: 12.w,
               mainAxisSpacing: 12.h,
-              childAspectRatio: crossAxisCount == 3 ? 0.70 : 1,
+              childAspectRatio: crossAxisCount == 3 ? 0.70 : 1.1,
             ),
             itemCount: displayProducts.length,
             itemBuilder: (context, index) {
