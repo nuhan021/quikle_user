@@ -22,10 +22,7 @@ class MinimalSubcategoriesSection extends StatelessWidget {
     if (subcategories.isEmpty) return const SizedBox.shrink();
 
     return Container(
-      margin: EdgeInsets.symmetric(
-        horizontal: 8.w,
-        vertical: 4.h,
-      ), // Reduced margins
+      margin: EdgeInsets.symmetric(horizontal: 8.w, vertical: 6.h),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -35,15 +32,15 @@ class MinimalSubcategoriesSection extends StatelessWidget {
               'Subcategories',
               style: getTextStyle(
                 font: CustomFonts.obviously,
-                fontSize: 12.sp, // Smaller font
-                fontWeight: FontWeight.w500,
+                fontSize: 16.sp,
+                fontWeight: FontWeight.w600,
                 color: AppColors.ebonyBlack,
               ),
             ),
           ),
-          SizedBox(height: 4.h), // Reduced spacing
+          SizedBox(height: 6.h),
           SizedBox(
-            height: 50.h, // Increased height to accommodate icon + text
+            height: 70.h,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: subcategories.length,
@@ -54,14 +51,14 @@ class MinimalSubcategoriesSection extends StatelessWidget {
                 return GestureDetector(
                   onTap: () => onSubcategoryTap(subcategory),
                   child: Container(
-                    margin: EdgeInsets.only(right: 8.w),
+                    margin: EdgeInsets.only(right: 12.w),
                     child: Column(
                       children: [
                         Container(
-                          height: 32.h, // Compact icon container
-                          width: 32.w,
+                          height: 48.h,
+                          width: 48.w,
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8.r),
+                            borderRadius: BorderRadius.circular(12.r),
                             border: isSelected
                                 ? Border.all(
                                     color: AppColors.beakYellow,
@@ -70,7 +67,7 @@ class MinimalSubcategoriesSection extends StatelessWidget {
                                 : null,
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.grey.withValues(alpha: .04),
+                                color: Colors.grey.withValues(alpha: .08),
                                 blurRadius: 8,
                                 offset: const Offset(0, 2),
                               ),
@@ -79,13 +76,13 @@ class MinimalSubcategoriesSection extends StatelessWidget {
                           child: Center(
                             child: Image.asset(
                               subcategory.iconPath,
-                              width: 20.w,
-                              height: 20.h,
-                              fit: BoxFit.cover,
+                              width: 38.w,
+                              height: 38.h,
+                              fit: BoxFit.contain,
                             ),
                           ),
                         ),
-                        SizedBox(height: 2.h),
+                        SizedBox(height: 4.h),
                         Text(
                           subcategory.title,
                           textAlign: TextAlign.center,
@@ -93,9 +90,8 @@ class MinimalSubcategoriesSection extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                           style: getTextStyle(
                             font: CustomFonts.inter,
-                            fontSize:
-                                9.sp, // Very small font for compact layout
-                            fontWeight: FontWeight.w500,
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w600,
                             color: isSelected
                                 ? AppColors.beakYellow
                                 : AppColors.ebonyBlack,

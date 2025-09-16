@@ -107,15 +107,12 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
 
                             return Column(
                               children: [
-                                // Search section
                                 SearchAndFiltersSection(
                                   searchController: searchController,
                                   onSearchChanged: controller.onSearchChanged,
                                   onVoiceTap: () {},
                                   dynamicHint: controller.currentPlaceholder,
                                 ),
-
-                                // Minimal subcategories section
                                 MinimalSubcategoriesSection(
                                   subcategories: controller.subcategories,
                                   selectedSubcategory:
@@ -123,7 +120,6 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
                                   onSubcategoryTap: controller.onSubcategoryTap,
                                 ),
 
-                                // Products grid
                                 Expanded(child: _buildProductsGrid(controller)),
                               ],
                             );
@@ -135,17 +131,13 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
                 ],
               ),
 
-              // Navigation bar
               Positioned(
                 left: 0,
                 right: 0,
                 bottom: 0,
                 child: KeyedSubtree(
                   key: _navKey,
-                  child: CustomNavBar(
-                    currentIndex: 2, // Categories tab index
-                    onTap: _onNavItemTapped,
-                  ),
+                  child: CustomNavBar(currentIndex: 2, onTap: _onNavItemTapped),
                 ),
               ),
 
@@ -180,13 +172,13 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
     }
 
     return Padding(
-      padding: EdgeInsets.all(8.w), // Reduced padding for more product space
+      padding: EdgeInsets.all(8.w),
       child: GridView.builder(
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 4, // More items per row for compact layout
-          crossAxisSpacing: 6.w,
-          mainAxisSpacing: 6.h,
-          childAspectRatio: 0.7, // Slightly taller for better product display
+          crossAxisCount: 3,
+          crossAxisSpacing: 12.w,
+          mainAxisSpacing: 12.h,
+          childAspectRatio: 0.8,
         ),
         itemCount: controller.displayProducts.length,
         itemBuilder: (context, index) {

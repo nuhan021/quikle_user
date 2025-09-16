@@ -243,7 +243,7 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
 
         if (!controller.isGroceryCategory &&
             controller.recommendedProducts.isNotEmpty) ...[
-          SizedBox(height: 24.h),
+          // SizedBox(height: 24.h),
           ProductGridSection(
             title: 'Recommended for You',
             products: controller.recommendedProducts,
@@ -349,8 +349,8 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
               ],
             ),
           ),
-          SizedBox(height: 16.h),
 
+          //SizedBox(height: 16.h),
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -358,7 +358,7 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
               crossAxisCount: 3,
               crossAxisSpacing: 12.w,
               mainAxisSpacing: 12.h,
-              childAspectRatio: 0.55.h,
+              mainAxisExtent: 150.h,
             ),
             itemCount: controller.displayProducts.length,
             itemBuilder: (context, index) {

@@ -147,6 +147,7 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
                   widget.variant == ProductCardVariant.youMayLike ? 12.sp : 8.w,
                   6.w, // tighter bottom padding
                 ),
+
                 child: _buildProductInfo(),
               ),
             ],
@@ -279,7 +280,7 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
             ],
           ),
         ],
-        SizedBox(height: 6.h),
+        SizedBox(height: 15.h),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
