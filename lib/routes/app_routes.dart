@@ -12,6 +12,7 @@ import 'package:quikle_user/features/categories/presentation/screens/category_de
 import 'package:quikle_user/features/categories/presentation/screens/subcategory_products_screen.dart';
 import 'package:quikle_user/features/categories/presentation/screens/grocery_navigation_screen.dart';
 import 'package:quikle_user/features/categories/presentation/screens/unified_category_screen.dart';
+import 'package:quikle_user/features/categories/presentation/screens/category_products_screen.dart';
 import 'package:quikle_user/features/restaurants/presentation/screens/category_restaurants_screen.dart';
 import 'package:quikle_user/features/restaurants/presentation/screens/restaurant_page_screen.dart';
 import 'package:quikle_user/features/payout/presentation/screens/checkout_screen.dart';
@@ -36,6 +37,7 @@ class AppRoute {
   static const String _productDetails = '/product-details';
   static const String _categoryDetail = '/category-detail';
   static const String _unifiedCategory = '/unified-category';
+  static const String _categoryProducts = '/category-products';
   static const String _subcategoryProducts = '/subcategory-products';
   static const String _groceryNavigation = '/grocery-navigation';
   static const String _checkout = '/checkout';
@@ -63,6 +65,7 @@ class AppRoute {
   static String getProductDetails() => _productDetails;
   static String getCategoryDetail() => _categoryDetail;
   static String getUnifiedCategory() => _unifiedCategory;
+  static String getCategoryProducts() => _categoryProducts;
   static String getSubcategoryProducts() => _subcategoryProducts;
   static String getGroceryNavigation() => _groceryNavigation;
   static String getCheckout() => _checkout;
@@ -106,6 +109,10 @@ class AppRoute {
     ),
     GetPage(name: _categoryDetail, page: () => const CategoryDetailScreen()),
     GetPage(name: _unifiedCategory, page: () => const UnifiedCategoryScreen()),
+    GetPage(
+      name: _categoryProducts,
+      page: () => const CategoryProductsScreen(),
+    ),
     GetPage(
       name: _subcategoryProducts,
       page: () => const SubcategoryProductsScreen(),

@@ -92,8 +92,7 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
                       showNotification: false,
                       showProfile: false,
                       onBackTap: () => Get.back(),
-                      addressWidget:
-                          AddressWidget(), // Use the common address widget
+                      addressWidget: AddressWidget(),
                     ),
                   ),
 
@@ -117,20 +116,11 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
                                   SearchAndFiltersSection(
                                     searchController: searchController,
                                     onSearchChanged: controller.onSearchChanged,
-                                    onSortTap: () => _showSortBottomSheet(
-                                      context,
-                                      controller,
-                                    ),
-                                    onFilterTap: () => _showFilterBottomSheet(
-                                      context,
-                                      controller,
-                                    ),
                                     onVoiceTap: () {},
-                                    searchHint:
-                                        'Search in ${controller.categoryTitle.value}...',
+                                    dynamicHint: controller.currentPlaceholder,
                                   ),
-                                  SizedBox(height: 24.h),
 
+                                  //SizedBox(height: 8.h),
                                   PopularItemsSection(
                                     subcategories: controller.isGroceryCategory
                                         ? controller.allCategories
@@ -179,11 +169,11 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
                                     ),
                                   ],
 
-                                  SizedBox(height: 26.h),
+                                  SizedBox(height: 16.h),
                                   OfferBanner(),
-                                  SizedBox(height: 24.h),
+                                  SizedBox(height: 16.h),
                                   _buildContent(controller),
-                                  SizedBox(height: 32.h),
+                                  //SizedBox(height: 32.h),
                                 ],
                               ),
                             );
@@ -202,10 +192,7 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
                 bottom: 0,
                 child: KeyedSubtree(
                   key: _navKey,
-                  child: CustomNavBar(
-                    currentIndex: 2, // Categories tab index
-                    onTap: _onNavItemTapped,
-                  ),
+                  child: CustomNavBar(currentIndex: 2, onTap: _onNavItemTapped),
                 ),
               ),
 
@@ -390,38 +377,6 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
           ),
         ],
       ),
-    );
-  }
-
-  void _showSortBottomSheet(
-    BuildContext context,
-    UnifiedCategoryController controller,
-  ) {
-    Get.bottomSheet(
-      SortBottomSheet(
-        selectedSort: controller.selectedSortOption.value,
-        onSortSelected: controller.onSortChanged,
-      ),
-      isScrollControlled: true,
-    );
-  }
-
-  void _showFilterBottomSheet(
-    BuildContext context,
-    UnifiedCategoryController controller,
-  ) {
-    Get.bottomSheet(
-      FilterBottomSheet(
-        selectedFilters: controller.selectedFilters,
-        priceRange: controller.priceRange,
-        showOnlyInStock: controller.showOnlyInStock.value,
-        onFiltersApplied: (filters, priceRange, showOnlyInStock) {
-          controller.onFilterChanged(filters);
-          controller.onPriceRangeChanged(priceRange);
-          controller.onStockFilterChanged(showOnlyInStock);
-        },
-      ),
-      isScrollControlled: true,
     );
   }
 }

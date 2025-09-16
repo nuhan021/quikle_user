@@ -2,13 +2,11 @@ import 'package:quikle_user/core/utils/constants/image_path.dart';
 import 'package:quikle_user/features/restaurants/data/models/restaurant_model.dart';
 
 class RestaurantService {
-  
   static List<RestaurantModel> _restaurants = [
-    
     const RestaurantModel(
       id: 'restaurant_1',
       name: 'Tandoori Tarang',
-      image: ImagePath.shopImage,
+      image: '', // No default image - will use signature dish
       deliveryTime: '30-35 min',
       rating: 4.8,
       address: '123 Food Street, City',
@@ -18,11 +16,29 @@ class RestaurantService {
       reviewCount: 1250,
       popularity: 4.8,
       isTopRated: true,
+      signatureDishes: [
+        SignatureDish(
+          id: 'dish_1_1',
+          name: 'Special Chicken Biryani',
+          image: ImagePath.biryaniDish,
+          description: 'Our signature biryani with aromatic spices',
+          price: '\$18',
+          isPopular: true,
+        ),
+        SignatureDish(
+          id: 'dish_1_2',
+          name: 'Tandoori Chicken',
+          image: ImagePath.tandooriDish,
+          description: 'Perfectly grilled tandoori chicken',
+          price: '\$16',
+          isPopular: false,
+        ),
+      ],
     ),
     const RestaurantModel(
       id: 'restaurant_2',
       name: 'Biryani Paradise',
-      image: ImagePath.shopImage,
+      image: '', // No default image - will use signature dish
       deliveryTime: '25-30 min',
       rating: 4.9,
       address: '456 Spice Avenue, City',
@@ -32,11 +48,29 @@ class RestaurantService {
       reviewCount: 980,
       popularity: 4.9,
       isTopRated: true,
+      signatureDishes: [
+        SignatureDish(
+          id: 'dish_2_1',
+          name: 'Hyderabadi Dum Biryani',
+          image: ImagePath.biryaniDish,
+          description: 'Authentic Hyderabadi style biryani',
+          price: '\$22',
+          isPopular: true,
+        ),
+        SignatureDish(
+          id: 'dish_2_2',
+          name: 'Mutton Biryani',
+          image: ImagePath.biryaniDish,
+          description: 'Tender mutton with fragrant rice',
+          price: '\$25',
+          isPopular: false,
+        ),
+      ],
     ),
     const RestaurantModel(
       id: 'restaurant_3',
       name: 'Pizza Palace',
-      image: ImagePath.shopImage,
+      image: '', // No default image - will use signature dish
       deliveryTime: '20-25 min',
       rating: 4.7,
       address: '789 Italian Street, City',
@@ -46,11 +80,29 @@ class RestaurantService {
       reviewCount: 850,
       popularity: 4.7,
       isTopRated: true,
+      signatureDishes: [
+        SignatureDish(
+          id: 'dish_3_1',
+          name: 'Margherita Supreme',
+          image: ImagePath.pizzaDish,
+          description: 'Classic margherita with premium mozzarella',
+          price: '\$16',
+          isPopular: true,
+        ),
+        SignatureDish(
+          id: 'dish_3_2',
+          name: 'Creamy Alfredo Pasta',
+          image: ImagePath.pastaDish,
+          description: 'Rich and creamy pasta with chicken',
+          price: '\$14',
+          isPopular: false,
+        ),
+      ],
     ),
     const RestaurantModel(
       id: 'restaurant_4',
       name: 'Burger Junction',
-      image: ImagePath.shopImage,
+      image: '', // No default image - will use signature dish
       deliveryTime: '15-20 min',
       rating: 4.6,
       address: '321 Fast Food Lane, City',
@@ -60,11 +112,29 @@ class RestaurantService {
       reviewCount: 750,
       popularity: 4.6,
       isTopRated: true,
+      signatureDishes: [
+        SignatureDish(
+          id: 'dish_4_1',
+          name: 'Double Cheese Burger',
+          image: ImagePath.burgerDish,
+          description: 'Juicy beef patty with double cheese',
+          price: '\$12',
+          isPopular: true,
+        ),
+        SignatureDish(
+          id: 'dish_4_2',
+          name: 'Crispy Chicken Sandwich',
+          image: ImagePath.sandwichDish,
+          description: 'Crispy fried chicken with fresh veggies',
+          price: '\$10',
+          isPopular: false,
+        ),
+      ],
     ),
     const RestaurantModel(
       id: 'restaurant_5',
       name: 'Chinese Garden',
-      image: ImagePath.shopImage,
+      image: '', // No default image - will use signature dish
       deliveryTime: '35-40 min',
       rating: 4.5,
       address: '654 Asian Plaza, City',
@@ -74,6 +144,24 @@ class RestaurantService {
       reviewCount: 620,
       popularity: 4.5,
       isTopRated: true,
+      signatureDishes: [
+        SignatureDish(
+          id: 'dish_5_1',
+          name: 'Special Fried Rice',
+          image: ImagePath.friedRice,
+          description: 'Wok-tossed rice with chicken and vegetables',
+          price: '\$13',
+          isPopular: true,
+        ),
+        SignatureDish(
+          id: 'dish_5_2',
+          name: 'Hakka Noodles',
+          image: ImagePath.noodlesDish,
+          description: 'Stir-fried noodles with authentic spices',
+          price: '\$11',
+          isPopular: false,
+        ),
+      ],
     ),
     const RestaurantModel(
       id: 'restaurant_6',
@@ -106,7 +194,7 @@ class RestaurantService {
     const RestaurantModel(
       id: 'restaurant_8',
       name: 'Royal Biryani',
-      image: ImagePath.shopImage,
+      image: '', // No default image - will use signature dish
       deliveryTime: '40-45 min',
       rating: 4.7,
       address: '258 Royal Court, City',
@@ -116,6 +204,24 @@ class RestaurantService {
       reviewCount: 680,
       popularity: 4.7,
       isTopRated: true,
+      signatureDishes: [
+        SignatureDish(
+          id: 'dish_8_1',
+          name: 'Royal Dum Biryani',
+          image: ImagePath.biryaniDish,
+          description: 'Premium biryani with royal spices',
+          price: '\$24',
+          isPopular: true,
+        ),
+        SignatureDish(
+          id: 'dish_8_2',
+          name: 'Mughlai Chicken',
+          image: ImagePath.tandooriDish,
+          description: 'Traditional Mughlai style chicken',
+          price: '\$20',
+          isPopular: false,
+        ),
+      ],
     ),
     const RestaurantModel(
       id: 'restaurant_9',
@@ -134,7 +240,7 @@ class RestaurantService {
     const RestaurantModel(
       id: 'restaurant_10',
       name: 'Maharaja Kitchen',
-      image: ImagePath.profileIcon,
+      image: ImagePath.shopImage,
       deliveryTime: '35-40 min',
       rating: 4.6,
       address: '741 Heritage Lane, City',
@@ -148,7 +254,7 @@ class RestaurantService {
     const RestaurantModel(
       id: 'restaurant_11',
       name: 'Street Food Corner',
-      image: ImagePath.profileIcon,
+      image: ImagePath.shopImage,
       deliveryTime: '20-25 min',
       rating: 4.1,
       address: '852 Street Food Hub, City',
@@ -162,7 +268,7 @@ class RestaurantService {
     const RestaurantModel(
       id: 'restaurant_12',
       name: 'Golden Dragon',
-      image: ImagePath.profileIcon,
+      image: ImagePath.shopImage,
       deliveryTime: '30-35 min',
       rating: 4.4,
       address: '963 Golden Plaza, City',
@@ -176,7 +282,7 @@ class RestaurantService {
     const RestaurantModel(
       id: 'restaurant_13',
       name: 'Italian Corner',
-      image: ImagePath.profileIcon,
+      image: ImagePath.shopImage,
       deliveryTime: '25-30 min',
       rating: 4.5,
       address: '159 Europe Street, City',
@@ -190,7 +296,7 @@ class RestaurantService {
     const RestaurantModel(
       id: 'restaurant_14',
       name: 'Grill House',
-      image: ImagePath.profileIcon,
+      image: ImagePath.shopImage,
       deliveryTime: '20-25 min',
       rating: 4.3,
       address: '357 Grill Avenue, City',
@@ -204,7 +310,7 @@ class RestaurantService {
     const RestaurantModel(
       id: 'restaurant_15',
       name: 'Hyderabadi Biryani',
-      image: ImagePath.profileIcon,
+      image: '', // No default image - will use signature dish
       deliveryTime: '45-50 min',
       rating: 4.8,
       address: '468 Hyderabad Street, City',
@@ -214,11 +320,29 @@ class RestaurantService {
       reviewCount: 920,
       popularity: 4.8,
       isTopRated: true,
+      signatureDishes: [
+        SignatureDish(
+          id: 'dish_15_1',
+          name: 'Authentic Hyderabadi Biryani',
+          image: ImagePath.biryaniDish,
+          description: 'Traditional Hyderabadi dum biryani',
+          price: '\$26',
+          isPopular: true,
+        ),
+        SignatureDish(
+          id: 'dish_15_2',
+          name: 'Mutton Dum Biryani',
+          image: ImagePath.biryaniDish,
+          description: 'Slow-cooked mutton biryani',
+          price: '\$28',
+          isPopular: false,
+        ),
+      ],
     ),
     const RestaurantModel(
       id: 'restaurant_16',
       name: 'Sandwich Express',
-      image: ImagePath.profileIcon,
+      image: ImagePath.shopImage,
       deliveryTime: '15-20 min',
       rating: 4.0,
       address: '579 Quick Lane, City',
@@ -232,7 +356,7 @@ class RestaurantService {
     const RestaurantModel(
       id: 'restaurant_17',
       name: 'Wok This Way',
-      image: ImagePath.profileIcon,
+      image: ImagePath.shopImage,
       deliveryTime: '25-30 min',
       rating: 4.2,
       address: '681 Wok Street, City',
@@ -246,7 +370,7 @@ class RestaurantService {
     const RestaurantModel(
       id: 'restaurant_18',
       name: 'Burger King',
-      image: ImagePath.profileIcon,
+      image: ImagePath.shopImage,
       deliveryTime: '20-25 min',
       rating: 4.1,
       address: '792 King Road, City',
@@ -260,7 +384,7 @@ class RestaurantService {
     const RestaurantModel(
       id: 'restaurant_19',
       name: 'Pizza Hut',
-      image: ImagePath.profileIcon,
+      image: ImagePath.shopImage,
       deliveryTime: '30-35 min',
       rating: 4.2,
       address: '803 Pizza Lane, City',
@@ -274,7 +398,7 @@ class RestaurantService {
     const RestaurantModel(
       id: 'restaurant_20',
       name: 'Noodle House',
-      image: ImagePath.profileIcon,
+      image: ImagePath.shopImage,
       deliveryTime: '25-30 min',
       rating: 4.0,
       address: '914 Noodle Street, City',
@@ -288,7 +412,7 @@ class RestaurantService {
     const RestaurantModel(
       id: 'restaurant_21',
       name: 'Biriyani Brothers',
-      image: ImagePath.profileIcon,
+      image: ImagePath.shopImage,
       deliveryTime: '35-40 min',
       rating: 4.5,
       address: '125 Brothers Lane, City',
@@ -302,7 +426,7 @@ class RestaurantService {
     const RestaurantModel(
       id: 'restaurant_22',
       name: 'McDonalds',
-      image: ImagePath.profileIcon,
+      image: ImagePath.shopImage,
       deliveryTime: '15-20 min',
       rating: 4.0,
       address: '236 Golden Arches, City',
@@ -316,7 +440,7 @@ class RestaurantService {
     const RestaurantModel(
       id: 'restaurant_23',
       name: 'Dominos',
-      image: ImagePath.profileIcon,
+      image: ImagePath.shopImage,
       deliveryTime: '25-30 min',
       rating: 4.1,
       address: '347 Pizza Plaza, City',
@@ -330,7 +454,7 @@ class RestaurantService {
     const RestaurantModel(
       id: 'restaurant_24',
       name: 'Subway',
-      image: ImagePath.profileIcon,
+      image: ImagePath.shopImage,
       deliveryTime: '10-15 min',
       rating: 3.9,
       address: '458 Sub Street, City',
@@ -344,7 +468,7 @@ class RestaurantService {
     const RestaurantModel(
       id: 'restaurant_25',
       name: 'KFC',
-      image: ImagePath.profileIcon,
+      image: ImagePath.shopImage,
       deliveryTime: '20-25 min',
       rating: 4.0,
       address: '569 Chicken Lane, City',
@@ -357,21 +481,16 @@ class RestaurantService {
     ),
   ];
 
-  
   Future<List<RestaurantModel>> getAllRestaurants() async {
     return _restaurants;
   }
 
-  
   Future<List<RestaurantModel>> getTopRestaurants({int limit = 25}) async {
     final restaurants = await getAllRestaurants();
-    restaurants.sort(
-      (a, b) => b.rating.compareTo(a.rating),
-    ); 
+    restaurants.sort((a, b) => b.rating.compareTo(a.rating));
     return restaurants.take(limit).toList();
   }
 
-  
   Future<List<RestaurantModel>> getRestaurantsByCategory(
     String categoryId,
   ) async {
@@ -380,7 +499,6 @@ class RestaurantService {
         .toList();
   }
 
-  
   Future<RestaurantModel?> getRestaurantById(String restaurantId) async {
     try {
       return _restaurants.firstWhere(
@@ -391,7 +509,6 @@ class RestaurantService {
     }
   }
 
-  
   Future<List<RestaurantModel>> getTopRatedRestaurants({int limit = 10}) async {
     final topRated = _restaurants
         .where((restaurant) => restaurant.isTopRated)
@@ -400,7 +517,6 @@ class RestaurantService {
     return topRated.take(limit).toList();
   }
 
-  
   Future<List<RestaurantModel>> searchRestaurants(String query) async {
     final lowercaseQuery = query.toLowerCase();
     return _restaurants.where((restaurant) {

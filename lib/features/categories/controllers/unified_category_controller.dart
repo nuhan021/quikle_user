@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'dart:math';
 import 'package:get/get.dart';
 import 'package:quikle_user/features/home/data/models/category_model.dart';
 import 'package:quikle_user/features/home/data/models/product_model.dart';
@@ -44,11 +46,70 @@ class UnifiedCategoryController extends GetxController {
   final priceRange = RxList<double>([0.0, 100.0]);
   final showOnlyInStock = false.obs;
 
+  // Search placeholder functionality
+  final currentPlaceholder = "Search products...".obs;
+  Timer? _placeholderTimer;
+
   late CategoryModel currentCategory;
   bool get isGroceryCategory => currentCategory.id == '2';
   bool get isFoodCategory => currentCategory.id == '1';
 
   bool get shouldShowCombinedSection => selectedSubcategory.value != null;
+
+  // Category-specific placeholder items
+  Map<String, List<String>> get categoryPlaceholders => {
+    '1': [
+      // Food category
+      'biryani',
+      'pizza',
+      'burger',
+      'pasta',
+      'sushi',
+      'tacos',
+      'noodles',
+      'sandwich',
+      'ice cream',
+      'coffee',
+    ],
+    '2': [
+      // Grocery category
+      'rice',
+      'milk',
+      'bread',
+      'fruits',
+      'vegetables',
+      'oil',
+      'flour',
+      'eggs',
+      'cheese',
+      'yogurt',
+    ],
+    '3': [
+      // Medicine category
+      'paracetamol',
+      'vitamins',
+      'cough syrup',
+      'bandages',
+      'antiseptic',
+      'thermometer',
+      'pain relief',
+      'antibiotics',
+      'first aid',
+      'supplements',
+    ],
+    'default': [
+      'products',
+      'items',
+      'essentials',
+      'basics',
+      'quality products',
+    ],
+  };
+
+  List<String> get currentCategoryPlaceholders {
+    return categoryPlaceholders[currentCategory.id] ??
+        categoryPlaceholders['default']!;
+  }
 
   @override
   void onInit() {
@@ -58,8 +119,35 @@ class UnifiedCategoryController extends GetxController {
     if (args != null && args['category'] != null) {
       currentCategory = args['category'] as CategoryModel;
       categoryTitle.value = currentCategory.title;
+      _startPlaceholderRotation();
       _loadCategoryData();
     }
+  }
+
+  @override
+  void onClose() {
+    _placeholderTimer?.cancel();
+    super.onClose();
+  }
+
+  void _startPlaceholderRotation() {
+    // Set initial placeholder
+    final placeholders = currentCategoryPlaceholders;
+    if (placeholders.isNotEmpty) {
+      final randomIndex = Random().nextInt(placeholders.length);
+      final randomItem = placeholders[randomIndex];
+      currentPlaceholder.value = "Search for '$randomItem'";
+    }
+
+    // Start rotation timer
+    _placeholderTimer = Timer.periodic(const Duration(seconds: 4), (timer) {
+      final placeholders = currentCategoryPlaceholders;
+      if (placeholders.isNotEmpty) {
+        final randomIndex = Random().nextInt(placeholders.length);
+        final randomItem = placeholders[randomIndex];
+        currentPlaceholder.value = "Search for '$randomItem'";
+      }
+    });
   }
 
   ShopModel? getShopForProduct(ProductModel product) {
@@ -186,23 +274,15 @@ class UnifiedCategoryController extends GetxController {
 
       if (isGroceryCategory) {
         if (allCategories.contains(subcategory)) {
-          selectedMainCategory.value = subcategory;
-          selectedSubcategory.value = null;
-          selectedFilter.value = null;
-          showingAllProducts.value = false;
-
-          final subCategories = await _categoryService.fetchSubcategories(
-            currentCategory.id,
-            parentSubcategoryId: subcategory.id,
+          // Navigate to new category products screen
+          Get.toNamed(
+            AppRoute.getCategoryProducts(),
+            arguments: {
+              'category': currentCategory,
+              'mainCategory': subcategory,
+            },
           );
-          filterSubcategories.value = subCategories;
-
-          final products = await _categoryService.fetchProductsByMainCategory(
-            subcategory.id,
-          );
-          allProducts.value = products;
-          displayProducts.value = products;
-          productsTitle.value = 'All ${subcategory.title}';
+          return;
         } else {
           selectedSubcategory.value = subcategory;
           showingAllProducts.value = false;
