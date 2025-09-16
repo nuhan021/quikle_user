@@ -27,7 +27,7 @@ class RestaurantPageScreen extends StatefulWidget {
 
 class _RestaurantPageScreenState extends State<RestaurantPageScreen>
     with TickerProviderStateMixin {
-  // Animation controller for navbar
+  
   late AnimationController _navController;
   final GlobalKey _navKey = GlobalKey();
   double _navBarHeight = 0.0;
@@ -587,7 +587,7 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen>
                 ],
               ),
 
-              // Navigation bar
+              
               Positioned(
                 left: 0,
                 right: 0,
@@ -595,13 +595,13 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen>
                 child: KeyedSubtree(
                   key: _navKey,
                   child: CustomNavBar(
-                    currentIndex: -1, // No active tab for restaurant details
+                    currentIndex: -1, 
                     onTap: _onNavItemTapped,
                   ),
                 ),
               ),
 
-              // Floating cart button
+              
               AnimatedBuilder(
                 animation: _navController,
                 builder: (context, _) {

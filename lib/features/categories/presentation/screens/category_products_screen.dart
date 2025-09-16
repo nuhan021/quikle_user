@@ -141,7 +141,7 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
                 ),
               ),
 
-              // Floating cart button
+              
               AnimatedBuilder(
                 animation: _navController,
                 builder: (context, _) {

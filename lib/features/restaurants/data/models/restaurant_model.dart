@@ -59,7 +59,7 @@ class RestaurantModel {
   }
 
   String getDisplayImage() {
-    // If restaurant has signature dishes and no specific image, use signature dish
+    
     if (signatureDishes.isNotEmpty && image.isEmpty) {
       final random = Random();
       final selectedDish =
@@ -67,7 +67,7 @@ class RestaurantModel {
       return selectedDish.image;
     }
 
-    // Otherwise use restaurant image or fallback
+    
     return image.isNotEmpty ? image : ImagePath.profileIcon;
   }
 

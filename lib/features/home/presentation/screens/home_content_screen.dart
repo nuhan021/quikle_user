@@ -24,7 +24,7 @@ class HomeContentScreen extends StatelessWidget {
       ),
     );
 
-    // Constant height for search + categories header
+    
     final double headerHeight = 0.20.sh;
 
     return Scaffold(
@@ -48,7 +48,7 @@ class HomeContentScreen extends StatelessWidget {
                     ),
                   ),
 
-                  // Header with only top padding
+                  
                   SliverPersistentHeader(
                     pinned: true,
                     delegate: _FixedHeaderDelegate(
@@ -161,7 +161,7 @@ class HomeContentScreen extends StatelessWidget {
 
 class _FixedHeaderDelegate extends SliverPersistentHeaderDelegate {
   _FixedHeaderDelegate({required this.child, required this.height}) {
-    // initialize with "true" since header is visible at start
+    
     appBarVisibleNotifier = ValueNotifier<bool>(true);
   }
 
@@ -184,7 +184,7 @@ class _FixedHeaderDelegate extends SliverPersistentHeaderDelegate {
   ) {
     final bool appBarVisible = !(overlapsContent || shrinkOffset > 0.0);
 
-    // notify only if value changes
+    
     if (appBarVisibleNotifier.value != appBarVisible) {
       appBarVisibleNotifier.value = appBarVisible;
     }

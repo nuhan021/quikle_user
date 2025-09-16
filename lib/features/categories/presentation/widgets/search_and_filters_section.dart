@@ -49,7 +49,7 @@ class SearchAndFiltersSection extends StatelessWidget {
                     child: Stack(
                       alignment: Alignment.centerLeft,
                       children: [
-                        // Dynamic hint display
+                        
                         if (dynamicHint != null &&
                             (searchController?.text.isEmpty ?? true))
                           Obx(() {
@@ -88,7 +88,7 @@ class SearchAndFiltersSection extends StatelessWidget {
                             );
                           }),
 
-                        // Text field
+                        
                         TextField(
                           controller: searchController,
                           onChanged: onSearchChanged,

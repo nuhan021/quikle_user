@@ -11,6 +11,9 @@ import 'package:quikle_user/features/payout/data/models/payment_method_model.dar
 import 'package:quikle_user/features/profile/data/models/shipping_address_model.dart';
 
 class OrderService {
+  
+  static List<OrderModel>? _persistentOrders;
+
   List<OrderModel> _getMockOrders() {
     return [
       OrderModel(
@@ -81,9 +84,9 @@ class OrderService {
         subtotal: 31.0,
         deliveryFee: 0.0,
         total: 31.0,
-        orderDate: DateTime.now().subtract(const Duration(hours: 2)),
-        status: OrderStatus.pending,
-        estimatedDelivery: DateTime.now().add(const Duration(minutes: 45)),
+        orderDate: DateTime.now().subtract(const Duration(minutes: 30)),
+        status: OrderStatus.outForDelivery,
+        estimatedDelivery: DateTime.now().add(const Duration(minutes: 15)),
       ),
       OrderModel(
         orderId: '#12345',
@@ -262,15 +265,63 @@ class OrderService {
 
   Future<List<OrderModel>> getUserOrders(String userId) async {
     await Future.delayed(const Duration(milliseconds: 500));
-    return _getMockOrders().where((order) => order.userId == userId).toList();
+
+    print('OrderService: Getting orders for user $userId');
+
+    
+    final mockOrders = _getMockOrders()
+        .where((order) => order.userId == userId)
+        .toList();
+    final persistentOrders =
+        _persistentOrders?.where((order) => order.userId == userId).toList() ??
+        [];
+
+    print(
+      'OrderService: Found ${mockOrders.length} mock orders and ${persistentOrders.length} persistent orders',
+    );
+
+    
+    final allOrders = [...persistentOrders, ...mockOrders];
+    allOrders.sort((a, b) => b.orderDate.compareTo(a.orderDate));
+
+    print('OrderService: Returning ${allOrders.length} total orders');
+
+    return allOrders;
   }
 
   Future<OrderModel?> getOrderById(String orderId) async {
     await Future.delayed(const Duration(milliseconds: 300));
     try {
+      
+      if (_persistentOrders != null) {
+        try {
+          return _persistentOrders!.firstWhere(
+            (order) => order.orderId == orderId,
+          );
+        } catch (e) {
+          
+        }
+      }
+
+      
       return _getMockOrders().firstWhere((order) => order.orderId == orderId);
     } catch (e) {
       return null;
     }
+  }
+
+  
+  Future<void> addOrder(OrderModel order) async {
+    await Future.delayed(
+      const Duration(milliseconds: 200),
+    ); 
+
+    _persistentOrders ??= <OrderModel>[];
+    _persistentOrders!.add(order);
+
+    print(
+      'OrderService: Added order ${order.orderId}. Total persistent orders: ${_persistentOrders!.length}',
+    );
+    print('OrderService: Order has ${order.items.length} items');
   }
 }

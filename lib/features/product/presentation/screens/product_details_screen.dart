@@ -509,7 +509,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen>
                 ],
               ),
 
-              // Navigation bar
+              
               Positioned(
                 left: 0,
                 right: 0,
@@ -517,13 +517,13 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen>
                 child: KeyedSubtree(
                   key: _navKey,
                   child: CustomNavBar(
-                    currentIndex: -1, // No active tab for product details
+                    currentIndex: -1, 
                     onTap: _onNavItemTapped,
                   ),
                 ),
               ),
 
-              // Floating cart button
+              
               AnimatedBuilder(
                 animation: _navController,
                 builder: (context, _) {

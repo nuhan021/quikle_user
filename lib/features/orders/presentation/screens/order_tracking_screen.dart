@@ -5,9 +5,9 @@ import 'package:quikle_user/features/orders/controllers/order_tracking_controlle
 import 'package:quikle_user/features/orders/data/models/order_model.dart';
 import 'package:quikle_user/features/orders/presentation/widgets/order_tracking_app_bar.dart';
 import 'package:quikle_user/features/orders/presentation/widgets/order_tracking_map_section.dart';
-import 'package:quikle_user/features/orders/presentation/widgets/order_details_section.dart';
 import 'package:quikle_user/features/orders/presentation/widgets/time_estimation_section.dart';
 import 'package:quikle_user/features/orders/presentation/widgets/progress_section.dart';
+import 'package:quikle_user/features/orders/presentation/widgets/order_tracking_summary.dart';
 
 class OrderTrackingScreen extends StatelessWidget {
   final OrderModel order;
@@ -16,7 +16,6 @@ class OrderTrackingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    
     OrderTrackingController controller;
     if (Get.isRegistered<OrderTrackingController>()) {
       controller = Get.find<OrderTrackingController>();
@@ -24,7 +23,6 @@ class OrderTrackingScreen extends StatelessWidget {
       controller = Get.put(OrderTrackingController());
     }
 
-    
     controller.initializeWithOrder(order);
 
     return Scaffold(
@@ -42,7 +40,7 @@ class OrderTrackingScreen extends StatelessWidget {
 
                 SizedBox(height: 16.h),
 
-                OrderDetailsSection(order: order, controller: controller),
+                OrderTrackingSummary(order: order, controller: controller),
 
                 SizedBox(height: 16.h),
 

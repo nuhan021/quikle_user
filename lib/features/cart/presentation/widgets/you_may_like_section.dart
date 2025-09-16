@@ -81,7 +81,7 @@ class _YouMayLikeSectionState extends State<YouMayLikeSection> {
               crossAxisCount: 2,
               crossAxisSpacing: 12.w,
               mainAxisSpacing: 12.h,
-              childAspectRatio: 0.78.h,
+              childAspectRatio: 1.h,
             ),
             itemCount: _products.length,
             itemBuilder: (context, index) {

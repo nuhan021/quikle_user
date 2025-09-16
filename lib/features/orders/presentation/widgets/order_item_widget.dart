@@ -29,7 +29,7 @@ class OrderItemWidget extends StatelessWidget {
                   return SizedBox(
                     width: 60.w,
                     height: 60.h,
-                    
+
                     child: Icon(Icons.image, color: Colors.white, size: 24.r),
                   );
                 },
@@ -42,7 +42,7 @@ class OrderItemWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  item.product?.title ?? 'Product Name',
+                  item.product.title,
                   style: getTextStyle(
                     font: CustomFonts.inter,
                     fontSize: 16.sp,
@@ -57,7 +57,7 @@ class OrderItemWidget extends StatelessWidget {
                   text: TextSpan(
                     children: [
                       TextSpan(
-                        text: '${item.product.title} x ${item.quantity ?? 1}',
+                        text: '${item.product.title} x ${item.quantity}',
                         style: getTextStyle(
                           font: CustomFonts.inter,
                           fontSize: 14.sp,
@@ -75,7 +75,7 @@ class OrderItemWidget extends StatelessWidget {
                         ),
                       ),
                       TextSpan(
-                        text: '${item.product?.price ?? '0.00'}',
+                        text: '${item.product.price}',
                         style: getTextStyle(
                           font: CustomFonts.inter,
                           fontSize: 14.sp,
