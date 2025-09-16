@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import '../data/models/cart_item_model.dart';
 import '../data/services/cart_service.dart';
 import '../../home/data/models/product_model.dart';
+import '../presentation/widgets/cart_bottom_section.dart';
 
 class CartController extends GetxController {
   final CartService _cartService = CartService();
@@ -58,6 +59,9 @@ class CartController extends GetxController {
     _cartService.clearCart();
     _updateCartData();
 
+    
+    CartBottomSection.clearSelectedAddress();
+
     Get.snackbar(
       'Cart Cleared',
       'All items have been removed from your cart.',
@@ -73,7 +77,13 @@ class CartController extends GetxController {
 
   void onCheckout() {
     if (hasItems) {
-      Get.toNamed('/checkout');
+      
+      
+      Get.snackbar(
+        'Ready for Checkout',
+        'Please select payment method and place order.',
+        duration: const Duration(seconds: 2),
+      );
     } else {
       Get.snackbar(
         'Empty Cart',

@@ -24,7 +24,7 @@ class CategoryProductsController extends GetxController {
   final selectedSubcategory = Rxn<SubcategoryModel>();
   final searchQuery = ''.obs;
 
-  // Search placeholder functionality
+  
   final currentPlaceholder = "Search products...".obs;
   Timer? _placeholderTimer;
 
@@ -32,10 +32,10 @@ class CategoryProductsController extends GetxController {
   late SubcategoryModel currentMainCategory;
   bool get isGroceryCategory => currentCategory.id == '2';
 
-  // Category-specific placeholder items
+  
   Map<String, List<String>> get categoryPlaceholders => {
     '1': [
-      // Food category
+      
       'biryani',
       'pizza',
       'burger',
@@ -48,7 +48,7 @@ class CategoryProductsController extends GetxController {
       'coffee',
     ],
     '2': [
-      // Grocery category
+      
       'rice',
       'milk',
       'bread',
@@ -61,7 +61,7 @@ class CategoryProductsController extends GetxController {
       'yogurt',
     ],
     '3': [
-      // Medicine category
+      
       'paracetamol',
       'vitamins',
       'cough syrup',
@@ -108,7 +108,7 @@ class CategoryProductsController extends GetxController {
   }
 
   void _startPlaceholderRotation() {
-    // Set initial placeholder
+    
     final placeholders = currentCategoryPlaceholders;
     if (placeholders.isNotEmpty) {
       final randomIndex = Random().nextInt(placeholders.length);
@@ -116,7 +116,7 @@ class CategoryProductsController extends GetxController {
       currentPlaceholder.value = "Search for '$randomItem'";
     }
 
-    // Start rotation timer
+    
     _placeholderTimer = Timer.periodic(const Duration(seconds: 4), (timer) {
       final placeholders = currentCategoryPlaceholders;
       if (placeholders.isNotEmpty) {
@@ -171,14 +171,14 @@ class CategoryProductsController extends GetxController {
       isLoading.value = true;
       await _loadShopData();
 
-      // Load subcategories for the main category
+      
       final subCategories = await _categoryService.fetchSubcategories(
         currentCategory.id,
         parentSubcategoryId: currentMainCategory.id,
       );
       subcategories.value = subCategories;
 
-      // Load all products for this main category
+      
       final products = await _categoryService.fetchProductsByMainCategory(
         currentMainCategory.id,
       );
@@ -193,7 +193,7 @@ class CategoryProductsController extends GetxController {
 
   void onSubcategoryTap(SubcategoryModel subcategory) {
     if (selectedSubcategory.value?.id == subcategory.id) {
-      // Deselect if same subcategory is tapped
+      
       selectedSubcategory.value = null;
       displayProducts.value = allProducts;
       return;

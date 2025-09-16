@@ -7,6 +7,7 @@ import 'package:quikle_user/features/home/presentation/screens/home_content_scre
 import 'package:quikle_user/features/orders/presentation/screens/orders_screen.dart';
 import 'package:quikle_user/features/categories/presentation/screens/categories_screen.dart';
 import 'package:quikle_user/features/profile/presentation/screens/profile_screen.dart';
+import 'package:quikle_user/features/orders/presentation/widgets/live_order_indicator.dart';
 
 class MainScreen extends StatefulWidget {
   final int initialIndex;
@@ -168,12 +169,29 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                         ),
                       );
                     },
-                    child: KeyedSubtree(
-                      key: _navKey,
-                      child: CustomNavBar(
-                        currentIndex: _currentIndex,
-                        onTap: _onNavItemTapped,
-                      ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        
+                        Container(
+                          padding: EdgeInsets.only(
+                            left: 16.0,
+                            right:
+                                88.0, 
+                            bottom: 8.0,
+                          ),
+                          child: const LiveOrderIndicator(),
+                        ),
+
+                        
+                        KeyedSubtree(
+                          key: _navKey,
+                          child: CustomNavBar(
+                            currentIndex: _currentIndex,
+                            onTap: _onNavItemTapped,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),

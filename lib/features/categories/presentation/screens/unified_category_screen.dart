@@ -120,7 +120,7 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
                                     dynamicHint: controller.currentPlaceholder,
                                   ),
 
-                                  //SizedBox(height: 8.h),
+                                  
                                   PopularItemsSection(
                                     subcategories: controller.isGroceryCategory
                                         ? controller.allCategories
@@ -173,7 +173,7 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
                                   OfferBanner(),
                                   SizedBox(height: 16.h),
                                   _buildContent(controller),
-                                  //SizedBox(height: 32.h),
+                                  
                                 ],
                               ),
                             );
@@ -185,7 +185,7 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
                 ],
               ),
 
-              // Navigation bar
+              
               Positioned(
                 left: 0,
                 right: 0,
@@ -196,7 +196,7 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
                 ),
               ),
 
-              // Floating cart button
+              
               AnimatedBuilder(
                 animation: _navController,
                 builder: (context, _) {
@@ -243,7 +243,7 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
 
         if (!controller.isGroceryCategory &&
             controller.recommendedProducts.isNotEmpty) ...[
-          // SizedBox(height: 24.h),
+          
           ProductGridSection(
             title: 'Recommended for You',
             products: controller.recommendedProducts,
@@ -350,7 +350,7 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
             ),
           ),
 
-          //SizedBox(height: 16.h),
+          
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),

@@ -71,6 +71,7 @@ class OrderSummarySection extends StatelessWidget {
 
             if (cartItems.isNotEmpty)
               ListView.separated(
+                padding: EdgeInsets.zero, 
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: cartItems.length,
@@ -78,13 +79,18 @@ class OrderSummarySection extends StatelessWidget {
                     Divider(height: 1, color: dividerColor),
                 itemBuilder: (_, index) {
                   final item = cartItems[index];
+                  final isLast = index == cartItems.length - 1;
+
                   final unitPrice = double.parse(
                     item.product.price.replaceAll('\$', '').trim(),
                   );
                   final lineTotal = unitPrice * item.quantity;
 
                   return Padding(
-                    padding: EdgeInsets.symmetric(vertical: 12.h),
+                    padding: EdgeInsets.only(
+                      top: 12.h,
+                      bottom: isLast ? 0 : 12.h,
+                    ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [

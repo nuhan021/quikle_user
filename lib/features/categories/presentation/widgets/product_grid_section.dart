@@ -84,7 +84,7 @@ class ProductGridSection extends StatelessWidget {
               ),
             ),
           ),
-        //if (title.isNotEmpty) SizedBox(height: 16.h),
+        
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 18.w),
           child: GridView.builder(

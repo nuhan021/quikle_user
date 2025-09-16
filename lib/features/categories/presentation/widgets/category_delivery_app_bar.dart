@@ -59,7 +59,7 @@ class CategoryDeliveryAppBar extends StatelessWidget
       onBackTap: onBackTap,
       titleWidget: Row(
         children: [
-          // Category title
+          
           Expanded(
             flex: 2,
             child: Padding(
@@ -88,7 +88,7 @@ class CategoryDeliveryAppBar extends StatelessWidget
             ),
           ),
 
-          // Delivery location section
+          
           Expanded(
             flex: 3,
             child: GetBuilder<AddressController>(
@@ -98,7 +98,7 @@ class CategoryDeliveryAppBar extends StatelessWidget
 
                 return GestureDetector(
                   onTap: () async {
-                    // Handle address selection similar to home page
+                    
                     if (addressController.addresses.isEmpty) {
                       Get.toNamed(AppRoute.getAddAddress());
                       return;

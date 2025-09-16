@@ -15,7 +15,6 @@ class CartItemsSection extends StatelessWidget {
     final cartController = Get.find<CartController>();
 
     return Container(
-      
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12.r),
@@ -37,13 +36,21 @@ class CartItemsSection extends StatelessWidget {
           ),
           Obx(() {
             return ListView.builder(
+              padding: EdgeInsets.only(bottom: 8.h),
+              primary: false,
               shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
+              physics: const NeverScrollableScrollPhysics(),
               itemCount: cartController.cartItems.length,
               itemBuilder: (context, index) {
                 final cartItem = cartController.cartItems[index];
+                final isLast = index == cartController.cartItems.length - 1;
+
                 return Container(
-                  margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                  margin: EdgeInsets.only(
+                    left: 16.w,
+                    right: 16.w,
+                    bottom: isLast ? 0 : 8.h,
+                  ),
                   padding: EdgeInsets.all(12.w),
                   decoration: BoxDecoration(
                     color: AppColors.homeGrey,
@@ -79,10 +86,10 @@ class CartItemsSection extends StatelessWidget {
                         height: 80.h,
                         color: Colors.grey[400],
                       ),
-
                       SizedBox(width: 12.w),
                       Expanded(
                         child: Column(
+                          mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
@@ -126,7 +133,7 @@ class CartItemsSection extends StatelessWidget {
                                     color: AppColors.featherGrey,
                                   ),
                                 ),
-                                Spacer(),
+                                const Spacer(),
                                 _buildQuantityControls(
                                   cartItem.quantity,
                                   () =>

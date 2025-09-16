@@ -46,7 +46,7 @@ class UnifiedCategoryController extends GetxController {
   final priceRange = RxList<double>([0.0, 100.0]);
   final showOnlyInStock = false.obs;
 
-  // Search placeholder functionality
+  
   final currentPlaceholder = "Search products...".obs;
   Timer? _placeholderTimer;
 
@@ -56,10 +56,10 @@ class UnifiedCategoryController extends GetxController {
 
   bool get shouldShowCombinedSection => selectedSubcategory.value != null;
 
-  // Category-specific placeholder items
+  
   Map<String, List<String>> get categoryPlaceholders => {
     '1': [
-      // Food category
+      
       'biryani',
       'pizza',
       'burger',
@@ -72,7 +72,7 @@ class UnifiedCategoryController extends GetxController {
       'coffee',
     ],
     '2': [
-      // Grocery category
+      
       'rice',
       'milk',
       'bread',
@@ -85,7 +85,7 @@ class UnifiedCategoryController extends GetxController {
       'yogurt',
     ],
     '3': [
-      // Medicine category
+      
       'paracetamol',
       'vitamins',
       'cough syrup',
@@ -131,7 +131,7 @@ class UnifiedCategoryController extends GetxController {
   }
 
   void _startPlaceholderRotation() {
-    // Set initial placeholder
+    
     final placeholders = currentCategoryPlaceholders;
     if (placeholders.isNotEmpty) {
       final randomIndex = Random().nextInt(placeholders.length);
@@ -139,7 +139,7 @@ class UnifiedCategoryController extends GetxController {
       currentPlaceholder.value = "Search for '$randomItem'";
     }
 
-    // Start rotation timer
+    
     _placeholderTimer = Timer.periodic(const Duration(seconds: 4), (timer) {
       final placeholders = currentCategoryPlaceholders;
       if (placeholders.isNotEmpty) {
@@ -274,7 +274,7 @@ class UnifiedCategoryController extends GetxController {
 
       if (isGroceryCategory) {
         if (allCategories.contains(subcategory)) {
-          // Navigate to new category products screen
+          
           Get.toNamed(
             AppRoute.getCategoryProducts(),
             arguments: {
