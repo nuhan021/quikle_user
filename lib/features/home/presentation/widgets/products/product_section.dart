@@ -29,13 +29,24 @@ class ProductSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final visibleCount = math.min(section.products.length, 6);
+
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 16.w),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
+          // Header
+          Container(
+            height: 32.h,
             padding: EdgeInsets.symmetric(horizontal: 12.w),
+            alignment: Alignment.center,
+            decoration: const BoxDecoration(
+              color: AppColors.homeGrey,
+              border: Border(
+                bottom: BorderSide(color: Color(0xFFEDEDED), width: 2),
+              ),
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -71,33 +82,31 @@ class ProductSection extends StatelessWidget {
             ),
           ),
 
-          Divider(thickness: 3.h, height: 3.h, color: const Color(0xFFEDEDED)),
-
-          SizedBox(
-            height: 330.h,
-            child: GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                crossAxisSpacing: 12.w,
-                mainAxisSpacing: 12.h,
-                childAspectRatio: 0.80,
-              ),
-              itemCount: math.min(section.products.length, 6),
-              itemBuilder: (context, index) {
-                final product = section.products[index];
-                return ProductItem(
-                  product: product,
-                  onTap: () => onProductTap(product),
-                  onAddToCart: () => onAddToCart(product),
-                  onFavoriteToggle: onFavoriteToggle != null
-                      ? () => onFavoriteToggle!(product)
-                      : null,
-                );
-              },
+          // Grid
+          GridView.builder(
+            padding: EdgeInsets.only(top: 12.h),
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3,
+              crossAxisSpacing: 12.w,
+              mainAxisSpacing: 12.h,
+              childAspectRatio: 0.80,
             ),
+            itemCount: visibleCount,
+            itemBuilder: (context, index) {
+              final product = section.products[index];
+              return ProductItem(
+                product: product,
+                onTap: () => onProductTap(product),
+                onAddToCart: () => onAddToCart(product),
+                onFavoriteToggle: onFavoriteToggle != null
+                    ? () => onFavoriteToggle!(product)
+                    : null,
+              );
+            },
           ),
+          SizedBox(height: 20.h),
         ],
       ),
     );

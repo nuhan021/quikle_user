@@ -84,7 +84,7 @@ class ProductGridSection extends StatelessWidget {
               ),
             ),
           ),
-        
+
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 18.w),
           child: GridView.builder(

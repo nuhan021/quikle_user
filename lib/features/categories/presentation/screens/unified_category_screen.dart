@@ -13,12 +13,9 @@ import 'package:quikle_user/core/common/widgets/common_app_bar.dart';
 import 'package:quikle_user/features/categories/presentation/widgets/search_and_filters_section.dart';
 import 'package:quikle_user/features/categories/presentation/widgets/popular_items_section.dart';
 import 'package:quikle_user/features/categories/presentation/widgets/product_grid_section.dart';
-import 'package:quikle_user/features/categories/presentation/widgets/sort_bottom_sheet.dart';
-import 'package:quikle_user/features/categories/presentation/widgets/filter_bottom_sheet.dart';
 import 'package:quikle_user/features/categories/presentation/widgets/category_product_item.dart';
 import 'package:quikle_user/features/restaurants/presentation/widgets/top_restaurants_section.dart';
 import 'package:quikle_user/features/home/presentation/widgets/banners/offer_banner.dart';
-import 'package:quikle_user/routes/app_routes.dart';
 
 class UnifiedCategoryScreen extends StatefulWidget {
   const UnifiedCategoryScreen({super.key});
@@ -120,7 +117,6 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
                                     dynamicHint: controller.currentPlaceholder,
                                   ),
 
-                                  
                                   PopularItemsSection(
                                     subcategories: controller.isGroceryCategory
                                         ? controller.allCategories
@@ -173,7 +169,6 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
                                   OfferBanner(),
                                   SizedBox(height: 16.h),
                                   _buildContent(controller),
-                                  
                                 ],
                               ),
                             );
@@ -185,7 +180,6 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
                 ],
               ),
 
-              
               Positioned(
                 left: 0,
                 right: 0,
@@ -196,7 +190,6 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
                 ),
               ),
 
-              
               AnimatedBuilder(
                 animation: _navController,
                 builder: (context, _) {
@@ -243,7 +236,6 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
 
         if (!controller.isGroceryCategory &&
             controller.recommendedProducts.isNotEmpty) ...[
-          
           ProductGridSection(
             title: 'Recommended for You',
             products: controller.recommendedProducts,
@@ -350,7 +342,6 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
             ),
           ),
 
-          
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -358,7 +349,7 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
               crossAxisCount: 3,
               crossAxisSpacing: 12.w,
               mainAxisSpacing: 12.h,
-              mainAxisExtent: 150.h,
+              childAspectRatio: 0.70.h,
             ),
             itemCount: controller.displayProducts.length,
             itemBuilder: (context, index) {

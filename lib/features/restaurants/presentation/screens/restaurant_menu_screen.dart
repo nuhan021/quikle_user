@@ -249,14 +249,7 @@ class _RestaurantMenuScreenState extends State<RestaurantMenuScreen> {
                                           arguments: {'product': product},
                                         );
                                       },
-                                      onAddToCart: () {
-                                        Get.snackbar(
-                                          'Added to Cart',
-                                          '${product.title} added to your cart',
-                                          snackPosition: SnackPosition.BOTTOM,
-                                          duration: const Duration(seconds: 2),
-                                        );
-                                      },
+                                      onAddToCart: () {},
                                       onFavoriteToggle: () {},
                                     );
                                   },

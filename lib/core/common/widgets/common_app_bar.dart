@@ -7,6 +7,9 @@ import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 
 class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
+  // ─────────────────── New field ───────────────────
+  final String? subtitle;
+
   final String title;
   final Widget? titleWidget;
   final VoidCallback? onNotificationTap;
@@ -23,6 +26,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
   const CommonAppBar({
     super.key,
     required this.title,
+    this.subtitle, // ← added
     this.titleWidget,
     this.onNotificationTap,
     this.onProfileTap,
@@ -84,6 +88,55 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
     return Row(mainAxisSize: MainAxisSize.min, children: items);
   }
 
+  // ─────────────────── Helper to build title / subtitle ───────────────────
+  Widget _buildTitleArea(Color txtColor) {
+    if (titleWidget != null) return titleWidget!;
+
+    if (subtitle != null && subtitle!.isNotEmpty) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: getTextStyle(
+              font: CustomFonts.obviously,
+              fontSize: 14.sp,
+              fontWeight: FontWeight.w600,
+              color: txtColor,
+            ),
+          ),
+          SizedBox(height: 2.h),
+          Text(
+            subtitle!,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: getTextStyle(
+              font: CustomFonts.inter,
+              fontSize: 11.sp,
+              fontWeight: FontWeight.w400,
+              color: txtColor.withOpacity(.70),
+            ),
+          ),
+        ],
+      );
+    }
+
+    return Text(
+      title,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style: getTextStyle(
+        font: CustomFonts.obviously,
+        fontSize: 14.sp,
+        fontWeight: FontWeight.w500,
+        color: txtColor,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
@@ -115,25 +168,11 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
                   )
                 else
                   SizedBox(width: 12.w),
-                if (isFromHome && addressWidget != null)
-                  Expanded(child: addressWidget!)
-                else
-                  Expanded(
-                    child:
-                        titleWidget ??
-                        Text(
-                          title,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: getTextStyle(
-                            font: CustomFonts.obviously,
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w500,
-                            color: _iconColor,
-                          ),
-                        ),
-                  ),
 
+                // Title area
+                Expanded(child: _buildTitleArea(_iconColor)),
+
+                // Actions / trailing icons
                 _buildTrailing(),
               ],
             ),

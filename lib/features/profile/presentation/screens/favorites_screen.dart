@@ -125,7 +125,6 @@ class FavoritesScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -181,16 +180,6 @@ class FavoritesScreen extends StatelessWidget {
 
   void _addToCart(product, CartController cartController) {
     cartController.addToCart(product);
-    Get.snackbar(
-      'Added to Cart',
-      '${product.title} has been added to your cart',
-      backgroundColor: AppColors.success,
-      colorText: Colors.white,
-      snackPosition: SnackPosition.BOTTOM,
-      duration: const Duration(seconds: 2),
-      margin: EdgeInsets.all(16.w),
-      borderRadius: 8.r,
-    );
   }
 
   void _toggleFavorite(product, FavoritesController controller) {

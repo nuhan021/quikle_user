@@ -46,7 +46,6 @@ class UnifiedCategoryController extends GetxController {
   final priceRange = RxList<double>([0.0, 100.0]);
   final showOnlyInStock = false.obs;
 
-  
   final currentPlaceholder = "Search products...".obs;
   Timer? _placeholderTimer;
 
@@ -56,10 +55,8 @@ class UnifiedCategoryController extends GetxController {
 
   bool get shouldShowCombinedSection => selectedSubcategory.value != null;
 
-  
   Map<String, List<String>> get categoryPlaceholders => {
     '1': [
-      
       'biryani',
       'pizza',
       'burger',
@@ -72,7 +69,6 @@ class UnifiedCategoryController extends GetxController {
       'coffee',
     ],
     '2': [
-      
       'rice',
       'milk',
       'bread',
@@ -85,7 +81,6 @@ class UnifiedCategoryController extends GetxController {
       'yogurt',
     ],
     '3': [
-      
       'paracetamol',
       'vitamins',
       'cough syrup',
@@ -131,7 +126,6 @@ class UnifiedCategoryController extends GetxController {
   }
 
   void _startPlaceholderRotation() {
-    
     final placeholders = currentCategoryPlaceholders;
     if (placeholders.isNotEmpty) {
       final randomIndex = Random().nextInt(placeholders.length);
@@ -139,7 +133,6 @@ class UnifiedCategoryController extends GetxController {
       currentPlaceholder.value = "Search for '$randomItem'";
     }
 
-    
     _placeholderTimer = Timer.periodic(const Duration(seconds: 4), (timer) {
       final placeholders = currentCategoryPlaceholders;
       if (placeholders.isNotEmpty) {
@@ -274,7 +267,6 @@ class UnifiedCategoryController extends GetxController {
 
       if (isGroceryCategory) {
         if (allCategories.contains(subcategory)) {
-          
           Get.toNamed(
             AppRoute.getCategoryProducts(),
             arguments: {
@@ -372,12 +364,6 @@ class UnifiedCategoryController extends GetxController {
 
   void onAddToCart(ProductModel product) {
     _cartController.addToCart(product);
-    Get.snackbar(
-      'Added to Cart',
-      '${product.title} has been added to your cart',
-      snackPosition: SnackPosition.BOTTOM,
-      duration: const Duration(seconds: 2),
-    );
   }
 
   void onFavoriteToggle(ProductModel product) {
