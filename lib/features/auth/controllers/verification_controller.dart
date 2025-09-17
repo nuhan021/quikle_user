@@ -79,19 +79,19 @@ class VerificationController extends GetxController {
         final response = await _auth.verifyOtp(phone, code);
 
         if (response.isSuccess) {
-          String message = 'Phone number verified successfully';
-          if (response.responseData != null &&
-              response.responseData['message'] != null) {
-            message = response.responseData['message'].toString();
-          }
+          // String message = 'Phone number verified successfully';
+          // if (response.responseData != null &&
+          //     response.responseData['message'] != null) {
+          //   message = response.responseData['message'].toString();
+          // }
 
-          Get.snackbar(
-            'Success',
-            message,
-            snackPosition: SnackPosition.TOP,
-            backgroundColor: Colors.green.withValues(alpha: 0.1),
-            colorText: Colors.green,
-          );
+          // Get.snackbar(
+          //   'Success',
+          //   message,
+          //   snackPosition: SnackPosition.TOP,
+          //   backgroundColor: Colors.green.withValues(alpha: 0.1),
+          //   colorText: Colors.green,
+          // );
           Get.offAllNamed(AppRoute.getWelcome());
         } else {
           errorMessage.value = response.errorMessage;
@@ -119,18 +119,6 @@ class VerificationController extends GetxController {
   }
 
   bool _validateOtp(String otp) {
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
     return true;
   }
 

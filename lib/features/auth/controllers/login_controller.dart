@@ -5,8 +5,11 @@ import 'package:quikle_user/routes/app_routes.dart';
 
 class LoginController extends GetxController {
   final phoneController = TextEditingController();
+  final nameController = TextEditingController();
   final isLoading = false.obs;
   final errorMessage = ''.obs;
+  final showNameField = false.obs;
+  final isExistingUser = true.obs;
 
   late final AuthService _auth;
 
@@ -16,18 +19,35 @@ class LoginController extends GetxController {
     _auth = Get.find<AuthService>();
   }
 
-  Future<void> onTapLogin() async {
-    if (_validatePhone()) {
+  Future<void> onTapContinue() async {
+    if (_validateInputs()) {
       isLoading.value = true;
       errorMessage.value = '';
 
       try {
-        final response = await _auth.login(phoneController.text.trim());
+        final response = await _auth.sendOtp(
+          phoneController.text.trim(),
+          name: showNameField.value ? nameController.text.trim() : null,
+        );
 
         if (response.isSuccess) {
+          final userExists = response.responseData?['userExists'] ?? true;
+
+          if (!userExists && !showNameField.value) {
+            showNameField.value = true;
+            isExistingUser.value = false;
+            isLoading.value = false;
+            return;
+          }
+
+          // Proceed to verification
           Get.toNamed(
             AppRoute.getVerify(),
-            arguments: {'phone': phoneController.text.trim(), 'isLogin': true},
+            arguments: {
+              'phone': phoneController.text.trim(),
+              'name': showNameField.value ? nameController.text.trim() : null,
+              'isLogin': userExists,
+            },
           );
         } else {
           errorMessage.value = response.errorMessage;
@@ -54,42 +74,59 @@ class LoginController extends GetxController {
     }
   }
 
-  bool _validatePhone() {
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+  bool _validateInputs() {
+    final phone = phoneController.text.trim();
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    if (phone.isEmpty) {
+      errorMessage.value = 'Please enter your phone number';
+      Get.snackbar(
+        'Validation Error',
+        'Please enter your phone number',
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.orange.withValues(alpha: 0.1),
+        colorText: Colors.orange,
+      );
+      return false;
+    }
+
+    if (showNameField.value) {
+      final name = nameController.text.trim();
+      if (name.isEmpty) {
+        errorMessage.value = 'Please enter your full name';
+        Get.snackbar(
+          'Validation Error',
+          'Please enter your full name',
+          snackPosition: SnackPosition.TOP,
+          backgroundColor: Colors.orange.withValues(alpha: 0.1),
+          colorText: Colors.orange,
+        );
+        return false;
+      }
+
+      if (name.length < 2) {
+        errorMessage.value = 'Name must be at least 2 characters long';
+        Get.snackbar(
+          'Validation Error',
+          'Name must be at least 2 characters long',
+          snackPosition: SnackPosition.TOP,
+          backgroundColor: Colors.orange.withValues(alpha: 0.1),
+          colorText: Colors.orange,
+        );
+        return false;
+      }
+    }
 
     return true;
   }
 
-  void onTapCreateAccount() {
-    Get.toNamed(AppRoute.getRegister());
-  }
+  // Legacy methods for backward compatibility
+  Future<void> onTapLogin() async => onTapContinue();
+  void onTapCreateAccount() => onTapContinue();
 
   @override
   void onClose() {
     phoneController.dispose();
+    nameController.dispose();
     super.onClose();
   }
 }

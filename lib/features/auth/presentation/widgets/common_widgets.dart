@@ -69,8 +69,6 @@ class CommonWidgets {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: double.infinity,
-        height: 48.h,
         padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 14.h),
         decoration: ShapeDecoration(
           color: const Color(0xFFFFC200),

@@ -10,6 +10,7 @@ import 'package:quikle_user/features/home/data/services/home_services.dart';
 import 'package:quikle_user/features/cart/controllers/cart_controller.dart';
 import 'package:quikle_user/features/profile/controllers/favorites_controller.dart';
 import 'package:quikle_user/routes/app_routes.dart';
+import 'package:quikle_user/core/services/whatsapp_service.dart';
 
 class ProductSearchController extends GetxController {
   final HomeService _homeService = HomeService();
@@ -17,6 +18,9 @@ class ProductSearchController extends GetxController {
 
   final TextEditingController searchController = TextEditingController();
   final SpeechToText _speechToText = SpeechToText();
+
+  // Callback for when voice recognition completes
+  Function(String)? onVoiceSearchCompleted;
 
   static ProductSearchController? get currentInstance {
     try {
@@ -164,6 +168,12 @@ class ProductSearchController extends GetxController {
             _isListening.value = false;
             soundLevel.value = 0.0;
             _currentPlaceholder.value = "Search for 'biryani'";
+
+            // Call the callback if voice search completed with results
+            if (onVoiceSearchCompleted != null &&
+                result.recognizedWords.isNotEmpty) {
+              onVoiceSearchCompleted!(result.recognizedWords);
+            }
           }
         },
         onSoundLevelChange: (level) {
@@ -288,5 +298,31 @@ class ProductSearchController extends GetxController {
     );
   }
 
-  List<String> get _placeholderItems => placeholderItems;
+  /// Handles custom order request via WhatsApp
+  Future<void> onRequestCustomOrder() async {
+    if (_searchQuery.value.isEmpty) {
+      Get.snackbar(
+        'Error',
+        'Please enter a search query first',
+        snackPosition: SnackPosition.BOTTOM,
+        duration: const Duration(seconds: 2),
+      );
+      return;
+    }
+
+    try {
+      await WhatsAppService.requestCustomOrder(
+        searchQuery: _searchQuery.value,
+        userName: null, // Could be retrieved from user profile if available
+      );
+    } catch (e) {
+      debugPrint('Error opening WhatsApp: $e');
+      Get.snackbar(
+        'Error',
+        'Failed to open WhatsApp. Please try again.',
+        snackPosition: SnackPosition.BOTTOM,
+        duration: const Duration(seconds: 3),
+      );
+    }
+  }
 }

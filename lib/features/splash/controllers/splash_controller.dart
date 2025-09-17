@@ -11,6 +11,7 @@ class SplashController extends GetxController {
   final RxBool showLogin = false.obs;
 
   final Duration ellipseTriggerAt = const Duration(seconds: 2);
+  final Duration playDuration = const Duration(seconds: 3);
   bool _ellipseMoved = false;
 
   @override
@@ -26,7 +27,9 @@ class SplashController extends GetxController {
     await video.play();
     isReady.value = true;
     video.addListener(_progressWatcher);
-    video.addListener(_listenEnd);
+
+    // Call _listenDuration to handle the video stopping after 3 seconds
+    video.addListener(_listenDuration);
   }
 
   void _progressWatcher() {
@@ -42,18 +45,20 @@ class SplashController extends GetxController {
     ellipseTop.value = _ellipseTopPlaying;
   }
 
-  void _listenEnd() {
+  // New method to check video position and stop after 3 seconds
+  void _listenDuration() {
     final v = video.value;
-    if (v.isInitialized && v.position >= v.duration && !v.isPlaying) {
+    if (v.isInitialized && v.position >= playDuration) {
+      video.pause();
       showLogin.value = true;
-      
+      video.removeListener(_listenDuration);
     }
   }
 
   @override
   void onClose() {
     video.removeListener(_progressWatcher);
-    video.removeListener(_listenEnd);
+    video.removeListener(_listenDuration);
     video.dispose();
     super.onClose();
   }

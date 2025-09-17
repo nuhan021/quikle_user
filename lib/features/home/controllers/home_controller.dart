@@ -1,15 +1,13 @@
 import 'package:get/get.dart';
-import 'package:speech_to_text/speech_to_text.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:quikle_user/features/home/data/services/home_services.dart';
 import 'package:quikle_user/features/cart/controllers/cart_controller.dart';
 import 'package:quikle_user/features/profile/controllers/favorites_controller.dart';
 import 'package:quikle_user/routes/app_routes.dart';
-import 'package:quikle_user/features/search/controllers/search_controller.dart';
+import 'package:quikle_user/core/mixins/voice_search_mixin.dart';
 import '../data/models/category_model.dart';
 import '../data/models/product_model.dart';
 
-class HomeController extends GetxController {
+class HomeController extends GetxController with VoiceSearchMixin {
   final HomeService _homeService = HomeService();
   late final CartController _cartController;
   final _selectedCategoryId = '0'.obs;
@@ -91,110 +89,43 @@ class HomeController extends GetxController {
         : await _homeService.fetchProductSections();
   }
 
-  void onNotificationPressed() {
-    
-  }
+  void onNotificationPressed() {}
 
   void onSearchPressed() {
-    
     Get.toNamed(AppRoute.getSearch());
   }
 
   Future<void> onVoiceSearchPressed() async {
-    final speechToText = SpeechToText();
-
-    try {
-      
-      final permissionStatus = await Permission.microphone.request();
-
-      if (permissionStatus != PermissionStatus.granted) {
-        Get.snackbar(
-          'Permission Denied',
-          'Microphone permission is required for voice search.',
-          snackPosition: SnackPosition.BOTTOM,
-          duration: const Duration(seconds: 3),
-        );
-        return;
-      }
-
-      
-      final available = await speechToText.initialize(
-        onError: (errorNotification) {
-          Get.snackbar(
-            'Voice Recognition Error',
-            'Could not recognize speech. Please try again.',
-            snackPosition: SnackPosition.BOTTOM,
-            duration: const Duration(seconds: 2),
-          );
-        },
-      );
-
-      if (!available) {
-        Get.snackbar(
-          'Voice Search Unavailable',
-          'Speech recognition is not available on this device.',
-          snackPosition: SnackPosition.BOTTOM,
-          duration: const Duration(seconds: 2),
-        );
-        return;
-      }
-
-      
-      Get.toNamed(AppRoute.getSearch());
-
-      
-      await Future.delayed(const Duration(milliseconds: 500));
-
-      
-      await Future.delayed(const Duration(milliseconds: 300));
-      final searchController = ProductSearchController.currentInstance;
-      if (searchController != null) {
-        await searchController.toggleVoiceRecognition();
-      }
-    } catch (e) {
-      print('Error in voice search: $e');
-      Get.snackbar(
-        'Voice Search Error',
-        'An error occurred while starting voice search.',
-        snackPosition: SnackPosition.BOTTOM,
-        duration: const Duration(seconds: 2),
-      );
-    }
+    await startVoiceSearch(navigateToSearch: true);
   }
 
   Future<void> onCategoryPressed(CategoryModel category) async {
-    
     if (category.id != '0') {
       Get.toNamed(
         AppRoute.getUnifiedCategory(),
         arguments: {'category': category},
       );
     } else {
-      
       _selectedCategoryId.value = category.id;
       await _loadContent();
     }
   }
 
   void onProductPressed(ProductModel product) {
-    
     Get.toNamed(AppRoute.getProductDetails(), arguments: product);
   }
 
   void onAddToCartPressed(ProductModel product) {
-    
     _cartController.addToCart(product);
   }
 
   void onFavoriteToggle(ProductModel product) {
-    
     if (FavoritesController.isProductFavorite(product.id)) {
       FavoritesController.removeFromGlobalFavorites(product.id);
     } else {
       FavoritesController.addToGlobalFavorites(product.id);
     }
 
-    
     final isFavorite = FavoritesController.isProductFavorite(product.id);
     final updatedProduct = product.copyWith(isFavorite: isFavorite);
     _updateProductInLists(product, updatedProduct);
@@ -249,19 +180,15 @@ class HomeController extends GetxController {
   void onViewAllPressed(String categoryId) {
     final category = _categories.firstWhere((cat) => cat.id == categoryId);
 
-    
     if (categoryId != '0') {
       Get.toNamed(
         AppRoute.getUnifiedCategory(),
         arguments: {'category': category},
       );
     } else {
-      
       onCategoryPressed(category);
     }
   }
 
-  void onShopNowPressed() {
-    
-  }
+  void onShopNowPressed() {}
 }
