@@ -32,7 +32,7 @@ class CategoriesScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(height: 20.h),
+                    //SizedBox(height: 20.h),
                     CategoriesSection(
                       categories: controller.categories,
                       onCategoryTap: controller.onCategoryPressed,
@@ -100,33 +100,6 @@ class CategoriesScreen extends StatelessWidget {
                                     ),
                                   ),
                                 ],
-                              ),
-                              const SizedBox(height: 16),
-                              GridView.builder(
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                gridDelegate:
-                                    SliverGridDelegateWithFixedCrossAxisCount(
-                                      crossAxisCount: 3,
-                                      childAspectRatio: 0.65.h,
-                                      crossAxisSpacing: 12.w,
-                                      mainAxisSpacing: 12.w,
-                                    ),
-                                itemCount: controller.filteredProducts.length,
-                                itemBuilder: (context, index) => ProductItem(
-                                  product: controller.filteredProducts[index],
-                                  onTap: () => controller.onProductPressed(
-                                    controller.filteredProducts[index],
-                                  ),
-                                  onAddToCart: () =>
-                                      controller.onAddToCartPressed(
-                                        controller.filteredProducts[index],
-                                      ),
-                                  onFavoriteToggle: () =>
-                                      controller.onFavoriteToggle(
-                                        controller.filteredProducts[index],
-                                      ),
-                                ),
                               ),
                             ] else ...[
                               const Center(

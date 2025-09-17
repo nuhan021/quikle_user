@@ -54,38 +54,11 @@ class EmptyCartScreen extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.vertical(
-                  bottom: Radius.circular(20),
-                ),
-                border: Border(
-                  bottom: BorderSide(color: AppColors.gradientColor, width: 2),
-                ),
-              ),
-              child: Row(
-                children: [
-                  Text(
-                    'Cart',
-                    style: getTextStyle(
-                      font: CustomFonts.obviously,
-                      fontSize: 18.sp,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.ebonyBlack,
-                    ),
-                  ),
-                ],
-              ),
-            ),
             Expanded(
               child: Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    
                     SizedBox(
                       width: 225.w,
                       height: 120.w,

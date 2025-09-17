@@ -3,20 +3,55 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
-import 'package:quikle_user/features/home/presentation/widgets/app_bar/home_app_bar.dart';
-import 'package:quikle_user/features/home/presentation/widgets/banners/offer_banner.dart';
-import 'package:quikle_user/features/home/presentation/widgets/categories/categories_section.dart';
-import 'package:quikle_user/features/home/presentation/widgets/products/product_section.dart';
-import '../widgets/search/search_bar.dart' as custom_search;
 import '../../controllers/home_controller.dart';
+import '../widgets/app_bar/home_app_bar.dart';
+import '../widgets/banners/offer_banner.dart';
+import '../widgets/categories/categories_section.dart';
+import '../widgets/products/product_section.dart';
+import '../widgets/search/search_bar.dart' as custom_search;
 
-class HomeContentScreen extends StatelessWidget {
+class HomeContentScreen extends StatefulWidget {
   const HomeContentScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final controller = Get.find<HomeController>();
+  State<HomeContentScreen> createState() => _HomeContentScreenState();
+}
 
+class _HomeContentScreenState extends State<HomeContentScreen>
+    with SingleTickerProviderStateMixin {
+  final HomeController controller = Get.find<HomeController>();
+  final ScrollController _scroll = ScrollController();
+
+  late final AnimationController _barAnim;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _barAnim = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 220),
+      value: 1,
+    );
+
+    _scroll.addListener(() {
+      if (_scroll.offset > 8 && _barAnim.value == 1) {
+        _barAnim.reverse();
+      } else if (_scroll.offset <= 8 && _barAnim.value == 0) {
+        _barAnim.forward();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _scroll.dispose();
+    _barAnim.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
@@ -24,187 +59,134 @@ class HomeContentScreen extends StatelessWidget {
       ),
     );
 
-    
-    final double headerHeight = 0.20.sh;
-
     return Scaffold(
       backgroundColor: AppColors.homeGrey,
-      body: Obx(
-        () => controller.isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : CustomScrollView(
-                slivers: [
-                  SliverAppBar(
-                    backgroundColor: AppColors.homeGrey,
-                    elevation: 0,
-                    automaticallyImplyLeading: false,
-                    floating: false,
-                    snap: false,
-                    pinned: false,
-                    toolbarHeight: kToolbarHeight,
-                    titleSpacing: 0,
-                    title: HomeAppBar(
-                      onNotificationTap: controller.onNotificationPressed,
-                    ),
-                  ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            ClipRect(
+              child: SizeTransition(
+                axisAlignment: -1,
+                sizeFactor: _barAnim,
+                child: HomeAppBar(
+                  //onNotificationTap: controller.onNotificationPressed,
+                ),
+              ),
+            ),
 
-                  
-                  SliverPersistentHeader(
-                    pinned: true,
-                    delegate: _FixedHeaderDelegate(
-                      height: headerHeight,
-                      child: Column(
-                        children: [
-                          custom_search.SearchBar(
-                            onTap: controller.onSearchPressed,
-                            onVoiceTap: controller.onVoiceSearchPressed,
-                          ),
-                          Expanded(
-                            child: CategoriesSection(
-                              categories: controller.categories,
-                              onCategoryTap: controller.onCategoryPressed,
-                              selectedCategoryId: controller.selectedCategoryId,
-                              showTitle: true,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.w),
+              child: Column(
+                children: [
+                  custom_search.SearchBar(
+                    onTap: controller.onSearchPressed,
+                    onVoiceTap: controller.onVoiceSearchPressed,
                   ),
-
-                  SliverList(
-                    delegate: SliverChildListDelegate([
-                      const SizedBox(height: 12),
-                      Center(child: OfferBanner()),
-                      const SizedBox(height: 12),
-                      if (controller.isShowingAllCategories)
-                        Column(
-                          children: controller.productSections
-                              .map(
-                                (section) => ProductSection(
-                                  section: section,
-                                  onProductTap: controller.onProductPressed,
-                                  onAddToCart: controller.onAddToCartPressed,
-                                  onViewAllTap: () => controller
-                                      .onViewAllPressed(section.categoryId),
-                                  categoryIconPath: controller
-                                      .getCategoryIconPath(section.categoryId),
-                                  categoryTitle: controller.getCategoryTitle(
-                                    section.categoryId,
-                                  ),
-                                  onFavoriteToggle: controller.onFavoriteToggle,
-                                ),
-                              )
-                              .toList(),
-                        )
-                      else
-                        Container(
-                          padding: EdgeInsets.symmetric(horizontal: 16.sp),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              if (controller.filteredProducts.isNotEmpty)
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      controller.categories
-                                          .firstWhere(
-                                            (cat) =>
-                                                cat.id ==
-                                                controller.selectedCategoryId,
-                                          )
-                                          .title,
-                                      style: const TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                    GestureDetector(
-                                      onTap: () => controller.onViewAllPressed(
-                                        controller.selectedCategoryId,
-                                      ),
-                                      child: const Text(
-                                        'View all',
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w500,
-                                          color: Color(0xFFFF6B35),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                )
-                              else
-                                const Center(
-                                  child: Text(
-                                    'No products found for this category',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                ),
-                            ],
-                          ),
-                        ),
-                    ]),
+                  //12.verticalSpace,
+                  CategoriesSection(
+                    categories: controller.categories,
+                    onCategoryTap: controller.onCategoryPressed,
+                    selectedCategoryId: controller.selectedCategoryId,
+                    showTitle: true,
                   ),
                 ],
               ),
+            ),
+            Expanded(
+              child: Obx(
+                () => controller.isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : ListView(
+                        controller: _scroll,
+                        padding: EdgeInsets.only(top: 12.h, bottom: 24.h),
+                        children: [
+                          Center(child: OfferBanner()),
+                          12.verticalSpace,
+                          if (controller.isShowingAllCategories)
+                            ...controller.productSections.map(
+                              (section) => ProductSection(
+                                section: section,
+                                onProductTap: controller.onProductPressed,
+                                onAddToCart: controller.onAddToCartPressed,
+                                onViewAllTap: () => controller.onViewAllPressed(
+                                  section.categoryId,
+                                ),
+                                categoryIconPath: controller
+                                    .getCategoryIconPath(section.categoryId),
+                                categoryTitle: controller.getCategoryTitle(
+                                  section.categoryId,
+                                ),
+                                onFavoriteToggle: controller.onFavoriteToggle,
+                              ),
+                            )
+                          else
+                            _buildFilteredSection(),
+                        ],
+                      ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
-}
 
-class _FixedHeaderDelegate extends SliverPersistentHeaderDelegate {
-  _FixedHeaderDelegate({required this.child, required this.height}) {
-    
-    appBarVisibleNotifier = ValueNotifier<bool>(true);
-  }
-
-  final Widget child;
-  final double height;
-
-  late final ValueNotifier<bool> appBarVisibleNotifier;
-
-  @override
-  double get minExtent => height;
-
-  @override
-  double get maxExtent => height;
-
-  @override
-  Widget build(
-    BuildContext context,
-    double shrinkOffset,
-    bool overlapsContent,
-  ) {
-    final bool appBarVisible = !(overlapsContent || shrinkOffset > 0.0);
-
-    
-    if (appBarVisibleNotifier.value != appBarVisible) {
-      appBarVisibleNotifier.value = appBarVisible;
+  Widget _buildFilteredSection() {
+    if (controller.filteredProducts.isEmpty) {
+      return const Center(
+        child: Text(
+          'No products found for this category',
+          style: TextStyle(fontSize: 16, color: Colors.grey),
+        ),
+      );
     }
 
-    return ValueListenableBuilder<bool>(
-      valueListenable: appBarVisibleNotifier,
-      builder: (context, isVisible, _) {
-        return Container(
-          color: AppColors.homeGrey,
-          padding: isVisible
-              ? EdgeInsets.zero
-              : EdgeInsets.only(top: MediaQuery.of(context).padding.top),
-          child: SizedBox.expand(child: child),
-        );
-      },
+    final selectedCat = controller.categories.firstWhere(
+      (c) => c.id == controller.selectedCategoryId,
     );
-  }
 
-  @override
-  bool shouldRebuild(_FixedHeaderDelegate oldDelegate) {
-    return oldDelegate.height != height || oldDelegate.child != child;
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16.w),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                selectedCat.title,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black,
+                ),
+              ),
+              GestureDetector(
+                onTap: () =>
+                    controller.onViewAllPressed(controller.selectedCategoryId),
+                child: const Text(
+                  'View all',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFFFF6B35),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          8.verticalSpace,
+          /* Products */
+          // ...controller.filteredProducts.map(
+          //   (prod) => ProductSection(
+          //     section: prod,
+          //     onProductTap: controller.onProductPressed,
+          //     onAddToCart: controller.onAddToCartPressed,
+          //     onFavoriteToggle: controller.onFavoriteToggle,
+          //   ),
+          // ),
+        ],
+      ),
+    );
   }
 }

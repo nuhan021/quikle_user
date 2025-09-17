@@ -49,7 +49,7 @@ class PopularItemsSection extends StatelessWidget {
         ),
         SizedBox(height: 8.h),
         SizedBox(
-          height: 55.h,
+          height: 60.h,
           width: double.infinity,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
