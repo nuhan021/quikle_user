@@ -9,8 +9,9 @@ import 'package:quikle_user/features/categories/data/services/category_service.d
 import 'package:quikle_user/features/cart/controllers/cart_controller.dart';
 import 'package:quikle_user/features/profile/controllers/favorites_controller.dart';
 import 'package:quikle_user/routes/app_routes.dart';
+import 'package:quikle_user/core/mixins/voice_search_mixin.dart';
 
-class CategoryProductsController extends GetxController {
+class CategoryProductsController extends GetxController with VoiceSearchMixin {
   final CategoryService _categoryService = CategoryService();
   final CartController _cartController = Get.find<CartController>();
 
@@ -24,7 +25,6 @@ class CategoryProductsController extends GetxController {
   final selectedSubcategory = Rxn<SubcategoryModel>();
   final searchQuery = ''.obs;
 
-  
   final currentPlaceholder = "Search products...".obs;
   Timer? _placeholderTimer;
 
@@ -32,10 +32,8 @@ class CategoryProductsController extends GetxController {
   late SubcategoryModel currentMainCategory;
   bool get isGroceryCategory => currentCategory.id == '2';
 
-  
   Map<String, List<String>> get categoryPlaceholders => {
     '1': [
-      
       'biryani',
       'pizza',
       'burger',
@@ -48,7 +46,6 @@ class CategoryProductsController extends GetxController {
       'coffee',
     ],
     '2': [
-      
       'rice',
       'milk',
       'bread',
@@ -61,7 +58,6 @@ class CategoryProductsController extends GetxController {
       'yogurt',
     ],
     '3': [
-      
       'paracetamol',
       'vitamins',
       'cough syrup',
@@ -108,7 +104,6 @@ class CategoryProductsController extends GetxController {
   }
 
   void _startPlaceholderRotation() {
-    
     final placeholders = currentCategoryPlaceholders;
     if (placeholders.isNotEmpty) {
       final randomIndex = Random().nextInt(placeholders.length);
@@ -116,7 +111,6 @@ class CategoryProductsController extends GetxController {
       currentPlaceholder.value = "Search for '$randomItem'";
     }
 
-    
     _placeholderTimer = Timer.periodic(const Duration(seconds: 4), (timer) {
       final placeholders = currentCategoryPlaceholders;
       if (placeholders.isNotEmpty) {
@@ -171,14 +165,12 @@ class CategoryProductsController extends GetxController {
       isLoading.value = true;
       await _loadShopData();
 
-      
       final subCategories = await _categoryService.fetchSubcategories(
         currentCategory.id,
         parentSubcategoryId: currentMainCategory.id,
       );
       subcategories.value = subCategories;
 
-      
       final products = await _categoryService.fetchProductsByMainCategory(
         currentMainCategory.id,
       );
@@ -193,7 +185,6 @@ class CategoryProductsController extends GetxController {
 
   void onSubcategoryTap(SubcategoryModel subcategory) {
     if (selectedSubcategory.value?.id == subcategory.id) {
-      
       selectedSubcategory.value = null;
       displayProducts.value = allProducts;
       return;
@@ -249,5 +240,9 @@ class CategoryProductsController extends GetxController {
   void onFavoriteToggle(ProductModel product) {
     final favController = Get.find<FavoritesController>();
     favController.toggleFavorite(product);
+  }
+
+  Future<void> onVoiceSearchPressed() async {
+    await startVoiceSearch(navigateToSearch: true);
   }
 }

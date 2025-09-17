@@ -86,7 +86,7 @@ class SplashScreen extends GetView<SplashController> {
                       text: TextSpan(
                         children: [
                           TextSpan(
-                            text: 'Fresh Food, ',
+                            text: 'Things delivered ',
                             style: TextStyle(
                               fontFamily: 'Obviously',
                               fontWeight: FontWeight.w500,
@@ -96,7 +96,7 @@ class SplashScreen extends GetView<SplashController> {
                             ),
                           ),
                           TextSpan(
-                            text: 'Delivered Fast',
+                            text: 'Quickly',
                             style: TextStyle(
                               fontFamily: 'Obviously',
                               fontWeight: FontWeight.w500,

@@ -6,6 +6,7 @@ import 'package:quikle_user/core/common/widgets/address_widget.dart';
 import 'package:quikle_user/core/common/widgets/cart_animation_overlay.dart';
 import 'package:quikle_user/core/common/widgets/custom_navbar.dart';
 import 'package:quikle_user/core/common/widgets/floating_cart_button.dart';
+import 'package:quikle_user/core/common/widgets/voice_search_overlay.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/navigation/navbar_navigation_helper.dart';
 import 'package:quikle_user/features/categories/controllers/unified_category_controller.dart';
@@ -113,7 +114,7 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
                                   SearchAndFiltersSection(
                                     searchController: searchController,
                                     onSearchChanged: controller.onSearchChanged,
-                                    onVoiceTap: () {},
+                                    onVoiceTap: controller.onVoiceSearchPressed,
                                     dynamicHint: controller.currentPlaceholder,
                                   ),
 
@@ -198,6 +199,15 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
                   return FloatingCartButton(bottomInset: inset);
                 },
               ),
+
+              // Voice search overlay
+              Obx(() {
+                if (!controller.isListening) return const SizedBox.shrink();
+                return VoiceSearchOverlay(
+                  soundLevel: controller.soundLevel,
+                  onCancel: controller.stopVoiceSearch,
+                );
+              }),
             ],
           ),
         ),

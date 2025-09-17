@@ -11,8 +11,9 @@ import 'package:quikle_user/features/restaurants/data/services/restaurant_servic
 import 'package:quikle_user/features/cart/controllers/cart_controller.dart';
 import 'package:quikle_user/features/profile/controllers/favorites_controller.dart';
 import 'package:quikle_user/routes/app_routes.dart';
+import 'package:quikle_user/core/mixins/voice_search_mixin.dart';
 
-class UnifiedCategoryController extends GetxController {
+class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
   final CategoryService _categoryService = CategoryService();
   final RestaurantService _restaurantService = RestaurantService();
   final CartController _cartController = Get.find<CartController>();
@@ -683,5 +684,9 @@ class UnifiedCategoryController extends GetxController {
         'categoryName': '',
       },
     );
+  }
+
+  Future<void> onVoiceSearchPressed() async {
+    await startVoiceSearch(navigateToSearch: true);
   }
 }

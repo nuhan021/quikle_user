@@ -24,11 +24,11 @@ class CartController extends GetxController {
     _cartService.addToCart(product);
     _updateCartData();
 
-    Get.snackbar(
-      'Added to Cart',
-      '${product.title} has been added to your cart.',
-      duration: const Duration(seconds: 2),
-    );
+    // Get.snackbar(
+    //   'Added to Cart',
+    //   '${product.title} has been added to your cart.',
+    //   duration: const Duration(seconds: 2),
+    // );
   }
 
   void removeFromCart(CartItemModel cartItem) {
@@ -59,14 +59,13 @@ class CartController extends GetxController {
     _cartService.clearCart();
     _updateCartData();
 
-    
     CartBottomSection.clearSelectedAddress();
 
-    Get.snackbar(
-      'Cart Cleared',
-      'All items have been removed from your cart.',
-      duration: const Duration(seconds: 2),
-    );
+    // Get.snackbar(
+    //   'Cart Cleared',
+    //   'All items have been removed from your cart.',
+    //   duration: const Duration(seconds: 2),
+    // );
   }
 
   void _updateCartData() {
@@ -77,8 +76,6 @@ class CartController extends GetxController {
 
   void onCheckout() {
     if (hasItems) {
-      
-      
       Get.snackbar(
         'Ready for Checkout',
         'Please select payment method and place order.',

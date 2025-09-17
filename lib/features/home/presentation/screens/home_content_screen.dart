@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
+import 'package:quikle_user/core/common/widgets/voice_search_overlay.dart';
 import '../../controllers/home_controller.dart';
 import '../widgets/app_bar/home_app_bar.dart';
 import '../widgets/banners/offer_banner.dart';
@@ -61,72 +62,87 @@ class _HomeContentScreenState extends State<HomeContentScreen>
 
     return Scaffold(
       backgroundColor: AppColors.homeGrey,
-      body: SafeArea(
-        child: Column(
-          children: [
-            ClipRect(
-              child: SizeTransition(
-                axisAlignment: -1,
-                sizeFactor: _barAnim,
-                child: HomeAppBar(
-                  //onNotificationTap: controller.onNotificationPressed,
+      body: Stack(
+        children: [
+          SafeArea(
+            child: Column(
+              children: [
+                ClipRect(
+                  child: SizeTransition(
+                    axisAlignment: -1,
+                    sizeFactor: _barAnim,
+                    child: HomeAppBar(
+                      //onNotificationTap: controller.onNotificationPressed,
+                    ),
+                  ),
                 ),
-              ),
-            ),
 
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.w),
-              child: Column(
-                children: [
-                  custom_search.SearchBar(
-                    onTap: controller.onSearchPressed,
-                    onVoiceTap: controller.onVoiceSearchPressed,
-                  ),
-                  //12.verticalSpace,
-                  CategoriesSection(
-                    categories: controller.categories,
-                    onCategoryTap: controller.onCategoryPressed,
-                    selectedCategoryId: controller.selectedCategoryId,
-                    showTitle: true,
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: Obx(
-                () => controller.isLoading
-                    ? const Center(child: CircularProgressIndicator())
-                    : ListView(
-                        controller: _scroll,
-                        padding: EdgeInsets.only(top: 12.h, bottom: 24.h),
-                        children: [
-                          Center(child: OfferBanner()),
-                          12.verticalSpace,
-                          if (controller.isShowingAllCategories)
-                            ...controller.productSections.map(
-                              (section) => ProductSection(
-                                section: section,
-                                onProductTap: controller.onProductPressed,
-                                onAddToCart: controller.onAddToCartPressed,
-                                onViewAllTap: () => controller.onViewAllPressed(
-                                  section.categoryId,
-                                ),
-                                categoryIconPath: controller
-                                    .getCategoryIconPath(section.categoryId),
-                                categoryTitle: controller.getCategoryTitle(
-                                  section.categoryId,
-                                ),
-                                onFavoriteToggle: controller.onFavoriteToggle,
-                              ),
-                            )
-                          else
-                            _buildFilteredSection(),
-                        ],
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  child: Column(
+                    children: [
+                      custom_search.SearchBar(
+                        onTap: controller.onSearchPressed,
+                        onVoiceTap: controller.onVoiceSearchPressed,
                       ),
-              ),
+                      //12.verticalSpace,
+                      CategoriesSection(
+                        categories: controller.categories,
+                        onCategoryTap: controller.onCategoryPressed,
+                        selectedCategoryId: controller.selectedCategoryId,
+                        showTitle: true,
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: Obx(
+                    () => controller.isLoading
+                        ? const Center(child: CircularProgressIndicator())
+                        : ListView(
+                            controller: _scroll,
+                            padding: EdgeInsets.only(top: 12.h, bottom: 24.h),
+                            children: [
+                              Center(child: OfferBanner()),
+                              12.verticalSpace,
+                              if (controller.isShowingAllCategories)
+                                ...controller.productSections.map(
+                                  (section) => ProductSection(
+                                    section: section,
+                                    onProductTap: controller.onProductPressed,
+                                    onAddToCart: controller.onAddToCartPressed,
+                                    onViewAllTap: () => controller
+                                        .onViewAllPressed(section.categoryId),
+                                    categoryIconPath: controller
+                                        .getCategoryIconPath(
+                                          section.categoryId,
+                                        ),
+                                    categoryTitle: controller.getCategoryTitle(
+                                      section.categoryId,
+                                    ),
+                                    onFavoriteToggle:
+                                        controller.onFavoriteToggle,
+                                  ),
+                                )
+                              else
+                                _buildFilteredSection(),
+                            ],
+                          ),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+
+          // Voice search overlay
+          Obx(() {
+            if (!controller.isListening) return const SizedBox.shrink();
+            return VoiceSearchOverlay(
+              soundLevel: controller.soundLevel,
+              onCancel: controller.stopVoiceSearch,
+            );
+          }),
+        ],
       ),
     );
   }

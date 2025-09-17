@@ -7,6 +7,8 @@ import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 import 'package:quikle_user/core/utils/constants/image_path.dart';
 import 'package:quikle_user/features/search/controllers/search_controller.dart';
 import 'package:quikle_user/core/common/widgets/unified_product_card.dart';
+import 'package:quikle_user/core/common/widgets/voice_search_overlay.dart';
+import 'package:quikle_user/core/common/widgets/custom_order_suggestion_widget.dart';
 
 class SearchScreen extends StatelessWidget {
   const SearchScreen({super.key});
@@ -138,15 +140,11 @@ class SearchScreen extends StatelessWidget {
 
           Obx(() {
             if (!controller.isListening) return const SizedBox.shrink();
-            return Container(
-              color: Colors.black.withValues(alpha: 0.25),
-              alignment: Alignment.center,
-              child: _ListeningPopup(
-                soundLevel: controller.soundLevel.value,
-                onCancel: () async {
-                  await controller.toggleVoiceRecognition();
-                },
-              ),
+            return VoiceSearchOverlay(
+              soundLevel: controller.soundLevel.value,
+              onCancel: () async {
+                await controller.toggleVoiceRecognition();
+              },
             );
           }),
         ],
@@ -256,31 +254,10 @@ class SearchScreen extends StatelessWidget {
   Widget _buildSearchResults(ProductSearchController controller) {
     return Obx(() {
       if (controller.searchResults.isEmpty) {
-        return Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.search_off, size: 64.w, color: Colors.grey[400]),
-              SizedBox(height: 16.h),
-              Text(
-                'No results found',
-                style: getTextStyle(
-                  font: CustomFonts.obviously,
-                  fontSize: 18.sp,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.ebonyBlack,
-                ),
-              ),
-              SizedBox(height: 8.h),
-              Text(
-                'Try searching for something else',
-                style: getTextStyle(
-                  font: CustomFonts.inter,
-                  fontSize: 14.sp,
-                  color: Colors.grey,
-                ),
-              ),
-            ],
+        return SingleChildScrollView(
+          child: CustomOrderSuggestionWidget(
+            searchQuery: controller.searchQuery,
+            onRequestCustomOrder: () => controller.onRequestCustomOrder(),
           ),
         );
       }
@@ -324,106 +301,5 @@ class SearchScreen extends StatelessWidget {
         ],
       );
     });
-  }
-}
-
-class _ListeningPopup extends StatefulWidget {
-  final double soundLevel;
-  final VoidCallback onCancel;
-  const _ListeningPopup({required this.soundLevel, required this.onCancel});
-
-  @override
-  State<_ListeningPopup> createState() => _ListeningPopupState();
-}
-
-class _ListeningPopupState extends State<_ListeningPopup>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _pulse;
-  late final Animation<double> _scale;
-
-  @override
-  void initState() {
-    super.initState();
-    _pulse = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 900),
-    )..repeat(reverse: true);
-    _scale = Tween<double>(begin: 0.96, end: 1.04).animate(_pulse);
-  }
-
-  @override
-  void dispose() {
-    _pulse.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final double dynamicSize = 80.w + (widget.soundLevel.clamp(0, 1) * 40.w);
-
-    return ScaleTransition(
-      scale: _scale,
-      child: Container(
-        width: 220.w,
-        height: 220.w,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.primary.withValues(alpha: 0.35),
-              blurRadius: 28,
-              spreadRadius: 8,
-            ),
-          ],
-          border: Border.all(
-            color: AppColors.primary.withValues(alpha: 0.15),
-            width: 1,
-          ),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 250),
-              width: dynamicSize,
-              height: dynamicSize,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppColors.primary.withValues(alpha: 0.18),
-                border: Border.all(
-                  color: AppColors.primary.withValues(alpha: 0.25),
-                  width: 1,
-                ),
-              ),
-              child: Icon(Icons.mic, size: 56.w, color: AppColors.primary),
-            ),
-            SizedBox(height: 14.h),
-            Text(
-              'Listening...',
-              style: getTextStyle(
-                font: CustomFonts.inter,
-                fontSize: 16.sp,
-                fontWeight: FontWeight.w700,
-                color: AppColors.ebonyBlack,
-              ),
-            ),
-            SizedBox(height: 8.h),
-            TextButton(
-              onPressed: widget.onCancel,
-              style: TextButton.styleFrom(foregroundColor: AppColors.primary),
-              child: Text(
-                'Tap to stop',
-                style: getTextStyle(
-                  font: CustomFonts.inter,
-                  fontSize: 13.sp,
-                  color: AppColors.primary,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }

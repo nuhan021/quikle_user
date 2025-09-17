@@ -2,12 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
-import 'package:quikle_user/core/common/widgets/common_app_bar.dart';
 import 'package:quikle_user/features/home/controllers/home_controller.dart';
 import 'package:quikle_user/features/home/presentation/widgets/categories/categories_section.dart';
-import 'package:quikle_user/features/home/presentation/widgets/products/product_item.dart';
 import 'package:quikle_user/features/home/presentation/widgets/products/product_section.dart';
-import 'package:quikle_user/routes/app_routes.dart';
+import 'package:quikle_user/features/profile/presentation/widgets/unified_profile_app_bar.dart';
 
 class CategoriesScreen extends StatelessWidget {
   const CategoriesScreen({super.key});
@@ -18,13 +16,6 @@ class CategoriesScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: AppColors.homeGrey,
-      appBar: CommonAppBar(
-        onNotificationTap: () =>
-            Get.toNamed(AppRoute.getNotificationSettings()),
-        onProfileTap: () => Get.toNamed(AppRoute.getMyProfile()),
-        title: 'All Categories',
-        showBackButton: false,
-      ),
       body: Obx(
         () => controller.isLoading
             ? const Center(child: CircularProgressIndicator())
@@ -32,6 +23,10 @@ class CategoriesScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    const UnifiedProfileAppBar(
+                      title: 'All Categories',
+                      showBackButton: false,
+                    ),
                     //SizedBox(height: 20.h),
                     CategoriesSection(
                       categories: controller.categories,
