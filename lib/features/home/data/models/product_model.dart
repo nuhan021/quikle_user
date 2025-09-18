@@ -14,6 +14,9 @@ class ProductModel {
   final bool isOTC;
   final bool hasPrescriptionUploaded;
   final String? productType;
+  final bool isPrescriptionMedicine;
+  final String? prescriptionId;
+  final String? vendorResponseId;
 
   const ProductModel({
     required this.id,
@@ -31,6 +34,9 @@ class ProductModel {
     this.isOTC = false,
     this.hasPrescriptionUploaded = false,
     this.productType,
+    this.isPrescriptionMedicine = false,
+    this.prescriptionId,
+    this.vendorResponseId,
   });
   ProductModel copyWith({
     String? id,
@@ -48,6 +54,9 @@ class ProductModel {
     bool? isOTC,
     bool? hasPrescriptionUploaded,
     String? productType,
+    bool? isPrescriptionMedicine,
+    String? prescriptionId,
+    String? vendorResponseId,
   }) {
     return ProductModel(
       id: id ?? this.id,
@@ -66,6 +75,10 @@ class ProductModel {
       hasPrescriptionUploaded:
           hasPrescriptionUploaded ?? this.hasPrescriptionUploaded,
       productType: productType ?? this.productType,
+      isPrescriptionMedicine:
+          isPrescriptionMedicine ?? this.isPrescriptionMedicine,
+      prescriptionId: prescriptionId ?? this.prescriptionId,
+      vendorResponseId: vendorResponseId ?? this.vendorResponseId,
     );
   }
 
@@ -85,7 +98,10 @@ class ProductModel {
         other.weight == weight &&
         other.isOTC == isOTC &&
         other.hasPrescriptionUploaded == hasPrescriptionUploaded &&
-        other.productType == productType;
+        other.productType == productType &&
+        other.isPrescriptionMedicine == isPrescriptionMedicine &&
+        other.prescriptionId == prescriptionId &&
+        other.vendorResponseId == vendorResponseId;
   }
 
   @override
@@ -102,17 +118,36 @@ class ProductModel {
         weight.hashCode ^
         isOTC.hashCode ^
         hasPrescriptionUploaded.hashCode ^
-        productType.hashCode;
+        productType.hashCode ^
+        isPrescriptionMedicine.hashCode ^
+        prescriptionId.hashCode ^
+        vendorResponseId.hashCode;
   }
 
-  
+  // Medicine related getters
   bool get isMedicine => categoryId == '3';
 
   bool get canAddToCart {
     if (!isMedicine) return true;
-    if (isOTC)
-      return hasPrescriptionUploaded; 
-    return true; 
+
+    // For prescription medicines (from uploaded prescriptions) - always addable
+    if (isPrescriptionMedicine) return true;
+
+    // For OTC medicines (displayed in app) - always addable without restrictions
+    if (isOTC) return true;
+
+    // Non-OTC medicines should not be visible in the app
+    return false;
+  }
+
+  bool get requiresPrescription =>
+      isMedicine && !isOTC && !isPrescriptionMedicine;
+
+  String get medicineType {
+    if (!isMedicine) return 'regular';
+    if (isPrescriptionMedicine) return 'prescription_approved';
+    if (isOTC) return 'otc';
+    return 'prescription_required';
   }
 }
 

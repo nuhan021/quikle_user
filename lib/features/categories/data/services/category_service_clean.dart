@@ -7,7 +7,6 @@ import 'package:quikle_user/core/data/services/product_data_service.dart';
 class CategoryService {
   final ProductDataService _productService = ProductDataService();
 
-  
   Future<List<SubcategoryModel>> fetchFoodSubcategories() async {
     return [
       const SubcategoryModel(
@@ -61,7 +60,6 @@ class CategoryService {
     ];
   }
 
-  
   Future<List<SubcategoryModel>> fetchGroceryMainCategories() async {
     return [
       const SubcategoryModel(
@@ -115,7 +113,6 @@ class CategoryService {
     ];
   }
 
-  
   Future<List<SubcategoryModel>> fetchProduceSubcategories() async {
     return [
       const SubcategoryModel(
@@ -153,29 +150,20 @@ class CategoryService {
     ];
   }
 
-  
   Future<List<SubcategoryModel>> fetchMedicineSubcategories() async {
     return [
       const SubcategoryModel(
-        id: 'medicine_prescription',
-        title: 'Prescription',
-        description: 'Prescription medicines',
-        iconPath: ImagePath.medicineIcon,
-        categoryId: '3',
-        isPopular: true,
-      ),
-      const SubcategoryModel(
         id: 'medicine_otc',
         title: 'Over the Counter',
-        description: 'OTC medicines',
+        description: 'OTC medicines available without prescription',
         iconPath: ImagePath.medicineIcon,
         categoryId: '3',
         isPopular: true,
       ),
       const SubcategoryModel(
         id: 'medicine_vitamins',
-        title: 'Vitamins',
-        description: 'Vitamins and supplements',
+        title: 'Vitamins & Supplements',
+        description: 'Vitamins and nutritional supplements',
         iconPath: ImagePath.medicineIcon,
         categoryId: '3',
         isPopular: true,
@@ -183,7 +171,7 @@ class CategoryService {
       const SubcategoryModel(
         id: 'medicine_firstaid',
         title: 'First Aid',
-        description: 'First aid supplies',
+        description: 'First aid supplies and medical equipment',
         iconPath: ImagePath.medicineIcon,
         categoryId: '3',
         isPopular: false,
@@ -191,7 +179,6 @@ class CategoryService {
     ];
   }
 
-  
   Future<List<SubcategoryModel>> fetchCleaningSubcategories() async {
     return [
       const SubcategoryModel(
@@ -229,7 +216,6 @@ class CategoryService {
     ];
   }
 
-  
   Future<List<SubcategoryModel>> fetchPersonalCareSubcategories() async {
     return [
       const SubcategoryModel(
@@ -267,7 +253,6 @@ class CategoryService {
     ];
   }
 
-  
   Future<List<SubcategoryModel>> fetchPetSuppliesSubcategories() async {
     return [
       const SubcategoryModel(
@@ -305,7 +290,6 @@ class CategoryService {
     ];
   }
 
-  
   Future<List<SubcategoryModel>> fetchCustomSubcategories() async {
     return [
       const SubcategoryModel(
@@ -343,61 +327,46 @@ class CategoryService {
     ];
   }
 
-  
   Future<List<SubcategoryModel>> fetchSubcategories(
     String categoryId, {
     String? parentSubcategoryId,
   }) async {
     if (categoryId == '1') {
-      
       return fetchFoodSubcategories();
     } else if (categoryId == '2') {
-      
       if (parentSubcategoryId == null) {
-        
         return fetchGroceryMainCategories();
       } else if (parentSubcategoryId == 'grocery_produce') {
-        
         return fetchProduceSubcategories();
       } else if (parentSubcategoryId == 'grocery_cooking') {
-        
         return [];
       } else if (parentSubcategoryId == 'grocery_meats') {
-        
         return [];
       } else if (parentSubcategoryId == 'grocery_oils') {
-        
         return [];
       }
-      
+
       return [];
     } else if (categoryId == '3') {
-      
       return fetchMedicineSubcategories();
     } else if (categoryId == '4') {
-      
       return fetchCleaningSubcategories();
     } else if (categoryId == '5') {
-      
       return fetchPersonalCareSubcategories();
     } else if (categoryId == '6') {
-      
       return fetchPetSuppliesSubcategories();
     } else if (categoryId == '7') {
-      
       return fetchCustomSubcategories();
     }
     return [];
   }
 
-  
   Future<List<ProductModel>> fetchProductsBySubcategory(
     String subcategoryId,
   ) async {
     return _productService.getProductsBySubcategory(subcategoryId);
   }
 
-  
   Future<List<SubcategoryModel>> fetchPopularSubcategories(
     String categoryId,
   ) async {
@@ -405,24 +374,20 @@ class CategoryService {
     return subcategories.where((sub) => sub.isPopular).toList();
   }
 
-  
   Future<List<ProductModel>> fetchFeaturedProducts(String categoryId) async {
     return _productService.getFeaturedProducts(categoryId);
   }
 
-  
   Future<List<ProductModel>> fetchRecommendedProducts(String categoryId) async {
     return _productService.getRecommendedProducts(categoryId);
   }
 
-  
   Future<List<ProductModel>> fetchProductsByMainCategory(
     String mainCategoryId,
   ) async {
     return _productService.getProductsByMainCategory(mainCategoryId);
   }
 
-  
   Future<List<ProductModel>> fetchAllProductsByCategory(
     String categoryId,
   ) async {

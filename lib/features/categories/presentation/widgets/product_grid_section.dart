@@ -66,6 +66,8 @@ class ProductGridSection extends StatelessWidget {
                       fontWeight: FontWeight.w500,
                       color: AppColors.ebonyBlack,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   if (showViewAll && onViewAllTap != null)
                     GestureDetector(

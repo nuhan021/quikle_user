@@ -27,6 +27,8 @@ import 'package:quikle_user/features/search/presentation/screens/search_screen.d
 import 'package:quikle_user/features/orders/presentation/screens/order_tracking_screen.dart';
 import 'package:quikle_user/features/orders/presentation/screens/order_invoice_screen.dart';
 import 'package:quikle_user/features/orders/data/models/order_model.dart';
+import 'package:quikle_user/features/prescription/presentation/screens/prescription_list_screen.dart';
+import 'package:quikle_user/features/prescription/presentation/screens/prescription_details_screen.dart';
 
 class AppRoute {
   static const String _splash = '/';
@@ -58,6 +60,8 @@ class AppRoute {
   static const String _myProfile = '/my-profile';
   static const String _orderTracking = '/order-tracking';
   static const String _orderInvoice = '/order-invoice';
+  static const String _prescriptionList = '/prescription-list';
+  static const String _prescriptionDetails = '/prescription-details';
 
   static String getSplashScreen() => _splash;
   static String getLoginScreen() => _login;
@@ -88,6 +92,8 @@ class AppRoute {
   static String getMyProfile() => _myProfile;
   static String getOrderTracking() => _orderTracking;
   static String getOrderInvoice() => _orderInvoice;
+  static String getPrescriptionList() => _prescriptionList;
+  static String getPrescriptionDetails() => _prescriptionDetails;
 
   static final List<GetPage<dynamic>> routes = <GetPage>[
     GetPage(name: _splash, page: () => const SplashScreen()),
@@ -152,6 +158,14 @@ class AppRoute {
     GetPage(
       name: _orderInvoice,
       page: () => OrderInvoiceScreen(order: Get.arguments as OrderModel),
+    ),
+    GetPage(
+      name: _prescriptionList,
+      page: () => const PrescriptionListScreen(),
+    ),
+    GetPage(
+      name: _prescriptionDetails,
+      page: () => const PrescriptionDetailsScreen(),
     ),
 
     // GetPage(

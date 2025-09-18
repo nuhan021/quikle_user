@@ -123,7 +123,6 @@ class CartScreen extends StatelessWidget {
         return;
       }
 
-      
       _processPayment(selectedPaymentMethod, payoutController);
     }
   }
@@ -132,9 +131,6 @@ class CartScreen extends StatelessWidget {
     dynamic paymentMethod,
     PayoutController payoutController,
   ) {
-    
-    
-
     Get.dialog(
       AlertDialog(
         title: const Text('Processing Payment'),
@@ -143,7 +139,7 @@ class CartScreen extends StatelessWidget {
           TextButton(
             onPressed: () {
               Get.back();
-              
+
               _simulatePaymentSuccess(payoutController);
             },
             child: const Text('Simulate Success'),
@@ -167,7 +163,6 @@ class CartScreen extends StatelessWidget {
 
     if (selectedPaymentMethod == null) return;
 
-    
     if (!cartController.hasItems || cartController.cartItems.isEmpty) {
       Get.snackbar(
         'Empty Cart',
@@ -178,16 +173,13 @@ class CartScreen extends StatelessWidget {
     }
 
     try {
-      
       final orderItems = List<CartItemModel>.from(cartController.cartItems);
 
-      
       final subtotal = payoutController.subtotal;
       final deliveryFee = payoutController.deliveryFee;
       final discountAmount = payoutController.discountAmount;
       final total = payoutController.totalAmount;
 
-      
       final selectedDeliveryOption = payoutController.selectedDeliveryOption;
       final deliveryOption =
           selectedDeliveryOption ??
@@ -199,7 +191,6 @@ class CartScreen extends StatelessWidget {
             isSelected: true,
           );
 
-      
       final selectedShippingAddress = payoutController.selectedShippingAddress;
       final shippingAddress =
           selectedShippingAddress ??
@@ -217,7 +208,6 @@ class CartScreen extends StatelessWidget {
             isSelected: true,
           );
 
-      
       print('Creating order with ${orderItems.length} items');
       for (var item in orderItems) {
         print(
@@ -225,7 +215,6 @@ class CartScreen extends StatelessWidget {
         );
       }
 
-      
       print(
         'Order totals - Subtotal: \$${subtotal.toStringAsFixed(2)}, Delivery: \$${deliveryFee.toStringAsFixed(2)}, Discount: \$${discountAmount.toStringAsFixed(2)}, Total: \$${total.toStringAsFixed(2)}',
       );
@@ -236,42 +225,34 @@ class CartScreen extends StatelessWidget {
         'Selected shipping address: ${shippingAddress.name} - ${shippingAddress.address}',
       );
 
-      
       final orderId = generateOrderId();
       final transactionId = 'TXN_${DateTime.now().millisecondsSinceEpoch}';
 
-      
       final payoutPaymentMethod = payout.PaymentMethodModel(
         type: selectedPaymentMethod.type,
         isSelected: true,
       );
 
-      
       final order = OrderModel(
         orderId: orderId,
         userId: 'user123',
-        items:
-            orderItems, 
+        items: orderItems,
         shippingAddress: shippingAddress,
         deliveryOption: deliveryOption,
         paymentMethod: payoutPaymentMethod,
         subtotal: subtotal,
         deliveryFee: deliveryFee,
         total: total,
-        discount: discountAmount > 0
-            ? discountAmount
-            : null, 
+        discount: discountAmount > 0 ? discountAmount : null,
         couponCode: payoutController.appliedCoupon?['isValid'] == true
             ? payoutController.couponCode
-            : null, 
+            : null,
         orderDate: DateTime.now(),
-        status: OrderStatus
-            .pending, 
+        status: OrderStatus.pending,
         transactionId: transactionId,
         estimatedDelivery: DateTime.now().add(const Duration(minutes: 30)),
       );
 
-      
       OrdersController ordersController;
       try {
         ordersController = Get.find<OrdersController>();
@@ -280,7 +261,6 @@ class CartScreen extends StatelessWidget {
       }
       await ordersController.addOrder(order);
 
-      
       try {
         final liveOrderController = Get.find<LiveOrderController>();
         await liveOrderController.addNewOrder(order);
@@ -288,10 +268,8 @@ class CartScreen extends StatelessWidget {
         print('LiveOrderController not found or error: $e');
       }
 
-      
       cartController.clearCart();
 
-      
       Get.dialog(
         OrderSuccessDialog(
           order: order,
@@ -334,7 +312,6 @@ class CartScreen extends StatelessWidget {
               ),
               SizedBox(height: 16.h),
 
-              
               ...paymentMethods.map((method) {
                 return ListTile(
                   leading: method.type.iconPath != null
