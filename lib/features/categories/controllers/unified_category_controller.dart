@@ -53,6 +53,7 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
   late CategoryModel currentCategory;
   bool get isGroceryCategory => currentCategory.id == '2';
   bool get isFoodCategory => currentCategory.id == '1';
+  bool get isMedicineCategory => currentCategory.id == '3';
 
   bool get shouldShowCombinedSection => selectedSubcategory.value != null;
 
