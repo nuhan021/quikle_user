@@ -251,6 +251,10 @@ class CartScreen extends StatelessWidget {
         status: OrderStatus.pending,
         transactionId: transactionId,
         estimatedDelivery: DateTime.now().add(const Duration(minutes: 30)),
+        metadata: {
+          'deliveryPreference': payoutController.selectedDeliveryPreference,
+          'isUrgent': payoutController.isUrgentDelivery,
+        },
       );
 
       OrdersController ordersController;
@@ -276,7 +280,12 @@ class CartScreen extends StatelessWidget {
           transactionId: transactionId,
           onContinue: () {
             Get.back();
-            Get.offAllNamed('/home');
+            // Return to previous route instead of forcing home
+            if (Get.previousRoute.isNotEmpty) {
+              Get.back();
+            } else {
+              Get.offAllNamed('/home');
+            }
           },
         ),
         barrierDismissible: false,

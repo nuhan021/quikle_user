@@ -17,6 +17,15 @@ class LoginController extends GetxController {
   void onInit() {
     super.onInit();
     _auth = Get.find<AuthService>();
+    // Clear name field visibility when phone changes so server check is fresh.
+    phoneController.addListener(() {
+      // If user edits phone after previously showing name field, hide it and reset existing flag
+      if (showNameField.value || !isExistingUser.value) {
+        showNameField.value = false;
+        isExistingUser.value = true;
+        nameController.text = '';
+      }
+    });
   }
 
   Future<void> onTapContinue() async {
@@ -25,31 +34,20 @@ class LoginController extends GetxController {
       errorMessage.value = '';
 
       try {
+        // Demo override: consider phone length 5-10 digits as existing user
+        final phoneTrim = phoneController.text.trim();
+        final digitOnly = phoneTrim.replaceAll(RegExp(r'\D'), '');
+        // Demo rule: any phone with 5 or more digits treated as existing user
+        final isDemoExisting = digitOnly.length >= 5;
+
+        // Send OTP to server (pass name only if we're already showing it)
         final response = await _auth.sendOtp(
-          phoneController.text.trim(),
+          phoneTrim,
           name: showNameField.value ? nameController.text.trim() : null,
         );
 
-        if (response.isSuccess) {
-          final userExists = response.responseData?['userExists'] ?? true;
-
-          if (!userExists && !showNameField.value) {
-            showNameField.value = true;
-            isExistingUser.value = false;
-            isLoading.value = false;
-            return;
-          }
-
-          // Proceed to verification
-          Get.toNamed(
-            AppRoute.getVerify(),
-            arguments: {
-              'phone': phoneController.text.trim(),
-              'name': showNameField.value ? nameController.text.trim() : null,
-              'isLogin': userExists,
-            },
-          );
-        } else {
+        // If server returned an error, show it and stop
+        if (!response.isSuccess) {
           errorMessage.value = response.errorMessage;
           Get.snackbar(
             'Error',
@@ -58,7 +56,45 @@ class LoginController extends GetxController {
             backgroundColor: Colors.red.withValues(alpha: 0.1),
             colorText: Colors.red,
           );
+          isLoading.value = false;
+          return;
         }
+
+        // decide user existence: prefer server response if provided, otherwise apply demo rule
+        bool userExists = isDemoExisting;
+        debugPrint('Phone number: $phoneTrim');
+        debugPrint('LoginController: isDemoExisting=$userExists');
+
+        // try {
+        //   if (response.responseData != null &&
+        //       response.responseData!['userExists'] != null) {
+        //     userExists = response.responseData?['userExists'] ?? isDemoExisting;
+        //   }
+        // } catch (_) {}
+
+        debugPrint('LoginController: isDemoExisting=$userExists');
+
+        // If server (or demo rule) says user does not exist, show name field for registration.
+        if (!userExists && !showNameField.value) {
+          clearInputs();
+          showNameField.value = true;
+          isExistingUser.value = false;
+          isLoading.value = false;
+          return;
+        }
+
+        // Proceed: hide name field for login flow and navigate to verification
+        showNameField.value = false;
+        isExistingUser.value = true;
+        Get.toNamed(
+          AppRoute.getVerify(),
+
+          arguments: {
+            'phone': phoneTrim,
+            'name': showNameField.value ? nameController.text.trim() : null,
+            'isLogin': userExists,
+          },
+        );
       } catch (e) {
         errorMessage.value = 'Something went wrong. Please try again.';
         Get.snackbar(
@@ -122,6 +158,10 @@ class LoginController extends GetxController {
   // Legacy methods for backward compatibility
   Future<void> onTapLogin() async => onTapContinue();
   void onTapCreateAccount() => onTapContinue();
+
+  void clearInputs() {
+    nameController.text = '';
+  }
 
   @override
   void onClose() {

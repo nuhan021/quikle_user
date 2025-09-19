@@ -14,6 +14,7 @@ class VerificationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<VerificationController>();
+    controller.startTimer();
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
@@ -34,7 +35,14 @@ class VerificationScreen extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       GestureDetector(
-                        onTap: Get.back,
+                        onTap: () {
+                          try {
+                            final controller =
+                                Get.find<VerificationController>();
+                            controller.clearOtp();
+                          } catch (_) {}
+                          Get.back();
+                        },
                         child: SizedBox(
                           width: 40.w,
                           height: 40.w,

@@ -1,3 +1,4 @@
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -32,7 +33,6 @@ class PrescriptionUploadSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          
           Row(
             children: [
               Container(
@@ -79,7 +79,6 @@ class PrescriptionUploadSection extends StatelessWidget {
 
           SizedBox(height: 16.h),
 
-          
           Obx(() {
             if (controller.isUploading.value) {
               return Column(
@@ -118,7 +117,6 @@ class PrescriptionUploadSection extends StatelessWidget {
             return const SizedBox.shrink();
           }),
 
-          
           Obx(() {
             return SizedBox(
               width: double.infinity,
@@ -152,10 +150,55 @@ class PrescriptionUploadSection extends StatelessWidget {
 
           SizedBox(height: 12.h),
 
-          
           Obx(() {
-            if (controller.prescriptions.isEmpty) {
+            if (controller.prescriptions.isEmpty)
               return const SizedBox.shrink();
+
+            final prescription = controller.prescriptions.first;
+
+            String _normalize(String p) =>
+                p.startsWith('file://') ? p.replaceFirst('file://', '') : p;
+
+            Widget _thumbPlaceholder() {
+              return Container(
+                width: 56.w,
+                height: 56.h,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade100,
+                  borderRadius: BorderRadius.circular(8.r),
+                  border: Border.all(color: Colors.grey.shade300),
+                ),
+                child: Icon(
+                  Icons.image_outlined,
+                  color: Colors.grey.shade500,
+                  size: 24.sp,
+                ),
+              );
+            }
+
+            Widget _buildThumb(String path) {
+              final normalized = _normalize(path);
+              if (normalized.startsWith('http://') ||
+                  normalized.startsWith('https://')) {
+                return Image.network(
+                  normalized,
+                  fit: BoxFit.cover,
+                  width: 56.w,
+                  height: 56.h,
+                  errorBuilder: (c, e, s) => _thumbPlaceholder(),
+                );
+              }
+              try {
+                return Image.file(
+                  File(normalized),
+                  fit: BoxFit.cover,
+                  width: 56.w,
+                  height: 56.h,
+                  errorBuilder: (c, e, s) => _thumbPlaceholder(),
+                );
+              } catch (_) {
+                return _thumbPlaceholder();
+              }
             }
 
             return Column(
@@ -188,248 +231,130 @@ class PrescriptionUploadSection extends StatelessWidget {
                   ],
                 ),
                 SizedBox(height: 8.h),
-                ...controller.prescriptions.take(1).map((prescription) {
-                  return Container(
-                    margin: EdgeInsets.only(bottom: 8.h),
-                    padding: EdgeInsets.all(12.w),
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade50,
-                      borderRadius: BorderRadius.circular(8.r),
-                      border: Border.all(color: Colors.grey.shade200),
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          padding: EdgeInsets.all(6.w),
-                          decoration: BoxDecoration(
-                            color: _getStatusColor(
-                              prescription.status,
-                            ).withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(6.r),
-                          ),
-                          child: Icon(
-                            _getStatusIcon(prescription.status),
-                            color: _getStatusColor(prescription.status),
-                            size: 16.sp,
-                          ),
-                        ),
-                        SizedBox(width: 12.w),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                prescription.fileName,
-                                style: getTextStyle(
-                                  font: CustomFonts.inter,
-                                  fontSize: 13.sp,
-                                  fontWeight: FontWeight.w500,
-                                  color: AppColors.ebonyBlack,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              SizedBox(height: 2.h),
-                              Text(
-                                prescription.status.displayName,
-                                style: getTextStyle(
-                                  font: CustomFonts.inter,
-                                  fontSize: 11.sp,
-                                  fontWeight: FontWeight.w400,
-                                  color: _getStatusColor(prescription.status),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        if (prescription.vendorResponses.isNotEmpty)
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 8.w,
-                              vertical: 4.h,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.green.shade100,
-                              borderRadius: BorderRadius.circular(12.r),
-                            ),
-                            child: Text(
-                              '${prescription.vendorResponses.length} offer${prescription.vendorResponses.length > 1 ? 's' : ''}',
+
+                Container(
+                  margin: EdgeInsets.only(bottom: 8.h),
+                  padding: EdgeInsets.all(8.w),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade50,
+                    borderRadius: BorderRadius.circular(8.r),
+                    border: Border.all(color: Colors.grey.shade200),
+                  ),
+                  child: Row(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8.r),
+                        child: _buildThumb(prescription.imagePath),
+                      ),
+                      SizedBox(width: 12.w),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              prescription.fileName,
                               style: getTextStyle(
                                 font: CustomFonts.inter,
-                                fontSize: 10.sp,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.green.shade700,
+                                fontSize: 13.sp,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.ebonyBlack,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            SizedBox(height: 4.h),
+                            // Compact status chip: icon + status text
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 8.w,
+                                vertical: 4.h,
+                              ),
+                              decoration: BoxDecoration(
+                                color: _getStatusColor(
+                                  prescription.status,
+                                ).withOpacity(0.12),
+                                borderRadius: BorderRadius.circular(12.r),
+                                border: Border.all(
+                                  color: _getStatusColor(
+                                    prescription.status,
+                                  ).withOpacity(0.18),
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    // small icon to match status
+                                    prescription.status ==
+                                            PrescriptionStatus.uploaded
+                                        ? Icons.cloud_upload
+                                        : prescription.status ==
+                                              PrescriptionStatus.processing
+                                        ? Icons.hourglass_empty
+                                        : prescription.status ==
+                                              PrescriptionStatus.responded
+                                        ? Icons.check_circle
+                                        : prescription.status ==
+                                              PrescriptionStatus.expired
+                                        ? Icons.access_time
+                                        : Icons.cancel,
+                                    size: 14.sp,
+                                    color: _getStatusColor(prescription.status),
+                                  ),
+                                  SizedBox(width: 6.w),
+                                  Text(
+                                    // concise status labels: Uploaded, Processing, Responded, Expired, Rejected
+                                    prescription.status.displayName,
+                                    style: getTextStyle(
+                                      font: CustomFonts.inter,
+                                      fontSize: 12.sp,
+                                      fontWeight: FontWeight.w600,
+                                      color: _getStatusColor(
+                                        prescription.status,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(width: 8.w),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          GestureDetector(
+                            onTap: () => controller.viewPrescriptionDetails(
+                              prescription,
+                            ),
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 12.w,
+                                vertical: 6.h,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.blue.shade600,
+                                borderRadius: BorderRadius.circular(6.r),
+                              ),
+                              child: Text(
+                                'View Details',
+                                style: getTextStyle(
+                                  font: CustomFonts.inter,
+                                  fontSize: 12.sp,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
                               ),
                             ),
                           ),
-                      ],
-                    ),
-                  );
-                }).toList(),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
               ],
             );
-          }),
-
-          
-          Obx(() {
-            
-            final recentPrescription = controller.prescriptions.isNotEmpty
-                ? controller.prescriptions.first
-                : null;
-
-            if (recentPrescription == null) {
-              return const SizedBox.shrink();
-            }
-
-            
-            if (recentPrescription.status == PrescriptionStatus.uploaded ||
-                recentPrescription.status == PrescriptionStatus.processing) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: 16.h),
-                  Container(
-                    padding: EdgeInsets.all(12.w),
-                    decoration: BoxDecoration(
-                      color: Colors.orange.shade50,
-                      borderRadius: BorderRadius.circular(8.r),
-                      border: Border.all(color: Colors.orange.shade200),
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          padding: EdgeInsets.all(6.w),
-                          decoration: BoxDecoration(
-                            color: Colors.orange.shade100,
-                            borderRadius: BorderRadius.circular(6.r),
-                          ),
-                          child: Icon(
-                            Icons.hourglass_empty,
-                            color: Colors.orange.shade600,
-                            size: 20.sp,
-                          ),
-                        ),
-                        SizedBox(width: 12.w),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                recentPrescription.status ==
-                                        PrescriptionStatus.uploaded
-                                    ? 'Prescription Uploaded'
-                                    : 'Processing',
-                                style: getTextStyle(
-                                  font: CustomFonts.inter,
-                                  fontSize: 14.sp,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.orange.shade700,
-                                ),
-                              ),
-                              SizedBox(height: 2.h),
-                              Text(
-                                'Vendors are reviewing your prescription...',
-                                style: getTextStyle(
-                                  font: CustomFonts.inter,
-                                  fontSize: 12.sp,
-                                  fontWeight: FontWeight.w400,
-                                  color: AppColors.ebonyBlack.withOpacity(0.7),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              );
-            }
-
-            
-            if (controller.recentPrescriptionMedicines.isNotEmpty) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: 16.h),
-                  Container(
-                    padding: EdgeInsets.all(12.w),
-                    decoration: BoxDecoration(
-                      color: Colors.green.shade50,
-                      borderRadius: BorderRadius.circular(8.r),
-                      border: Border.all(color: Colors.green.shade200),
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          padding: EdgeInsets.all(6.w),
-                          decoration: BoxDecoration(
-                            color: Colors.green.shade100,
-                            borderRadius: BorderRadius.circular(6.r),
-                          ),
-                          child: Icon(
-                            Icons.check_circle,
-                            color: Colors.green.shade600,
-                            size: 20.sp,
-                          ),
-                        ),
-                        SizedBox(width: 12.w),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Vendor Accepted',
-                                style: getTextStyle(
-                                  font: CustomFonts.inter,
-                                  fontSize: 14.sp,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.green.shade700,
-                                ),
-                              ),
-                              SizedBox(height: 2.h),
-                              Text(
-                                '${controller.recentPrescriptionMedicines.length} medicine${controller.recentPrescriptionMedicines.length > 1 ? 's' : ''} available to add to cart',
-                                style: getTextStyle(
-                                  font: CustomFonts.inter,
-                                  fontSize: 12.sp,
-                                  fontWeight: FontWeight.w400,
-                                  color: AppColors.ebonyBlack.withOpacity(0.7),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () => Get.toNamed('/prescription-list'),
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 12.w,
-                              vertical: 6.h,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.green.shade600,
-                              borderRadius: BorderRadius.circular(6.r),
-                            ),
-                            child: Text(
-                              'View Details',
-                              style: getTextStyle(
-                                font: CustomFonts.inter,
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              );
-            }
-
-            return const SizedBox.shrink();
           }),
         ],
       ),
@@ -448,21 +373,6 @@ class PrescriptionUploadSection extends StatelessWidget {
         return Colors.red;
       case PrescriptionStatus.rejected:
         return Colors.red;
-    }
-  }
-
-  IconData _getStatusIcon(PrescriptionStatus status) {
-    switch (status) {
-      case PrescriptionStatus.uploaded:
-        return Icons.cloud_upload;
-      case PrescriptionStatus.processing:
-        return Icons.hourglass_empty;
-      case PrescriptionStatus.responded:
-        return Icons.check_circle;
-      case PrescriptionStatus.expired:
-        return Icons.access_time;
-      case PrescriptionStatus.rejected:
-        return Icons.cancel;
     }
   }
 }

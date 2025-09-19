@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:quikle_user/core/common/styles/global_text_style.dart';
@@ -12,6 +14,20 @@ class PrescriptionImageCardWidget extends StatelessWidget {
 
   bool _isRemote(String p) =>
       p.startsWith('http://') || p.startsWith('https://');
+
+  bool _isLocal(String p) {
+    try {
+      final normalized = _normalizeLocalPath(p);
+      return File(normalized).existsSync();
+    } catch (e) {
+      return false;
+    }
+  }
+
+  String _normalizeLocalPath(String p) {
+    if (p.startsWith('file://')) return p.replaceFirst('file://', '');
+    return p;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -97,6 +113,15 @@ class PrescriptionImageCardWidget extends StatelessWidget {
             ),
           );
         },
+        errorBuilder: (context, error, stackTrace) => _buildImageError(),
+      );
+    } else if (_isLocal(imagePath)) {
+      final path = _normalizeLocalPath(imagePath);
+      return Image.file(
+        File(path),
+        fit: BoxFit.cover,
+        width: double.infinity,
+        height: double.infinity,
         errorBuilder: (context, error, stackTrace) => _buildImageError(),
       );
     } else {
@@ -200,6 +225,13 @@ class PrescriptionImageCardWidget extends StatelessWidget {
     if (_isRemote(imagePath)) {
       return Image.network(
         imagePath,
+        fit: BoxFit.contain,
+        errorBuilder: (context, error, stackTrace) => _buildPreviewError(),
+      );
+    } else if (_isLocal(imagePath)) {
+      final path = _normalizeLocalPath(imagePath);
+      return Image.file(
+        File(path),
         fit: BoxFit.contain,
         errorBuilder: (context, error, stackTrace) => _buildPreviewError(),
       );

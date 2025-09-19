@@ -1,5 +1,4 @@
 import 'package:get/get.dart';
-import 'package:quikle_user/features/auth/presentation/screens/resgiter_screen.dart';
 import 'package:quikle_user/features/auth/presentation/screens/verification_scree.dart';
 import 'package:quikle_user/features/auth/presentation/screens/welcome_screen.dart';
 import 'package:quikle_user/features/main/presentation/screens/main_screen.dart';
@@ -98,7 +97,6 @@ class AppRoute {
   static final List<GetPage<dynamic>> routes = <GetPage>[
     GetPage(name: _splash, page: () => const SplashScreen()),
     GetPage(name: _login, page: () => const LoginScreen()),
-    GetPage(name: _register, page: () => const RegisterScreen()),
     GetPage(name: _verify, page: () => const VerificationScreen()),
     GetPage(name: _welcome, page: () => const WelcomeScreen()),
     GetPage(
