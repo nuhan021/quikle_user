@@ -1,4 +1,3 @@
-
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -12,7 +11,6 @@ class PrescriptionController extends GetxController {
   final PrescriptionService _prescriptionService = PrescriptionService();
   final ImagePicker _imagePicker = ImagePicker();
 
-  
   final isUploading = false.obs;
   final isLoading = false.obs;
   final prescriptions = <PrescriptionModel>[].obs;
@@ -20,11 +18,9 @@ class PrescriptionController extends GetxController {
   final recentPrescriptionMedicines = <ProductModel>[].obs;
   final selectedPrescription = Rxn<PrescriptionModel>();
 
-  
   final uploadProgress = 0.0.obs;
   final uploadNotes = ''.obs;
 
-  
   final prescriptionStats = <String, int>{}.obs;
 
   @override
@@ -36,7 +32,6 @@ class PrescriptionController extends GetxController {
     loadPrescriptionStats();
   }
 
-  
   Future<void> uploadFromCamera() async {
     try {
       final XFile? image = await _imagePicker.pickImage(
@@ -58,7 +53,6 @@ class PrescriptionController extends GetxController {
     }
   }
 
-  
   Future<void> uploadFromGallery() async {
     try {
       final XFile? image = await _imagePicker.pickImage(
@@ -80,20 +74,18 @@ class PrescriptionController extends GetxController {
     }
   }
 
-  
   Future<void> _uploadPrescription(File imageFile) async {
     try {
       isUploading.value = true;
       uploadProgress.value = 0.0;
 
-      
       for (int i = 0; i <= 100; i += 10) {
         uploadProgress.value = i / 100.0;
         await Future.delayed(const Duration(milliseconds: 100));
       }
 
       final prescription = await _prescriptionService.uploadPrescription(
-        userId: 'current_user_id', 
+        userId: 'current_user_id',
         imageFile: imageFile,
         notes: uploadNotes.value.isEmpty ? null : uploadNotes.value,
       );
@@ -108,7 +100,6 @@ class PrescriptionController extends GetxController {
         duration: const Duration(seconds: 4),
       );
 
-      
       await Future.wait([
         loadPrescriptionStats(),
         loadRecentPrescriptionMedicines(),
@@ -125,7 +116,6 @@ class PrescriptionController extends GetxController {
     }
   }
 
-  
   Future<void> loadUserPrescriptions() async {
     try {
       isLoading.value = true;
@@ -144,7 +134,6 @@ class PrescriptionController extends GetxController {
     }
   }
 
-  
   Future<void> loadPrescriptionMedicines() async {
     try {
       final medicines = await _prescriptionService
@@ -155,7 +144,6 @@ class PrescriptionController extends GetxController {
     }
   }
 
-  
   Future<void> loadRecentPrescriptionMedicines() async {
     try {
       final medicines = await _prescriptionService
@@ -166,7 +154,6 @@ class PrescriptionController extends GetxController {
     }
   }
 
-  
   Future<void> loadPrescriptionStats() async {
     try {
       final stats = await _prescriptionService.getPrescriptionStats(
@@ -178,13 +165,11 @@ class PrescriptionController extends GetxController {
     }
   }
 
-  
   void viewPrescriptionDetails(PrescriptionModel prescription) {
     selectedPrescription.value = prescription;
     Get.toNamed('/prescription-details', arguments: prescription);
   }
 
-  
   Future<void> deletePrescription(String prescriptionId) async {
     try {
       final success = await _prescriptionService.deletePrescription(
@@ -208,7 +193,6 @@ class PrescriptionController extends GetxController {
     }
   }
 
-  
   void addPrescriptionMedicineToCart(ProductModel medicine) {
     try {
       final cartController = Get.find<CartController>();
@@ -228,7 +212,6 @@ class PrescriptionController extends GetxController {
     }
   }
 
-  
   void addPrescriptionMedicineToCartWithQuantity(
     ProductModel medicine,
     int quantity,
@@ -236,7 +219,6 @@ class PrescriptionController extends GetxController {
     try {
       final cartController = Get.find<CartController>();
 
-      
       for (int i = 0; i < quantity; i++) {
         cartController.addToCart(medicine);
       }
@@ -255,14 +237,12 @@ class PrescriptionController extends GetxController {
     }
   }
 
-  
   Future<void> acceptVendorResponse(PrescriptionResponseModel response) async {
     try {
       final success = await _prescriptionService.acceptVendorResponse(
         response.id,
       );
       if (success) {
-        
         for (final medicine in response.medicines) {
           if (medicine.isMedicineAvailable) {
             final product = ProductModel(
@@ -303,7 +283,6 @@ class PrescriptionController extends GetxController {
     }
   }
 
-  
   Future<void> refreshData() async {
     await Future.wait([
       loadUserPrescriptions(),
@@ -313,12 +292,10 @@ class PrescriptionController extends GetxController {
     ]);
   }
 
-  
   void setUploadNotes(String notes) {
     uploadNotes.value = notes;
   }
 
-  
   void showUploadOptions() {
     Get.bottomSheet(
       Container(

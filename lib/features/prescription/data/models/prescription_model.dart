@@ -1,4 +1,3 @@
-
 import 'package:quikle_user/features/home/data/models/product_model.dart';
 
 class PrescriptionModel {
@@ -142,7 +141,7 @@ class PrescriptionResponseModel {
               description: e['brand'] as String,
               price: (e['price'] as num).toDouble().toString(),
               imagePath: e['imagePath'] as String? ?? '',
-              categoryId: '3', 
+              categoryId: '3',
               shopId: e['vendorId'] as String? ?? '',
               weight: e['dosage'] as String?,
               isPrescriptionMedicine: true,
@@ -173,14 +172,13 @@ class PrescriptionResponseModel {
     };
   }
 
-  
   Map<String, dynamic> _productToMedicineJson(ProductModel product) {
     return {
       'id': product.id,
       'name': product.title,
       'brand': product.description,
       'dosage': product.weight ?? '',
-      'quantity': 1, 
+      'quantity': 1,
       'price': double.tryParse(product.price) ?? 0.0,
       'notes': null,
       'isAvailable': true,
@@ -208,7 +206,7 @@ extension PrescriptionStatusExtension on PrescriptionStatus {
       case PrescriptionStatus.processing:
         return 'Processing';
       case PrescriptionStatus.responded:
-        return 'Vendor Responded';
+        return 'Approved';
       case PrescriptionStatus.expired:
         return 'Expired';
       case PrescriptionStatus.rejected:
@@ -249,9 +247,7 @@ extension VendorResponseStatusExtension on VendorResponseStatus {
   }
 }
 
-
 extension PrescriptionProductExtension on ProductModel {
-  
   int get prescriptionQuantity {
     if (vendorResponseId?.isNotEmpty == true) {
       return int.tryParse(vendorResponseId!.split('_').last) ?? 1;
@@ -259,22 +255,16 @@ extension PrescriptionProductExtension on ProductModel {
     return 1;
   }
 
-  
   String get dosage => weight ?? '';
 
-  
   String get medicineName => title;
 
-  
   String get brandName => description;
 
-  
   double get medicinePrice => double.tryParse(price) ?? 0.0;
 
-  
-  bool get isMedicineAvailable => true; 
+  bool get isMedicineAvailable => true;
 
-  
   ProductModel copyWithPrescriptionData({
     String? dosage,
     int? quantity,

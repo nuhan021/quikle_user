@@ -4,7 +4,6 @@ import 'package:quikle_user/features/user/data/services/user_service.dart';
 import 'package:quikle_user/features/user/controllers/user_controller.dart';
 import 'package:quikle_user/features/auth/controllers/auth_controller.dart';
 import 'package:quikle_user/features/auth/controllers/login_controller.dart';
-import 'package:quikle_user/features/auth/controllers/register_controller.dart';
 import 'package:quikle_user/features/auth/controllers/verification_controller.dart';
 import 'package:quikle_user/features/auth/controllers/welcome_controller.dart';
 import 'package:quikle_user/features/auth/data/services/auth_service.dart';
@@ -34,7 +33,6 @@ class ControllerBinder extends Bindings {
     // Controllers
     Get.put<SplashController>(SplashController(), permanent: true);
     Get.put<LoginController>(LoginController(), permanent: true);
-    Get.put<RegisterController>(RegisterController(), permanent: true);
     Get.put<VerificationController>(VerificationController(), permanent: true);
     Get.lazyPut<WelcomeController>(() => WelcomeController(), fenix: true);
     Get.put<CartController>(CartController(), permanent: true);
