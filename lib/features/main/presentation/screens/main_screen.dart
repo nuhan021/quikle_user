@@ -138,19 +138,14 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
           onNotification: _onScrollNotification,
           child: Stack(
             children: [
+              // Main content screens
               AnimatedBuilder(
                 animation: _navController,
                 builder: (context, _) {
-                  final inset = _navController.value * _navBarHeight;
-                  return Padding(
-                    padding: EdgeInsets.only(bottom: inset),
-                    child: IndexedStack(
-                      index: _currentIndex,
-                      children: _screens,
-                    ),
-                  );
+                  return IndexedStack(index: _currentIndex, children: _screens);
                 },
               ),
+
               Positioned(
                 left: 0,
                 right: 0,
@@ -169,33 +164,18 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                         ),
                       );
                     },
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        
-                        Container(
-                          padding: EdgeInsets.only(
-                            left: 16.0,
-                            right:
-                                88.0, 
-                            bottom: 8.0,
-                          ),
-                          child: const LiveOrderIndicator(),
-                        ),
-
-                        
-                        KeyedSubtree(
-                          key: _navKey,
-                          child: CustomNavBar(
-                            currentIndex: _currentIndex,
-                            onTap: _onNavItemTapped,
-                          ),
-                        ),
-                      ],
+                    child: KeyedSubtree(
+                      key: _navKey,
+                      child: CustomNavBar(
+                        currentIndex: _currentIndex,
+                        onTap: _onNavItemTapped,
+                      ),
                     ),
                   ),
                 ),
               ),
+
+              // Floating cart button
               AnimatedBuilder(
                 animation: _navController,
                 builder: (context, _) {
@@ -204,6 +184,9 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                   return FloatingCartButton(bottomInset: inset);
                 },
               ),
+
+              // Floating Live Order Indicator (NEW - replaces the old one)
+              const LiveOrderIndicator(),
             ],
           ),
         ),

@@ -23,9 +23,14 @@ class OrderInvoiceScreen extends StatelessWidget {
         bottom: false,
         child: Column(
           children: [
-            const UnifiedProfileAppBar(
+            UnifiedProfileAppBar(
               title: 'Order Details',
               showBackButton: true,
+              showActionButton: order.isTrackable,
+              actionText: order.isTrackable ? 'Track Order' : null,
+              onActionPressed: order.isTrackable
+                  ? () => Get.to(() => OrderTrackingScreen(order: order))
+                  : null,
             ),
             Expanded(
               child: SingleChildScrollView(
@@ -44,10 +49,6 @@ class OrderInvoiceScreen extends StatelessWidget {
                     _buildShippingAddress(),
                     SizedBox(height: 16.h),
                     _buildDeliveryInfo(),
-                    if (order.isTrackable) ...[
-                      SizedBox(height: 24.h),
-                      _buildTrackOrderButton(),
-                    ],
                     SizedBox(height: 24.h),
                   ],
                 ),
@@ -244,7 +245,6 @@ class OrderInvoiceScreen extends StatelessWidget {
                 children: [
                   Container(
                     width: 60.w,
-                    height: 60.w,
                     decoration: BoxDecoration(
                       color: const Color(0xFFF5F5F5),
                       borderRadius: BorderRadius.circular(8.r),
@@ -255,7 +255,6 @@ class OrderInvoiceScreen extends StatelessWidget {
                         item.product.imagePath,
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) {
-                          
                           return Icon(
                             Icons.shopping_bag_outlined,
                             size: 24.sp,
@@ -630,42 +629,6 @@ class OrderInvoiceScreen extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildTrackOrderButton() {
-    return SizedBox(
-      width: double.infinity,
-      height: 50.h,
-      child: ElevatedButton(
-        onPressed: () {
-          Get.to(() => OrderTrackingScreen(order: order));
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.beakYellow,
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12.r),
-          ),
-          elevation: 0,
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.my_location, size: 20.sp, color: Colors.white),
-            SizedBox(width: 8.w),
-            Text(
-              'Track Order',
-              style: getTextStyle(
-                font: CustomFonts.obviously,
-                fontSize: 14.sp,
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

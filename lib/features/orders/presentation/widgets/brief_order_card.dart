@@ -51,7 +51,7 @@ class BriefOrderCard extends StatelessWidget {
                         'Order ${order.orderId}',
                         style: getTextStyle(
                           font: CustomFonts.obviously,
-                          fontSize: 16.sp,
+                          fontSize: 14.sp,
                           fontWeight: FontWeight.w500,
                           color: AppColors.ebonyBlack,
                         ),
@@ -63,7 +63,7 @@ class BriefOrderCard extends StatelessWidget {
                         ).format(order.orderDate),
                         style: getTextStyle(
                           font: CustomFonts.inter,
-                          fontSize: 12.sp,
+                          fontSize: 10.sp,
                           fontWeight: FontWeight.w400,
                           color: const Color(0xFF7C7C7C),
                         ),
@@ -78,7 +78,7 @@ class BriefOrderCard extends StatelessWidget {
                       '\$${order.total.toStringAsFixed(2)}',
                       style: getTextStyle(
                         font: CustomFonts.obviously,
-                        fontSize: 16.sp,
+                        fontSize: 14.sp,
                         fontWeight: FontWeight.w600,
                         color: AppColors.ebonyBlack,
                       ),
@@ -88,7 +88,7 @@ class BriefOrderCard extends StatelessWidget {
                       '${order.items.length} item${order.items.length != 1 ? 's' : ''}',
                       style: getTextStyle(
                         font: CustomFonts.inter,
-                        fontSize: 12.sp,
+                        fontSize: 10.sp,
                         fontWeight: FontWeight.w400,
                         color: const Color(0xFF7C7C7C),
                       ),
@@ -97,7 +97,7 @@ class BriefOrderCard extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: 12.h),
+            SizedBox(height: 8.h),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -109,7 +109,7 @@ class BriefOrderCard extends StatelessWidget {
                       OrderStatusHelpers.getStatusText(order.status),
                       style: getTextStyle(
                         font: CustomFonts.inter,
-                        fontSize: 14.sp,
+                        fontSize: 12.sp,
                         fontWeight: FontWeight.w500,
                         color: OrderStatusHelpers.getStatusColor(order.status),
                       ),
@@ -122,7 +122,7 @@ class BriefOrderCard extends StatelessWidget {
                       'View Details',
                       style: getTextStyle(
                         font: CustomFonts.inter,
-                        fontSize: 14.sp,
+                        fontSize: 12.sp,
                         fontWeight: FontWeight.w500,
                         color: AppColors.beakYellow,
                       ),
@@ -130,14 +130,14 @@ class BriefOrderCard extends StatelessWidget {
                     SizedBox(width: 4.w),
                     Icon(
                       Icons.arrow_forward_ios,
-                      size: 12.sp,
+                      size: 10.sp,
                       color: AppColors.beakYellow,
                     ),
                   ],
                 ),
               ],
             ),
-            
+
             if (order.isTrackable) ...[
               SizedBox(height: 12.h),
               Container(

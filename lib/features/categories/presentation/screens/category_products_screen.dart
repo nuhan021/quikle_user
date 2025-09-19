@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -24,22 +25,45 @@ class CategoryProductsScreen extends StatefulWidget {
 
 class _CategoryProductsScreenState extends State<CategoryProductsScreen>
     with TickerProviderStateMixin {
+  // Bottom navbar animation
   late AnimationController _navController;
   final GlobalKey _navKey = GlobalKey();
   double _navBarHeight = 0.0;
 
+  // Collapsible top app bar + scroll
+  late final AnimationController _barAnim;
+  final ScrollController _scroll = ScrollController();
+
   @override
   void initState() {
     super.initState();
+
     _navController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 260),
-      value: 1.0,
+      value: 1.0, // navbar visible initially
     );
+
+    _barAnim = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 220),
+      value: 1.0, // app bar visible initially
+    );
+
+    // AppBar show/hide based on offset threshold (navbar handled via notifications below)
+    _scroll.addListener(() {
+      if (_scroll.offset > 8 && _barAnim.value == 1.0) {
+        _barAnim.reverse();
+      } else if (_scroll.offset <= 8 && _barAnim.value == 0.0) {
+        _barAnim.forward();
+      }
+    });
   }
 
   @override
   void dispose() {
+    _scroll.dispose();
+    _barAnim.dispose();
     _navController.dispose();
     super.dispose();
   }
@@ -56,14 +80,19 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
   }
 
   void _onNavItemTapped(int index) {
-    if (index == 2) {
-      return;
-    }
+    if (index == 2) return;
     NavbarNavigationHelper.navigateToTab(index);
   }
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+      ),
+    );
+
     WidgetsBinding.instance.addPostFrameCallback((_) => _measureNavBarHeight());
     const double cartMargin = 16.0;
 
@@ -80,69 +109,137 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
           backgroundColor: AppColors.homeGrey,
           body: Stack(
             children: [
-              Column(
-                children: [
-                  Obx(
-                    () => CommonAppBar(
-                      title: controller.categoryTitle.value,
-                      showNotification: false,
-                      showProfile: false,
-                      onBackTap: () => Get.back(),
-                      addressWidget: AddressWidget(),
+              SafeArea(
+                top: true,
+                bottom: false, // bottom handled by animated navbar inset
+                child: Column(
+                  children: [
+                    // Collapsible AppBar (hides on grid scroll)
+                    ClipRect(
+                      child: SizeTransition(
+                        axisAlignment: -1,
+                        sizeFactor: _barAnim,
+                        child: Obx(
+                          () => CommonAppBar(
+                            title: controller.categoryTitle.value,
+                            showNotification: false,
+                            showProfile: false,
+                            onBackTap: () => Get.back(),
+                            addressWidget: AddressWidget(),
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
 
-                  Expanded(
-                    child: AnimatedBuilder(
-                      animation: _navController,
-                      builder: (context, _) {
-                        final inset = _navController.value * _navBarHeight;
-                        return Padding(
-                          padding: EdgeInsets.only(bottom: inset),
-                          child: Obx(() {
-                            if (controller.isLoading.value) {
-                              return const Center(
-                                child: CircularProgressIndicator(),
+                    Expanded(
+                      child: AnimatedBuilder(
+                        animation: _navController,
+                        builder: (context, _) {
+                          final bottomInset =
+                              _navController.value * _navBarHeight;
+
+                          return Padding(
+                            padding: EdgeInsets.only(
+                              bottom:
+                                  bottomInset, // content respects animated nav height
+                              left: 16.w,
+                              right: 16.w,
+                            ),
+                            child: Obx(() {
+                              if (controller.isLoading.value) {
+                                return const Center(
+                                  child: CircularProgressIndicator(),
+                                );
+                              }
+
+                              return Column(
+                                children: [
+                                  SizedBox(height: 8.h),
+                                  SearchAndFiltersSection(
+                                    searchController: searchController,
+                                    onSearchChanged: controller.onSearchChanged,
+                                    onVoiceTap: controller.onVoiceSearchPressed,
+                                    dynamicHint: controller.currentPlaceholder,
+                                  ),
+                                  SizedBox(height: 12.h),
+
+                                  MinimalSubcategoriesSection(
+                                    subcategories: controller.subcategories,
+                                    selectedSubcategory:
+                                        controller.selectedSubcategory.value,
+                                    onSubcategoryTap:
+                                        controller.onSubcategoryTap,
+                                  ),
+
+                                  SizedBox(height: 12.h),
+
+                                  // Grid is the only scrollable; we listen to its scroll notifications
+                                  Expanded(
+                                    child: NotificationListener<ScrollNotification>(
+                                      onNotification: (notification) {
+                                        // Hide nav on downward scroll, show on upward; show when idle/end
+                                        if (notification
+                                            is UserScrollNotification) {
+                                          if (notification.direction ==
+                                                  ScrollDirection.reverse &&
+                                              _navController.value != 0.0 &&
+                                              _navController.status !=
+                                                  AnimationStatus.reverse) {
+                                            _navController.reverse();
+                                          } else if (notification.direction ==
+                                                  ScrollDirection.forward &&
+                                              _navController.value != 1.0 &&
+                                              _navController.status !=
+                                                  AnimationStatus.forward) {
+                                            _navController.forward();
+                                          } else if (notification.direction ==
+                                              ScrollDirection.idle) {
+                                            if (_navController.value != 1.0) {
+                                              _navController.forward();
+                                            }
+                                          }
+                                        }
+                                        if (notification
+                                            is ScrollEndNotification) {
+                                          if (_navController.value != 1.0) {
+                                            _navController.forward();
+                                          }
+                                        }
+                                        return false;
+                                      },
+                                      child: _buildProductsGrid(controller),
+                                    ),
+                                  ),
+                                ],
                               );
-                            }
-
-                            return Column(
-                              children: [
-                                SearchAndFiltersSection(
-                                  searchController: searchController,
-                                  onSearchChanged: controller.onSearchChanged,
-                                  onVoiceTap: controller.onVoiceSearchPressed,
-                                  dynamicHint: controller.currentPlaceholder,
-                                ),
-                                MinimalSubcategoriesSection(
-                                  subcategories: controller.subcategories,
-                                  selectedSubcategory:
-                                      controller.selectedSubcategory.value,
-                                  onSubcategoryTap: controller.onSubcategoryTap,
-                                ),
-
-                                Expanded(child: _buildProductsGrid(controller)),
-                              ],
-                            );
-                          }),
-                        );
-                      },
+                            }),
+                          );
+                        },
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
 
+              // Bottom Nav (animated vanish on scroll; reappears when idle/end)
               Positioned(
                 left: 0,
                 right: 0,
                 bottom: 0,
-                child: KeyedSubtree(
-                  key: _navKey,
-                  child: CustomNavBar(currentIndex: 2, onTap: _onNavItemTapped),
+                child: SizeTransition(
+                  axisAlignment: 1.0,
+                  sizeFactor: _navController, // 1 -> visible, 0 -> hidden
+                  child: KeyedSubtree(
+                    key: _navKey,
+                    child: CustomNavBar(
+                      currentIndex: 2,
+                      onTap: _onNavItemTapped,
+                    ),
+                  ),
                 ),
               ),
 
-              // Floating Cart Button
+              // Floating Cart Button respects nav inset
               AnimatedBuilder(
                 animation: _navController,
                 builder: (context, _) {
@@ -171,7 +268,7 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
     if (controller.displayProducts.isEmpty) {
       return Center(
         child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 40.h),
+          padding: EdgeInsets.symmetric(vertical: 10.h),
           child: Text(
             'No products available',
             style: TextStyle(color: AppColors.featherGrey, fontSize: 16.sp),
@@ -181,14 +278,21 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
       );
     }
 
-    return Padding(
-      padding: EdgeInsets.all(8.w),
+    return MediaQuery.removePadding(
+      context: context,
+      removeTop: true,
+      removeBottom: true,
       child: GridView.builder(
+        controller:
+            _scroll, // drives app bar (offset) & sends notifications for navbar
+        primary:
+            false, // don't inherit primary scroll view padding (prevents top gap)
+        padding: EdgeInsets.zero,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 3,
           crossAxisSpacing: 12.w,
           mainAxisSpacing: 12.h,
-          childAspectRatio: 0.8,
+          childAspectRatio: 0.75,
         ),
         itemCount: controller.displayProducts.length,
         itemBuilder: (context, index) {

@@ -27,16 +27,13 @@ class TopRestaurantsSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.w),
-          child: Text(
-            title,
-            style: getTextStyle(
-              font: CustomFonts.obviously,
-              fontSize: 14.sp,
-              fontWeight: FontWeight.w600,
-              color: AppColors.ebonyBlack,
-            ),
+        Text(
+          title,
+          style: getTextStyle(
+            font: CustomFonts.obviously,
+            fontSize: 14.sp,
+            fontWeight: FontWeight.w600,
+            color: AppColors.ebonyBlack,
           ),
         ),
         SizedBox(height: 16.h),
@@ -45,7 +42,7 @@ class TopRestaurantsSection extends StatelessWidget {
           height: 140.h,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            padding: EdgeInsets.symmetric(horizontal: 16.w),
+            //padding: EdgeInsets.symmetric(horizontal: 16.w),
             itemCount: restaurants.length,
             itemBuilder: (context, index) {
               final restaurant = restaurants[index];

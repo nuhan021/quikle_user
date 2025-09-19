@@ -14,7 +14,7 @@ class IconRowMarquee extends StatefulWidget {
   const IconRowMarquee({
     super.key,
     required this.images,
-    this.boxSize = 80,
+    this.boxSize = 100,
     this.gap = 12,
     this.speed = 60,
     this.offsetSlots = 0.0,

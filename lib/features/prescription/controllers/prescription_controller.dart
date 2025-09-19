@@ -197,12 +197,6 @@ class PrescriptionController extends GetxController {
     try {
       final cartController = Get.find<CartController>();
       cartController.addToCart(medicine);
-
-      Get.snackbar(
-        'Added to Cart',
-        '${medicine.title} has been added to your cart',
-        snackPosition: SnackPosition.BOTTOM,
-      );
     } catch (e) {
       Get.snackbar(
         'Error',
@@ -222,12 +216,6 @@ class PrescriptionController extends GetxController {
       for (int i = 0; i < quantity; i++) {
         cartController.addToCart(medicine);
       }
-
-      Get.snackbar(
-        'Added to Cart',
-        '${medicine.title} (Qty: $quantity) has been added to your cart',
-        snackPosition: SnackPosition.BOTTOM,
-      );
     } catch (e) {
       Get.snackbar(
         'Error',
@@ -267,12 +255,6 @@ class PrescriptionController extends GetxController {
             );
           }
         }
-
-        Get.snackbar(
-          'Success',
-          'Medicines from ${response.vendorName} added to cart',
-          snackPosition: SnackPosition.BOTTOM,
-        );
       }
     } catch (e) {
       Get.snackbar(

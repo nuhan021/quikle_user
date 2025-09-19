@@ -313,7 +313,7 @@ class ProductSearchController extends GetxController {
     try {
       await WhatsAppService.requestCustomOrder(
         searchQuery: _searchQuery.value,
-        userName: null, // Could be retrieved from user profile if available
+        userName: null,
       );
     } catch (e) {
       debugPrint('Error opening WhatsApp: $e');

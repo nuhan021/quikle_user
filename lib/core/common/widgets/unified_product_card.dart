@@ -161,9 +161,6 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
     final imageHeight = widget.variant == ProductCardVariant.youMayLike
         ? 60.h
         : 50.h;
-    final imageSize = widget.variant == ProductCardVariant.youMayLike
-        ? 48.w
-        : 40.w;
 
     return Stack(
       children: [
@@ -185,8 +182,6 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
             alignment: Alignment.topCenter,
             child: Image.asset(
               widget.product.imagePath,
-              width: imageSize,
-              height: imageSize,
               fit: BoxFit.cover,
               filterQuality: FilterQuality.high,
             ),

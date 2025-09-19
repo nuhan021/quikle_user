@@ -76,11 +76,11 @@ class ImagePath {
   static const String antacid = 'assets/icons/antacid.png';
   static const String banana = 'assets/icons/banana.png';
   static const String bread = 'assets/icons/bread.png';
-  static const String catFood = 'assets/icons/catfood.png';
+  static const String catFood = 'assets/icons/catFood.png';
   static const String chickenBreast = 'assets/icons/chickenBreast.png';
   static const String cleaningSpray = 'assets/icons/cleaningSpray.png';
   static const String dishWashing = 'assets/icons/dishWashing.png';
-  static const String dogChewToy = 'assets/icons/dogchewtoy.png';
+  static const String dogChewToy = 'assets/icons/dogChewToy.png';
   static const String dogFood = 'assets/icons/dogFood.png';
   static const String earbuds = 'assets/icons/earbuds.png';
   static const String eggs = 'assets/icons/eggs.png';
@@ -90,7 +90,7 @@ class ImagePath {
   static const String moisturizer = 'assets/icons/moisturizer.png';
   static const String momos = 'assets/icons/momos.png';
   static const String mop = 'assets/icons/mop.png';
-  static const String paracetamol = 'assets/icons/paracetemol.png';
+  static const String paracetamol = 'assets/icons/paracetamol.png';
   static const String puri = 'assets/icons/puri.png';
   static const String shampoo = 'assets/icons/shampoo.png';
   static const String soup = 'assets/icons/soup.png';
@@ -98,4 +98,8 @@ class ImagePath {
   static const String tShirt = 'assets/icons/tshirt.png';
   static const String vitaminC = 'assets/icons/vitaminC.png';
   static const String waterBottle = 'assets/icons/waterBottle.png';
+  static const String allergy = 'assets/icons/allergy.png';
+  static const String deodorant = 'assets/icons/deodorant.png';
+  static const String dogBed = 'assets/icons/dogBed.png';
+  static const String ledLamp = 'assets/icons/ledLamp.png';
 }

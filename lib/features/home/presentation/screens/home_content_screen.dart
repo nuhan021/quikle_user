@@ -192,7 +192,7 @@ class _HomeContentScreenState extends State<HomeContentScreen>
             ],
           ),
           8.verticalSpace,
-          /* Products */
+          
           // ...controller.filteredProducts.map(
           //   (prod) => ProductSection(
           //     section: prod,

@@ -26,24 +26,21 @@ class PopularItemsSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 2.w),
-          child: Container(
-            width: double.infinity,
-            padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 12.w),
-            decoration: const BoxDecoration(
-              border: Border(
-                bottom: BorderSide(width: 3, color: Color(0xFFEDEDED)),
-              ),
+        Container(
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(vertical: 8.h),
+          decoration: const BoxDecoration(
+            border: Border(
+              bottom: BorderSide(width: 3, color: Color(0xFFEDEDED)),
             ),
-            child: Text(
-              title,
-              style: getTextStyle(
-                font: CustomFonts.obviously,
-                fontSize: 14.sp,
-                fontWeight: FontWeight.w500,
-                color: AppColors.ebonyBlack,
-              ),
+          ),
+          child: Text(
+            title,
+            style: getTextStyle(
+              font: CustomFonts.obviously,
+              fontSize: 14.sp,
+              fontWeight: FontWeight.w500,
+              color: AppColors.ebonyBlack,
             ),
           ),
         ),
@@ -53,7 +50,7 @@ class PopularItemsSection extends StatelessWidget {
           width: double.infinity,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            padding: EdgeInsets.symmetric(horizontal: 16.w),
+            //padding: EdgeInsets.symmetric(horizontal: 16.w),
             itemCount: subcategories.length,
             itemBuilder: (context, index) {
               final subcategory = subcategories[index];

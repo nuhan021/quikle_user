@@ -43,9 +43,9 @@ class OrderTrackingSummary extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildOrderHeader(),
-            SizedBox(height: 12.h),
+            SizedBox(height: 8.h),
             _buildOrderSummary(),
-            SizedBox(height: 16.h),
+            SizedBox(height: 8.h),
             _buildViewDetailsButton(),
           ],
         );
@@ -61,7 +61,7 @@ class OrderTrackingSummary extends StatelessWidget {
           'Order ${order.orderId}',
           style: getTextStyle(
             font: CustomFonts.obviously,
-            fontSize: 18.sp,
+            fontSize: 14.sp,
             fontWeight: FontWeight.w600,
             color: AppColors.ebonyBlack,
           ),
@@ -76,7 +76,7 @@ class OrderTrackingSummary extends StatelessWidget {
             controller.statusText,
             style: getTextStyle(
               font: CustomFonts.inter,
-              fontSize: 12.sp,
+              fontSize: 10.sp,
               fontWeight: FontWeight.w400,
               color: AppColors.ebonyBlack,
             ),
@@ -94,7 +94,7 @@ class OrderTrackingSummary extends StatelessWidget {
           '${order.items.length} item${order.items.length != 1 ? 's' : ''}',
           style: getTextStyle(
             font: CustomFonts.inter,
-            fontSize: 14.sp,
+            fontSize: 12.sp,
             fontWeight: FontWeight.w400,
             color: const Color(0xFF7C7C7C),
           ),
@@ -107,7 +107,7 @@ class OrderTrackingSummary extends StatelessWidget {
               'Total Amount:',
               style: getTextStyle(
                 font: CustomFonts.obviously,
-                fontSize: 16.sp,
+                fontSize: 12.sp,
                 fontWeight: FontWeight.w500,
                 color: AppColors.ebonyBlack,
               ),
@@ -116,7 +116,7 @@ class OrderTrackingSummary extends StatelessWidget {
               '\$${order.total.toStringAsFixed(2)}',
               style: getTextStyle(
                 font: CustomFonts.obviously,
-                fontSize: 16.sp,
+                fontSize: 12.sp,
                 fontWeight: FontWeight.w600,
                 color: AppColors.beakYellow,
               ),
@@ -130,7 +130,6 @@ class OrderTrackingSummary extends StatelessWidget {
   Widget _buildViewDetailsButton() {
     return SizedBox(
       width: double.infinity,
-      height: 44.h,
       child: OutlinedButton(
         onPressed: () {
           Get.to(() => OrderInvoiceScreen(order: order));

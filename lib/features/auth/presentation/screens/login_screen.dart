@@ -16,7 +16,6 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<LoginController>();
-    // Make separate, random orders
     final iconsRow1 = List<ImageProvider>.from(ProductIcons.asProviders())
       ..shuffle();
     final iconsRow2 = List<ImageProvider>.from(ProductIcons.asProviders())
@@ -36,7 +35,7 @@ class LoginScreen extends StatelessWidget {
                   padding: EdgeInsets.symmetric(horizontal: 20.w),
                   child: Column(
                     children: [
-                      SizedBox(height: 64.h),
+                      //SizedBox(height: 64.h),
                       CommonWidgets.appLogo(),
                       SizedBox(height: 16.h),
                       Obx(() {
@@ -78,9 +77,9 @@ class LoginScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-                IconRowMarquee(images: iconsRow1, speed: 10, offsetSlots: 0.0),
+                IconRowMarquee(images: iconsRow1, speed: 20, offsetSlots: 0.0),
                 SizedBox(height: 12.h),
-                IconRowMarquee(images: iconsRow2, speed: 10, offsetSlots: 0.5),
+                IconRowMarquee(images: iconsRow2, speed: 20, offsetSlots: 0.5),
                 SizedBox(height: 76.h),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20.w),

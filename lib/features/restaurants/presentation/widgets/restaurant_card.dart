@@ -55,8 +55,6 @@ class RestaurantCard extends StatelessWidget {
                 child: Image.asset(
                   restaurant.getDisplayImage(),
                   fit: BoxFit.cover,
-                  width: double.infinity,
-                  height: double.infinity,
                   errorBuilder: (context, error, stackTrace) {
                     return Container(
                       color: AppColors.homeGrey,
