@@ -59,15 +59,11 @@ class RestaurantModel {
   }
 
   String getDisplayImage() {
-    
     if (signatureDishes.isNotEmpty && image.isEmpty) {
-      final random = Random();
-      final selectedDish =
-          signatureDishes[random.nextInt(signatureDishes.length)];
+      final selectedDish = signatureDishes[0];
       return selectedDish.image;
     }
 
-    
     return image.isNotEmpty ? image : ImagePath.profileIcon;
   }
 

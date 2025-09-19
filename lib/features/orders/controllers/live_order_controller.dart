@@ -7,18 +7,15 @@ import 'package:quikle_user/features/orders/data/services/order_service.dart';
 class LiveOrderController extends GetxController {
   final OrderService _orderService = OrderService();
 
-  
   final _currentLiveOrder = Rx<OrderModel?>(null);
   final _isLoading = false.obs;
   final _progressPercentage = 0.0.obs;
 
-  
   OrderModel? get currentLiveOrder => _currentLiveOrder.value;
   bool get hasLiveOrder => _currentLiveOrder.value != null;
   bool get isLoading => _isLoading.value;
   double get progressPercentage => _progressPercentage.value;
 
-  
   Timer? _liveOrderTimer;
 
   @override
@@ -33,26 +30,21 @@ class LiveOrderController extends GetxController {
     super.onClose();
   }
 
-  
   void _startLiveOrderTracking() {
     _checkForLiveOrder();
 
-    
     _liveOrderTimer = Timer.periodic(
       const Duration(seconds: 30),
       (timer) => _checkForLiveOrder(),
     );
   }
 
-  
   Future<void> _checkForLiveOrder() async {
     try {
       _isLoading.value = true;
 
-      
       final orders = await _orderService.getUserOrders('user123');
 
-      
       final liveOrder = _findLiveOrder(orders);
 
       if (liveOrder != null) {
@@ -69,10 +61,8 @@ class LiveOrderController extends GetxController {
     }
   }
 
-  
   OrderModel? _findLiveOrder(List<OrderModel> orders) {
     try {
-      
       final trackableOrders = orders.where((order) {
         return [
           OrderStatus.confirmed,
@@ -84,7 +74,6 @@ class LiveOrderController extends GetxController {
 
       if (trackableOrders.isEmpty) return null;
 
-      
       trackableOrders.sort((a, b) => b.orderDate.compareTo(a.orderDate));
       return trackableOrders.first;
     } catch (e) {
@@ -93,7 +82,6 @@ class LiveOrderController extends GetxController {
     }
   }
 
-  
   void _updateProgress() {
     if (_currentLiveOrder.value == null) return;
 
@@ -118,7 +106,6 @@ class LiveOrderController extends GetxController {
     }
   }
 
-  
   String get statusText {
     if (_currentLiveOrder.value == null) return '';
 
@@ -138,7 +125,6 @@ class LiveOrderController extends GetxController {
     }
   }
 
-  
   String get estimatedTime {
     if (_currentLiveOrder.value?.estimatedDelivery == null) return '';
 
@@ -155,7 +141,6 @@ class LiveOrderController extends GetxController {
     }
   }
 
-  
   String get primaryItemName {
     if (_currentLiveOrder.value?.items.isEmpty ?? true) {
       return 'Order Items';
@@ -164,27 +149,22 @@ class LiveOrderController extends GetxController {
     return _currentLiveOrder.value!.items.first.product.title;
   }
 
-  
   void navigateToTracking() {
     if (_currentLiveOrder.value != null) {
       Get.toNamed('/order-tracking', arguments: _currentLiveOrder.value!);
     }
   }
 
-  
   Future<void> refreshLiveOrder() async {
     await _checkForLiveOrder();
   }
 
-  
   void clearLiveOrder() {
     _currentLiveOrder.value = null;
     _progressPercentage.value = 0.0;
   }
 
-  
   Future<void> addNewOrder(OrderModel order) async {
-    
     final isTrackable = [
       OrderStatus.confirmed,
       OrderStatus.processing,

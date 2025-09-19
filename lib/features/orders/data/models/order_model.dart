@@ -88,10 +88,9 @@ class OrderModel {
   }
 
   bool get isTrackable {
-    return trackingNumber != null &&
-        (status == OrderStatus.confirmed ||
-            status == OrderStatus.shipped ||
-            status == OrderStatus.outForDelivery);
+    return (status == OrderStatus.confirmed ||
+        status == OrderStatus.shipped ||
+        status == OrderStatus.outForDelivery);
   }
 
   String get statusDisplayName {

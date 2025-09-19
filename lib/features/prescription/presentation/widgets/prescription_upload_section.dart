@@ -17,14 +17,13 @@ class PrescriptionUploadSection extends StatelessWidget {
     final controller = Get.put(PrescriptionController());
 
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: .05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -68,7 +67,7 @@ class PrescriptionUploadSection extends StatelessWidget {
                         font: CustomFonts.inter,
                         fontSize: 12.sp,
                         fontWeight: FontWeight.w400,
-                        color: AppColors.ebonyBlack.withOpacity(0.6),
+                        color: AppColors.ebonyBlack.withValues(alpha: .6),
                       ),
                     ),
                   ],
@@ -272,12 +271,12 @@ class PrescriptionUploadSection extends StatelessWidget {
                               decoration: BoxDecoration(
                                 color: _getStatusColor(
                                   prescription.status,
-                                ).withOpacity(0.12),
+                                ).withValues(alpha: .12),
                                 borderRadius: BorderRadius.circular(12.r),
                                 border: Border.all(
                                   color: _getStatusColor(
                                     prescription.status,
-                                  ).withOpacity(0.18),
+                                  ).withValues(alpha: .18),
                                 ),
                               ),
                               child: Row(

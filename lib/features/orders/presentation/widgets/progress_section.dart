@@ -52,7 +52,7 @@ class ProgressSection extends StatelessWidget {
       'Delivery Progress',
       style: getTextStyle(
         font: CustomFonts.obviously,
-        fontSize: 16.sp,
+        fontSize: 14.sp,
         fontWeight: FontWeight.w500,
         color: const Color(0xFF333333),
       ),
@@ -70,7 +70,7 @@ class ProgressSection extends StatelessWidget {
                 controller.statusText,
                 style: getTextStyle(
                   font: CustomFonts.inter,
-                  fontSize: 16.sp,
+                  fontSize: 12.sp,
                   fontWeight: FontWeight.w500,
                   color: const Color(0xFF333333),
                 ),
@@ -78,7 +78,7 @@ class ProgressSection extends StatelessWidget {
               SizedBox(height: 8.h),
               Container(
                 width: double.infinity,
-                height: 8.h,
+                height: 4.h,
                 decoration: BoxDecoration(
                   color: const Color(0xFFF0F0F0),
                   borderRadius: BorderRadius.circular(4.r),
@@ -102,7 +102,7 @@ class ProgressSection extends StatelessWidget {
           '${(controller.progressPercentage * 100).toInt()}%',
           style: getTextStyle(
             font: CustomFonts.obviously,
-            fontSize: 16.sp,
+            fontSize: 12.sp,
             fontWeight: FontWeight.w500,
             color: AppColors.ebonyBlack,
           ),

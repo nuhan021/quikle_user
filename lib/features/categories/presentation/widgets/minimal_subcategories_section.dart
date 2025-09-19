@@ -21,69 +21,81 @@ class MinimalSubcategoriesSection extends StatelessWidget {
   Widget build(BuildContext context) {
     if (subcategories.isEmpty) return const SizedBox.shrink();
 
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 8.w, vertical: 6.h),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: EdgeInsets.only(left: 8.w),
-            child: Text(
-              'Subcategories',
-              style: getTextStyle(
-                font: CustomFonts.obviously,
-                fontSize: 16.sp,
-                fontWeight: FontWeight.w600,
-                color: AppColors.ebonyBlack,
-              ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // ✔ Reduced vertical padding under header
+        Container(
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(vertical: 4.h), // was 8.h
+          decoration: const BoxDecoration(
+            border: Border(
+              bottom: BorderSide(width: 3, color: Color(0xFFEDEDED)),
             ),
           ),
-          SizedBox(height: 6.h),
-          SizedBox(
-            height: 70.h,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: subcategories.length,
-              itemBuilder: (context, index) {
-                final subcategory = subcategories[index];
-                final isSelected = selectedSubcategory?.id == subcategory.id;
+          child: Text(
+            'Subcategories',
+            style: getTextStyle(
+              font: CustomFonts.obviously,
+              fontSize: 14.sp,
+              fontWeight: FontWeight.w500,
+              color: AppColors.ebonyBlack,
+            ),
+          ),
+        ),
 
-                return GestureDetector(
-                  onTap: () => onSubcategoryTap(subcategory),
-                  child: Container(
-                    margin: EdgeInsets.only(right: 12.w),
-                    child: Column(
-                      children: [
-                        Container(
-                          height: 48.h,
-                          width: 48.w,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12.r),
-                            border: isSelected
-                                ? Border.all(
-                                    color: AppColors.beakYellow,
-                                    width: 2,
-                                  )
-                                : null,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withValues(alpha: .08),
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: Center(
-                            child: Image.asset(
-                              subcategory.iconPath,
-                              width: 38.w,
-                              height: 38.h,
-                              fit: BoxFit.contain,
+        // (Optional) keep it minimal; remove or keep tiny spacing
+        SizedBox(height: 4.h), // was 6.h
+        // ✔ Fixed height, no hidden ListView padding, non-primary
+        SizedBox(
+          height: 60.h, // was 65.h
+          width: double.infinity,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            primary: false,
+            padding: EdgeInsets.zero,
+            itemCount: subcategories.length,
+            itemBuilder: (context, index) {
+              final subcategory = subcategories[index];
+              final isSelected = selectedSubcategory?.id == subcategory.id;
+
+              return GestureDetector(
+                onTap: () => onSubcategoryTap(subcategory),
+                child: Container(
+                  margin: EdgeInsets.only(right: 12.w),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        height: 38.h,
+                        //width: 38.h, // ensures consistent chip size
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12.r),
+                          border: isSelected
+                              ? Border.all(
+                                  color: AppColors.beakYellow,
+                                  width: 2,
+                                )
+                              : null,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withValues(alpha: .08),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
                             ),
+                          ],
+                        ),
+                        child: Center(
+                          child: Image.asset(
+                            subcategory.iconPath,
+                            fit: BoxFit.contain,
                           ),
                         ),
-                        SizedBox(height: 4.h),
-                        Text(
+                      ),
+                      SizedBox(height: 4.h),
+                      SizedBox(
+                        //width: 56.w, // keeps label on one line nicely
+                        child: Text(
                           subcategory.title,
                           textAlign: TextAlign.center,
                           maxLines: 1,
@@ -91,21 +103,21 @@ class MinimalSubcategoriesSection extends StatelessWidget {
                           style: getTextStyle(
                             font: CustomFonts.inter,
                             fontSize: 12.sp,
-                            fontWeight: FontWeight.w600,
+                            fontWeight: FontWeight.w500,
                             color: isSelected
                                 ? AppColors.beakYellow
                                 : AppColors.ebonyBlack,
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                );
-              },
-            ),
+                ),
+              );
+            },
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

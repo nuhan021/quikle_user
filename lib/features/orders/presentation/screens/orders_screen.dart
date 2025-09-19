@@ -9,7 +9,6 @@ import 'package:quikle_user/features/orders/presentation/widgets/brief_order_car
 import 'package:quikle_user/features/orders/presentation/screens/order_invoice_screen.dart';
 import 'package:quikle_user/features/orders/presentation/screens/order_tracking_screen.dart';
 import 'package:quikle_user/features/profile/presentation/widgets/unified_profile_app_bar.dart';
-import 'package:quikle_user/features/profile/presentation/widgets/unified_profile_app_bar.dart';
 
 class OrdersScreen extends StatelessWidget {
   const OrdersScreen({super.key});
@@ -172,12 +171,10 @@ class OrdersScreen extends StatelessWidget {
                       return BriefOrderCard(
                         order: order,
                         onTap: () {
-                          
                           Get.to(() => OrderInvoiceScreen(order: order));
                         },
                         onTrack: order.isTrackable
                             ? () {
-                                
                                 Get.to(() => OrderTrackingScreen(order: order));
                               }
                             : null,

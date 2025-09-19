@@ -35,22 +35,22 @@ class OrderTrackingScreen extends StatelessWidget {
             child: Column(
               children: [
                 const OrderTrackingAppBar(),
-                SizedBox(height: 24.h),
+                SizedBox(height: 16.h),
                 const OrderTrackingMapSection(),
 
-                SizedBox(height: 16.h),
+                SizedBox(height: 12.h),
 
                 OrderTrackingSummary(order: order, controller: controller),
 
-                SizedBox(height: 16.h),
+                SizedBox(height: 12.h),
 
                 TimeEstimationSection(controller: controller),
 
-                SizedBox(height: 16.h),
+                SizedBox(height: 12.h),
 
                 ProgressSection(controller: controller),
 
-                SizedBox(height: 24.h),
+                SizedBox(height: 12.h),
               ],
             ),
           ),

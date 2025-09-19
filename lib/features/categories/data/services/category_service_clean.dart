@@ -154,7 +154,7 @@ class CategoryService {
     return [
       const SubcategoryModel(
         id: 'medicine_otc',
-        title: 'Over the Counter',
+        title: 'Pain Killers',
         description: 'OTC medicines available without prescription',
         iconPath: ImagePath.medicineIcon,
         categoryId: '3',
@@ -162,7 +162,7 @@ class CategoryService {
       ),
       const SubcategoryModel(
         id: 'medicine_vitamins',
-        title: 'Vitamins & Supplements',
+        title: 'Vitamins ',
         description: 'Vitamins and nutritional supplements',
         iconPath: ImagePath.medicineIcon,
         categoryId: '3',
