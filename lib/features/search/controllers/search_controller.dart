@@ -19,13 +19,13 @@ class ProductSearchController extends GetxController {
   final TextEditingController searchController = TextEditingController();
   final SpeechToText _speechToText = SpeechToText();
 
-  // Callback for when voice recognition completes
+  // Optional callback when voice search completes
   Function(String)? onVoiceSearchCompleted;
 
   static ProductSearchController? get currentInstance {
     try {
       return Get.find<ProductSearchController>();
-    } catch (e) {
+    } catch (_) {
       return null;
     }
   }
@@ -34,13 +34,20 @@ class ProductSearchController extends GetxController {
   final _searchResults = <ProductModel>[].obs;
   final _recentSearches = <String>[].obs;
   final _isLoading = false.obs;
+
   final _isListening = false.obs;
+  bool get isListening => _isListening.value;
+
   final _currentPlaceholder = "Search for 'biryani'".obs;
+  RxString get currentPlaceholder => _currentPlaceholder;
 
   final RxDouble soundLevel = 0.0.obs;
 
   late Timer _placeholderTimer;
   Timer? _debounceTimer;
+
+  // NEW: lazy init guard
+  bool _speechInitialized = false;
 
   final List<String> placeholderItems = [
     'biryani',
@@ -80,16 +87,16 @@ class ProductSearchController extends GetxController {
   List<ProductModel> get searchResults => _searchResults;
   List<String> get recentSearches => _recentSearches;
   bool get isLoading => _isLoading.value;
-  bool get isListening => _isListening.value;
-  RxString get currentPlaceholder => _currentPlaceholder;
 
   @override
   void onInit() {
     super.onInit();
     _cartController = Get.find<CartController>();
     _loadRecentSearches();
-    _initSpeechToText();
     _startPlaceholderRotation();
+
+    // IMPORTANT: do NOT ask for mic here (lazy on first tap)
+    // do not call _initSpeechToText() here anymore
   }
 
   @override
@@ -101,47 +108,84 @@ class ProductSearchController extends GetxController {
   }
 
   void _startPlaceholderRotation() {
-    _placeholderTimer = Timer.periodic(const Duration(seconds: 4), (timer) {
+    _placeholderTimer = Timer.periodic(const Duration(seconds: 4), (_) {
       final randomIndex = Random().nextInt(placeholderItems.length);
       final randomItem = placeholderItems[randomIndex];
       _currentPlaceholder.value = "Search for '$randomItem'";
     });
   }
 
-  Future<void> _initSpeechToText() async {
-    try {
-      final permissionStatus = await Permission.microphone.request();
-      if (permissionStatus == PermissionStatus.granted) {
-        await _speechToText.initialize(
-          onStatus: (status) {
-            _isListening.value =
-                status == 'listening' || _speechToText.isListening;
-          },
-          onError: (errorNotification) {
-            _isListening.value = false;
-            soundLevel.value = 0.0;
-            Get.snackbar(
-              'Voice Recognition Error',
-              'Could not recognize speech. Please try again.',
-              snackPosition: SnackPosition.BOTTOM,
-              duration: const Duration(seconds: 2),
-            );
-          },
-        );
-      } else {
+  /// NEW: ask for permissions & initialize speech lazily
+  Future<bool> _ensureMicAndSpeechThenInit() async {
+    // Request microphone
+    final mic = await Permission.microphone.request();
+
+    // On iOS also request speech
+    PermissionStatus speech = PermissionStatus.granted;
+    if (GetPlatform.isIOS) {
+      speech = await Permission.speech.request();
+    }
+
+    // Handle permanently denied
+    if (mic.isPermanentlyDenied || speech.isPermanentlyDenied) {
+      Get.snackbar(
+        'Permission Needed',
+        'Please enable Microphone${GetPlatform.isIOS ? " & Speech" : ""} access in Settings.',
+        snackPosition: SnackPosition.BOTTOM,
+        duration: const Duration(seconds: 3),
+      );
+      openAppSettings();
+      return false;
+    }
+
+    // If not granted -> explain and bail
+    if (!mic.isGranted || (GetPlatform.isIOS && !speech.isGranted)) {
+      Get.snackbar(
+        'Permission Denied',
+        'Microphone${GetPlatform.isIOS ? " & Speech" : ""} permission is required for voice search.',
+        snackPosition: SnackPosition.BOTTOM,
+        duration: const Duration(seconds: 3),
+      );
+      return false;
+    }
+
+    // Init speech_to_text once
+    if (!_speechInitialized) {
+      final ok = await _speechToText.initialize(
+        onStatus: (s) => _isListening.value = _speechToText.isListening,
+        onError: (_) {
+          _isListening.value = false;
+          soundLevel.value = 0.0;
+          Get.snackbar(
+            'Voice Recognition Error',
+            'Could not recognize speech. Please try again.',
+            snackPosition: SnackPosition.BOTTOM,
+            duration: const Duration(seconds: 2),
+          );
+        },
+      );
+      _speechInitialized = ok;
+      if (!ok) {
         Get.snackbar(
-          'Permission Denied',
-          'Microphone permission is required for voice search.',
+          'Voice Search Unavailable',
+          'Speech recognition is not available on this device.',
           snackPosition: SnackPosition.BOTTOM,
-          duration: const Duration(seconds: 3),
+          duration: const Duration(seconds: 2),
         );
       }
-    } catch (e) {
-      debugPrint('Error initializing speech to text: $e');
+      return ok;
     }
+
+    return true;
   }
 
   Future<void> toggleVoiceRecognition() async {
+    // Ensure permissions + init only when needed
+    if (!_speechInitialized) {
+      final ok = await _ensureMicAndSpeechThenInit();
+      if (!ok) return;
+    }
+
     if (!_speechToText.isAvailable) {
       Get.snackbar(
         'Voice Search Unavailable',
@@ -163,16 +207,15 @@ class ProductSearchController extends GetxController {
       await _speechToText.listen(
         onResult: (result) {
           if (result.finalResult) {
-            searchController.text = result.recognizedWords;
-            onSearchChanged(result.recognizedWords);
+            final words = result.recognizedWords;
+            searchController.text = words;
+            onSearchChanged(words);
             _isListening.value = false;
             soundLevel.value = 0.0;
             _currentPlaceholder.value = "Search for 'biryani'";
 
-            // Call the callback if voice search completed with results
-            if (onVoiceSearchCompleted != null &&
-                result.recognizedWords.isNotEmpty) {
-              onVoiceSearchCompleted!(result.recognizedWords);
+            if (onVoiceSearchCompleted != null && words.isNotEmpty) {
+              onVoiceSearchCompleted!(words);
             }
           }
         },
@@ -191,8 +234,7 @@ class ProductSearchController extends GetxController {
   Future<void> _loadRecentSearches() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final searches = prefs.getStringList('recent_searches') ?? [];
-      _recentSearches.value = searches;
+      _recentSearches.value = prefs.getStringList('recent_searches') ?? [];
     } catch (e) {
       debugPrint('Error loading recent searches: $e');
     }
@@ -229,12 +271,13 @@ class ProductSearchController extends GetxController {
 
     try {
       final allProducts = await _homeService.fetchAllProducts();
-      final filteredProducts = allProducts.where((product) {
-        return product.title.toLowerCase().contains(query.toLowerCase()) ||
-            product.description.toLowerCase().contains(query.toLowerCase());
+      final filtered = allProducts.where((p) {
+        return p.title.toLowerCase().contains(query.toLowerCase()) ||
+            p.description.toLowerCase().contains(query.toLowerCase());
       }).toList();
 
-      _searchResults.value = filteredProducts;
+      _searchResults.value = filtered;
+
       if (!_recentSearches.contains(query)) {
         _recentSearches.insert(0, query);
         if (_recentSearches.length > 10) {
@@ -281,9 +324,8 @@ class ProductSearchController extends GetxController {
     }
     final index = _searchResults.indexWhere((p) => p.id == product.id);
     if (index != -1) {
-      final isFavorite = FavoritesController.isProductFavorite(product.id);
-      final updatedProduct = product.copyWith(isFavorite: isFavorite);
-      _searchResults[index] = updatedProduct;
+      final isFav = FavoritesController.isProductFavorite(product.id);
+      _searchResults[index] = product.copyWith(isFavorite: isFav);
     }
 
     Get.snackbar(
@@ -298,7 +340,6 @@ class ProductSearchController extends GetxController {
     );
   }
 
-  /// Handles custom order request via WhatsApp
   Future<void> onRequestCustomOrder() async {
     if (_searchQuery.value.isEmpty) {
       Get.snackbar(

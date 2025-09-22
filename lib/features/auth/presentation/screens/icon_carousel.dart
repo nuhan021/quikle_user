@@ -5,10 +5,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class IconRowMarquee extends StatefulWidget {
   final List<ImageProvider> images;
-  final double boxSize;
-  final double gap;
-  final double speed;
-  final double offsetSlots;
+  final double boxSize; // square card size (logical)
+  final double gap; // gap between cards
+  final double speed; // px/sec
+  final double offsetSlots; // e.g., 0.5 = half-slot visual phase
   final bool reverse;
 
   const IconRowMarquee({
@@ -31,35 +31,39 @@ class _IconRowMarqueeState extends State<IconRowMarquee>
   late final Ticker _ticker;
   double _lastTs = 0;
 
-  late double _slotW;
-  late double _itemW;
-  late double _spacing;
+  // layout
+  double _slotW = 0;
+  double _itemW = 0;
+  double _spacing = 0;
 
   @override
   void initState() {
     super.initState();
     _ticker = createTicker(_onTick)..start();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _initPosition());
   }
 
-  void _initPosition() {
-    if (!mounted || widget.images.isEmpty) return;
-    final base = widget.images.length * 500;
-    final startPx = base * _slotW + widget.offsetSlots * _slotW;
-    if (_sc.hasClients) {
-      _sc.jumpTo(startPx);
-    }
+  @override
+  void dispose() {
+    _ticker.dispose();
+    _sc.dispose();
+    super.dispose();
   }
 
   void _onTick(Duration elapsed) {
-    if (!mounted || !_sc.hasClients || widget.images.isEmpty) return;
+    if (!mounted || !_sc.hasClients || widget.images.isEmpty || _slotW <= 0)
+      return;
+
     final t = elapsed.inMicroseconds / 1e6;
     final dt = max(0.0, t - _lastTs);
     _lastTs = t;
 
     final v = widget.reverse ? -widget.speed : widget.speed;
     double next = _sc.offset + v * dt;
+
     final period = widget.images.length * _slotW;
+    if (period <= 0) return;
+
+    // keep near center to avoid drift
     final center = period * 500;
     if ((next - center).abs() > period * 400) {
       next = center + (next - center) % period;
@@ -71,13 +75,6 @@ class _IconRowMarqueeState extends State<IconRowMarquee>
   }
 
   @override
-  void dispose() {
-    _ticker.dispose();
-    _sc.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     if (widget.images.isEmpty) return const SizedBox.shrink();
 
@@ -85,14 +82,21 @@ class _IconRowMarqueeState extends State<IconRowMarquee>
     _spacing = widget.gap.w;
     _slotW = _itemW + _spacing;
 
+    // phase as *padding*, not scroll offset
+    final phasePx = ((_slotW > 0) ? (widget.offsetSlots % 1) * _slotW : 0.0);
+
+    final leftPad = widget.reverse ? _spacing / 2 : _spacing / 2 + phasePx;
+    final rightPad = widget.reverse ? _spacing / 2 + phasePx : _spacing / 2;
+
     return SizedBox(
       height: _itemW,
       child: ListView.builder(
         controller: _sc,
         scrollDirection: Axis.horizontal,
         physics: const NeverScrollableScrollPhysics(),
-        padding: EdgeInsets.symmetric(horizontal: _spacing / 2),
+        padding: EdgeInsets.fromLTRB(leftPad, 0, rightPad, 0),
         itemExtent: _slotW,
+        itemCount: widget.images.length * 100000,
         itemBuilder: (context, index) {
           final img = widget.images[index % widget.images.length];
           return Align(
@@ -100,7 +104,6 @@ class _IconRowMarqueeState extends State<IconRowMarquee>
             child: _FigmaBox(image: img, size: _itemW),
           );
         },
-        itemCount: widget.images.length * 100000,
       ),
     );
   }
@@ -119,19 +122,16 @@ class _FigmaBox extends StatelessWidget {
       height: size,
       clipBehavior: Clip.antiAlias,
       decoration: ShapeDecoration(
-        color: Colors.white.withValues(alpha: 0.08),
+        color: Colors.white.withOpacity(0.08),
         shape: RoundedRectangleBorder(
-          side: BorderSide(
-            width: 1,
-            color: Colors.white.withValues(alpha: 0.25),
-          ),
-          borderRadius: BorderRadius.circular(12),
+          side: BorderSide(width: 1, color: Colors.white.withOpacity(0.25)),
+          borderRadius: BorderRadius.circular(12.r),
         ),
       ),
       child: Center(
         child: Container(
-          width: 56.w,
-          height: 56.h,
+          width: 74.w,
+          height: 74.w, // keep square
           decoration: BoxDecoration(
             image: DecorationImage(image: image, fit: BoxFit.cover),
           ),
