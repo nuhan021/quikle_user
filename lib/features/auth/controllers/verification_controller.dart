@@ -137,13 +137,13 @@ class VerificationController extends GetxController {
           message = response.responseData['message'].toString();
         }
 
-        Get.snackbar(
-          'Success',
-          message,
-          snackPosition: SnackPosition.TOP,
-          backgroundColor: Colors.green.withValues(alpha: 0.1),
-          colorText: Colors.green,
-        );
+        // Get.snackbar(
+        //   'Success',
+        //   message,
+        //   snackPosition: SnackPosition.TOP,
+        //   backgroundColor: Colors.green.withValues(alpha: 0.1),
+        //   colorText: Colors.green,
+        // );
         startTimer();
       } else {
         Get.snackbar(

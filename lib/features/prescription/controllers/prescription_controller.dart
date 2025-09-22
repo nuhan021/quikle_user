@@ -93,12 +93,12 @@ class PrescriptionController extends GetxController {
       prescriptions.insert(0, prescription);
       uploadNotes.value = '';
 
-      Get.snackbar(
-        'Success',
-        'Prescription uploaded successfully! Vendors will review it shortly.',
-        snackPosition: SnackPosition.BOTTOM,
-        duration: const Duration(seconds: 4),
-      );
+      // Get.snackbar(
+      //   'Success',
+      //   'Prescription uploaded successfully! Vendors will review it shortly.',
+      //   snackPosition: SnackPosition.BOTTOM,
+      //   duration: const Duration(seconds: 4),
+      // );
 
       await Future.wait([
         loadPrescriptionStats(),
@@ -177,11 +177,11 @@ class PrescriptionController extends GetxController {
       );
       if (success) {
         prescriptions.removeWhere((p) => p.id == prescriptionId);
-        Get.snackbar(
-          'Success',
-          'Prescription deleted successfully',
-          snackPosition: SnackPosition.BOTTOM,
-        );
+        // Get.snackbar(
+        //   'Success',
+        //   'Prescription deleted successfully',
+        //   snackPosition: SnackPosition.BOTTOM,
+        // );
         loadPrescriptionStats();
       }
     } catch (e) {

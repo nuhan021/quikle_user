@@ -39,10 +39,15 @@ class TopRestaurantsSection extends StatelessWidget {
         SizedBox(height: 16.h),
 
         SizedBox(
-          height: 140.h,
-          child: ListView.builder(
+          height: 300.h, // enough height for 2 rows
+          child: GridView.builder(
             scrollDirection: Axis.horizontal,
-            //padding: EdgeInsets.symmetric(horizontal: 16.w),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2, // 2 rows
+              mainAxisSpacing: 8.w,
+              crossAxisSpacing: 8.h,
+              childAspectRatio: 0.8, // adjust width/height ratio
+            ),
             itemCount: restaurants.length,
             itemBuilder: (context, index) {
               final restaurant = restaurants[index];

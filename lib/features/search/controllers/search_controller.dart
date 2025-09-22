@@ -328,16 +328,16 @@ class ProductSearchController extends GetxController {
       _searchResults[index] = product.copyWith(isFavorite: isFav);
     }
 
-    Get.snackbar(
-      FavoritesController.isProductFavorite(product.id)
-          ? 'Added to Favorites'
-          : 'Removed from Favorites',
-      FavoritesController.isProductFavorite(product.id)
-          ? '${product.title} has been added to your favorites.'
-          : '${product.title} has been removed from your favorites.',
-      snackPosition: SnackPosition.BOTTOM,
-      duration: const Duration(seconds: 2),
-    );
+    // Get.snackbar(
+    //   FavoritesController.isProductFavorite(product.id)
+    //       ? 'Added to Favorites'
+    //       : 'Removed from Favorites',
+    //   FavoritesController.isProductFavorite(product.id)
+    //       ? '${product.title} has been added to your favorites.'
+    //       : '${product.title} has been removed from your favorites.',
+    //   snackPosition: SnackPosition.BOTTOM,
+    //   duration: const Duration(seconds: 2),
+    // );
   }
 
   Future<void> onRequestCustomOrder() async {

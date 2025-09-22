@@ -54,18 +54,19 @@ class CartScreen extends StatelessWidget {
                     SizedBox(height: 16.h),
                     const CartItemsSection(),
                     SizedBox(height: 19.h),
-                    const OrderSummarySection(),
-                    SizedBox(height: 19.h),
-                    const DeliveryOptionsSection(),
-                    SizedBox(height: 19.h),
-                    const CouponSection(),
-                    SizedBox(height: 19.h),
                     YouMayLikeSection(
                       onAddToCart: cartController.addToCart,
                       onFavoriteToggle: homeController.onFavoriteToggle,
                       onProductTap: (p) =>
                           Get.toNamed('/product-details', arguments: p),
                     ),
+                    //SizedBox(height: 19.h),
+                    const DeliveryOptionsSection(),
+                    SizedBox(height: 19.h),
+                    const CouponSection(),
+                    SizedBox(height: 19.h),
+                    const OrderSummarySection(),
+                    SizedBox(height: 19.h),
                   ],
                 ),
               ),
@@ -76,6 +77,7 @@ class CartScreen extends StatelessWidget {
                 onPlaceOrder: () =>
                     _handlePlaceOrder(cartController, payoutController),
                 onPaymentMethodTap: _showPaymentMethods,
+                totalAmount: payoutController.totalAmount,
               ),
             ),
           ],
@@ -334,11 +336,11 @@ class CartScreen extends StatelessWidget {
                   onTap: () {
                     paymentMethodController.selectPaymentMethod(method);
                     Get.back();
-                    Get.snackbar(
-                      'Payment Method Selected',
-                      method.type.displayName,
-                      duration: const Duration(seconds: 1),
-                    );
+                    // Get.snackbar(
+                    //   'Payment Method Selected',
+                    //   method.type.displayName,
+                    //   duration: const Duration(seconds: 1),
+                    // );
                   },
                 );
               }).toList(),

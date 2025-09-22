@@ -100,11 +100,11 @@ class ProductController extends GetxController {
       );
       _product.value = updatedProduct;
 
-      Get.snackbar(
-        'Prescription Uploaded',
-        'Your prescription has been uploaded successfully. You can now add this medicine to your cart.',
-        duration: const Duration(seconds: 3),
-      );
+      // Get.snackbar(
+      //   'Prescription Uploaded',
+      //   'Your prescription has been uploaded successfully. You can now add this medicine to your cart.',
+      //   duration: const Duration(seconds: 3),
+      // );
     }
   }
 
@@ -130,13 +130,13 @@ class ProductController extends GetxController {
       final updatedProduct = _product.value!.copyWith(isFavorite: isFavorite);
       _product.value = updatedProduct;
 
-      Get.snackbar(
-        isFavorite ? 'Added to Favorites' : 'Removed from Favorites',
-        isFavorite
-            ? '${updatedProduct.title} has been added to your favorites.'
-            : '${updatedProduct.title} has been removed from your favorites.',
-        duration: const Duration(seconds: 2),
-      );
+      // Get.snackbar(
+      //   isFavorite ? 'Added to Favorites' : 'Removed from Favorites',
+      //   isFavorite
+      //       ? '${updatedProduct.title} has been added to your favorites.'
+      //       : '${updatedProduct.title} has been removed from your favorites.',
+      //   duration: const Duration(seconds: 2),
+      // );
     }
   }
 
