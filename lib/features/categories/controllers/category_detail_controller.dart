@@ -147,12 +147,12 @@ class CategoryDetailController extends GetxController {
       recommendedProducts[recommendedIndex] = updatedProduct;
     }
 
-    Get.snackbar(
-      isFavorite ? 'Added to Favorites' : 'Removed from Favorites',
-      isFavorite
-          ? '${product.title} has been added to your favorites.'
-          : '${product.title} has been removed from your favorites.',
-      duration: const Duration(seconds: 2),
-    );
+    // Get.snackbar(
+    //   isFavorite ? 'Added to Favorites' : 'Removed from Favorites',
+    //   isFavorite
+    //       ? '${product.title} has been added to your favorites.'
+    //       : '${product.title} has been removed from your favorites.',
+    //   duration: const Duration(seconds: 2),
+    // );
   }
 }

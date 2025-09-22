@@ -130,14 +130,14 @@ class HomeController extends GetxController with VoiceSearchMixin {
     final updatedProduct = product.copyWith(isFavorite: isFavorite);
     _updateProductInLists(product, updatedProduct);
 
-    Get.snackbar(
-      isFavorite ? 'Added to Favorites' : 'Removed from Favorites',
-      isFavorite
-          ? '${product.title} has been added to your favorites.'
-          : '${product.title} has been removed from your favorites.',
-      snackPosition: SnackPosition.BOTTOM,
-      duration: const Duration(seconds: 2),
-    );
+    // Get.snackbar(
+    //   isFavorite ? 'Added to Favorites' : 'Removed from Favorites',
+    //   isFavorite
+    //       ? '${product.title} has been added to your favorites.'
+    //       : '${product.title} has been removed from your favorites.',
+    //   snackPosition: SnackPosition.BOTTOM,
+    //   duration: const Duration(seconds: 2),
+    // );
   }
 
   void _updateProductInLists(ProductModel oldProduct, ProductModel newProduct) {

@@ -379,12 +379,12 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
     final updatedProduct = product.copyWith(isFavorite: isFavorite);
     _updateProductInLists(updatedProduct);
 
-    Get.snackbar(
-      isFavorite ? 'Added to Favorites' : 'Removed from Favorites',
-      '${updatedProduct.title} ${isFavorite ? 'added to' : 'removed from'} favorites',
-      snackPosition: SnackPosition.BOTTOM,
-      duration: const Duration(seconds: 2),
-    );
+    // Get.snackbar(
+    //   isFavorite ? 'Added to Favorites' : 'Removed from Favorites',
+    //   '${updatedProduct.title} ${isFavorite ? 'added to' : 'removed from'} favorites',
+    //   snackPosition: SnackPosition.BOTTOM,
+    //   duration: const Duration(seconds: 2),
+    // );
   }
 
   void _updateProductInLists(ProductModel updatedProduct) {

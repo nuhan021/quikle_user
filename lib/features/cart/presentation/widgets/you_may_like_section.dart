@@ -39,7 +39,7 @@ class _YouMayLikeSectionState extends State<YouMayLikeSection> {
       final allProducts = await _homeService.fetchAllProducts();
       allProducts.shuffle();
       setState(() {
-        _products = allProducts.take(4).toList();
+        _products = allProducts.take(6).toList();
         _isLoading = false;
       });
     } catch (e) {
@@ -78,10 +78,10 @@ class _YouMayLikeSectionState extends State<YouMayLikeSection> {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
+              crossAxisCount: 3,
               crossAxisSpacing: 12.w,
               mainAxisSpacing: 12.h,
-              childAspectRatio: 1.h,
+              childAspectRatio: 0.75,
             ),
             itemCount: _products.length,
             itemBuilder: (context, index) {

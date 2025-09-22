@@ -14,6 +14,7 @@ import 'package:quikle_user/core/common/widgets/common_app_bar.dart';
 import 'package:quikle_user/core/utils/navigation/navbar_navigation_helper.dart';
 import 'package:quikle_user/features/cart/controllers/cart_controller.dart';
 import 'package:quikle_user/features/home/data/models/product_model.dart';
+import 'package:quikle_user/features/orders/presentation/widgets/live_order_indicator.dart';
 import 'package:quikle_user/features/profile/controllers/favorites_controller.dart';
 import 'package:quikle_user/features/restaurants/data/models/restaurant_model.dart';
 import 'package:quikle_user/routes/app_routes.dart';
@@ -315,6 +316,7 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen>
                   return FloatingCartButton(bottomInset: inset);
                 },
               ),
+              const LiveOrderIndicator(),
             ],
           ),
         ),

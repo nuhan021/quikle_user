@@ -67,9 +67,7 @@ class CartItemsSection extends StatelessWidget {
                         child: Center(
                           child: Image.asset(
                             cartItem.product.imagePath,
-                            width: 40.w,
-                            height: 40.w,
-                            fit: BoxFit.contain,
+                            fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) {
                               return Icon(
                                 Icons.shopping_basket,

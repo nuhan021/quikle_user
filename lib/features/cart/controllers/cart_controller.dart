@@ -35,11 +35,11 @@ class CartController extends GetxController {
     _cartService.removeFromCart(cartItem);
     _updateCartData();
 
-    Get.snackbar(
-      'Removed from Cart',
-      '${cartItem.product.title} has been removed from your cart.',
-      duration: const Duration(seconds: 2),
-    );
+    // Get.snackbar(
+    //   'Removed from Cart',
+    //   '${cartItem.product.title} has been removed from your cart.',
+    //   duration: const Duration(seconds: 2),
+    // );
   }
 
   void updateQuantity(CartItemModel cartItem, int newQuantity) {
