@@ -80,7 +80,7 @@ class ImagePath {
   static const String chickenBreast = 'assets/icons/chickenBreast.png';
   static const String cleaningSpray = 'assets/icons/cleaningSpray.png';
   static const String dishWashing = 'assets/icons/dishWashing.png';
-  static const String dogChewToy = 'assets/icons/dogChewToy.png';
+  //static const String dogChewToy = 'assets/icons/dogChewToy.png';
   static const String dogFood = 'assets/icons/dogFood.png';
   static const String earbuds = 'assets/icons/earbuds.png';
   static const String eggs = 'assets/icons/eggs.png';

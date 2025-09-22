@@ -1462,7 +1462,7 @@ class ProductDataService {
       title: 'Cat Food',
       description: 'Nutritious wet cat food',
       price: '\$18',
-      imagePath: ImagePath.dogChewToy,
+      imagePath: ImagePath.catFood,
       categoryId: '6',
       subcategoryId: 'pet_food',
       shopId: 'shop_2',

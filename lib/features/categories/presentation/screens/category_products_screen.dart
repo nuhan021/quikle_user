@@ -25,12 +25,10 @@ class CategoryProductsScreen extends StatefulWidget {
 
 class _CategoryProductsScreenState extends State<CategoryProductsScreen>
     with TickerProviderStateMixin {
-  // Bottom navbar animation
   late AnimationController _navController;
   final GlobalKey _navKey = GlobalKey();
   double _navBarHeight = 0.0;
 
-  // Collapsible top app bar + scroll
   late final AnimationController _barAnim;
   final ScrollController _scroll = ScrollController();
 
@@ -41,16 +39,15 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
     _navController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 260),
-      value: 1.0, // navbar visible initially
+      value: 1.0,
     );
 
     _barAnim = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 220),
-      value: 1.0, // app bar visible initially
+      value: 1.0,
     );
 
-    // AppBar show/hide based on offset threshold (navbar handled via notifications below)
     _scroll.addListener(() {
       if (_scroll.offset > 8 && _barAnim.value == 1.0) {
         _barAnim.reverse();
@@ -99,6 +96,9 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
     final controller = Get.put(CategoryProductsController());
     final searchController = TextEditingController();
 
+    final keyboard = MediaQuery.of(context).viewInsets.bottom;
+    final isKeyboardOpen = keyboard > 0;
+
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
@@ -111,10 +111,9 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
             children: [
               SafeArea(
                 top: true,
-                bottom: false, // bottom handled by animated navbar inset
+                bottom: false,
                 child: Column(
                   children: [
-                    // Collapsible AppBar (hides on grid scroll)
                     ClipRect(
                       child: SizeTransition(
                         axisAlignment: -1,
@@ -135,13 +134,13 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
                       child: AnimatedBuilder(
                         animation: _navController,
                         builder: (context, _) {
-                          final bottomInset =
-                              _navController.value * _navBarHeight;
+                          final bottomInset = isKeyboardOpen
+                              ? 0.0
+                              : _navController.value * _navBarHeight;
 
                           return Padding(
                             padding: EdgeInsets.only(
-                              bottom:
-                                  bottomInset, // content respects animated nav height
+                              bottom: bottomInset,
                               left: 16.w,
                               right: 16.w,
                             ),
@@ -173,42 +172,46 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
 
                                   SizedBox(height: 12.h),
 
-                                  // Grid is the only scrollable; we listen to its scroll notifications
                                   Expanded(
-                                    child: NotificationListener<ScrollNotification>(
-                                      onNotification: (notification) {
-                                        // Hide nav on downward scroll, show on upward; show when idle/end
-                                        if (notification
-                                            is UserScrollNotification) {
-                                          if (notification.direction ==
-                                                  ScrollDirection.reverse &&
-                                              _navController.value != 0.0 &&
-                                              _navController.status !=
-                                                  AnimationStatus.reverse) {
-                                            _navController.reverse();
-                                          } else if (notification.direction ==
-                                                  ScrollDirection.forward &&
-                                              _navController.value != 1.0 &&
-                                              _navController.status !=
-                                                  AnimationStatus.forward) {
-                                            _navController.forward();
-                                          } else if (notification.direction ==
-                                              ScrollDirection.idle) {
-                                            if (_navController.value != 1.0) {
-                                              _navController.forward();
+                                    child:
+                                        NotificationListener<
+                                          ScrollNotification
+                                        >(
+                                          onNotification: (notification) {
+                                            if (notification
+                                                is UserScrollNotification) {
+                                              if (notification.direction ==
+                                                      ScrollDirection.reverse &&
+                                                  _navController.value != 0.0 &&
+                                                  _navController.status !=
+                                                      AnimationStatus.reverse) {
+                                                _navController.reverse();
+                                              } else if (notification
+                                                          .direction ==
+                                                      ScrollDirection.forward &&
+                                                  _navController.value != 1.0 &&
+                                                  _navController.status !=
+                                                      AnimationStatus.forward) {
+                                                _navController.forward();
+                                              } else if (notification
+                                                      .direction ==
+                                                  ScrollDirection.idle) {
+                                                if (_navController.value !=
+                                                    1.0) {
+                                                  _navController.forward();
+                                                }
+                                              }
                                             }
-                                          }
-                                        }
-                                        if (notification
-                                            is ScrollEndNotification) {
-                                          if (_navController.value != 1.0) {
-                                            _navController.forward();
-                                          }
-                                        }
-                                        return false;
-                                      },
-                                      child: _buildProductsGrid(controller),
-                                    ),
+                                            if (notification
+                                                is ScrollEndNotification) {
+                                              if (_navController.value != 1.0) {
+                                                _navController.forward();
+                                              }
+                                            }
+                                            return false;
+                                          },
+                                          child: _buildProductsGrid(controller),
+                                        ),
                                   ),
                                 ],
                               );
@@ -221,35 +224,45 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
                 ),
               ),
 
-              // Bottom Nav (animated vanish on scroll; reappears when idle/end)
               Positioned(
                 left: 0,
                 right: 0,
                 bottom: 0,
-                child: SizeTransition(
-                  axisAlignment: 1.0,
-                  sizeFactor: _navController, // 1 -> visible, 0 -> hidden
-                  child: KeyedSubtree(
-                    key: _navKey,
-                    child: CustomNavBar(
-                      currentIndex: 2,
-                      onTap: _onNavItemTapped,
+                child: AnimatedSlide(
+                  duration: const Duration(milliseconds: 180),
+                  offset: isKeyboardOpen
+                      ? const Offset(0, 1)
+                      : const Offset(0, 0),
+                  child: SizeTransition(
+                    axisAlignment: 1.0,
+                    sizeFactor: _navController,
+                    child: SafeArea(
+                      top: false,
+                      bottom: false,
+                      child: KeyedSubtree(
+                        key: _navKey,
+                        child: CustomNavBar(
+                          currentIndex: 2,
+                          onTap: _onNavItemTapped,
+                        ),
+                      ),
                     ),
                   ),
                 ),
               ),
 
-              // Floating Cart Button respects nav inset
               AnimatedBuilder(
                 animation: _navController,
                 builder: (context, _) {
+                  final navSpace = isKeyboardOpen
+                      ? 0.0
+                      : (_navController.value * _navBarHeight);
                   final inset =
-                      (_navController.value * _navBarHeight) + cartMargin;
+                      (isKeyboardOpen ? keyboard : navSpace) + cartMargin;
                   return FloatingCartButton(bottomInset: inset);
                 },
               ),
 
-              // Voice search overlay
               Obx(() {
                 if (!controller.isListening) return const SizedBox.shrink();
                 return VoiceSearchOverlay(
@@ -283,10 +296,8 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
       removeTop: true,
       removeBottom: true,
       child: GridView.builder(
-        controller:
-            _scroll, // drives app bar (offset) & sends notifications for navbar
-        primary:
-            false, // don't inherit primary scroll view padding (prevents top gap)
+        controller: _scroll,
+        primary: false,
         padding: EdgeInsets.zero,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 3,
