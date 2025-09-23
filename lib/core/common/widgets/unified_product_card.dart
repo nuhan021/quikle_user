@@ -171,9 +171,7 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
   }
 
   Widget _buildImageSection() {
-    final imageHeight = widget.variant == ProductCardVariant.youMayLike
-        ? 60.h
-        : 50.h;
+    final imageHeight = 70.h;
 
     return Stack(
       children: [

@@ -1,4 +1,3 @@
-
 import 'dart:io';
 import 'dart:math';
 import 'package:quikle_user/features/prescription/data/models/prescription_model.dart';
@@ -6,16 +5,13 @@ import 'package:quikle_user/features/home/data/models/product_model.dart';
 import 'package:quikle_user/core/utils/constants/image_path.dart';
 
 class PrescriptionService {
-  
   static final List<PrescriptionModel> _prescriptions = [];
 
-  
   Future<PrescriptionModel> uploadPrescription({
     required String userId,
     required File imageFile,
     String? notes,
   }) async {
-    
     await Future.delayed(const Duration(seconds: 2));
 
     final prescriptionId = 'presc_${DateTime.now().millisecondsSinceEpoch}';
@@ -23,8 +19,7 @@ class PrescriptionService {
     final prescription = PrescriptionModel(
       id: prescriptionId,
       userId: userId,
-      imagePath: imageFile
-          .path, 
+      imagePath: imageFile.path,
       fileName: imageFile.path.split('/').last,
       uploadedAt: DateTime.now(),
       status: PrescriptionStatus.uploaded,
@@ -33,20 +28,17 @@ class PrescriptionService {
 
     _prescriptions.add(prescription);
 
-    
     _simulateVendorProcessing(prescriptionId);
 
     return prescription;
   }
 
-  
   Future<List<PrescriptionModel>> getUserPrescriptions(String userId) async {
     await Future.delayed(const Duration(milliseconds: 500));
     return _prescriptions.where((p) => p.userId == userId).toList()
       ..sort((a, b) => b.uploadedAt.compareTo(a.uploadedAt));
   }
 
-  
   Future<PrescriptionModel?> getPrescriptionById(String prescriptionId) async {
     await Future.delayed(const Duration(milliseconds: 300));
     try {
@@ -56,7 +48,6 @@ class PrescriptionService {
     }
   }
 
-  
   Future<List<ProductModel>> getPendingPrescriptionMedicines(
     String userId,
   ) async {
@@ -72,7 +63,6 @@ class PrescriptionService {
               response.status == VendorResponseStatus.partiallyApproved) {
             for (final medicine in response.medicines) {
               if (medicine.isMedicineAvailable) {
-                
                 final product = ProductModel(
                   id: 'presc_med_${medicine.id}',
                   title: '${medicine.brandName} ${medicine.medicineName}',
@@ -100,7 +90,6 @@ class PrescriptionService {
     return prescriptionMedicines;
   }
 
-  
   Future<List<ProductModel>> getRecentPrescriptionMedicines(
     String userId,
   ) async {
@@ -109,7 +98,6 @@ class PrescriptionService {
     final userPrescriptions = await getUserPrescriptions(userId);
     final prescriptionMedicines = <ProductModel>[];
 
-    
     final recentPrescription = userPrescriptions
         .where((p) => p.status == PrescriptionStatus.responded)
         .firstOrNull;
@@ -120,7 +108,6 @@ class PrescriptionService {
             response.status == VendorResponseStatus.partiallyApproved) {
           for (final medicine in response.medicines) {
             if (medicine.isMedicineAvailable) {
-              
               final product = ProductModel(
                 id: 'presc_med_${medicine.id}',
                 title: '${medicine.brandName} ${medicine.medicineName}',
@@ -147,18 +134,15 @@ class PrescriptionService {
     return prescriptionMedicines;
   }
 
-  
   void _simulateVendorProcessing(String prescriptionId) {
     Future.delayed(const Duration(seconds: 5), () async {
       final prescriptionIndex = _prescriptions.indexWhere(
         (p) => p.id == prescriptionId,
       );
       if (prescriptionIndex != -1) {
-        
         _prescriptions[prescriptionIndex] = _prescriptions[prescriptionIndex]
             .copyWith(status: PrescriptionStatus.processing);
 
-        
         Future.delayed(const Duration(seconds: 10), () {
           _generateMockVendorResponses(prescriptionId);
         });
@@ -166,10 +150,9 @@ class PrescriptionService {
     });
   }
 
-  
   void _generateMockVendorResponses(String prescriptionId) {
     final random = Random();
-    
+
     final approvedVendor = {
       'id': 'vendor_${random.nextInt(3) + 1}',
       'name': [
@@ -189,8 +172,7 @@ class PrescriptionService {
 
     final responses = <PrescriptionResponseModel>[];
 
-    
-    final numMedicines = random.nextInt(3) + 2; 
+    final numMedicines = random.nextInt(3) + 2;
     final medicines = <ProductModel>[];
 
     for (int j = 0; j < numMedicines; j++) {
@@ -229,7 +211,7 @@ class PrescriptionService {
       vendorName: approvedVendor['name']!,
       medicines: medicines,
       totalAmount: totalAmount,
-      status: VendorResponseStatus.approved, 
+      status: VendorResponseStatus.approved,
       respondedAt: DateTime.now(),
       notes:
           'We can provide all medicines from your prescription. Please add them to your cart.',
@@ -237,7 +219,6 @@ class PrescriptionService {
 
     responses.add(response);
 
-    
     final prescriptionIndex = _prescriptions.indexWhere(
       (p) => p.id == prescriptionId,
     );
@@ -248,7 +229,7 @@ class PrescriptionService {
             vendorResponses: responses,
           );
     }
-  } 
+  }
 
   Future<bool> deletePrescription(String prescriptionId) async {
     await Future.delayed(const Duration(milliseconds: 500));
@@ -260,15 +241,12 @@ class PrescriptionService {
     return false;
   }
 
-  
   Future<bool> acceptVendorResponse(String responseId) async {
     await Future.delayed(const Duration(milliseconds: 500));
-    
-    
+
     return true;
   }
 
-  
   Future<Map<String, int>> getPrescriptionStats(String userId) async {
     final prescriptions = await getUserPrescriptions(userId);
 
