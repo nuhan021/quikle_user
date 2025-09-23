@@ -263,9 +263,19 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
     }
   }
 
-  void onSubcategoryTap(SubcategoryModel subcategory) async {
+  void onSubcategoryTap(SubcategoryModel? subcategory) async {
     try {
       isLoading.value = true;
+
+      // Handle "All" option
+      if (subcategory == null) {
+        selectedSubcategory.value = null;
+        showingAllProducts.value = false;
+        displayProducts.value = allProducts;
+        productsTitle.value = 'All Items';
+        isLoading.value = false;
+        return;
+      }
 
       if (isGroceryCategory) {
         if (allCategories.contains(subcategory)) {

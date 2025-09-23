@@ -90,9 +90,9 @@ class ProductGridSection extends StatelessWidget {
           physics: const NeverScrollableScrollPhysics(),
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: crossAxisCount,
-            crossAxisSpacing: 12.w,
-            mainAxisSpacing: 12.h,
-            childAspectRatio: crossAxisCount == 3 ? 0.70 : 1.1,
+            crossAxisSpacing: 8.w,
+            mainAxisSpacing: 8.h,
+            childAspectRatio: crossAxisCount == 3 ? 0.75 : 1,
           ),
           itemCount: displayProducts.length,
           itemBuilder: (context, index) {

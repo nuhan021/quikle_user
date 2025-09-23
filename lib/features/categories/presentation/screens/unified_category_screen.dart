@@ -150,6 +150,7 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
                               selectedSubcategory: controller.isGroceryCategory
                                   ? controller.selectedMainCategory.value
                                   : controller.selectedSubcategory.value,
+                              category: controller.currentCategory,
                             ),
                           ),
                         ],
@@ -233,6 +234,7 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
                                           'Select ${controller.selectedMainCategory.value!.title}',
                                       selectedSubcategory:
                                           controller.selectedSubcategory.value,
+                                      category: controller.currentCategory,
                                     ),
                                   ],
                                   if (controller.isMedicineCategory) ...[
@@ -440,8 +442,8 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
             physics: const NeverScrollableScrollPhysics(),
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 3,
-              crossAxisSpacing: 12.w,
-              mainAxisSpacing: 12.h,
+              crossAxisSpacing: 8.w,
+              mainAxisSpacing: 8.h,
               childAspectRatio: 0.70.h,
             ),
             itemCount: controller.displayProducts.length,

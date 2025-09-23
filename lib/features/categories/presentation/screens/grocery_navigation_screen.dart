@@ -70,7 +70,6 @@ class GroceryNavigationScreen extends StatelessWidget {
                         children: [
                           SizedBox(height: 16.h),
 
-                          
                           if (controller.breadcrumb.isNotEmpty) ...[
                             Container(
                               width: double.infinity,
@@ -93,7 +92,6 @@ class GroceryNavigationScreen extends StatelessWidget {
                             SizedBox(height: 16.h),
                           ],
 
-                          
                           if (controller.popularSubcategories.isNotEmpty) ...[
                             PopularItemsSection(
                               subcategories: controller.popularSubcategories,
@@ -102,7 +100,6 @@ class GroceryNavigationScreen extends StatelessWidget {
                             SizedBox(height: 24.h),
                           ],
 
-                          
                           if (controller.currentSubcategories.isNotEmpty) ...[
                             Padding(
                               padding: EdgeInsets.symmetric(horizontal: 16.w),
@@ -188,7 +185,6 @@ class GroceryNavigationScreen extends StatelessWidget {
                             SizedBox(height: 24.h),
                           ],
 
-                          
                           if (controller.currentProducts.isNotEmpty) ...[
                             Padding(
                               padding: EdgeInsets.symmetric(horizontal: 16.w),
@@ -339,7 +335,7 @@ class GroceryNavigationScreen extends StatelessWidget {
                 ),
               ],
             ),
-            
+
             const FloatingCartButton(),
           ],
         ),

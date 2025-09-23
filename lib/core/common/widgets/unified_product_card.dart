@@ -3,9 +3,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:quikle_user/core/common/styles/global_text_style.dart';
 import 'package:quikle_user/core/common/widgets/cart_animation_overlay.dart';
+import 'package:quikle_user/core/common/widgets/quantity_selector.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 import 'package:quikle_user/core/utils/constants/image_path.dart';
+import 'package:quikle_user/features/cart/controllers/cart_controller.dart';
 import 'package:quikle_user/features/home/data/models/product_model.dart';
 import 'package:quikle_user/features/home/data/models/shop_model.dart';
 import 'package:quikle_user/features/profile/controllers/favorites_controller.dart';
@@ -50,6 +52,16 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
   final GlobalKey _cartButtonKey = GlobalKey();
   final GlobalKey _imageKey = GlobalKey();
 
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void didUpdateWidget(UnifiedProductCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+  }
+
   void _handleAddToCart() {
     if (widget.onAddToCart != null) {
       if (widget.enableCartAnimation) {
@@ -59,6 +71,9 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
         } catch (e) {}
       }
       widget.onAddToCart!();
+
+      // Trigger a rebuild to update the cart section
+      setState(() {});
     }
   }
 
@@ -121,9 +136,7 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
           decoration: ShapeDecoration(
             color: AppColors.textWhite,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(
-                widget.variant == ProductCardVariant.youMayLike ? 12.r : 8.r,
-              ),
+              borderRadius: BorderRadius.circular(8.r),
             ),
             shadows: [
               BoxShadow(
@@ -142,9 +155,9 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
               _buildImageSection(),
               Padding(
                 padding: EdgeInsets.fromLTRB(
-                  widget.variant == ProductCardVariant.youMayLike ? 12.sp : 8.w,
-                  widget.variant == ProductCardVariant.youMayLike ? 12.sp : 8.w,
-                  widget.variant == ProductCardVariant.youMayLike ? 12.sp : 8.w,
+                  widget.variant == ProductCardVariant.youMayLike ? 6.sp : 6.w,
+                  widget.variant == ProductCardVariant.youMayLike ? 6.sp : 6.w,
+                  widget.variant == ProductCardVariant.youMayLike ? 6.sp : 6.w,
                   6.w, // tighter bottom padding
                 ),
 
@@ -172,7 +185,7 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.vertical(
                 top: Radius.circular(
-                  widget.variant == ProductCardVariant.youMayLike ? 12.r : 4.r,
+                  widget.variant == ProductCardVariant.youMayLike ? 4.r : 4.r,
                 ),
               ),
             ),
@@ -191,15 +204,13 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
         // OTC Badge
         if (widget.product.isMedicine && widget.product.isOTC)
           Positioned(
-            top: widget.variant == ProductCardVariant.youMayLike ? 8.h : 0.h,
-            left: widget.variant == ProductCardVariant.youMayLike ? 8.w : 6.w,
+            // top: widget.variant == ProductCardVariant.youMayLike ? 0.h : 0.h,
+            left: 6.w,
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.h),
               decoration: BoxDecoration(
                 color: AppColors.grocery,
-                borderRadius: BorderRadius.circular(
-                  widget.variant == ProductCardVariant.youMayLike ? 4.r : 3.r,
-                ),
+                borderRadius: BorderRadius.circular(3.r),
               ),
               child: Text(
                 'OTC',
@@ -283,58 +294,91 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
               widget.product.price,
               style: getTextStyle(
                 font: CustomFonts.inter,
-                fontSize: widget.variant == ProductCardVariant.youMayLike
-                    ? 16.sp
-                    : 14.sp,
-                fontWeight: widget.variant == ProductCardVariant.youMayLike
-                    ? FontWeight.w700
-                    : FontWeight.w600,
-                color: widget.variant == ProductCardVariant.youMayLike
-                    ? Colors.black
-                    : AppColors.ebonyBlack,
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w600,
+                color: AppColors.ebonyBlack,
               ),
             ),
-            if (widget.onAddToCart != null)
-              GestureDetector(
-                key: _cartButtonKey,
-                onTap: widget.product.canAddToCart ? _handleAddToCart : null,
-                child: Container(
-                  width: widget.variant == ProductCardVariant.youMayLike
-                      ? 30.w
-                      : 24.w,
-                  height: widget.variant == ProductCardVariant.youMayLike
-                      ? 30.w
-                      : 24.w,
-                  decoration: BoxDecoration(
-                    color: widget.product.canAddToCart
-                        ? Colors.transparent
-                        : Colors.grey.withValues(alpha: 0.3),
-                    borderRadius: BorderRadius.circular(
-                      widget.variant == ProductCardVariant.youMayLike
-                          ? 4.r
-                          : 6.r,
-                    ),
-                  ),
-                  clipBehavior: Clip.antiAlias,
-                  child: Center(
-                    child: Image.asset(
-                      ImagePath.cartIcon,
-                      width: widget.variant == ProductCardVariant.youMayLike
-                          ? 22.w
-                          : null,
-                      height: widget.variant == ProductCardVariant.youMayLike
-                          ? 22.w
-                          : null,
-                      fit: BoxFit.cover,
-                      filterQuality: FilterQuality.high,
-                      color: widget.product.canAddToCart ? null : Colors.grey,
-                    ),
-                  ),
-                ),
-              ),
+            if (widget.onAddToCart != null) _buildCartSection(),
           ],
         ),
       ],
+    );
+  }
+
+  Widget _buildCartSection() {
+    // Get current cart state directly without reactive wrappers
+    int currentQuantity = 0;
+    bool currentIsInCart = false;
+
+    try {
+      final cartController = Get.find<CartController>();
+      currentQuantity = cartController.getProductQuantity(widget.product);
+      currentIsInCart = currentQuantity > 0;
+    } catch (e) {
+      // Cart controller not found
+    }
+
+    if (currentIsInCart) {
+      return QuantitySelector(
+        quantity: currentQuantity,
+        onIncrease: () {
+          try {
+            final cartController = Get.find<CartController>();
+            cartController.addProductToCart(widget.product);
+            // Trigger rebuild by calling setState
+            setState(() {});
+          } catch (e) {
+            // Cart controller not found
+          }
+        },
+        onDecrease: () {
+          try {
+            final cartController = Get.find<CartController>();
+            cartController.removeProductFromCart(widget.product);
+            // Trigger rebuild by calling setState
+            setState(() {});
+          } catch (e) {
+            // Cart controller not found
+          }
+        },
+        fontSize: 12.sp,
+        iconSize: 14.sp,
+      );
+    } else {
+      return _buildAddToCartButton();
+    }
+  }
+
+  Widget _buildAddToCartButton() {
+    return GestureDetector(
+      key: _cartButtonKey,
+      onTap: widget.product.canAddToCart ? _handleAddToCart : null,
+      child: Container(
+        //width: 24.w,
+        height: 24.w,
+        decoration: BoxDecoration(
+          color: widget.product.canAddToCart
+              ? Colors.transparent
+              : Colors.grey.withValues(alpha: 0.3),
+          borderRadius: BorderRadius.circular(6.r),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Center(
+          child: Image.asset(
+            ImagePath.cartIcon,
+            width: widget.variant == ProductCardVariant.youMayLike
+                ? 22.w
+                : null,
+            height: widget.variant == ProductCardVariant.youMayLike
+                ? 22.w
+                : null,
+            fit: BoxFit.cover,
+            filterQuality: FilterQuality.high,
+            color: widget.product.canAddToCart ? null : Colors.grey,
+          ),
+        ),
+      ),
     );
   }
 
@@ -408,9 +452,9 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
               child: Center(
                 child: Image.asset(
                   widget.product.imagePath,
-                  width: 40.w,
-                  height: 40.w,
-                  fit: BoxFit.contain,
+                  // width: 40.w,
+                  // height: 40.w,
+                  fit: BoxFit.cover,
                   filterQuality: FilterQuality.high,
                 ),
               ),
@@ -445,7 +489,7 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
                   if (widget.quantity != null) ...[
                     SizedBox(height: 6.h),
                     Text(
-                      'Total: ₹${(widget.quantity! * _getNumericPrice()).toStringAsFixed(2)}',
+                      'Total: \$ ${(widget.quantity! * _getNumericPrice()).toStringAsFixed(2)}',
                       style: getTextStyle(
                         font: CustomFonts.inter,
                         fontSize: 14.sp,

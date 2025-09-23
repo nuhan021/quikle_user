@@ -280,9 +280,9 @@ class SearchScreen extends StatelessWidget {
             child: GridView.builder(
               padding: EdgeInsets.symmetric(horizontal: 16.w),
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 12.w,
-                mainAxisSpacing: 16.h,
+                crossAxisCount: 3,
+                crossAxisSpacing: 8.w,
+                mainAxisSpacing: 8.h,
                 childAspectRatio: 0.75,
               ),
               itemCount: controller.searchResults.length,

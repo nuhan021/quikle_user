@@ -183,7 +183,14 @@ class CategoryProductsController extends GetxController with VoiceSearchMixin {
     }
   }
 
-  void onSubcategoryTap(SubcategoryModel subcategory) {
+  void onSubcategoryTap(SubcategoryModel? subcategory) {
+    if (subcategory == null) {
+      // "All" option selected - show all products
+      selectedSubcategory.value = null;
+      displayProducts.value = allProducts;
+      return;
+    }
+
     if (selectedSubcategory.value?.id == subcategory.id) {
       selectedSubcategory.value = null;
       displayProducts.value = allProducts;
