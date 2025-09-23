@@ -111,15 +111,11 @@ class _VendorResponseCardState extends State<VendorResponseCard>
       ),
       child: Column(
         children: [
-          
           Container(
             padding: EdgeInsets.all(16.w),
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [
-                  Colors.blue.shade50,
-                  Colors.blue.shade100, 
-                ],
+                colors: [Colors.blue.shade50, Colors.blue.shade100],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -179,7 +175,6 @@ class _VendorResponseCardState extends State<VendorResponseCard>
                       ),
                     ),
 
-                    
                     Container(
                       key: addAllKey,
                       child: ElevatedButton(
@@ -187,8 +182,7 @@ class _VendorResponseCardState extends State<VendorResponseCard>
                           if (widget.onCartAnimation != null) {
                             widget.onCartAnimation!(
                               addAllKey,
-                              ImagePath
-                                  .medicineIcon, 
+                              ImagePath.medicineIcon,
                             );
                           }
                           widget.controller.acceptVendorResponse(
@@ -295,12 +289,10 @@ class _VendorResponseCardState extends State<VendorResponseCard>
             ),
           ),
 
-          
           Padding(
             padding: EdgeInsets.all(16.w),
             child: Column(
               children: [
-                
                 GestureDetector(
                   onTap: () {
                     setState(() => _isExpanded = !_isExpanded);
@@ -349,15 +341,13 @@ class _VendorResponseCardState extends State<VendorResponseCard>
                   ),
                 ),
 
-                
                 SizeTransition(
                   sizeFactor: _expandAnimation,
                   child: Column(
                     children: [
                       SizedBox(height: 12.h),
                       ...meds.asMap().entries.map((entry) {
-                        final index = entry
-                            .key; 
+                        final index = entry.key;
                         final medicine = entry.value;
                         final medicineKey = GlobalKey();
 
@@ -385,7 +375,6 @@ class _VendorResponseCardState extends State<VendorResponseCard>
                             padding: EdgeInsets.all(12.w),
                             child: Row(
                               children: [
-                                
                                 Container(
                                   width: 40.w,
                                   height: 40.w,
@@ -411,7 +400,6 @@ class _VendorResponseCardState extends State<VendorResponseCard>
                                 ),
                                 SizedBox(width: 12.w),
 
-                                
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment:

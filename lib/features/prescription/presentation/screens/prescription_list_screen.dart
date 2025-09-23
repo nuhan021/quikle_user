@@ -18,6 +18,8 @@ class PrescriptionListScreen extends StatefulWidget {
 }
 
 class _PrescriptionListScreenState extends State<PrescriptionListScreen> {
+  final GlobalKey _cartFabKey = GlobalKey(); // for locating the button
+
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<PrescriptionController>();
@@ -25,12 +27,14 @@ class _PrescriptionListScreenState extends State<PrescriptionListScreen> {
     return CartAnimationWrapper(
       child: Scaffold(
         backgroundColor: AppColors.backgroundLight,
+
         appBar: const CommonAppBar(
           title: 'My Prescriptions',
           showNotification: false,
           showProfile: false,
           backgroundColor: AppColors.backgroundLight,
         ),
+
         body: Stack(
           children: [
             RefreshIndicator(
@@ -92,7 +96,6 @@ class _PrescriptionListScreenState extends State<PrescriptionListScreen> {
 
                 return Column(
                   children: [
-                    
                     Padding(
                       padding: EdgeInsets.all(16.w),
                       child: Row(
@@ -134,8 +137,6 @@ class _PrescriptionListScreenState extends State<PrescriptionListScreen> {
                         ],
                       ),
                     ),
-
-                    
                     Expanded(
                       child: ListView.builder(
                         padding: EdgeInsets.symmetric(horizontal: 16.w),
@@ -154,15 +155,26 @@ class _PrescriptionListScreenState extends State<PrescriptionListScreen> {
                 );
               }),
             ),
-
-            
-            const Positioned(
-              bottom: 20,
-              right: 20,
-              child: FloatingCartButton(),
-            ),
           ],
         ),
+
+        // ✅ This replaces the old hard-coded Positioned(...)
+        floatingActionButton: SafeArea(
+          // SafeArea ensures it clears system gesture/nav bars
+          child: Padding(
+            // Optional: add consistent spacing from edges
+            padding: EdgeInsets.only(right: 16.w, bottom: 16.h),
+            child: Container(
+              key: _cartFabKey, // so we can compute the target position
+              child: const FloatingCartButton(),
+            ),
+          ),
+        ),
+
+        // Optional: If this screen has its own bottomNavigationBar,
+        // the FAB will automatically float above it.
+        // bottomNavigationBar: YourBottomNavBar(),
+        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       ),
     );
   }
@@ -198,7 +210,6 @@ class _PrescriptionListScreenState extends State<PrescriptionListScreen> {
         ),
       );
     } catch (e) {
-      
       print('Cart animation controller not found: $e');
     }
   }
