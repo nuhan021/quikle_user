@@ -108,7 +108,16 @@ class CategoryDetailController extends GetxController {
     }
   }
 
-  void onSubcategoryTap(SubcategoryModel subcategory) {
+  void onSubcategoryTap(SubcategoryModel? subcategory) {
+    if (subcategory == null) {
+      // Handle "All" option - could navigate to show all products for this category
+      Get.toNamed(
+        AppRoute.getCategoryProducts(),
+        arguments: {'category': category},
+      );
+      return;
+    }
+
     Get.toNamed(
       AppRoute.getSubcategoryProducts(),
       arguments: {'subcategory': subcategory, 'category': category},

@@ -89,4 +89,36 @@ class CartController extends GetxController {
       );
     }
   }
+
+  // Get the quantity of a specific product in the cart
+  int getProductQuantity(ProductModel product) {
+    return _cartService.getProductQuantity(product);
+  }
+
+  // Check if a product is in the cart
+  bool isProductInCart(ProductModel product) {
+    return _cartService.isProductInCart(product);
+  }
+
+  // Get cart item for a specific product
+  CartItemModel? getCartItemForProduct(ProductModel product) {
+    return _cartService.getCartItemForProduct(product);
+  }
+
+  // Add specific quantity of product to cart
+  void addProductToCart(ProductModel product) {
+    addToCart(product);
+  }
+
+  // Remove one quantity of product from cart
+  void removeProductFromCart(ProductModel product) {
+    final cartItem = getCartItemForProduct(product);
+    if (cartItem != null) {
+      if (cartItem.quantity > 1) {
+        decreaseQuantity(cartItem);
+      } else {
+        removeFromCart(cartItem);
+      }
+    }
+  }
 }

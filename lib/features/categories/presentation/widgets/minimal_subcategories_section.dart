@@ -8,10 +8,12 @@ import 'package:quikle_user/features/categories/data/models/subcategory_model.da
 class MinimalSubcategoriesSection extends StatelessWidget {
   final List<SubcategoryModel> subcategories;
   final SubcategoryModel? selectedSubcategory;
-  final Function(SubcategoryModel) onSubcategoryTap;
+  final String categoryIconPath;
+  final Function(SubcategoryModel?) onSubcategoryTap;
 
   const MinimalSubcategoriesSection({
     super.key,
+    required this.categoryIconPath,
     required this.subcategories,
     required this.selectedSubcategory,
     required this.onSubcategoryTap,
@@ -54,9 +56,65 @@ class MinimalSubcategoriesSection extends StatelessWidget {
             scrollDirection: Axis.horizontal,
             primary: false,
             padding: EdgeInsets.zero,
-            itemCount: subcategories.length,
+            itemCount: subcategories.length + 1, // +1 for "All" option
             itemBuilder: (context, index) {
-              final subcategory = subcategories[index];
+              // First item is "All"
+              if (index == 0) {
+                final isSelected = selectedSubcategory == null;
+                return GestureDetector(
+                  onTap: () => onSubcategoryTap(null),
+                  child: Container(
+                    margin: EdgeInsets.only(right: 12.w),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          height: 38.h,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12.r),
+                            border: isSelected
+                                ? Border.all(
+                                    color: AppColors.beakYellow,
+                                    width: 2,
+                                  )
+                                : null,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withValues(alpha: .08),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Image.asset(
+                            categoryIconPath,
+                            fit: BoxFit.cover,
+                            //size: 20.sp,
+                          ),
+                        ),
+                        SizedBox(height: 4.h),
+                        Text(
+                          'All',
+                          textAlign: TextAlign.center,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: getTextStyle(
+                            font: CustomFonts.inter,
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w500,
+                            color: isSelected
+                                ? AppColors.beakYellow
+                                : AppColors.ebonyBlack,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }
+
+              // Remaining items are subcategories
+              final subcategory = subcategories[index - 1];
               final isSelected = selectedSubcategory?.id == subcategory.id;
 
               return GestureDetector(
@@ -88,7 +146,7 @@ class MinimalSubcategoriesSection extends StatelessWidget {
                         child: Center(
                           child: Image.asset(
                             subcategory.iconPath,
-                            fit: BoxFit.contain,
+                            fit: BoxFit.cover,
                           ),
                         ),
                       ),

@@ -234,8 +234,8 @@ class _RestaurantMenuScreenState extends State<RestaurantMenuScreen> {
                                   gridDelegate:
                                       SliverGridDelegateWithFixedCrossAxisCount(
                                         crossAxisCount: 2,
-                                        crossAxisSpacing: 12.w,
-                                        mainAxisSpacing: 12.h,
+                                        crossAxisSpacing: 8.w,
+                                        mainAxisSpacing: 8.h,
                                         childAspectRatio: 0.75,
                                       ),
                                   itemCount: _categoryProducts.length,

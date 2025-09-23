@@ -44,9 +44,9 @@ class TopRestaurantsSection extends StatelessWidget {
             scrollDirection: Axis.horizontal,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2, // 2 rows
-              mainAxisSpacing: 8.w,
+              //mainAxisSpacing: 2.w,
               crossAxisSpacing: 8.h,
-              childAspectRatio: 0.8, // adjust width/height ratio
+              childAspectRatio: 0.8,
             ),
             itemCount: restaurants.length,
             itemBuilder: (context, index) {
