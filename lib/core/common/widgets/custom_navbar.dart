@@ -23,19 +23,19 @@ class CustomNavBar extends StatelessWidget {
 
     return Container(
       padding: EdgeInsets.only(
-        top: 14.h,
-        left: 12.w,
-        right: 12.w,
-        bottom: systemBottom > 0 ? systemBottom : 12.h,
+        top: 8.h,
+        left: 8.w,
+        right: 8.w,
+        bottom: systemBottom > 0 ? systemBottom : 8.h,
       ),
       decoration: BoxDecoration(
         color: Colors.black.withValues(alpha: 0.80),
         borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(20.r),
-          topRight: Radius.circular(20.r),
+          topLeft: Radius.circular(16.r),
+          topRight: Radius.circular(16.r),
         ),
         border: Border(
-          top: BorderSide(width: 1.w, color: AppColors.gradientColor),
+          top: BorderSide(width: 2.w, color: AppColors.gradientColor),
         ),
       ),
       child: Row(
@@ -89,7 +89,7 @@ class _NavItem extends StatelessWidget {
     required this.label,
     required this.isSelected,
     required this.onTap,
-    this.iconSize = 24.0,
+    this.iconSize = 20.0, // was 24.0
     this.showText = true,
   }) : assert(
          icon != null || iconAsset != null || fallbackIcon != null,
@@ -102,7 +102,7 @@ class _NavItem extends StatelessWidget {
       child: GestureDetector(
         onTap: onTap,
         child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 6.h),
+          padding: EdgeInsets.symmetric(vertical: 4.h), // was 6.h
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -129,7 +129,7 @@ class _NavItem extends StatelessWidget {
                           ? AppColors.beakYellow
                           : AppColors.eggshellWhite,
                     ),
-              if (showText) SizedBox(height: 8.h),
+              if (showText) SizedBox(height: 4.h), // was 8.h
               if (showText)
                 Text(
                   label,
@@ -138,7 +138,7 @@ class _NavItem extends StatelessWidget {
                     color: isSelected
                         ? AppColors.beakYellow
                         : AppColors.eggshellWhite,
-                    fontSize: 14.sp,
+                    fontSize: 12.sp, // was 14.sp
                     fontWeight: FontWeight.w400,
                   ),
                 ),

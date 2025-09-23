@@ -45,17 +45,10 @@ class ProductGridSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (title.isNotEmpty)
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8.w),
-            child: Container(
-              width: double.infinity,
-              padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 12.w),
-              decoration: const BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(width: 3, color: Color(0xFFEDEDED)),
-                ),
-              ),
-              child: Row(
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
@@ -66,6 +59,8 @@ class ProductGridSection extends StatelessWidget {
                       fontWeight: FontWeight.w500,
                       color: AppColors.ebonyBlack,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   if (showViewAll && onViewAllTap != null)
                     GestureDetector(
@@ -82,36 +77,39 @@ class ProductGridSection extends StatelessWidget {
                     ),
                 ],
               ),
-            ),
+              Divider(
+                thickness: 3,
+                color: const Color(0xFFEDEDED),
+                height: 12.h, // space around the divider
+              ),
+            ],
           ),
-        if (title.isNotEmpty) SizedBox(height: 16.h),
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.w),
-          child: GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: crossAxisCount,
-              crossAxisSpacing: 12.w,
-              mainAxisSpacing: 12.h,
-              childAspectRatio: crossAxisCount == 3 ? 0.60 : 1,
-            ),
-            itemCount: displayProducts.length,
-            itemBuilder: (context, index) {
-              final product = displayProducts[index];
-              final shop = shops?[product.shopId];
 
-              return CategoryProductItem(
-                product: product,
-                onTap: () => onProductTap(product),
-                onAddToCart: () => onAddToCart(product),
-                onFavoriteToggle: () => onFavoriteToggle(product),
-                isGroceryCategory: isGroceryCategory,
-                shop: shop,
-              );
-            },
+        GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount,
+            crossAxisSpacing: 8.w,
+            mainAxisSpacing: 8.h,
+            childAspectRatio: crossAxisCount == 3 ? 0.75 : 1,
           ),
+          itemCount: displayProducts.length,
+          itemBuilder: (context, index) {
+            final product = displayProducts[index];
+            final shop = shops?[product.shopId];
+
+            return CategoryProductItem(
+              product: product,
+              onTap: () => onProductTap(product),
+              onAddToCart: () => onAddToCart(product),
+              onFavoriteToggle: () => onFavoriteToggle(product),
+              isGroceryCategory: isGroceryCategory,
+              shop: shop,
+            );
+          },
         ),
+        SizedBox(height: 16.h),
       ],
     );
   }

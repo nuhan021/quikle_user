@@ -27,26 +27,27 @@ class TopRestaurantsSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.w),
-          child: Text(
-            title,
-            style: getTextStyle(
-              font: CustomFonts.obviously,
-              fontSize: 16.sp,
-              fontWeight: FontWeight.w600,
-              color: AppColors.ebonyBlack,
-            ),
+        Text(
+          title,
+          style: getTextStyle(
+            font: CustomFonts.obviously,
+            fontSize: 14.sp,
+            fontWeight: FontWeight.w600,
+            color: AppColors.ebonyBlack,
           ),
         ),
         SizedBox(height: 16.h),
 
         SizedBox(
-          height: 200.h, 
-          child: ListView.builder(
+          height: 300.h, // enough height for 2 rows
+          child: GridView.builder(
             scrollDirection: Axis.horizontal,
-            padding: EdgeInsets.symmetric(horizontal: 16.w),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2, // 2 rows
+              //mainAxisSpacing: 2.w,
+              crossAxisSpacing: 8.h,
+              childAspectRatio: 0.8,
+            ),
             itemCount: restaurants.length,
             itemBuilder: (context, index) {
               final restaurant = restaurants[index];

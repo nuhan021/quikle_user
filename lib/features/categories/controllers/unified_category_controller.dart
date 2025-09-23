@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'dart:math';
 import 'package:get/get.dart';
 import 'package:quikle_user/features/home/data/models/category_model.dart';
 import 'package:quikle_user/features/home/data/models/product_model.dart';
@@ -9,8 +11,9 @@ import 'package:quikle_user/features/restaurants/data/services/restaurant_servic
 import 'package:quikle_user/features/cart/controllers/cart_controller.dart';
 import 'package:quikle_user/features/profile/controllers/favorites_controller.dart';
 import 'package:quikle_user/routes/app_routes.dart';
+import 'package:quikle_user/core/mixins/voice_search_mixin.dart';
 
-class UnifiedCategoryController extends GetxController {
+class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
   final CategoryService _categoryService = CategoryService();
   final RestaurantService _restaurantService = RestaurantService();
   final CartController _cartController = Get.find<CartController>();
@@ -44,11 +47,66 @@ class UnifiedCategoryController extends GetxController {
   final priceRange = RxList<double>([0.0, 100.0]);
   final showOnlyInStock = false.obs;
 
+  final currentPlaceholder = "Search products...".obs;
+  Timer? _placeholderTimer;
+
   late CategoryModel currentCategory;
   bool get isGroceryCategory => currentCategory.id == '2';
   bool get isFoodCategory => currentCategory.id == '1';
+  bool get isMedicineCategory => currentCategory.id == '3';
 
   bool get shouldShowCombinedSection => selectedSubcategory.value != null;
+
+  Map<String, List<String>> get categoryPlaceholders => {
+    '1': [
+      'biryani',
+      'pizza',
+      'burger',
+      'pasta',
+      'sushi',
+      'tacos',
+      'noodles',
+      'sandwich',
+      'ice cream',
+      'coffee',
+    ],
+    '2': [
+      'rice',
+      'milk',
+      'bread',
+      'fruits',
+      'vegetables',
+      'oil',
+      'flour',
+      'eggs',
+      'cheese',
+      'yogurt',
+    ],
+    '3': [
+      'paracetamol',
+      'vitamins',
+      'cough syrup',
+      'bandages',
+      'antiseptic',
+      'thermometer',
+      'pain relief',
+      'antibiotics',
+      'first aid',
+      'supplements',
+    ],
+    'default': [
+      'products',
+      'items',
+      'essentials',
+      'basics',
+      'quality products',
+    ],
+  };
+
+  List<String> get currentCategoryPlaceholders {
+    return categoryPlaceholders[currentCategory.id] ??
+        categoryPlaceholders['default']!;
+  }
 
   @override
   void onInit() {
@@ -58,8 +116,33 @@ class UnifiedCategoryController extends GetxController {
     if (args != null && args['category'] != null) {
       currentCategory = args['category'] as CategoryModel;
       categoryTitle.value = currentCategory.title;
+      _startPlaceholderRotation();
       _loadCategoryData();
     }
+  }
+
+  @override
+  void onClose() {
+    _placeholderTimer?.cancel();
+    super.onClose();
+  }
+
+  void _startPlaceholderRotation() {
+    final placeholders = currentCategoryPlaceholders;
+    if (placeholders.isNotEmpty) {
+      final randomIndex = Random().nextInt(placeholders.length);
+      final randomItem = placeholders[randomIndex];
+      currentPlaceholder.value = "Search for '$randomItem'";
+    }
+
+    _placeholderTimer = Timer.periodic(const Duration(seconds: 4), (timer) {
+      final placeholders = currentCategoryPlaceholders;
+      if (placeholders.isNotEmpty) {
+        final randomIndex = Random().nextInt(placeholders.length);
+        final randomItem = placeholders[randomIndex];
+        currentPlaceholder.value = "Search for '$randomItem'";
+      }
+    });
   }
 
   ShopModel? getShopForProduct(ProductModel product) {
@@ -180,29 +263,30 @@ class UnifiedCategoryController extends GetxController {
     }
   }
 
-  void onSubcategoryTap(SubcategoryModel subcategory) async {
+  void onSubcategoryTap(SubcategoryModel? subcategory) async {
     try {
       isLoading.value = true;
 
+      // Handle "All" option
+      if (subcategory == null) {
+        selectedSubcategory.value = null;
+        showingAllProducts.value = false;
+        displayProducts.value = allProducts;
+        productsTitle.value = 'All Items';
+        isLoading.value = false;
+        return;
+      }
+
       if (isGroceryCategory) {
         if (allCategories.contains(subcategory)) {
-          selectedMainCategory.value = subcategory;
-          selectedSubcategory.value = null;
-          selectedFilter.value = null;
-          showingAllProducts.value = false;
-
-          final subCategories = await _categoryService.fetchSubcategories(
-            currentCategory.id,
-            parentSubcategoryId: subcategory.id,
+          Get.toNamed(
+            AppRoute.getCategoryProducts(),
+            arguments: {
+              'category': currentCategory,
+              'mainCategory': subcategory,
+            },
           );
-          filterSubcategories.value = subCategories;
-
-          final products = await _categoryService.fetchProductsByMainCategory(
-            subcategory.id,
-          );
-          allProducts.value = products;
-          displayProducts.value = products;
-          productsTitle.value = 'All ${subcategory.title}';
+          return;
         } else {
           selectedSubcategory.value = subcategory;
           showingAllProducts.value = false;
@@ -292,12 +376,6 @@ class UnifiedCategoryController extends GetxController {
 
   void onAddToCart(ProductModel product) {
     _cartController.addToCart(product);
-    Get.snackbar(
-      'Added to Cart',
-      '${product.title} has been added to your cart',
-      snackPosition: SnackPosition.BOTTOM,
-      duration: const Duration(seconds: 2),
-    );
   }
 
   void onFavoriteToggle(ProductModel product) {
@@ -311,12 +389,12 @@ class UnifiedCategoryController extends GetxController {
     final updatedProduct = product.copyWith(isFavorite: isFavorite);
     _updateProductInLists(updatedProduct);
 
-    Get.snackbar(
-      isFavorite ? 'Added to Favorites' : 'Removed from Favorites',
-      '${updatedProduct.title} ${isFavorite ? 'added to' : 'removed from'} favorites',
-      snackPosition: SnackPosition.BOTTOM,
-      duration: const Duration(seconds: 2),
-    );
+    // Get.snackbar(
+    //   isFavorite ? 'Added to Favorites' : 'Removed from Favorites',
+    //   '${updatedProduct.title} ${isFavorite ? 'added to' : 'removed from'} favorites',
+    //   snackPosition: SnackPosition.BOTTOM,
+    //   duration: const Duration(seconds: 2),
+    // );
   }
 
   void _updateProductInLists(ProductModel updatedProduct) {
@@ -617,5 +695,9 @@ class UnifiedCategoryController extends GetxController {
         'categoryName': '',
       },
     );
+  }
+
+  Future<void> onVoiceSearchPressed() async {
+    await startVoiceSearch(navigateToSearch: true);
   }
 }

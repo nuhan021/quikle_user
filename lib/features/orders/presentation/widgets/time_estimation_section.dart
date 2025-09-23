@@ -72,7 +72,7 @@ class TimeEstimationSection extends StatelessWidget {
                     : 'Estimated Delivery Time',
                 style: getTextStyle(
                   font: CustomFonts.obviously,
-                  fontSize: 16.sp,
+                  fontSize: 14.sp,
                   fontWeight: FontWeight.w500,
                   color: controller.isActiveDelivery
                       ? const Color(0xFFFFC200)
@@ -86,7 +86,7 @@ class TimeEstimationSection extends StatelessWidget {
                     : 'Arriving in ${controller.estimatedTime.value}',
                 style: getTextStyle(
                   font: CustomFonts.inter,
-                  fontSize: 14.sp,
+                  fontSize: 12.sp,
                   fontWeight: FontWeight.w400,
                   color: const Color(0xFF7C7C7C),
                 ),

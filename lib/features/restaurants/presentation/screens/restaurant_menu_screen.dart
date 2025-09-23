@@ -234,8 +234,8 @@ class _RestaurantMenuScreenState extends State<RestaurantMenuScreen> {
                                   gridDelegate:
                                       SliverGridDelegateWithFixedCrossAxisCount(
                                         crossAxisCount: 2,
-                                        crossAxisSpacing: 12.w,
-                                        mainAxisSpacing: 12.h,
+                                        crossAxisSpacing: 8.w,
+                                        mainAxisSpacing: 8.h,
                                         childAspectRatio: 0.75,
                                       ),
                                   itemCount: _categoryProducts.length,
@@ -249,14 +249,7 @@ class _RestaurantMenuScreenState extends State<RestaurantMenuScreen> {
                                           arguments: {'product': product},
                                         );
                                       },
-                                      onAddToCart: () {
-                                        Get.snackbar(
-                                          'Added to Cart',
-                                          '${product.title} added to your cart',
-                                          snackPosition: SnackPosition.BOTTOM,
-                                          duration: const Duration(seconds: 2),
-                                        );
-                                      },
+                                      onAddToCart: () {},
                                       onFavoriteToggle: () {},
                                     );
                                   },

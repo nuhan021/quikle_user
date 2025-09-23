@@ -20,12 +20,10 @@ class ProductController extends GetxController {
   final _description = ''.obs;
   final _ratingDistribution = <String, dynamic>{}.obs;
 
-  
   final reviewController = TextEditingController();
   final questionController = TextEditingController();
   final _userRating = 5.0.obs;
 
-  
   bool get isLoading => _isLoading.value;
   ProductModel? get product => _product.value;
   List<ReviewModel> get reviews => _reviews;
@@ -58,7 +56,6 @@ class ProductController extends GetxController {
     try {
       _product.value = productModel;
 
-      
       _reviews.clear();
       _reviews.addAll(_productService.getProductReviews(productModel));
 
@@ -93,34 +90,25 @@ class ProductController extends GetxController {
       }
 
       _cartController.addToCart(_product.value!);
-      Get.snackbar(
-        'Added to Cart',
-        '${_product.value!.title} has been added to your cart.',
-        duration: const Duration(seconds: 2),
-      );
     }
   }
 
   void onUploadPrescription() {
-    
     if (_product.value != null) {
-      
-      
       final updatedProduct = _product.value!.copyWith(
         hasPrescriptionUploaded: true,
       );
       _product.value = updatedProduct;
 
-      Get.snackbar(
-        'Prescription Uploaded',
-        'Your prescription has been uploaded successfully. You can now add this medicine to your cart.',
-        duration: const Duration(seconds: 3),
-      );
+      // Get.snackbar(
+      //   'Prescription Uploaded',
+      //   'Your prescription has been uploaded successfully. You can now add this medicine to your cart.',
+      //   duration: const Duration(seconds: 3),
+      // );
     }
   }
 
   void onViewPrescription() {
-    
     Get.snackbar(
       'View Prescription',
       'Prescription viewer will open here.',
@@ -130,27 +118,25 @@ class ProductController extends GetxController {
 
   void onFavoriteToggle() {
     if (_product.value != null) {
-      
       if (FavoritesController.isProductFavorite(_product.value!.id)) {
         FavoritesController.removeFromGlobalFavorites(_product.value!.id);
       } else {
         FavoritesController.addToGlobalFavorites(_product.value!.id);
       }
 
-      
       final isFavorite = FavoritesController.isProductFavorite(
         _product.value!.id,
       );
       final updatedProduct = _product.value!.copyWith(isFavorite: isFavorite);
       _product.value = updatedProduct;
 
-      Get.snackbar(
-        isFavorite ? 'Added to Favorites' : 'Removed from Favorites',
-        isFavorite
-            ? '${updatedProduct.title} has been added to your favorites.'
-            : '${updatedProduct.title} has been removed from your favorites.',
-        duration: const Duration(seconds: 2),
-      );
+      // Get.snackbar(
+      //   isFavorite ? 'Added to Favorites' : 'Removed from Favorites',
+      //   isFavorite
+      //       ? '${updatedProduct.title} has been added to your favorites.'
+      //       : '${updatedProduct.title} has been removed from your favorites.',
+      //   duration: const Duration(seconds: 2),
+      // );
     }
   }
 
@@ -170,7 +156,6 @@ class ProductController extends GetxController {
       return;
     }
 
-    
     final newReview = ReviewModel(
       id: 'review_${DateTime.now().millisecondsSinceEpoch}',
       productId: _product.value?.id ?? '',
@@ -182,10 +167,8 @@ class ProductController extends GetxController {
       date: DateTime.now(),
     );
 
-    
     _reviews.insert(0, newReview);
 
-    
     reviewController.clear();
     _userRating.value = 5.0;
 
@@ -210,7 +193,6 @@ class ProductController extends GetxController {
       return;
     }
 
-    
     final newQuestion = QuestionModel(
       id: 'question_${DateTime.now().millisecondsSinceEpoch}',
       productId: _product.value?.id ?? '',
@@ -218,14 +200,12 @@ class ProductController extends GetxController {
       userName: 'You',
       userImage: 'assets/icons/profile.png',
       question: questionController.text.trim(),
-      answer: '', 
+      answer: '',
       date: DateTime.now(),
     );
 
-    
     _questions.insert(0, newQuestion);
 
-    
     questionController.clear();
 
     Get.snackbar(
@@ -238,7 +218,6 @@ class ProductController extends GetxController {
   }
 
   void onReplyToQuestion(QuestionModel question) {
-    
     Get.snackbar(
       'Reply',
       'Reply functionality will be implemented',
@@ -247,7 +226,6 @@ class ProductController extends GetxController {
   }
 
   void onSeeAllReviews() {
-    
     Get.snackbar(
       'All Reviews',
       'All reviews functionality will be implemented',
@@ -256,7 +234,6 @@ class ProductController extends GetxController {
   }
 
   void onShareProduct() {
-    
     Get.snackbar(
       'Share',
       'Share functionality will be implemented',
@@ -266,15 +243,9 @@ class ProductController extends GetxController {
 
   void addToCartFromSimilar(ProductModel product) {
     _cartController.addToCart(product);
-    Get.snackbar(
-      'Added to Cart',
-      '${product.title} has been added to your cart.',
-      duration: const Duration(seconds: 2),
-    );
   }
 
   void onFavoriteToggleFromSimilar(ProductModel product) {
-    
     Get.snackbar(
       'Favorite',
       '${product.title} ${product.isFavorite ? 'removed from' : 'added to'} favorites.',

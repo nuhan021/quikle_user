@@ -9,6 +9,7 @@ import '../data/services/payout_service.dart';
 import '../../cart/controllers/cart_controller.dart';
 import '../../user/controllers/user_controller.dart';
 import '../../../core/utils/constants/enums/order_enums.dart';
+import '../../../core/utils/constants/enums/delivery_enums.dart';
 
 class PayoutController extends GetxController {
   final PayoutService _payoutService = PayoutService();
@@ -16,6 +17,8 @@ class PayoutController extends GetxController {
   final _userController = Get.find<UserController>();
 
   final _deliveryOptions = <DeliveryOptionModel>[].obs;
+  final _deliveryPreferenceController = TextEditingController();
+  final _selectedDeliveryPreference = Rxn<String?>(null);
   final _paymentMethods = <PaymentMethodModel>[].obs;
   final _shippingAddresses = <ShippingAddressModel>[].obs;
   final _isUrgentDelivery = false.obs;
@@ -25,6 +28,15 @@ class PayoutController extends GetxController {
   final _couponController = TextEditingController();
 
   List<DeliveryOptionModel> get deliveryOptions => _deliveryOptions;
+  TextEditingController get deliveryPreferenceController =>
+      _deliveryPreferenceController;
+  String? get selectedDeliveryPreference {
+    final explicit = _selectedDeliveryPreference.value;
+    if (explicit != null && explicit.trim().isNotEmpty) return explicit;
+    final typed = _deliveryPreferenceController.text.trim();
+    return typed.isNotEmpty ? typed : null;
+  }
+
   List<PaymentMethodModel> get paymentMethods => _paymentMethods;
   List<ShippingAddressModel> get shippingAddresses => _shippingAddresses;
   bool get isUrgentDelivery => _isUrgentDelivery.value;
@@ -33,7 +45,6 @@ class PayoutController extends GetxController {
   bool get isProcessingPayment => _isProcessingPayment.value;
   TextEditingController get couponController => _couponController;
 
-  
   bool get canApplyCoupon => _couponCode.value.trim().isNotEmpty;
 
   DeliveryOptionModel? get selectedDeliveryOption =>
@@ -93,14 +104,20 @@ class PayoutController extends GetxController {
     super.onInit();
     _loadInitialData();
 
-    
     _couponController.addListener(_syncCouponText);
+    _deliveryPreferenceController.addListener(() {
+      _selectedDeliveryPreference.value =
+          _deliveryPreferenceController.text.trim().isNotEmpty
+          ? _deliveryPreferenceController.text.trim()
+          : null;
+    });
   }
 
   @override
   void onClose() {
     _couponController.removeListener(_syncCouponText);
     _couponController.dispose();
+    _deliveryPreferenceController.dispose();
     super.onClose();
   }
 
@@ -120,6 +137,11 @@ class PayoutController extends GetxController {
     }).toList();
   }
 
+  void selectDeliveryPreference(String? pref) {
+    _selectedDeliveryPreference.value = pref;
+    if (pref != null) _deliveryPreferenceController.text = pref;
+  }
+
   void selectPaymentMethod(PaymentMethodModel method) {
     _paymentMethods.value = _paymentMethods.map((item) {
       return item.copyWith(isSelected: item.type == method.type);
@@ -134,6 +156,20 @@ class PayoutController extends GetxController {
 
   void toggleUrgentDelivery() {
     _isUrgentDelivery.value = !_isUrgentDelivery.value;
+
+    // When urgent is turned on, prefer split delivery for speed.
+    if (_isUrgentDelivery.value) {
+      final splitOption = _deliveryOptions.firstWhereOrNull(
+        (o) => o.type.name == 'split' || o.type == DeliveryType.split,
+      );
+      if (splitOption != null) selectDeliveryOption(splitOption);
+    } else {
+      // revert to combined (cheaper) if available
+      final combinedOption = _deliveryOptions.firstWhereOrNull(
+        (o) => o.type.name == 'combined' || o.type == DeliveryType.combined,
+      );
+      if (combinedOption != null) selectDeliveryOption(combinedOption);
+    }
   }
 
   Future<void> applyCoupon() async {
@@ -165,6 +201,19 @@ class PayoutController extends GetxController {
   }
 
   Future<void> placeOrder() async {
+    // Auto-select sensible defaults if the user hasn't made explicit choices
+    if (selectedDeliveryOption == null && _deliveryOptions.isNotEmpty) {
+      selectDeliveryOption(_deliveryOptions.first);
+    }
+
+    if (selectedPaymentMethod == null && _paymentMethods.isNotEmpty) {
+      selectPaymentMethod(_paymentMethods.first);
+    }
+
+    if (selectedShippingAddress == null && _shippingAddresses.isNotEmpty) {
+      selectShippingAddress(_shippingAddresses.first);
+    }
+
     if (selectedDeliveryOption == null ||
         selectedPaymentMethod == null ||
         selectedShippingAddress == null) {
@@ -200,6 +249,10 @@ class PayoutController extends GetxController {
           orderDate: DateTime.now(),
           status: OrderStatus.pending,
           transactionId: paymentResult['transactionId'],
+          metadata: {
+            'deliveryPreference': selectedDeliveryPreference,
+            'isUrgent': isUrgentDelivery,
+          },
         );
 
         _cartController.clearCart();

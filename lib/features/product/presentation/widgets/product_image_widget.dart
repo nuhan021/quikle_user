@@ -24,14 +24,7 @@ class ProductImageWidget extends StatelessWidget {
       ),
       child: Stack(
         children: [
-          Center(
-            child: Image.asset(
-              imagePath,
-              height: 200.h,
-              width: 200.w,
-              fit: BoxFit.cover,
-            ),
-          ),
+          Center(child: Image.asset(imagePath, fit: BoxFit.cover)),
           Positioned(
             top: 16.h,
             right: 16.w,

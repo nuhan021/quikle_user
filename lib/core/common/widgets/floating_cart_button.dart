@@ -19,7 +19,7 @@ class FloatingCartButton extends StatelessWidget {
       }
 
       return Positioned(
-        bottom: bottomInset,
+        bottom: MediaQuery.of(context).padding.bottom + 80.h,
         right: 16.w,
         child: GestureDetector(
           onTap: () => Get.to(() => const CartScreen()),

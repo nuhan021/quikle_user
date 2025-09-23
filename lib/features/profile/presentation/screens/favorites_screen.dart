@@ -125,7 +125,6 @@ class FavoritesScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -181,16 +180,6 @@ class FavoritesScreen extends StatelessWidget {
 
   void _addToCart(product, CartController cartController) {
     cartController.addToCart(product);
-    Get.snackbar(
-      'Added to Cart',
-      '${product.title} has been added to your cart',
-      backgroundColor: AppColors.success,
-      colorText: Colors.white,
-      snackPosition: SnackPosition.BOTTOM,
-      duration: const Duration(seconds: 2),
-      margin: EdgeInsets.all(16.w),
-      borderRadius: 8.r,
-    );
   }
 
   void _toggleFavorite(product, FavoritesController controller) {
@@ -198,18 +187,18 @@ class FavoritesScreen extends StatelessWidget {
 
     final isFavorite = controller.isFavorite(product.id);
 
-    Get.snackbar(
-      isFavorite ? 'Added to Favorites' : 'Removed from Favorites',
-      isFavorite
-          ? '${product.title} has been added to your favorites'
-          : '${product.title} has been removed from your favorites',
-      backgroundColor: isFavorite ? AppColors.success : AppColors.warning,
-      colorText: Colors.white,
-      snackPosition: SnackPosition.BOTTOM,
-      duration: const Duration(seconds: 2),
-      margin: EdgeInsets.all(16.w),
-      borderRadius: 8.r,
-    );
+    // Get.snackbar(
+    //   isFavorite ? 'Added to Favorites' : 'Removed from Favorites',
+    //   isFavorite
+    //       ? '${product.title} has been added to your favorites'
+    //       : '${product.title} has been removed from your favorites',
+    //   backgroundColor: isFavorite ? AppColors.success : AppColors.warning,
+    //   colorText: Colors.white,
+    //   snackPosition: SnackPosition.BOTTOM,
+    //   duration: const Duration(seconds: 2),
+    //   margin: EdgeInsets.all(16.w),
+    //   borderRadius: 8.r,
+    // );
   }
 
   void _showClearAllDialog(FavoritesController controller) {
@@ -250,16 +239,16 @@ class FavoritesScreen extends StatelessWidget {
             onPressed: () {
               controller.clearAllFavorites();
               Get.back();
-              Get.snackbar(
-                'Favorites Cleared',
-                'All favorites have been removed',
-                backgroundColor: AppColors.warning,
-                colorText: Colors.white,
-                snackPosition: SnackPosition.BOTTOM,
-                duration: const Duration(seconds: 2),
-                margin: EdgeInsets.all(16.w),
-                borderRadius: 8.r,
-              );
+              // Get.snackbar(
+              //   'Favorites Cleared',
+              //   'All favorites have been removed',
+              //   backgroundColor: AppColors.warning,
+              //   colorText: Colors.white,
+              //   snackPosition: SnackPosition.BOTTOM,
+              //   duration: const Duration(seconds: 2),
+              //   margin: EdgeInsets.all(16.w),
+              //   borderRadius: 8.r,
+              // );
             },
             child: Text(
               'Clear All',

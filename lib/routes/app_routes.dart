@@ -1,5 +1,4 @@
 import 'package:get/get.dart';
-import 'package:quikle_user/features/auth/presentation/screens/resgiter_screen.dart';
 import 'package:quikle_user/features/auth/presentation/screens/verification_scree.dart';
 import 'package:quikle_user/features/auth/presentation/screens/welcome_screen.dart';
 import 'package:quikle_user/features/main/presentation/screens/main_screen.dart';
@@ -12,6 +11,7 @@ import 'package:quikle_user/features/categories/presentation/screens/category_de
 import 'package:quikle_user/features/categories/presentation/screens/subcategory_products_screen.dart';
 import 'package:quikle_user/features/categories/presentation/screens/grocery_navigation_screen.dart';
 import 'package:quikle_user/features/categories/presentation/screens/unified_category_screen.dart';
+import 'package:quikle_user/features/categories/presentation/screens/category_products_screen.dart';
 import 'package:quikle_user/features/restaurants/presentation/screens/category_restaurants_screen.dart';
 import 'package:quikle_user/features/restaurants/presentation/screens/restaurant_page_screen.dart';
 import 'package:quikle_user/features/payout/presentation/screens/checkout_screen.dart';
@@ -23,6 +23,11 @@ import 'package:quikle_user/features/profile/presentation/screens/notification_s
 import 'package:quikle_user/features/profile/presentation/screens/help_support_screen.dart';
 import 'package:quikle_user/features/home/data/models/product_model.dart';
 import 'package:quikle_user/features/search/presentation/screens/search_screen.dart';
+import 'package:quikle_user/features/orders/presentation/screens/order_tracking_screen.dart';
+import 'package:quikle_user/features/orders/presentation/screens/order_invoice_screen.dart';
+import 'package:quikle_user/features/orders/data/models/order_model.dart';
+import 'package:quikle_user/features/prescription/presentation/screens/prescription_list_screen.dart';
+import 'package:quikle_user/features/prescription/presentation/screens/prescription_details_screen.dart';
 
 class AppRoute {
   static const String _splash = '/';
@@ -36,6 +41,7 @@ class AppRoute {
   static const String _productDetails = '/product-details';
   static const String _categoryDetail = '/category-detail';
   static const String _unifiedCategory = '/unified-category';
+  static const String _categoryProducts = '/category-products';
   static const String _subcategoryProducts = '/subcategory-products';
   static const String _groceryNavigation = '/grocery-navigation';
   static const String _checkout = '/checkout';
@@ -51,6 +57,10 @@ class AppRoute {
   static const String _categoryRestaurants = '/category-restaurants';
   static const String _restaurantMenu = '/restaurant-menu';
   static const String _myProfile = '/my-profile';
+  static const String _orderTracking = '/order-tracking';
+  static const String _orderInvoice = '/order-invoice';
+  static const String _prescriptionList = '/prescription-list';
+  static const String _prescriptionDetails = '/prescription-details';
 
   static String getSplashScreen() => _splash;
   static String getLoginScreen() => _login;
@@ -63,6 +73,7 @@ class AppRoute {
   static String getProductDetails() => _productDetails;
   static String getCategoryDetail() => _categoryDetail;
   static String getUnifiedCategory() => _unifiedCategory;
+  static String getCategoryProducts() => _categoryProducts;
   static String getSubcategoryProducts() => _subcategoryProducts;
   static String getGroceryNavigation() => _groceryNavigation;
   static String getCheckout() => _checkout;
@@ -78,11 +89,14 @@ class AppRoute {
   static String getCategoryRestaurants() => _categoryRestaurants;
   static String getRestaurantMenu() => _restaurantMenu;
   static String getMyProfile() => _myProfile;
+  static String getOrderTracking() => _orderTracking;
+  static String getOrderInvoice() => _orderInvoice;
+  static String getPrescriptionList() => _prescriptionList;
+  static String getPrescriptionDetails() => _prescriptionDetails;
 
   static final List<GetPage<dynamic>> routes = <GetPage>[
     GetPage(name: _splash, page: () => const SplashScreen()),
     GetPage(name: _login, page: () => const LoginScreen()),
-    GetPage(name: _register, page: () => const RegisterScreen()),
     GetPage(name: _verify, page: () => const VerificationScreen()),
     GetPage(name: _welcome, page: () => const WelcomeScreen()),
     GetPage(
@@ -106,6 +120,10 @@ class AppRoute {
     ),
     GetPage(name: _categoryDetail, page: () => const CategoryDetailScreen()),
     GetPage(name: _unifiedCategory, page: () => const UnifiedCategoryScreen()),
+    GetPage(
+      name: _categoryProducts,
+      page: () => const CategoryProductsScreen(),
+    ),
     GetPage(
       name: _subcategoryProducts,
       page: () => const SubcategoryProductsScreen(),
@@ -131,6 +149,22 @@ class AppRoute {
     ),
     GetPage(name: _restaurantMenu, page: () => const RestaurantPageScreen()),
     GetPage(name: _myProfile, page: () => const MyProfileScreen()),
+    GetPage(
+      name: _orderTracking,
+      page: () => OrderTrackingScreen(order: Get.arguments as OrderModel),
+    ),
+    GetPage(
+      name: _orderInvoice,
+      page: () => OrderInvoiceScreen(order: Get.arguments as OrderModel),
+    ),
+    GetPage(
+      name: _prescriptionList,
+      page: () => const PrescriptionListScreen(),
+    ),
+    GetPage(
+      name: _prescriptionDetails,
+      page: () => const PrescriptionDetailsScreen(),
+    ),
 
     // GetPage(
     //   name: _home,

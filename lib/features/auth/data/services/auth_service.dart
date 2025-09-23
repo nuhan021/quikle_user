@@ -14,16 +14,22 @@ class AuthService {
   String get currentToken => _userService.token;
   bool get isLoggedIn => _userService.isLoggedIn;
 
-  Future<ResponseData> login(String phone) async {
+  // Unified method for sending OTP - handles both login and signup
+  Future<ResponseData> sendOtp(String phone, {String? name}) async {
     try {
       await Future<void>.delayed(const Duration(milliseconds: 500));
 
+      // Mock logic to check if user exists
+      final userExists = await _checkUserExists(phone);
+
       final mockUser = UserModel(
-        id: '1',
-        name: 'User',
+        id: userExists ? '1' : '2',
+        name: userExists ? 'Existing User' : (name ?? 'New User'),
         phone: phone,
         isVerified: false,
-        createdAt: DateTime.now(),
+        createdAt: userExists
+            ? DateTime.now().subtract(const Duration(days: 30))
+            : DateTime.now(),
       );
 
       return ResponseData(
@@ -33,6 +39,7 @@ class AuthService {
         responseData: {
           'success': true,
           'message': 'OTP sent successfully',
+          'userExists': userExists,
           'data': {'user': mockUser.toJson()},
         },
       );
@@ -46,36 +53,20 @@ class AuthService {
     }
   }
 
+  // Mock method to check if user exists (in real app, this would be an API call)
+  Future<bool> _checkUserExists(String phone) async {
+    await Future<void>.delayed(const Duration(milliseconds: 100));
+    // Mock logic: if phone ends with '1', user exists
+    return phone.endsWith('1') || phone.endsWith('2') || phone.endsWith('3');
+  }
+
+  // Keep the old methods for backward compatibility
+  Future<ResponseData> login(String phone) async {
+    return sendOtp(phone);
+  }
+
   Future<ResponseData> register(String name, String phone) async {
-    try {
-      await Future<void>.delayed(const Duration(milliseconds: 500));
-
-      final mockUser = UserModel(
-        id: '2',
-        name: name,
-        phone: phone,
-        isVerified: false,
-        createdAt: DateTime.now(),
-      );
-
-      return ResponseData(
-        isSuccess: true,
-        statusCode: 200,
-        errorMessage: '',
-        responseData: {
-          'success': true,
-          'message': 'OTP sent successfully',
-          'data': {'user': mockUser.toJson()},
-        },
-      );
-    } catch (e) {
-      return ResponseData(
-        isSuccess: false,
-        statusCode: 500,
-        errorMessage: 'Failed to create account. Please try again.',
-        responseData: null,
-      );
-    }
+    return sendOtp(phone, name: name);
   }
 
   Future<ResponseData> verifyOtp(String phone, String otp) async {

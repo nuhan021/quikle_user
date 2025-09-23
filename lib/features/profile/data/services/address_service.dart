@@ -23,8 +23,8 @@ class AddressService extends GetxService {
         ShippingAddressModel(
           id: DateTime.now().millisecondsSinceEpoch.toString() + '1',
           userId: userId,
-          name: 'Olivia Austin',
-          address: '2811 Crescent Day. LA Port',
+          name: 'Olivia Mark',
+          address: '1100 Crescent Day. LA Port',
           city: 'California',
           state: 'California',
           zipCode: '77571',

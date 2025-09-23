@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import '../data/models/cart_item_model.dart';
 import '../data/services/cart_service.dart';
 import '../../home/data/models/product_model.dart';
+import '../presentation/widgets/cart_bottom_section.dart';
 
 class CartController extends GetxController {
   final CartService _cartService = CartService();
@@ -23,22 +24,22 @@ class CartController extends GetxController {
     _cartService.addToCart(product);
     _updateCartData();
 
-    Get.snackbar(
-      'Added to Cart',
-      '${product.title} has been added to your cart.',
-      duration: const Duration(seconds: 2),
-    );
+    // Get.snackbar(
+    //   'Added to Cart',
+    //   '${product.title} has been added to your cart.',
+    //   duration: const Duration(seconds: 2),
+    // );
   }
 
   void removeFromCart(CartItemModel cartItem) {
     _cartService.removeFromCart(cartItem);
     _updateCartData();
 
-    Get.snackbar(
-      'Removed from Cart',
-      '${cartItem.product.title} has been removed from your cart.',
-      duration: const Duration(seconds: 2),
-    );
+    // Get.snackbar(
+    //   'Removed from Cart',
+    //   '${cartItem.product.title} has been removed from your cart.',
+    //   duration: const Duration(seconds: 2),
+    // );
   }
 
   void updateQuantity(CartItemModel cartItem, int newQuantity) {
@@ -58,11 +59,13 @@ class CartController extends GetxController {
     _cartService.clearCart();
     _updateCartData();
 
-    Get.snackbar(
-      'Cart Cleared',
-      'All items have been removed from your cart.',
-      duration: const Duration(seconds: 2),
-    );
+    CartBottomSection.clearSelectedAddress();
+
+    // Get.snackbar(
+    //   'Cart Cleared',
+    //   'All items have been removed from your cart.',
+    //   duration: const Duration(seconds: 2),
+    // );
   }
 
   void _updateCartData() {
@@ -73,13 +76,49 @@ class CartController extends GetxController {
 
   void onCheckout() {
     if (hasItems) {
-      Get.toNamed('/checkout');
+      Get.snackbar(
+        'Ready for Checkout',
+        'Please select payment method and place order.',
+        duration: const Duration(seconds: 2),
+      );
     } else {
       Get.snackbar(
         'Empty Cart',
         'Please add items to cart before checkout.',
         duration: const Duration(seconds: 2),
       );
+    }
+  }
+
+  // Get the quantity of a specific product in the cart
+  int getProductQuantity(ProductModel product) {
+    return _cartService.getProductQuantity(product);
+  }
+
+  // Check if a product is in the cart
+  bool isProductInCart(ProductModel product) {
+    return _cartService.isProductInCart(product);
+  }
+
+  // Get cart item for a specific product
+  CartItemModel? getCartItemForProduct(ProductModel product) {
+    return _cartService.getCartItemForProduct(product);
+  }
+
+  // Add specific quantity of product to cart
+  void addProductToCart(ProductModel product) {
+    addToCart(product);
+  }
+
+  // Remove one quantity of product from cart
+  void removeProductFromCart(ProductModel product) {
+    final cartItem = getCartItemForProduct(product);
+    if (cartItem != null) {
+      if (cartItem.quantity > 1) {
+        decreaseQuantity(cartItem);
+      } else {
+        removeFromCart(cartItem);
+      }
     }
   }
 }

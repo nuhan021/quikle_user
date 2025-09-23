@@ -19,6 +19,13 @@ class OrderSuccessDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Auto close after a short branded animation time and call onContinue
+    Future.delayed(const Duration(seconds: 2), () {
+      if (Get.isDialogOpen ?? false) {
+        Get.back();
+        if (onContinue != null) onContinue!();
+      }
+    });
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       insetPadding: const EdgeInsets.symmetric(horizontal: 24),
@@ -31,7 +38,6 @@ class OrderSuccessDialog extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            
             Container(
               width: 80,
               height: 80,
@@ -44,7 +50,6 @@ class OrderSuccessDialog extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            
             Text(
               "Your order is confirmed",
               style: getTextStyle(
@@ -58,7 +63,6 @@ class OrderSuccessDialog extends StatelessWidget {
 
             const SizedBox(height: 12),
 
-            
             Text(
               "Thank you for shopping with us.\n"
               "Your order will reach you soon.",
@@ -72,33 +76,7 @@ class OrderSuccessDialog extends StatelessWidget {
 
             const SizedBox(height: 24),
 
-            
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed:
-                    onContinue ??
-                    () {
-                      Get.back();
-                      Get.offAllNamed('/main');
-                    },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                child: const Text(
-                  "Continue Shopping",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
+            // Intentionally no CTA - dialog auto-dismisses to show live order updates
           ],
         ),
       ),

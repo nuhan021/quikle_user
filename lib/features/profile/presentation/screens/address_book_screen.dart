@@ -25,6 +25,7 @@ class AddressBookScreen extends StatelessWidget {
             title: 'Address Book',
             showActionButton: false,
           ),
+
           Expanded(
             child: Obx(() {
               if (controller.isLoading) {
@@ -34,20 +35,21 @@ class AddressBookScreen extends StatelessWidget {
               }
 
               if (controller.addresses.isEmpty) {
-                return _buildEmptyState();
+                return _buildEmptyState(context);
               }
 
-              return _buildAddressList(controller);
+              return _buildAddressList(context, controller);
             }),
           ),
 
-          _buildAddNewAddressButton(),
+          _buildAddNewAddressButton(context),
         ],
       ),
     );
   }
 
-  Widget _buildEmptyState() {
+  // Empty state stays centered, no special bottom handling needed
+  Widget _buildEmptyState(BuildContext context) {
     return Center(
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 32.w),
@@ -57,7 +59,7 @@ class AddressBookScreen extends StatelessWidget {
             Container(
               width: 120.w,
               height: 120.w,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.white,
                 shape: BoxShape.circle,
               ),
@@ -67,9 +69,7 @@ class AddressBookScreen extends StatelessWidget {
                 color: AppColors.featherGrey,
               ),
             ),
-
             SizedBox(height: 24.h),
-
             Text(
               'No Addresses Found',
               style: getTextStyle(
@@ -79,9 +79,7 @@ class AddressBookScreen extends StatelessWidget {
                 color: AppColors.ebonyBlack,
               ),
             ),
-
             SizedBox(height: 8.h),
-
             Text(
               'Add your first delivery address to\nget started with quick orders',
               textAlign: TextAlign.center,
@@ -98,9 +96,22 @@ class AddressBookScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAddressList(AddressController controller) {
+  // List gets bottom padding so last card never hides behind the fixed button or navbar
+  Widget _buildAddressList(BuildContext context, AddressController controller) {
+    // Estimated button height
+    final double buttonHeight = 56.h;
+    // Space for gesture pill and your custom navbar
+    final double gesture = MediaQuery.of(context).viewPadding.bottom;
+    const double navHeight = kBottomNavigationBarHeight;
+
     return ListView.builder(
-      padding: EdgeInsets.all(16.w),
+      padding: EdgeInsets.fromLTRB(
+        16.w,
+        16.w,
+        16.w,
+        // bottom padding ensures scrollable content clears the fixed button and navbar
+        16.h + buttonHeight + gesture + navHeight,
+      ),
       itemCount: controller.addresses.length,
       itemBuilder: (context, index) {
         final address = controller.addresses[index];
@@ -115,29 +126,34 @@ class AddressBookScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAddNewAddressButton() {
-    return Container(
-      width: double.infinity,
-      margin: EdgeInsets.all(16.w),
-      child: ElevatedButton.icon(
-        onPressed: () => _navigateToAddAddress(Get.context!),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.ebonyBlack,
-          foregroundColor: Colors.white,
-          padding: EdgeInsets.symmetric(vertical: 16.h),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8.r),
+  Widget _buildAddNewAddressButton(BuildContext context) {
+    final double gesture = MediaQuery.of(context).viewPadding.bottom;
+    //const double navHeight = kBottomNavigationBarHeight;
+
+    return Padding(
+      padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 16.h + gesture),
+      child: SizedBox(
+        width: double.infinity,
+        child: ElevatedButton.icon(
+          onPressed: () => _navigateToAddAddress(Get.context!),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.ebonyBlack,
+            foregroundColor: Colors.white,
+            padding: EdgeInsets.symmetric(vertical: 16.h),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8.r),
+            ),
+            elevation: 0,
           ),
-          elevation: 0,
-        ),
-        icon: Icon(Icons.add, size: 24.sp),
-        label: Text(
-          'Add New Address',
-          style: getTextStyle(
-            font: CustomFonts.inter,
-            fontSize: 18.sp,
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
+          icon: Icon(Icons.add, size: 24.sp),
+          label: Text(
+            'Add New Address',
+            style: getTextStyle(
+              font: CustomFonts.inter,
+              fontSize: 18.sp,
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+            ),
           ),
         ),
       ),
@@ -163,9 +179,7 @@ class AddressBookScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(2.r),
               ),
             ),
-
             SizedBox(height: 16.h),
-
             Text(
               'Address Options',
               style: getTextStyle(
@@ -175,10 +189,7 @@ class AddressBookScreen extends StatelessWidget {
                 color: AppColors.ebonyBlack,
               ),
             ),
-
             SizedBox(height: 24.h),
-
-            
             if (!address.isDefault)
               _buildBottomSheetOption(
                 icon: Iconsax.tick_circle,
@@ -188,7 +199,6 @@ class AddressBookScreen extends StatelessWidget {
                   controller.setAsDefault(address.id);
                 },
               ),
-
             _buildBottomSheetOption(
               icon: Iconsax.edit_2,
               title: 'Edit Address',
@@ -197,7 +207,6 @@ class AddressBookScreen extends StatelessWidget {
                 _navigateToEditAddress(address);
               },
             ),
-
             _buildBottomSheetOption(
               icon: Iconsax.trash,
               title: 'Delete Address',
@@ -207,7 +216,6 @@ class AddressBookScreen extends StatelessWidget {
                 _showDeleteConfirmation(address, controller);
               },
             ),
-
             SizedBox(height: 32.h),
           ],
         ),
@@ -241,7 +249,6 @@ class AddressBookScreen extends StatelessWidget {
   }
 
   void _navigateToEditAddress(address) {
-    
     Get.snackbar(
       'Coming Soon',
       'Edit address functionality will be implemented next',

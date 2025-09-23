@@ -133,7 +133,22 @@ class OrderCard extends StatelessWidget {
             SizedBox(height: 8.h),
             Container(height: 1.h, color: const Color(0xFFEEEEEE)),
             SizedBox(height: 12.h),
-            ...order.items.map((item) => OrderItemWidget(item: item)),
+            
+            if (order.items.isNotEmpty)
+              ...order.items.map((item) => OrderItemWidget(item: item))
+            else
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 12.h),
+                child: Text(
+                  'No items found',
+                  style: getTextStyle(
+                    font: CustomFonts.inter,
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w400,
+                    color: const Color(0xFF7C7C7C),
+                  ),
+                ),
+              ),
             SizedBox(height: 12.h),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

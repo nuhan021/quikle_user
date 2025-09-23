@@ -20,7 +20,6 @@ class OrdersController extends GetxController {
       isLoading.value = true;
       error.value = '';
 
-      
       const String userId = 'user123';
 
       final List<OrderModel> fetchedOrders = await _orderService.getUserOrders(
@@ -43,6 +42,29 @@ class OrdersController extends GetxController {
       return orders.firstWhere((order) => order.orderId == orderId);
     } catch (e) {
       return null;
+    }
+  }
+
+  
+  Future<void> addOrder(OrderModel order) async {
+    try {
+      print(
+        'OrdersController: Adding order ${order.orderId} with ${order.items.length} items',
+      );
+
+      
+      await _orderService.addOrder(order);
+
+      
+      orders.insert(0, order);
+
+      print(
+        'OrdersController: Order added successfully. Total orders: ${orders.length}',
+      );
+    } catch (e) {
+      print('OrdersController: Error adding order: $e');
+      error.value = 'Failed to add order: ${e.toString()}';
+      rethrow;
     }
   }
 }

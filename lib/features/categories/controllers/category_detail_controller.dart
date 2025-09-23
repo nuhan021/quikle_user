@@ -108,7 +108,16 @@ class CategoryDetailController extends GetxController {
     }
   }
 
-  void onSubcategoryTap(SubcategoryModel subcategory) {
+  void onSubcategoryTap(SubcategoryModel? subcategory) {
+    if (subcategory == null) {
+      // Handle "All" option - could navigate to show all products for this category
+      Get.toNamed(
+        AppRoute.getCategoryProducts(),
+        arguments: {'category': category},
+      );
+      return;
+    }
+
     Get.toNamed(
       AppRoute.getSubcategoryProducts(),
       arguments: {'subcategory': subcategory, 'category': category},
@@ -147,12 +156,12 @@ class CategoryDetailController extends GetxController {
       recommendedProducts[recommendedIndex] = updatedProduct;
     }
 
-    Get.snackbar(
-      isFavorite ? 'Added to Favorites' : 'Removed from Favorites',
-      isFavorite
-          ? '${product.title} has been added to your favorites.'
-          : '${product.title} has been removed from your favorites.',
-      duration: const Duration(seconds: 2),
-    );
+    // Get.snackbar(
+    //   isFavorite ? 'Added to Favorites' : 'Removed from Favorites',
+    //   isFavorite
+    //       ? '${product.title} has been added to your favorites.'
+    //       : '${product.title} has been removed from your favorites.',
+    //   duration: const Duration(seconds: 2),
+    // );
   }
 }

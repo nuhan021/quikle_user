@@ -18,18 +18,20 @@ class OrderTrackingAppBar extends StatelessWidget
       title: "Order Tracking",
       onBackTap: onBackTap ?? () => Get.back(),
       showBackButton: true,
-      actions: [
-        IconButton(
-          onPressed:
-              onShareTap ??
-              () => Get.find<OrderTrackingController>().shareTrackingInfo(),
-          icon: Icon(
-            Icons.share_outlined,
-            color: AppColors.ebonyBlack,
-            size: 24.sp,
-          ),
-        ),
-      ],
+      showNotification: false,
+      showProfile: false,
+      // actions: [
+      //   IconButton(
+      //     onPressed:
+      //         onShareTap ??
+      //         () => Get.find<OrderTrackingController>().shareTrackingInfo(),
+      //     icon: Icon(
+      //       Icons.share_outlined,
+      //       color: AppColors.ebonyBlack,
+      //       size: 24.sp,
+      //     ),
+      //   ),
+      // ],
     );
   }
 

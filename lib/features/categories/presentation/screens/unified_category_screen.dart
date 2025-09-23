@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -6,6 +7,7 @@ import 'package:quikle_user/core/common/widgets/address_widget.dart';
 import 'package:quikle_user/core/common/widgets/cart_animation_overlay.dart';
 import 'package:quikle_user/core/common/widgets/custom_navbar.dart';
 import 'package:quikle_user/core/common/widgets/floating_cart_button.dart';
+import 'package:quikle_user/core/common/widgets/voice_search_overlay.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/navigation/navbar_navigation_helper.dart';
 import 'package:quikle_user/features/categories/controllers/unified_category_controller.dart';
@@ -13,12 +15,11 @@ import 'package:quikle_user/core/common/widgets/common_app_bar.dart';
 import 'package:quikle_user/features/categories/presentation/widgets/search_and_filters_section.dart';
 import 'package:quikle_user/features/categories/presentation/widgets/popular_items_section.dart';
 import 'package:quikle_user/features/categories/presentation/widgets/product_grid_section.dart';
-import 'package:quikle_user/features/categories/presentation/widgets/sort_bottom_sheet.dart';
-import 'package:quikle_user/features/categories/presentation/widgets/filter_bottom_sheet.dart';
 import 'package:quikle_user/features/categories/presentation/widgets/category_product_item.dart';
+import 'package:quikle_user/features/orders/presentation/widgets/live_order_indicator.dart';
 import 'package:quikle_user/features/restaurants/presentation/widgets/top_restaurants_section.dart';
 import 'package:quikle_user/features/home/presentation/widgets/banners/offer_banner.dart';
-import 'package:quikle_user/routes/app_routes.dart';
+import 'package:quikle_user/features/prescription/presentation/widgets/prescription_upload_section.dart';
 
 class UnifiedCategoryScreen extends StatefulWidget {
   const UnifiedCategoryScreen({super.key});
@@ -29,22 +30,42 @@ class UnifiedCategoryScreen extends StatefulWidget {
 
 class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
     with TickerProviderStateMixin {
-  late AnimationController _navController;
+  late final AnimationController _navController;
   final GlobalKey _navKey = GlobalKey();
   double _navBarHeight = 0.0;
+
+  late final AnimationController _barAnim;
+  final ScrollController _scroll = ScrollController();
 
   @override
   void initState() {
     super.initState();
+
     _navController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 260),
       value: 1.0,
     );
+
+    _barAnim = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 220),
+      value: 1.0,
+    );
+
+    _scroll.addListener(() {
+      if (_scroll.offset > 8 && _barAnim.value == 1.0) {
+        _barAnim.reverse();
+      } else if (_scroll.offset <= 8 && _barAnim.value == 0.0) {
+        _barAnim.forward();
+      }
+    });
   }
 
   @override
   void dispose() {
+    _scroll.dispose();
+    _barAnim.dispose();
     _navController.dispose();
     super.dispose();
   }
@@ -61,9 +82,7 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
   }
 
   void _onNavItemTapped(int index) {
-    if (index == 2) {
-      return;
-    }
+    if (index == 2) return;
     NavbarNavigationHelper.navigateToTab(index);
   }
 
@@ -74,6 +93,10 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
 
     final controller = Get.put(UnifiedCategoryController());
     final searchController = TextEditingController();
+
+    final keyboard = MediaQuery.of(context).viewInsets.bottom;
+    final isKeyboardOpen = keyboard > 0;
+
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
@@ -84,74 +107,110 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
           backgroundColor: AppColors.homeGrey,
           body: Stack(
             children: [
-              Column(
-                children: [
-                  Obx(
-                    () => CommonAppBar(
-                      title: controller.categoryTitle.value,
-                      showNotification: false,
-                      showProfile: false,
-                      onBackTap: () => Get.back(),
-                      addressWidget:
-                          AddressWidget(), // Use the common address widget
+              SafeArea(
+                child: Column(
+                  children: [
+                    ClipRect(
+                      child: SizeTransition(
+                        axisAlignment: -1,
+                        sizeFactor: _barAnim,
+                        child: Obx(
+                          () => CommonAppBar(
+                            title: controller.categoryTitle.value,
+                            showNotification: false,
+                            showProfile: false,
+                            onBackTap: () => Get.back(),
+                            addressWidget: AddressWidget(),
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-
-                  Expanded(
-                    child: AnimatedBuilder(
-                      animation: _navController,
-                      builder: (context, _) {
-                        final inset = _navController.value * _navBarHeight;
-                        return Padding(
-                          padding: EdgeInsets.only(bottom: inset),
-                          child: Obx(() {
-                            if (controller.isLoading.value) {
-                              return const Center(
-                                child: CircularProgressIndicator(),
-                              );
-                            }
-
-                            return SingleChildScrollView(
-                              child: Column(
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16.w),
+                      child: Column(
+                        children: [
+                          SizedBox(height: 8.h),
+                          SearchAndFiltersSection(
+                            searchController: searchController,
+                            onSearchChanged: controller.onSearchChanged,
+                            onVoiceTap: controller.onVoiceSearchPressed,
+                            dynamicHint: controller.currentPlaceholder,
+                          ),
+                          Obx(
+                            () => PopularItemsSection(
+                              subcategories: controller.isGroceryCategory
+                                  ? controller.allCategories
+                                  : controller.availableSubcategories,
+                              onSubcategoryTap: controller.onSubcategoryTap,
+                              title: controller.isGroceryCategory
+                                  ? 'Categories'
+                                  : controller.sectionTitle.value.isEmpty
+                                  ? 'Popular Items'
+                                  : controller.sectionTitle.value,
+                              selectedSubcategory: controller.isGroceryCategory
+                                  ? controller.selectedMainCategory.value
+                                  : controller.selectedSubcategory.value,
+                              category: controller.currentCategory,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: Obx(() {
+                        if (controller.isLoading.value) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+                        return AnimatedBuilder(
+                          animation: _navController,
+                          builder: (context, _) {
+                            final bottomInset = isKeyboardOpen
+                                ? 0.0
+                                : _navController.value * _navBarHeight;
+                            return NotificationListener<ScrollNotification>(
+                              onNotification: (notification) {
+                                if (notification is UserScrollNotification) {
+                                  if (notification.direction ==
+                                          ScrollDirection.reverse &&
+                                      _navController.value != 0.0 &&
+                                      _navController.status !=
+                                          AnimationStatus.reverse) {
+                                    _navController.reverse();
+                                  } else if (notification.direction ==
+                                          ScrollDirection.forward &&
+                                      _navController.value != 1.0 &&
+                                      _navController.status !=
+                                          AnimationStatus.forward) {
+                                    _navController.forward();
+                                  } else if (notification.direction ==
+                                      ScrollDirection.idle) {
+                                    if (_navController.value != 1.0) {
+                                      _navController.forward();
+                                    }
+                                  }
+                                }
+                                if (notification is ScrollEndNotification) {
+                                  if (_navController.value != 1.0) {
+                                    _navController.forward();
+                                  }
+                                }
+                                return false;
+                              },
+                              child: ListView(
+                                controller: _scroll,
+                                padding: EdgeInsets.only(
+                                  top: 12.h,
+                                  left: 16.w,
+                                  right: 8.w,
+                                  bottom: bottomInset + 24.h,
+                                ),
                                 children: [
-                                  SearchAndFiltersSection(
-                                    searchController: searchController,
-                                    onSearchChanged: controller.onSearchChanged,
-                                    onSortTap: () => _showSortBottomSheet(
-                                      context,
-                                      controller,
-                                    ),
-                                    onFilterTap: () => _showFilterBottomSheet(
-                                      context,
-                                      controller,
-                                    ),
-                                    onVoiceTap: () {},
-                                    searchHint:
-                                        'Search in ${controller.categoryTitle.value}...',
-                                  ),
-                                  SizedBox(height: 24.h),
-
-                                  PopularItemsSection(
-                                    subcategories: controller.isGroceryCategory
-                                        ? controller.allCategories
-                                        : controller.availableSubcategories,
-                                    onSubcategoryTap:
-                                        controller.onSubcategoryTap,
-                                    title: controller.isGroceryCategory
-                                        ? 'Categories'
-                                        : controller.sectionTitle.value.isEmpty
-                                        ? 'Popular Items'
-                                        : controller.sectionTitle.value,
-                                    selectedSubcategory:
-                                        controller.isGroceryCategory
-                                        ? controller.selectedMainCategory.value
-                                        : controller.selectedSubcategory.value,
-                                  ),
-
                                   if (controller.isFoodCategory &&
                                       controller.showRestaurants.value &&
                                       controller.topRestaurants.isNotEmpty) ...[
-                                    SizedBox(height: 24.h),
+                                    SizedBox(height: 8.h),
                                     TopRestaurantsSection(
                                       restaurants: controller.topRestaurants,
                                       onRestaurantTap:
@@ -159,7 +218,6 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
                                       title: 'Top 25 Restaurants',
                                     ),
                                   ],
-
                                   if (controller.isGroceryCategory &&
                                       controller.selectedMainCategory.value !=
                                           null &&
@@ -176,48 +234,71 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
                                           'Select ${controller.selectedMainCategory.value!.title}',
                                       selectedSubcategory:
                                           controller.selectedSubcategory.value,
+                                      category: controller.currentCategory,
                                     ),
                                   ],
-
-                                  SizedBox(height: 26.h),
+                                  if (controller.isMedicineCategory) ...[
+                                    const PrescriptionUploadSection(),
+                                  ],
+                                  SizedBox(height: 16.h),
                                   OfferBanner(),
-                                  SizedBox(height: 24.h),
+                                  SizedBox(height: 16.h),
                                   _buildContent(controller),
-                                  SizedBox(height: 32.h),
                                 ],
                               ),
                             );
-                          }),
+                          },
                         );
-                      },
+                      }),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-
-              // Navigation bar
               Positioned(
                 left: 0,
                 right: 0,
                 bottom: 0,
-                child: KeyedSubtree(
-                  key: _navKey,
-                  child: CustomNavBar(
-                    currentIndex: 2, // Categories tab index
-                    onTap: _onNavItemTapped,
+                child: AnimatedSlide(
+                  duration: const Duration(milliseconds: 180),
+                  offset: isKeyboardOpen
+                      ? const Offset(0, 1)
+                      : const Offset(0, 0),
+                  child: SizeTransition(
+                    axisAlignment: 1.0,
+                    sizeFactor: _navController,
+                    child: SafeArea(
+                      top: false,
+                      bottom: false,
+                      child: KeyedSubtree(
+                        key: _navKey,
+                        child: CustomNavBar(
+                          currentIndex: 2,
+                          onTap: _onNavItemTapped,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ),
-
-              // Floating cart button
               AnimatedBuilder(
                 animation: _navController,
                 builder: (context, _) {
+                  final navSpace = isKeyboardOpen
+                      ? 0.0
+                      : (_navController.value * _navBarHeight);
                   final inset =
-                      (_navController.value * _navBarHeight) + cartMargin;
+                      (isKeyboardOpen ? keyboard : navSpace) + cartMargin;
                   return FloatingCartButton(bottomInset: inset);
                 },
               ),
+              Obx(() {
+                if (!controller.isListening) return const SizedBox.shrink();
+                return VoiceSearchOverlay(
+                  soundLevel: controller.soundLevel,
+                  onCancel: controller.stopVoiceSearch,
+                );
+              }),
+              const LiveOrderIndicator(),
             ],
           ),
         ),
@@ -229,16 +310,15 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
     if (controller.showingAllProducts.value) {
       return _buildAllProductsView(controller);
     }
-
     if (controller.isGroceryCategory) {
       return _buildGroceryContentView(controller);
     }
-
     return _buildDefaultCategoryView(controller);
   }
 
   Widget _buildDefaultCategoryView(UnifiedCategoryController controller) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (controller.displayProducts.isNotEmpty)
           ProductGridSection(
@@ -253,10 +333,8 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
             isGroceryCategory: controller.isGroceryCategory,
             shops: controller.shops,
           ),
-
         if (!controller.isGroceryCategory &&
-            controller.recommendedProducts.isNotEmpty) ...[
-          SizedBox(height: 24.h),
+            controller.recommendedProducts.isNotEmpty)
           ProductGridSection(
             title: 'Recommended for You',
             products: controller.recommendedProducts,
@@ -268,12 +346,10 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
             isGroceryCategory: controller.isGroceryCategory,
             shops: controller.shops,
           ),
-        ],
-
         if (controller.displayProducts.isEmpty)
-          Center(
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 40.h),
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 40.h),
+            child: Center(
               child: Text(
                 'No products available',
                 style: TextStyle(color: AppColors.featherGrey, fontSize: 16.sp),
@@ -295,15 +371,14 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
         onFavoriteToggle: controller.onFavoriteToggle,
         onViewAllTap: controller.showAllProducts,
         maxItems: 9,
-        crossAxisCount: 2,
+        crossAxisCount: 3,
         isGroceryCategory: controller.isGroceryCategory,
         shops: controller.shops,
       );
     }
-
-    return Center(
-      child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 40.h),
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 40.h),
+      child: Center(
         child: Text(
           'No products available',
           style: TextStyle(color: AppColors.featherGrey, fontSize: 16.sp),
@@ -315,7 +390,7 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
 
   Widget _buildAllProductsView(UnifiedCategoryController controller) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w),
+      padding: EdgeInsets.symmetric(horizontal: 0.w),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -362,22 +437,19 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
               ],
             ),
           ),
-          SizedBox(height: 16.h),
-
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 3,
-              crossAxisSpacing: 12.w,
-              mainAxisSpacing: 12.h,
-              childAspectRatio: 0.55.h,
+              crossAxisSpacing: 8.w,
+              mainAxisSpacing: 8.h,
+              childAspectRatio: 0.70.h,
             ),
             itemCount: controller.displayProducts.length,
             itemBuilder: (context, index) {
               final product = controller.displayProducts[index];
               final shop = controller.getShopForProduct(product);
-
               return CategoryProductItem(
                 product: product,
                 onTap: () => controller.onProductTap(product),
@@ -390,38 +462,6 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
           ),
         ],
       ),
-    );
-  }
-
-  void _showSortBottomSheet(
-    BuildContext context,
-    UnifiedCategoryController controller,
-  ) {
-    Get.bottomSheet(
-      SortBottomSheet(
-        selectedSort: controller.selectedSortOption.value,
-        onSortSelected: controller.onSortChanged,
-      ),
-      isScrollControlled: true,
-    );
-  }
-
-  void _showFilterBottomSheet(
-    BuildContext context,
-    UnifiedCategoryController controller,
-  ) {
-    Get.bottomSheet(
-      FilterBottomSheet(
-        selectedFilters: controller.selectedFilters,
-        priceRange: controller.priceRange,
-        showOnlyInStock: controller.showOnlyInStock.value,
-        onFiltersApplied: (filters, priceRange, showOnlyInStock) {
-          controller.onFilterChanged(filters);
-          controller.onPriceRangeChanged(priceRange);
-          controller.onStockFilterChanged(showOnlyInStock);
-        },
-      ),
-      isScrollControlled: true,
     );
   }
 }

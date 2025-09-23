@@ -1,70 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
-import 'package:quikle_user/core/utils/constants/enums/payment_enums.dart';
-import 'package:quikle_user/features/profile/data/models/payment_method_model.dart';
+import 'package:quikle_user/features/profile/controllers/payment_method_controller.dart';
 import 'package:quikle_user/features/profile/presentation/widgets/add_payment_method_button.dart';
 import 'package:quikle_user/features/profile/presentation/widgets/payment_method_list_item.dart';
 import 'package:quikle_user/features/profile/presentation/widgets/unified_profile_app_bar.dart';
 
-class PaymentMethodScreen extends StatefulWidget {
+class PaymentMethodScreen extends StatelessWidget {
   const PaymentMethodScreen({super.key});
 
   @override
-  State<PaymentMethodScreen> createState() => _PaymentMethodScreenState();
-}
-
-class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
-  
-  List<PaymentMethodModel> paymentMethods = [
-    const PaymentMethodModel(
-      id: '1',
-      type: PaymentMethodType.paytm,
-      isRemovable: true,
-    ),
-    const PaymentMethodModel(
-      id: '2',
-      type: PaymentMethodType.googlePay,
-      isRemovable: true,
-    ),
-    const PaymentMethodModel(
-      id: '3',
-      type: PaymentMethodType.phonePe,
-      isRemovable: true,
-    ),
-    const PaymentMethodModel(
-      id: '4',
-      type: PaymentMethodType.cashfree,
-      isRemovable: true,
-    ),
-    const PaymentMethodModel(
-      id: '5',
-      type: PaymentMethodType.razorpay,
-      isRemovable: true,
-    ),
-    const PaymentMethodModel(
-      id: '6',
-      type: PaymentMethodType.cashOnDelivery,
-      isRemovable: false, 
-    ),
-  ];
-
-  void _removePaymentMethod(String id) {
-    setState(() {
-      paymentMethods.removeWhere((method) => method.id == id);
-    });
-  }
-
-  void _addNewPaymentMethod() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Add new payment method functionality coming soon!'),
-      ),
-    );
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final controller = Get.find<PaymentMethodController>();
+
     return Scaffold(
       backgroundColor: AppColors.homeGrey,
       body: Column(
@@ -78,24 +27,38 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
               padding: EdgeInsets.symmetric(horizontal: 16.w),
               child: Column(
                 children: [
-                  
                   Expanded(
-                    child: ListView.builder(
-                      itemCount: paymentMethods.length,
-                      itemBuilder: (context, index) {
-                        final paymentMethod = paymentMethods[index];
-                        return PaymentMethodListItem(
-                          paymentMethod: paymentMethod,
-                          onRemove: paymentMethod.isRemovable
-                              ? () => _removePaymentMethod(paymentMethod.id)
-                              : null,
-                        );
-                      },
-                    ),
+                    child: Obx(() {
+                      return ListView.builder(
+                        itemCount: controller.paymentMethods.length,
+                        itemBuilder: (context, index) {
+                          final paymentMethod =
+                              controller.paymentMethods[index];
+                          return PaymentMethodListItem(
+                            paymentMethod: paymentMethod,
+                            onRemove: paymentMethod.isRemovable
+                                ? () => controller.removePaymentMethod(
+                                    paymentMethod.id,
+                                  )
+                                : null,
+                          );
+                        },
+                      );
+                    }),
                   ),
                   Padding(
                     padding: EdgeInsets.only(bottom: 24.h),
-                    child: AddPaymentMethodButton(onTap: _addNewPaymentMethod),
+                    child: AddPaymentMethodButton(
+                      onTap: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'Add new payment method functionality coming soon!',
+                            ),
+                          ),
+                        );
+                      },
+                    ),
                   ),
                 ],
               ),

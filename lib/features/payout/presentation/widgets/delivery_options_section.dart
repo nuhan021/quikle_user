@@ -30,9 +30,66 @@ class DeliveryOptionsSection extends StatelessWidget {
         Obx(() {
           return Column(
             children: [
-              ...payoutController.deliveryOptions.map(
-                (option) => _buildDeliveryOption(option, payoutController),
+              ExpansionTile(
+                initiallyExpanded: true,
+                title: Text('Delivery types'),
+                children: [
+                  ...payoutController.deliveryOptions.map(
+                    (option) => _buildDeliveryOption(option, payoutController),
+                  ),
+                ],
               ),
+              SizedBox(height: 8.h),
+
+              // Delivery preference selector
+              Container(
+                padding: EdgeInsets.all(12.w),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8.r),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withValues(alpha: 0.04),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'Delivery Preference',
+                        style: getTextStyle(
+                          font: CustomFonts.inter,
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w500,
+                          color: const Color(0xFF484848),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 200.w,
+                      child: TextField(
+                        controller:
+                            payoutController.deliveryPreferenceController,
+                        decoration: InputDecoration(
+                          hintText: 'e.g. Don\'t call',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.r),
+                          ),
+                          isDense: true,
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 12.w,
+                            vertical: 10.h,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
               SizedBox(height: 8.h),
               _buildUrgentDeliveryOption(payoutController),
             ],

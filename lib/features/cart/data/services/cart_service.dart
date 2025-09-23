@@ -56,4 +56,37 @@ class CartService {
   void clearCart() {
     _cartItems.clear();
   }
+
+  // Get the quantity of a specific product in the cart
+  int getProductQuantity(ProductModel product) {
+    final item = _cartItems.firstWhere(
+      (item) =>
+          item.product.title == product.title &&
+          item.product.categoryId == product.categoryId,
+      orElse: () => CartItemModel(product: product, quantity: 0),
+    );
+    return item.quantity;
+  }
+
+  // Check if a product is in the cart
+  bool isProductInCart(ProductModel product) {
+    return _cartItems.any(
+      (item) =>
+          item.product.title == product.title &&
+          item.product.categoryId == product.categoryId,
+    );
+  }
+
+  // Get a cart item for a specific product
+  CartItemModel? getCartItemForProduct(ProductModel product) {
+    try {
+      return _cartItems.firstWhere(
+        (item) =>
+            item.product.title == product.title &&
+            item.product.categoryId == product.categoryId,
+      );
+    } catch (e) {
+      return null;
+    }
+  }
 }

@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:quikle_user/routes/app_routes.dart';
 
 class WelcomeController extends GetxController {
-  final int delayMs = 1200;
+  final int delayMs = 200;
   Timer? _timer;
 
   @override

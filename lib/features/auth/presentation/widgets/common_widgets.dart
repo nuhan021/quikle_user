@@ -25,6 +25,10 @@ class CommonWidgets {
     required String hintText,
     TextInputType keyboardType = TextInputType.text,
     List<TextInputFormatter>? inputFormatters,
+    bool autofocus = false,
+    TextInputAction textInputAction = TextInputAction.done,
+    EdgeInsets scrollPadding = const EdgeInsets.all(20),
+    int? maxLength,
   }) {
     return Container(
       width: double.infinity,
@@ -39,8 +43,14 @@ class CommonWidgets {
       alignment: Alignment.centerLeft,
       child: TextField(
         controller: controller,
+        autofocus: autofocus,
         keyboardType: keyboardType,
         inputFormatters: inputFormatters,
+        textInputAction: textInputAction,
+        scrollPadding: scrollPadding,
+        maxLength: maxLength,
+        enableSuggestions: false,
+        autocorrect: false,
         style: getTextStyle(
           font: CustomFonts.inter,
           color: AppColors.eggshellWhite,
@@ -56,6 +66,7 @@ class CommonWidgets {
             font: CustomFonts.inter,
             color: AppColors.featherGrey,
           ),
+          counterText: "",
           contentPadding: EdgeInsets.zero,
         ),
       ),
@@ -69,8 +80,6 @@ class CommonWidgets {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: double.infinity,
-        height: 48.h,
         padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 14.h),
         decoration: ShapeDecoration(
           color: const Color(0xFFFFC200),

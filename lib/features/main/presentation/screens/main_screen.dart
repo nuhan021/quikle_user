@@ -7,6 +7,7 @@ import 'package:quikle_user/features/home/presentation/screens/home_content_scre
 import 'package:quikle_user/features/orders/presentation/screens/orders_screen.dart';
 import 'package:quikle_user/features/categories/presentation/screens/categories_screen.dart';
 import 'package:quikle_user/features/profile/presentation/screens/profile_screen.dart';
+import 'package:quikle_user/features/orders/presentation/widgets/live_order_indicator.dart';
 
 class MainScreen extends StatefulWidget {
   final int initialIndex;
@@ -24,9 +25,19 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   final GlobalKey _navKey = GlobalKey();
   double _navBarHeight = 0.0;
 
-  static const double _toggleDistance = 12.0;
+  static const double _hideDistance = 28.0;
+  static const double _showDistance = 44.0;
+  static const double _minDelta = 1.2;
+  static const int _debounceMs = 320;
+  static const int _cooldownMs = 350;
+  final Duration _hideDur = const Duration(milliseconds: 360);
+  final Duration _showDur = const Duration(milliseconds: 420);
+  final Curve _hideCurve = Curves.easeInCubic;
+  final Curve _showCurve = Curves.easeOutCubic;
+
   double _cumDown = 0.0;
   double _cumUp = 0.0;
+  DateTime? _lastToggleAt;
 
   final List<Widget> _screens = const [
     HomeContentScreen(),
@@ -41,7 +52,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     _currentIndex = widget.initialIndex;
     _navController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 260),
+      duration: const Duration(milliseconds: 420),
       value: 1.0,
     );
   }
@@ -55,24 +66,32 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
 
   void _onNavItemTapped(int index) {
     setState(() => _currentIndex = index);
+    _showNav();
+  }
+
+  void _animateTo(double v, Duration d, Curve c, bool animated) {
+    if (animated) {
+      _navController.animateTo(v, duration: d, curve: c);
+    } else {
+      _navController.value = v;
+    }
+    _lastToggleAt = DateTime.now();
+  }
+
+  bool _canToggle() {
+    if (_lastToggleAt == null) return true;
+    return DateTime.now().difference(_lastToggleAt!) >
+        Duration(milliseconds: _cooldownMs);
   }
 
   void _showNav({bool animated = true}) {
     if (_navController.value == 1.0) return;
-    if (animated) {
-      _navController.animateTo(1.0, curve: Curves.easeOutCubic);
-    } else {
-      _navController.value = 1.0;
-    }
+    _animateTo(1.0, _showDur, _showCurve, animated);
   }
 
   void _hideNav({bool animated = true}) {
     if (_navController.value == 0.0) return;
-    if (animated) {
-      _navController.animateTo(0.0, curve: Curves.easeOutCubic);
-    } else {
-      _navController.value = 0.0;
-    }
+    _animateTo(0.0, _hideDur, _hideCurve, animated);
   }
 
   void _measureNavBarHeight() {
@@ -91,33 +110,33 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
 
     if (n is ScrollUpdateNotification) {
       final delta = n.scrollDelta ?? 0.0;
-      if (delta.abs() < 0.5) return false;
+      if (delta.abs() < _minDelta) return false;
 
       if (delta > 0) {
         _cumDown += delta;
         _cumUp = 0;
-        if (_cumDown >= _toggleDistance) {
+        if (_cumDown >= _hideDistance && _canToggle()) {
           _hideNav();
           _cumDown = 0;
         }
       } else {
         _cumUp += -delta;
         _cumDown = 0;
-        if (_cumUp >= _toggleDistance) {
+        if (_cumUp >= _showDistance && _canToggle()) {
           _showNav();
           _cumUp = 0;
         }
       }
 
       _scrollDebounce?.cancel();
-      _scrollDebounce = Timer(const Duration(milliseconds: 220), () {
+      _scrollDebounce = Timer(const Duration(milliseconds: _debounceMs), () {
         if (mounted) _showNav();
       });
     }
 
     if (n is ScrollEndNotification) {
       _scrollDebounce?.cancel();
-      _scrollDebounce = Timer(const Duration(milliseconds: 180), () {
+      _scrollDebounce = Timer(const Duration(milliseconds: _debounceMs), () {
         if (mounted) _showNav();
       });
     }
@@ -140,16 +159,10 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
               AnimatedBuilder(
                 animation: _navController,
                 builder: (context, _) {
-                  final inset = _navController.value * _navBarHeight;
-                  return Padding(
-                    padding: EdgeInsets.only(bottom: inset),
-                    child: IndexedStack(
-                      index: _currentIndex,
-                      children: _screens,
-                    ),
-                  );
+                  return IndexedStack(index: _currentIndex, children: _screens);
                 },
               ),
+
               Positioned(
                 left: 0,
                 right: 0,
@@ -178,6 +191,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                   ),
                 ),
               ),
+
               AnimatedBuilder(
                 animation: _navController,
                 builder: (context, _) {
@@ -186,6 +200,8 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                   return FloatingCartButton(bottomInset: inset);
                 },
               ),
+
+              const LiveOrderIndicator(),
             ],
           ),
         ),

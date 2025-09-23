@@ -6,18 +6,17 @@ import 'package:quikle_user/routes/app_routes.dart';
 
 class VerificationController extends GetxController {
   final RxList<String> otpDigits = List.generate(6, (_) => '').obs;
-  late final String phone =
-      (Get.arguments is Map && Get.arguments['phone'] != null)
+
+  // Read arguments dynamically so the controller works correctly when reused
+  String get phone => (Get.arguments is Map && Get.arguments['phone'] != null)
       ? Get.arguments['phone'].toString()
       : '+8801XXXXXXXX';
 
-  late final String? name =
-      (Get.arguments is Map && Get.arguments['name'] != null)
+  String? get name => (Get.arguments is Map && Get.arguments['name'] != null)
       ? Get.arguments['name'].toString()
       : null;
 
-  late final bool isLogin =
-      (Get.arguments is Map && Get.arguments['isLogin'] != null)
+  bool get isLogin => (Get.arguments is Map && Get.arguments['isLogin'] != null)
       ? Get.arguments['isLogin'] as bool
       : false;
 
@@ -39,10 +38,12 @@ class VerificationController extends GetxController {
   void onInit() {
     super.onInit();
     _auth = Get.find<AuthService>();
-    _startTimer();
+    // ensure any stale OTP data is cleared when controller initializes
+    _clearOtp();
+    // _startTimer();
   }
 
-  void _startTimer() {
+  void startTimer() {
     _timer?.cancel();
     secondsLeft.value = 30;
     _timer = Timer.periodic(const Duration(seconds: 1), (t) {
@@ -76,22 +77,23 @@ class VerificationController extends GetxController {
       errorMessage.value = '';
 
       try {
+        // use dynamic getter so latest arguments are considered
         final response = await _auth.verifyOtp(phone, code);
 
         if (response.isSuccess) {
-          String message = 'Phone number verified successfully';
-          if (response.responseData != null &&
-              response.responseData['message'] != null) {
-            message = response.responseData['message'].toString();
-          }
+          // String message = 'Phone number verified successfully';
+          // if (response.responseData != null &&
+          //     response.responseData['message'] != null) {
+          //   message = response.responseData['message'].toString();
+          // }
 
-          Get.snackbar(
-            'Success',
-            message,
-            snackPosition: SnackPosition.TOP,
-            backgroundColor: Colors.green.withValues(alpha: 0.1),
-            colorText: Colors.green,
-          );
+          // Get.snackbar(
+          //   'Success',
+          //   message,
+          //   snackPosition: SnackPosition.TOP,
+          //   backgroundColor: Colors.green.withValues(alpha: 0.1),
+          //   colorText: Colors.green,
+          // );
           Get.offAllNamed(AppRoute.getWelcome());
         } else {
           errorMessage.value = response.errorMessage;
@@ -119,18 +121,6 @@ class VerificationController extends GetxController {
   }
 
   bool _validateOtp(String otp) {
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
     return true;
   }
 
@@ -147,14 +137,14 @@ class VerificationController extends GetxController {
           message = response.responseData['message'].toString();
         }
 
-        Get.snackbar(
-          'Success',
-          message,
-          snackPosition: SnackPosition.TOP,
-          backgroundColor: Colors.green.withValues(alpha: 0.1),
-          colorText: Colors.green,
-        );
-        _startTimer();
+        // Get.snackbar(
+        //   'Success',
+        //   message,
+        //   snackPosition: SnackPosition.TOP,
+        //   backgroundColor: Colors.green.withValues(alpha: 0.1),
+        //   colorText: Colors.green,
+        // );
+        startTimer();
       } else {
         Get.snackbar(
           'Error',
@@ -174,6 +164,24 @@ class VerificationController extends GetxController {
       );
     }
   }
+
+  /// Clear OTP inputs held in the controller (text fields and our observable list).
+  /// Call this when leaving the verification flow so stale OTP isn't shown later.
+  void clearOtp() {
+    for (int i = 0; i < digits.length; i++) {
+      try {
+        digits[i].text = '';
+      } catch (_) {}
+      try {
+        otpDigits[i] = '';
+      } catch (_) {}
+    }
+    errorMessage.value = '';
+    secondsLeft.value = 30;
+    _timer?.cancel();
+  }
+
+  void _clearOtp() => clearOtp();
 
   @override
   void onClose() {

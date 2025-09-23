@@ -20,11 +20,14 @@ class ProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.homeGrey,
-      body: Column(
-        children: [
-          const UnifiedProfileAppBar(title: 'Profile', showBackButton: false),
-          Expanded(
-            child: SingleChildScrollView(
+      body: SafeArea(
+        child: ListView(
+          physics: const ClampingScrollPhysics(),
+          padding: EdgeInsets.zero,
+          children: [
+            const UnifiedProfileAppBar(title: 'Profile', showBackButton: false),
+
+            Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.w),
               child: Column(
                 children: [
@@ -34,65 +37,74 @@ class ProfileScreen extends StatelessWidget {
                     email: 'anyadesai@gmail.com',
                   ),
                   SizedBox(height: 16.h),
+
                   ProfileMenuItem(
                     assetIcon: ImagePath.myProfileIcon,
                     title: 'My Profile',
                     onTap: () => _navigateToMyProfile(context),
                   ),
                   SizedBox(height: 8.h),
+
                   ProfileMenuItem(
                     assetIcon: ImagePath.myOrdersIcon,
                     title: 'My Orders',
                     onTap: () => _navigateToOrders(context),
                   ),
                   SizedBox(height: 8.h),
+
                   ProfileMenuItem(
                     assetIcon: ImagePath.favoriteFilledIcon,
                     title: 'My Favorites',
                     onTap: () => _navigateToFavorites(context),
                   ),
                   SizedBox(height: 8.h),
+
                   ProfileMenuItem(
                     assetIcon: ImagePath.addressIcon,
                     title: 'Address Book',
                     onTap: () => _navigateToAddressBook(context),
                   ),
                   SizedBox(height: 8.h),
+
                   ProfileMenuItem(
                     assetIcon: ImagePath.paymentIcon,
                     title: 'Payment Method',
                     onTap: () => _navigateToPaymentMethod(context),
                   ),
                   SizedBox(height: 8.h),
+
                   ProfileMenuItem(
                     assetIcon: ImagePath.notificationIcon,
                     title: 'Notification Settings',
                     onTap: () => _navigateToNotificationSettings(context),
                   ),
                   SizedBox(height: 8.h),
+
                   ProfileMenuItem(
                     assetIcon: ImagePath.languageIcon,
                     title: 'Language Settings',
                     onTap: () => _navigateToLanguageSettings(context),
                   ),
                   SizedBox(height: 8.h),
+
                   ProfileMenuItem(
                     assetIcon: ImagePath.helpIcon,
                     title: 'Help & Support',
                     onTap: () => _navigateToHelpSupport(context),
                   ),
                   SizedBox(height: 8.h),
+
                   ProfileMenuItem(
                     assetIcon: ImagePath.signOutIcon,
                     title: 'Sign out',
                     onTap: () => _showSignOutDialog(context),
                   ),
-                  SizedBox(height: 24.h),
+                  SizedBox(height: 100.h),
                 ],
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

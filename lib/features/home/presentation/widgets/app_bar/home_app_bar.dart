@@ -6,18 +6,17 @@ import 'package:quikle_user/core/common/widgets/common_app_bar.dart';
 import 'package:quikle_user/routes/app_routes.dart';
 
 class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final VoidCallback onNotificationTap;
-  const HomeAppBar({super.key, required this.onNotificationTap});
+  const HomeAppBar({super.key});
+
   @override
   Widget build(BuildContext context) {
     return CommonAppBar(
-      title: '',
+      title: ' ',
+      titleWidget: AddressWidget(),
       showBackButton: false,
       showNotification: false,
       showProfile: false,
       backgroundColor: Colors.white,
-      isFromHome: true,
-      addressWidget: AddressWidget(),
       actions: [
         IconButton(
           icon: const Icon(Iconsax.empty_wallet, color: Colors.black),
