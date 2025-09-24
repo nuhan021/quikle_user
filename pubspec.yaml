@@ -55,6 +55,7 @@ dependencies:
   sliver_tools: ^0.2.12
   file_picker: ^10.3.3
   open_filex: ^4.7.0
+  flutter_local_notifications: ^19.4.2
 
 dev_dependencies:
   flutter_test:

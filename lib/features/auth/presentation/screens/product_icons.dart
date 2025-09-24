@@ -22,7 +22,6 @@ class ProductIcons {
     AssetImage(ImagePath.chickenBreast),
     AssetImage(ImagePath.cleaningSpray),
     AssetImage(ImagePath.dishWashing),
-    //AssetImage(ImagePath.dogChewToy),
     AssetImage(ImagePath.dogFood),
     AssetImage(ImagePath.earbuds),
     AssetImage(ImagePath.eggs),

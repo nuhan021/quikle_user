@@ -60,7 +60,7 @@ class _VendorResponseCardState extends State<VendorResponseCard>
 
   Widget _modernChip(String text, {Color? bg, Color? fg, IconData? icon}) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+      //padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
       decoration: BoxDecoration(
         color: bg ?? Colors.grey.shade50,
         borderRadius: BorderRadius.circular(12.r),
@@ -96,7 +96,7 @@ class _VendorResponseCardState extends State<VendorResponseCard>
     final availableMeds = meds.where((m) => m.isMedicineAvailable).length;
 
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+      //margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16.r),

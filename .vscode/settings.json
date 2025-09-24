@@ -10,5 +10,6 @@
     "dart.evaluateGettersInDebugViews": true,
     "dart.evaluateToStringInDebugViews": true,
     "dart.flutterHotReloadOnSave": "manual",
-    "dart.hotReloadOnSave": "manual"
+    "dart.hotReloadOnSave": "manual",
+    "java.configuration.updateBuildConfiguration": "interactive"
 }

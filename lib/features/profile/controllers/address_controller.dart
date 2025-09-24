@@ -27,6 +27,7 @@ class AddressController extends GetxController {
     } finally {
       _isLoading.value = false;
     }
+    update();
   }
 
   Future<void> addAddress(ShippingAddressModel address) async {
