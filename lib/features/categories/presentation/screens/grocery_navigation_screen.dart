@@ -127,7 +127,7 @@ class GroceryNavigationScreen extends StatelessWidget {
                                           crossAxisCount: 2,
                                           crossAxisSpacing: 12.w,
                                           mainAxisSpacing: 12.h,
-                                          childAspectRatio: 2.5,
+                                          childAspectRatio: 2.5.h,
                                         ),
                                     itemCount:
                                         controller.currentSubcategories.length,
@@ -208,7 +208,7 @@ class GroceryNavigationScreen extends StatelessWidget {
                                     crossAxisCount: 2,
                                     crossAxisSpacing: 12.w,
                                     mainAxisSpacing: 12.h,
-                                    childAspectRatio: 0.75,
+                                    childAspectRatio: 0.75.h,
                                   ),
                               itemCount: controller.currentProducts.length,
                               itemBuilder: (context, index) {

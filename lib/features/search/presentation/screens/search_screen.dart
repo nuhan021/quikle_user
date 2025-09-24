@@ -283,7 +283,7 @@ class SearchScreen extends StatelessWidget {
                 crossAxisCount: 3,
                 crossAxisSpacing: 8.w,
                 mainAxisSpacing: 8.h,
-                childAspectRatio: 0.75,
+                childAspectRatio: 0.7,
               ),
               itemCount: controller.searchResults.length,
               itemBuilder: (context, index) {

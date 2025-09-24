@@ -155,9 +155,9 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
               _buildImageSection(),
               Padding(
                 padding: EdgeInsets.fromLTRB(
-                  widget.variant == ProductCardVariant.youMayLike ? 6.sp : 6.w,
-                  widget.variant == ProductCardVariant.youMayLike ? 6.sp : 6.w,
-                  widget.variant == ProductCardVariant.youMayLike ? 6.sp : 6.w,
+                  widget.variant == ProductCardVariant.youMayLike ? 6.w : 6.w,
+                  widget.variant == ProductCardVariant.youMayLike ? 6.w : 6.w,
+                  widget.variant == ProductCardVariant.youMayLike ? 6.w : 6.w,
                   6.w, // tighter bottom padding
                 ),
 
@@ -171,7 +171,7 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
   }
 
   Widget _buildImageSection() {
-    final imageHeight = 70.h;
+    final imageHeight = 55.h;
 
     return Stack(
       children: [
@@ -258,7 +258,7 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
             fontWeight: FontWeight.w500,
             color: AppColors.ebonyBlack,
           ),
-          maxLines: 2,
+          maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
 
@@ -284,6 +284,13 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
             ],
           ),
         ],
+
+        // Urgent delivery option for medicine items only
+        if (widget.product.isMedicine && widget.onAddToCart != null) ...[
+          SizedBox(height: 6.h),
+          _buildUrgentDeliveryOption(),
+        ],
+
         SizedBox(height: 15.h),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -377,6 +384,60 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildUrgentDeliveryOption() {
+    return GetBuilder<CartController>(
+      builder: (cartController) {
+        bool isUrgent = cartController.isProductUrgent(widget.product);
+
+        return Row(
+          children: [
+            Icon(Icons.local_hospital_outlined, size: 10.sp, color: Colors.red),
+            SizedBox(width: 4.w),
+            Text(
+              'Urgent',
+              style: getTextStyle(
+                font: CustomFonts.inter,
+                fontSize: 9.sp,
+                fontWeight: FontWeight.w500,
+                color: Colors.red.shade600,
+              ),
+            ),
+            SizedBox(width: 4.w),
+            GestureDetector(
+              onTap: () {
+                if (cartController.isProductInCart(widget.product)) {
+                  cartController.toggleProductUrgentStatus(widget.product);
+                } else {
+                  // Add to cart with urgent flag
+                  cartController.addProductToCart(
+                    widget.product,
+                    isUrgent: true,
+                  );
+                  _triggerCartAnimation();
+                }
+              },
+              child: Container(
+                width: 12.w,
+                height: 12.w,
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: isUrgent ? Colors.red : Colors.grey,
+                    width: 1.5,
+                  ),
+                  borderRadius: BorderRadius.circular(3.r),
+                  color: isUrgent ? Colors.red : Colors.transparent,
+                ),
+                child: isUrgent
+                    ? Icon(Icons.check, size: 8.sp, color: Colors.white)
+                    : null,
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
