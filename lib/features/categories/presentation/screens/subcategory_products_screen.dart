@@ -152,7 +152,7 @@ class SubcategoryProductsScreen extends StatelessWidget {
                           crossAxisCount: 2,
                           crossAxisSpacing: 12.w,
                           mainAxisSpacing: 12.h,
-                          childAspectRatio: 0.7,
+                          childAspectRatio: 0.7.h,
                         ),
                         itemCount: controller.products.length,
                         itemBuilder: (context, index) {

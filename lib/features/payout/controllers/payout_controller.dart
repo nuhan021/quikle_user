@@ -22,6 +22,7 @@ class PayoutController extends GetxController {
   final _paymentMethods = <PaymentMethodModel>[].obs;
   final _shippingAddresses = <ShippingAddressModel>[].obs;
   final _isUrgentDelivery = false.obs;
+  final _userToggledUrgent = false.obs; // Track if user manually toggled
   final _couponCode = ''.obs;
   final _appliedCoupon = Rxn<Map<String, dynamic>>();
   final _isProcessingPayment = false.obs;
@@ -103,6 +104,7 @@ class PayoutController extends GetxController {
   void onInit() {
     super.onInit();
     _loadInitialData();
+    _updateDeliveryBasedOnUrgency(); // Set initial delivery type based on cart
 
     _couponController.addListener(_syncCouponText);
     _deliveryPreferenceController.addListener(() {
@@ -111,6 +113,12 @@ class PayoutController extends GetxController {
           ? _deliveryPreferenceController.text.trim()
           : null;
     });
+
+    // Listen to cart changes to update delivery options automatically
+    ever(
+      _cartController.cartItemsObservable,
+      (_) => _updateDeliveryBasedOnUrgency(),
+    );
   }
 
   @override
@@ -155,16 +163,66 @@ class PayoutController extends GetxController {
   }
 
   void toggleUrgentDelivery() {
+    _userToggledUrgent.value = true; // Mark as manually toggled
     _isUrgentDelivery.value = !_isUrgentDelivery.value;
 
-    // When urgent is turned on, prefer split delivery for speed.
-    if (_isUrgentDelivery.value) {
+    // If turning off urgent delivery, remove urgent status from all items
+    if (!_isUrgentDelivery.value) {
+      _clearAllUrgentItems();
+    }
+
+    // Update delivery options
+    _updateDeliveryManually();
+  }
+
+  void _clearAllUrgentItems() {
+    // Remove urgent status from all cart items
+    for (final item in _cartController.cartItems) {
+      if (_cartController.isProductUrgent(item.product)) {
+        _cartController.toggleProductUrgentStatus(item.product);
+      }
+    }
+    // Reset user toggle flag since we've manually cleared all urgent items
+    _userToggledUrgent.value = false;
+  }
+
+  void _updateDeliveryBasedOnUrgency() {
+    // Check if there are urgent items in cart
+    final hasUrgentItems = _cartController.hasUrgentItems;
+
+    // Only auto-enable urgent delivery if user hasn't manually toggled it
+    if (hasUrgentItems &&
+        !_isUrgentDelivery.value &&
+        !_userToggledUrgent.value) {
+      _isUrgentDelivery.value = true;
+    }
+    // Auto-disable urgent delivery toggle only if no urgent items and user hasn't manually set it
+    else if (!hasUrgentItems &&
+        _isUrgentDelivery.value &&
+        !_userToggledUrgent.value) {
+      _isUrgentDelivery.value = false;
+    }
+
+    _updateDeliveryOptions();
+  }
+
+  void _updateDeliveryManually() {
+    // This is called when user manually toggles, don't auto-adjust the toggle
+    _updateDeliveryOptions();
+  }
+
+  void _updateDeliveryOptions() {
+    // Check if we should use split delivery
+    final shouldUseSplit = _isUrgentDelivery.value;
+
+    if (shouldUseSplit) {
+      // When urgent delivery is needed, prefer split delivery for speed
       final splitOption = _deliveryOptions.firstWhereOrNull(
         (o) => o.type.name == 'split' || o.type == DeliveryType.split,
       );
       if (splitOption != null) selectDeliveryOption(splitOption);
     } else {
-      // revert to combined (cheaper) if available
+      // Use combined delivery (cheaper) when no urgent items
       final combinedOption = _deliveryOptions.firstWhereOrNull(
         (o) => o.type.name == 'combined' || o.type == DeliveryType.combined,
       );
