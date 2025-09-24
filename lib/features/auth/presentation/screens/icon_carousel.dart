@@ -111,7 +111,7 @@ class _IconRowMarqueeState extends State<IconRowMarquee>
 
 class _FigmaBox extends StatelessWidget {
   final ImageProvider image;
-  final double size;
+  final double size; // new parameter for bg color
 
   const _FigmaBox({required this.image, required this.size});
 
@@ -120,19 +120,27 @@ class _FigmaBox extends StatelessWidget {
     return Container(
       width: size,
       height: size,
-      clipBehavior: Clip.antiAlias,
-      decoration: ShapeDecoration(
-        color: Colors.white.withOpacity(0.08),
-        shape: RoundedRectangleBorder(
-          side: BorderSide(width: 1, color: Colors.white.withOpacity(0.25)),
-          borderRadius: BorderRadius.circular(12.r),
+      decoration: BoxDecoration(
+        color: Color(0x1AFFFFFF),
+        borderRadius: BorderRadius.circular(size * 0.3), // soft corners
+        border: Border.all(
+          color: Colors.white.withValues(alpha: .15),
+          width: 1,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: .05),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Center(
         child: Container(
-          width: 74.w,
-          height: 74.w, // keep square
+          width: size * 0.7,
+          height: size * 0.7,
           decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(size * 0.35), // round image
             image: DecorationImage(image: image, fit: BoxFit.cover),
           ),
         ),

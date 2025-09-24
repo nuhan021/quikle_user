@@ -50,7 +50,7 @@ class AddressWidget extends StatelessWidget {
                     Text(
                       defaultAddress != null
                           ? '${_getAddressTypeLabel(defaultAddress.type)} - ${defaultAddress.name}'
-                          : 'Add Address',
+                          : ' ',
                       style: getTextStyle(
                         font: CustomFonts.inter,
                         color: AppColors.ebonyBlack,
@@ -73,7 +73,7 @@ class AddressWidget extends StatelessWidget {
                           defaultAddress.address,
                           defaultAddress.city,
                         )
-                      : 'Tap to select your delivery address',
+                      : ' ',
                   style: getTextStyle(
                     font: CustomFonts.inter,
                     color: AppColors.featherGrey,

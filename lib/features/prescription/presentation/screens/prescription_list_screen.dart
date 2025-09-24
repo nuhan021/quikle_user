@@ -111,8 +111,9 @@ class _PrescriptionListScreenState extends State<PrescriptionListScreen> {
                             ),
                           ),
                           ElevatedButton.icon(
-                            onPressed: () =>
-                                Get.toNamed('/prescription-upload'),
+                            onPressed: controller.isUploading.value
+                                ? null
+                                : controller.showUploadOptions,
                             icon: Icon(Icons.add, size: 16.sp),
                             label: Text(
                               'Upload',

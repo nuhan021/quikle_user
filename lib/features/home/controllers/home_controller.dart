@@ -59,6 +59,10 @@ class HomeController extends GetxController with VoiceSearchMixin {
     }
   }
 
+  Future<void> refreshData() async {
+    return _loadInitialData();
+  }
+
   Future<void> _loadContent() async {
     if (_selectedCategoryId.value == '0') {
       _productSections.value = await _homeService.fetchProductSections();

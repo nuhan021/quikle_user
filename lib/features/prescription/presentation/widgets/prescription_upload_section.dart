@@ -62,7 +62,7 @@ class PrescriptionUploadSection extends StatelessWidget {
                     ),
                     SizedBox(height: 2.h),
                     Text(
-                      'Upload your prescription to get quotes from vendors',
+                      'Upload your prescription to check medicine availability',
                       style: getTextStyle(
                         font: CustomFonts.inter,
                         fontSize: 12.sp,

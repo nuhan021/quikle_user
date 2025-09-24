@@ -4,12 +4,14 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/common/widgets/voice_search_overlay.dart';
+import 'package:quikle_user/features/prescription/controllers/prescription_controller.dart';
 import '../../controllers/home_controller.dart';
 import '../widgets/app_bar/home_app_bar.dart';
 import '../widgets/banners/offer_banner.dart';
 import '../widgets/categories/categories_section.dart';
 import '../widgets/products/product_section.dart';
 import '../widgets/search/search_bar.dart' as custom_search;
+import '../widgets/prescription_status_indicator.dart';
 
 class HomeContentScreen extends StatefulWidget {
   const HomeContentScreen({super.key});
@@ -49,6 +51,14 @@ class _HomeContentScreenState extends State<HomeContentScreen>
     _scroll.dispose();
     _barAnim.dispose();
     super.dispose();
+  }
+
+  Future<void> _onRefresh() async {
+    // Refresh both home data and prescription data
+    await Future.wait([
+      controller.refreshData(),
+      Get.find<PrescriptionController>().refreshData(),
+    ]);
   }
 
   @override
@@ -99,34 +109,41 @@ class _HomeContentScreenState extends State<HomeContentScreen>
                   child: Obx(
                     () => controller.isLoading
                         ? const Center(child: CircularProgressIndicator())
-                        : ListView(
-                            controller: _scroll,
-                            padding: EdgeInsets.only(top: 12.h, bottom: 24.h),
-                            children: [
-                              Center(child: OfferBanner()),
-                              12.verticalSpace,
-                              if (controller.isShowingAllCategories)
-                                ...controller.productSections.map(
-                                  (section) => ProductSection(
-                                    section: section,
-                                    onProductTap: controller.onProductPressed,
-                                    onAddToCart: controller.onAddToCartPressed,
-                                    onViewAllTap: () => controller
-                                        .onViewAllPressed(section.categoryId),
-                                    categoryIconPath: controller
-                                        .getCategoryIconPath(
-                                          section.categoryId,
-                                        ),
-                                    categoryTitle: controller.getCategoryTitle(
-                                      section.categoryId,
+                        : RefreshIndicator(
+                            onRefresh: _onRefresh,
+                            color: AppColors.primary,
+                            child: ListView(
+                              controller: _scroll,
+                              padding: EdgeInsets.only(top: 12.h, bottom: 24.h),
+                              children: [
+                                // Prescription Status Indicator
+                                const PrescriptionStatusIndicator(),
+                                8.verticalSpace,
+                                Center(child: OfferBanner()),
+                                12.verticalSpace,
+                                if (controller.isShowingAllCategories)
+                                  ...controller.productSections.map(
+                                    (section) => ProductSection(
+                                      section: section,
+                                      onProductTap: controller.onProductPressed,
+                                      onAddToCart:
+                                          controller.onAddToCartPressed,
+                                      onViewAllTap: () => controller
+                                          .onViewAllPressed(section.categoryId),
+                                      categoryIconPath: controller
+                                          .getCategoryIconPath(
+                                            section.categoryId,
+                                          ),
+                                      categoryTitle: controller
+                                          .getCategoryTitle(section.categoryId),
+                                      onFavoriteToggle:
+                                          controller.onFavoriteToggle,
                                     ),
-                                    onFavoriteToggle:
-                                        controller.onFavoriteToggle,
-                                  ),
-                                )
-                              else
-                                _buildFilteredSection(),
-                            ],
+                                  )
+                                else
+                                  _buildFilteredSection(),
+                              ],
+                            ),
                           ),
                   ),
                 ),
