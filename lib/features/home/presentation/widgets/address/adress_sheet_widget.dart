@@ -4,7 +4,9 @@ import 'package:quikle_user/core/common/styles/global_text_style.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 import 'package:quikle_user/core/utils/constants/enums/address_type_enums.dart';
+import 'package:quikle_user/core/utils/constants/image_path.dart';
 import 'package:quikle_user/features/profile/controllers/address_controller.dart';
+import 'package:quikle_user/features/profile/presentation/screens/add_address_screen.dart';
 import 'package:quikle_user/routes/app_routes.dart';
 
 Future<String?> showAddressSelectionSheet(AddressController addressController) {
@@ -74,19 +76,65 @@ class _AddressSelectionSheet extends StatelessWidget {
                         'Select Delivery Address',
                         style: getTextStyle(
                           font: CustomFonts.inter,
-                          fontSize: 18,
+                          fontSize: 14, // Slightly larger for emphasis
                           fontWeight: FontWeight.w600,
-                          color: AppColors.ebonyBlack,
+                          color: const Color(0xFF2A2A2A),
                         ),
                       ),
-                      IconButton(
-                        onPressed: () => Get.toNamed(AppRoute.getAddressBook()),
-                        icon: Icon(
-                          Icons.edit_location_alt_outlined,
-                          color: AppColors.gradientColor,
-                          size: 24,
+                      InkWell(
+                        onTap: () => _navigateToAddAddress(Get.context!),
+                        borderRadius: BorderRadius.circular(16),
+                        child: AnimatedContainer(
+                          duration: const Duration(
+                            milliseconds: 200,
+                          ), // Smooth animation
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [
+                                Color(0xFF26A69A), // Teal
+                                Color(0xFF4DD0E1), // Cyan
+                              ],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(
+                              14,
+                            ), // Softer corners
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.1),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.add,
+                                color: Colors.white, // White for contrast
+                                size: 16, // Slightly larger for visibility
+                              ),
+                              const SizedBox(
+                                width: 8,
+                              ), // More spacing for balance
+                              Text(
+                                'Add Address',
+                                style: getTextStyle(
+                                  font: CustomFonts.inter,
+                                  fontSize:
+                                      14, // Slightly larger for readability
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                        tooltip: 'Manage Addresses',
                       ),
                     ],
                   ),
@@ -126,22 +174,25 @@ class _AddressSelectionSheet extends StatelessWidget {
                               children: [
                                 Container(
                                   padding: const EdgeInsets.all(8),
-                                  decoration: BoxDecoration(
-                                    color: isSelected
-                                        ? AppColors.gradientColor
-                                        : Colors.grey[400],
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Icon(
+                                  // decoration: BoxDecoration(
+                                  //   color: isSelected
+                                  //       ? AppColors.gradientColor
+                                  //       : Colors.grey[400],
+                                  //   borderRadius: BorderRadius.circular(8),
+                                  // ),
+                                  child: Image.asset(
                                     address.type == AddressType.home
-                                        ? Icons.home
+                                        ? ImagePath.homeAddressIcon
                                         : address.type == AddressType.office
-                                        ? Icons.business
-                                        : Icons.location_on,
-                                    color: Colors.white,
-                                    size: 20,
+                                        ? ImagePath.officeAddressIcon
+                                        : ImagePath.addressIcon,
+                                    width: 30,
+                                    height: 30,
+                                    fit: BoxFit.contain,
+                                    //color: Colors.white,
                                   ),
                                 ),
+
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Column(
@@ -228,6 +279,10 @@ class _AddressSelectionSheet extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _navigateToAddAddress(BuildContext context) {
+    AddAddressScreen.show(context);
   }
 }
 

@@ -2,7 +2,7 @@ import 'package:flutter/services.dart';
 import 'package:quikle_user/app.dart';
 import 'package:flutter/material.dart';
 
-void main() {
+Future<void> main() async {
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,

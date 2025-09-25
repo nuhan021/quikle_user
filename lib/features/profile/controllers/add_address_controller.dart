@@ -7,33 +7,30 @@ import 'package:quikle_user/features/profile/controllers/address_controller.dart
 import 'package:quikle_user/core/utils/constants/enums/address_type_enums.dart';
 
 class AddAddressController extends GetxController {
-  
   final _addressService = Get.find<AddressService>();
   final _addressController = Get.find<AddressController>();
 
-  
   final nameController = TextEditingController();
   final addressController = TextEditingController();
   final zipCodeController = TextEditingController();
   final phoneController = TextEditingController();
 
-  
   final isLoading = false.obs;
   final isDefault = false.obs;
 
-  
   final selectedCountry = Rxn<String>();
+  final selectedState = Rxn<String>();
   final selectedCity = Rxn<String>();
   final selectedAddressType = Rxn<AddressType>();
 
-  
   final nameError = ''.obs;
   final addressError = ''.obs;
   final zipCodeError = ''.obs;
   final phoneError = ''.obs;
+  final stateError = ''.obs;
 
-  
   final countries = <String>[].obs;
+  final states = <String>[].obs;
   final cities = <String>[].obs;
 
   @override
@@ -54,28 +51,21 @@ class AddAddressController extends GetxController {
 
   void _loadInitialData() {
     countries.assignAll(_addressService.getCountries());
-    
-    selectedCountry.value = 'United States';
-    _loadCitiesForCountry('United States');
-
-    
+    selectedCountry.value = 'India'; // Set India as default
+    _loadStatesForCountry('India');
     selectedAddressType.value = AddressType.home;
   }
 
   void _setupListeners() {
-    
     nameController.addListener(() {
       if (nameError.value.isNotEmpty) nameError.value = '';
     });
-
     addressController.addListener(() {
       if (addressError.value.isNotEmpty) addressError.value = '';
     });
-
     zipCodeController.addListener(() {
       if (zipCodeError.value.isNotEmpty) zipCodeError.value = '';
     });
-
     phoneController.addListener(() {
       if (phoneError.value.isNotEmpty) phoneError.value = '';
     });
@@ -84,8 +74,23 @@ class AddAddressController extends GetxController {
   void setCountry(String? country) {
     if (country != null) {
       selectedCountry.value = country;
-      selectedCity.value = null; 
-      _loadCitiesForCountry(country);
+      selectedState.value = null;
+      selectedCity.value = null;
+      _loadStatesForCountry(country);
+      cities.clear();
+    }
+  }
+
+  void setState(String? state) {
+    if (state != null) {
+      selectedState.value = state;
+
+      // Clear previous city selection and cities list
+      selectedCity.value = null;
+      cities.clear();
+
+      // Load cities for the selected state
+      cities.assignAll(_addressService.getCitiesForState(state));
     }
   }
 
@@ -101,18 +106,11 @@ class AddAddressController extends GetxController {
     isDefault.value = !isDefault.value;
   }
 
-  void _loadCitiesForCountry(String country) {
-    final stateCities = _addressService.getStatesForCountry(country);
-    if (stateCities.isNotEmpty) {
-      final allCities = <String>[];
-      for (String state in stateCities) {
-        allCities.addAll(_addressService.getCitiesForState(state));
-      }
-      cities.assignAll(allCities.toSet().toList()..sort());
-    }
+  void _loadStatesForCountry(String country) {
+    states.assignAll(_addressService.getStatesForCountry(country));
   }
 
-  bool _validateForm() {
+  /* bool _validateForm() {
     bool isValid = true;
 
     final validationErrors = _addressService.validateAddress(
@@ -122,22 +120,27 @@ class AddAddressController extends GetxController {
       zipCode: zipCodeController.text.trim(),
       phoneNumber: phoneController.text.trim(),
       country: selectedCountry.value,
+      state: selectedState.value,
     );
 
-    
     nameError.value = validationErrors['name'] ?? '';
     addressError.value = validationErrors['address'] ?? '';
     zipCodeError.value = validationErrors['zipCode'] ?? '';
     phoneError.value = validationErrors['phoneNumber'] ?? '';
-
-    
-    if (selectedCity.value == null || selectedCity.value!.isEmpty) {
-      Get.snackbar('Validation Error', 'Please select a city');
-      isValid = false;
-    }
+    stateError.value = validationErrors['state'] ?? '';
 
     if (selectedCountry.value == null || selectedCountry.value!.isEmpty) {
       Get.snackbar('Validation Error', 'Please select a country');
+      isValid = false;
+    }
+
+    if (selectedState.value == null || selectedState.value!.isEmpty) {
+      Get.snackbar('Validation Error', 'Please select a state');
+      isValid = false;
+    }
+
+    if (selectedCity.value == null || selectedCity.value!.isEmpty) {
+      Get.snackbar('Validation Error', 'Please select a city');
       isValid = false;
     }
 
@@ -151,21 +154,20 @@ class AddAddressController extends GetxController {
           (error) => error == null || error.isEmpty,
         );
   }
-
+*/
   Future<void> addAddress() async {
-    if (!_validateForm()) return;
+    //if (!_validateForm()) return;
 
     try {
       isLoading.value = true;
 
-      
       final newAddress = ShippingAddressModel(
-        id: '', 
-        userId: 'user123', 
+        id: '',
+        userId: 'user123',
         name: nameController.text.trim(),
         address: addressController.text.trim(),
         city: selectedCity.value!,
-        state: selectedCountry.value!, 
+        state: selectedState.value!,
         zipCode: zipCodeController.text.trim(),
         phoneNumber: phoneController.text.trim(),
         type: selectedAddressType.value!,
@@ -173,19 +175,15 @@ class AddAddressController extends GetxController {
         createdAt: DateTime.now(),
       );
 
-      
       final addedAddress = await _addressService.addAddress(newAddress);
 
-      
       await _addressController.addAddress(addedAddress);
 
-      
       clearForm();
       Get.back();
       Get.snackbar(
         'Success',
         'Address added successfully',
-
         backgroundColor: AppColors.freeColor,
         colorText: Colors.white,
         duration: const Duration(seconds: 2),
@@ -207,10 +205,12 @@ class AddAddressController extends GetxController {
     addressController.clear();
     zipCodeController.clear();
     phoneController.clear();
-    selectedCountry.value = 'United States';
+    selectedCountry.value = 'India';
+    selectedState.value = null;
     selectedCity.value = null;
     selectedAddressType.value = AddressType.home;
     isDefault.value = false;
+    cities.clear(); // Clear cities when form is cleared
     _clearErrors();
   }
 
@@ -223,5 +223,6 @@ class AddAddressController extends GetxController {
     addressError.value = '';
     zipCodeError.value = '';
     phoneError.value = '';
+    stateError.value = '';
   }
 }

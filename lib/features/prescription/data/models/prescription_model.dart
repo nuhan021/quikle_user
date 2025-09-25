@@ -204,9 +204,9 @@ extension PrescriptionStatusExtension on PrescriptionStatus {
       case PrescriptionStatus.uploaded:
         return 'Uploaded';
       case PrescriptionStatus.processing:
-        return 'Processing';
+        return 'Verifying';
       case PrescriptionStatus.responded:
-        return 'Approved';
+        return 'Available';
       case PrescriptionStatus.expired:
         return 'Expired';
       case PrescriptionStatus.rejected:
@@ -219,13 +219,13 @@ extension PrescriptionStatusExtension on PrescriptionStatus {
       case PrescriptionStatus.uploaded:
         return 'Your prescription has been uploaded successfully';
       case PrescriptionStatus.processing:
-        return 'Vendors are reviewing your prescription';
+        return 'Pharmacies are verifying medicine availability';
       case PrescriptionStatus.responded:
-        return 'Vendors have responded with available medicines';
+        return 'Medicines are available from pharmacies';
       case PrescriptionStatus.expired:
         return 'Prescription has expired';
       case PrescriptionStatus.rejected:
-        return 'Prescription was rejected';
+        return 'Prescription could not be verified';
     }
   }
 }

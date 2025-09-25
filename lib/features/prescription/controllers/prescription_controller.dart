@@ -1,11 +1,14 @@
 import 'dart:io';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:quikle_user/features/prescription/data/models/prescription_model.dart';
 import 'package:quikle_user/features/prescription/data/services/prescription_service.dart';
 import 'package:quikle_user/features/home/data/models/product_model.dart';
 import 'package:quikle_user/features/cart/controllers/cart_controller.dart';
+import 'package:quikle_user/core/services/prescription_notification_service.dart';
 
 class PrescriptionController extends GetxController {
   final PrescriptionService _prescriptionService = PrescriptionService();
@@ -13,6 +16,7 @@ class PrescriptionController extends GetxController {
 
   final isUploading = false.obs;
   final isLoading = false.obs;
+  final isRefreshing = false.obs;
   final prescriptions = <PrescriptionModel>[].obs;
   final prescriptionMedicines = <ProductModel>[].obs;
   final recentPrescriptionMedicines = <ProductModel>[].obs;
@@ -23,13 +27,95 @@ class PrescriptionController extends GetxController {
 
   final prescriptionStats = <String, int>{}.obs;
 
+  // Auto-update functionality
+  Timer? _autoUpdateTimer;
+  static const Duration _autoUpdateInterval = Duration(seconds: 30);
+  final lastUpdateTime = Rxn<DateTime>();
+
   @override
   void onInit() {
     super.onInit();
+    // Initialize notification service
+    PrescriptionNotificationService.init();
+
     loadUserPrescriptions();
     loadPrescriptionMedicines();
     loadRecentPrescriptionMedicines();
     loadPrescriptionStats();
+    _startAutoUpdate();
+  }
+
+  @override
+  void onClose() {
+    _stopAutoUpdate();
+    super.onClose();
+  }
+
+  /// Start automatic updates for active prescriptions
+  void _startAutoUpdate() {
+    _autoUpdateTimer = Timer.periodic(_autoUpdateInterval, (timer) {
+      if (_hasActivePrescriptions()) {
+        _silentRefresh();
+      }
+    });
+  }
+
+  /// Stop automatic updates
+  void _stopAutoUpdate() {
+    _autoUpdateTimer?.cancel();
+    _autoUpdateTimer = null;
+  }
+
+  /// Check if there are any active prescriptions that need monitoring
+  bool _hasActivePrescriptions() {
+    return prescriptions.any(
+      (p) =>
+          p.status == PrescriptionStatus.uploaded ||
+          p.status == PrescriptionStatus.processing,
+    );
+  }
+
+  /// Silent refresh without showing loading indicators
+  Future<void> _silentRefresh() async {
+    try {
+      await Future.wait([
+        loadUserPrescriptions(silent: true),
+        loadPrescriptionMedicines(silent: true),
+        loadRecentPrescriptionMedicines(silent: true),
+        loadPrescriptionStats(silent: true),
+      ]);
+      lastUpdateTime.value = DateTime.now();
+    } catch (e) {
+      // Silent fail for background updates
+      print('Silent refresh failed: $e');
+    }
+  }
+
+  /// Manual refresh with pull-to-refresh indicator
+  Future<void> refreshData() async {
+    if (isRefreshing.value) return;
+
+    isRefreshing.value = true;
+    try {
+      await Future.wait([
+        loadUserPrescriptions(),
+        loadPrescriptionMedicines(),
+        loadRecentPrescriptionMedicines(),
+        loadPrescriptionStats(),
+      ]);
+      lastUpdateTime.value = DateTime.now();
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to refresh: $e',
+        snackPosition: SnackPosition.BOTTOM,
+        duration: const Duration(seconds: 3),
+        backgroundColor: Colors.red.withOpacity(0.8),
+        colorText: Colors.white,
+      );
+    } finally {
+      isRefreshing.value = false;
+    }
   }
 
   Future<void> uploadFromCamera() async {
@@ -74,11 +160,42 @@ class PrescriptionController extends GetxController {
     }
   }
 
+  /// NEW: Upload from Files (PDF or Image)
+  Future<void> uploadFromFiles() async {
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png', 'heic', 'webp'],
+        withReadStream: false,
+      );
+
+      if (result != null && result.files.isNotEmpty) {
+        final picked = result.files.first;
+        if (picked.path != null) {
+          await _uploadPrescription(File(picked.path!));
+        } else {
+          Get.snackbar(
+            'Error',
+            'Could not read the selected file.',
+            snackPosition: SnackPosition.BOTTOM,
+          );
+        }
+      }
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to pick file: $e',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
+  }
+
   Future<void> _uploadPrescription(File imageFile) async {
     try {
       isUploading.value = true;
       uploadProgress.value = 0.0;
 
+      // Fake client-side progress
       for (int i = 0; i <= 100; i += 10) {
         uploadProgress.value = i / 100.0;
         await Future.delayed(const Duration(milliseconds: 100));
@@ -86,19 +203,12 @@ class PrescriptionController extends GetxController {
 
       final prescription = await _prescriptionService.uploadPrescription(
         userId: 'current_user_id',
-        imageFile: imageFile,
+        imageFile: imageFile, // supports image or PDF
         notes: uploadNotes.value.isEmpty ? null : uploadNotes.value,
       );
 
       prescriptions.insert(0, prescription);
       uploadNotes.value = '';
-
-      // Get.snackbar(
-      //   'Success',
-      //   'Prescription uploaded successfully! Vendors will review it shortly.',
-      //   snackPosition: SnackPosition.BOTTOM,
-      //   duration: const Duration(seconds: 4),
-      // );
 
       await Future.wait([
         loadPrescriptionStats(),
@@ -116,52 +226,62 @@ class PrescriptionController extends GetxController {
     }
   }
 
-  Future<void> loadUserPrescriptions() async {
+  Future<void> loadUserPrescriptions({bool silent = false}) async {
     try {
-      isLoading.value = true;
+      if (!silent) isLoading.value = true;
+
+      // Store previous prescriptions for status change detection
+      final previousPrescriptions = List<PrescriptionModel>.from(prescriptions);
+
       final userPrescriptions = await _prescriptionService.getUserPrescriptions(
         'current_user_id',
       );
       prescriptions.value = userPrescriptions;
+
+      // Check for status changes and send notifications
+      _checkForStatusChanges(previousPrescriptions, userPrescriptions);
     } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Failed to load prescriptions: $e',
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      if (!silent) {
+        Get.snackbar(
+          'Error',
+          'Failed to load prescriptions: $e',
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      }
     } finally {
-      isLoading.value = false;
+      if (!silent) isLoading.value = false;
+      lastUpdateTime.value = DateTime.now();
     }
   }
 
-  Future<void> loadPrescriptionMedicines() async {
+  Future<void> loadPrescriptionMedicines({bool silent = false}) async {
     try {
       final medicines = await _prescriptionService
           .getPendingPrescriptionMedicines('current_user_id');
       prescriptionMedicines.value = medicines;
     } catch (e) {
-      print('Error loading prescription medicines: $e');
+      // ignore for mock
     }
   }
 
-  Future<void> loadRecentPrescriptionMedicines() async {
+  Future<void> loadRecentPrescriptionMedicines({bool silent = false}) async {
     try {
       final medicines = await _prescriptionService
           .getRecentPrescriptionMedicines('current_user_id');
       recentPrescriptionMedicines.value = medicines;
     } catch (e) {
-      print('Error loading recent prescription medicines: $e');
+      // ignore for mock
     }
   }
 
-  Future<void> loadPrescriptionStats() async {
+  Future<void> loadPrescriptionStats({bool silent = false}) async {
     try {
       final stats = await _prescriptionService.getPrescriptionStats(
         'current_user_id',
       );
       prescriptionStats.value = stats;
     } catch (e) {
-      print('Error loading prescription stats: $e');
+      // ignore for mock
     }
   }
 
@@ -177,11 +297,6 @@ class PrescriptionController extends GetxController {
       );
       if (success) {
         prescriptions.removeWhere((p) => p.id == prescriptionId);
-        // Get.snackbar(
-        //   'Success',
-        //   'Prescription deleted successfully',
-        //   snackPosition: SnackPosition.BOTTOM,
-        // );
         loadPrescriptionStats();
       }
     } catch (e) {
@@ -212,7 +327,6 @@ class PrescriptionController extends GetxController {
   ) {
     try {
       final cartController = Get.find<CartController>();
-
       for (int i = 0; i < quantity; i++) {
         cartController.addToCart(medicine);
       }
@@ -265,15 +379,6 @@ class PrescriptionController extends GetxController {
     }
   }
 
-  Future<void> refreshData() async {
-    await Future.wait([
-      loadUserPrescriptions(),
-      loadPrescriptionMedicines(),
-      loadRecentPrescriptionMedicines(),
-      loadPrescriptionStats(),
-    ]);
-  }
-
   void setUploadNotes(String notes) {
     uploadNotes.value = notes;
   }
@@ -319,10 +424,76 @@ class PrescriptionController extends GetxController {
                 uploadFromGallery();
               },
             ),
+            // NEW: Files (PDF/Image)
+            ListTile(
+              leading: const Icon(Icons.insert_drive_file),
+              title: const Text('Upload from Files'),
+              subtitle: const Text('Select a file from device storage'),
+              onTap: () {
+                Get.back();
+                uploadFromFiles();
+              },
+            ),
             const SizedBox(height: 20),
           ],
         ),
       ),
     );
+  }
+
+  /// Check for prescription status changes and send notifications
+  void _checkForStatusChanges(
+    List<PrescriptionModel> previousPrescriptions,
+    List<PrescriptionModel> currentPrescriptions,
+  ) {
+    // Don't send notifications on the first load when there are no previous prescriptions
+    if (previousPrescriptions.isEmpty) return;
+
+    for (final currentPrescription in currentPrescriptions) {
+      try {
+        final previousPrescription = previousPrescriptions.firstWhere(
+          (p) => p.id == currentPrescription.id,
+        );
+
+        // Check if status has changed
+        if (previousPrescription.status != currentPrescription.status) {
+          _sendStatusChangeNotification(currentPrescription);
+        }
+      } catch (e) {
+        // Prescription not found in previous list (new prescription)
+        // Only send notification for newly processed prescriptions, not newly uploaded ones
+        if (currentPrescription.status == PrescriptionStatus.processing ||
+            currentPrescription.status == PrescriptionStatus.responded ||
+            currentPrescription.status == PrescriptionStatus.rejected) {
+          _sendStatusChangeNotification(currentPrescription);
+        }
+      }
+    }
+  }
+
+  /// Send notification for prescription status change
+  void _sendStatusChangeNotification(PrescriptionModel prescription) {
+    // Only send notifications for meaningful status changes
+    switch (prescription.status) {
+      case PrescriptionStatus.processing:
+        PrescriptionNotificationService.showPrescriptionStatusNotification(
+          prescription: prescription,
+        );
+        break;
+      case PrescriptionStatus.responded:
+        PrescriptionNotificationService.showPrescriptionStatusNotification(
+          prescription: prescription,
+        );
+        break;
+      case PrescriptionStatus.rejected:
+        PrescriptionNotificationService.showPrescriptionStatusNotification(
+          prescription: prescription,
+        );
+        break;
+      case PrescriptionStatus.uploaded:
+      case PrescriptionStatus.expired:
+        // Don't send notifications for these statuses
+        break;
+    }
   }
 }

@@ -14,7 +14,7 @@ class CommonWidgets {
       decoration: const BoxDecoration(
         image: DecorationImage(
           image: AssetImage(ImagePath.logo),
-          fit: BoxFit.fill,
+          fit: BoxFit.cover,
         ),
       ),
     );

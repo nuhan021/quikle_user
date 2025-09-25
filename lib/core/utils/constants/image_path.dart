@@ -102,4 +102,18 @@ class ImagePath {
   static const String deodorant = 'assets/icons/deodorant.png';
   static const String dogBed = 'assets/icons/dogBed.png';
   static const String ledLamp = 'assets/icons/ledLamp.png';
+
+  static const String amulButter = 'assets/icons/amulButter.png';
+  static const String dairy = 'assets/icons/dairy.png';
+
+  static const String freshProduceBox = 'assets/icons/freshproduceBox.png';
+  static const String greenApple = 'assets/icons/greenApple.png';
+  static const String greenTea = 'assets/icons/greenTea.png';
+  static const String oranges = 'assets/icons/oranges.png';
+  static const String organicChicken = 'assets/icons/organicChicken.png';
+  static const String pasta = 'assets/icons/pasta.png';
+  static const String puriPlatter = 'assets/icons/puriPlatter.png';
+  static const String sunflowerOil = 'assets/icons/sunflowerOil.png';
+  static const String toothPaste = 'assets/icons/toothPaste.png';
+  static const String wheatBread = 'assets/icons/wheatBread.png';
 }

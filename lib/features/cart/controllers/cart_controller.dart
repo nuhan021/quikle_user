@@ -10,6 +10,7 @@ class CartController extends GetxController {
   final _totalItems = 0.obs;
   final _totalAmount = 0.0.obs;
   List<CartItemModel> get cartItems => _cartItems;
+  RxList<CartItemModel> get cartItemsObservable => _cartItems;
   int get totalItems => _totalItems.value;
   double get totalAmount => _totalAmount.value;
   bool get hasItems => _cartItems.isNotEmpty;
@@ -20,8 +21,8 @@ class CartController extends GetxController {
     _updateCartData();
   }
 
-  void addToCart(ProductModel product) {
-    _cartService.addToCart(product);
+  void addToCart(ProductModel product, {bool isUrgent = false}) {
+    _cartService.addToCart(product, isUrgent: isUrgent);
     _updateCartData();
 
     // Get.snackbar(
@@ -106,8 +107,9 @@ class CartController extends GetxController {
   }
 
   // Add specific quantity of product to cart
-  void addProductToCart(ProductModel product) {
-    addToCart(product);
+  void addProductToCart(ProductModel product, {bool isUrgent = false}) {
+    addToCart(product, isUrgent: isUrgent);
+    update(); // Notify GetBuilder widgets
   }
 
   // Remove one quantity of product from cart
@@ -120,5 +122,20 @@ class CartController extends GetxController {
         removeFromCart(cartItem);
       }
     }
+  }
+
+  // Toggle urgent status for a product
+  void toggleProductUrgentStatus(ProductModel product) {
+    _cartService.toggleProductUrgentStatus(product);
+    _updateCartData();
+    update(); // Notify GetBuilder widgets
+  }
+
+  // Check if there are any urgent items in cart
+  bool get hasUrgentItems => _cartService.hasUrgentItems;
+
+  // Check if a specific product is marked as urgent in cart
+  bool isProductUrgent(ProductModel product) {
+    return _cartService.isProductUrgent(product);
   }
 }

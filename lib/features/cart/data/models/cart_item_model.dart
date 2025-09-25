@@ -3,13 +3,23 @@ import 'package:quikle_user/features/home/data/models/product_model.dart';
 class CartItemModel {
   final ProductModel product;
   final int quantity;
+  final bool isUrgent;
 
-  CartItemModel({required this.product, required this.quantity});
+  CartItemModel({
+    required this.product,
+    required this.quantity,
+    this.isUrgent = false,
+  });
 
-  CartItemModel copyWith({ProductModel? product, int? quantity}) {
+  CartItemModel copyWith({
+    ProductModel? product,
+    int? quantity,
+    bool? isUrgent,
+  }) {
     return CartItemModel(
       product: product ?? this.product,
       quantity: quantity ?? this.quantity,
+      isUrgent: isUrgent ?? this.isUrgent,
     );
   }
 

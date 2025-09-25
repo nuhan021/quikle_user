@@ -148,10 +148,10 @@ class FavoritesScreen extends StatelessWidget {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 12.w,
-                mainAxisSpacing: 12.h,
-                childAspectRatio: 1.sp,
+                crossAxisCount: 3,
+                crossAxisSpacing: 8.w,
+                mainAxisSpacing: 8.h,
+                childAspectRatio: 0.75.sp,
               ),
               itemCount: controller.favoriteProducts.length,
               itemBuilder: (context, index) {
