@@ -165,6 +165,8 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen>
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) => _measureNavBarHeight());
     const double cartMargin = 16.0;
+    final keyboardInset = MediaQuery.of(context).viewInsets.bottom;
+    final isKeyboardOpen = keyboardInset > 0;
 
     return CartAnimationWrapper(
       child: AnnotatedRegion<SystemUiOverlayStyle>(
@@ -190,7 +192,6 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen>
                     padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 0),
                     child: Column(
                       children: [
-                        // Search field
                         Container(
                           height: 48.h,
                           decoration: BoxDecoration(
@@ -232,7 +233,6 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen>
                       ],
                     ),
                   ),
-
                   SizedBox(height: 24.h),
                   SizedBox(
                     height: 30.h,
@@ -256,7 +256,7 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen>
                               borderRadius: BorderRadius.circular(4.r),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.grey.withOpacity(0.1),
+                                  color: Colors.grey.withValues(alpha: .1),
                                   blurRadius: 8,
                                   offset: const Offset(0, 2),
                                 ),
@@ -276,15 +276,15 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen>
                       },
                     ),
                   ),
-
-                  // SizedBox(height: 4.h),
                   Expanded(
                     child: AnimatedBuilder(
                       animation: _navController,
                       builder: (_, __) {
-                        final inset = _navController.value * _navBarHeight;
+                        final bottomInset = isKeyboardOpen
+                            ? 0.0
+                            : _navController.value * _navBarHeight;
                         return Padding(
-                          padding: EdgeInsets.only(bottom: inset),
+                          padding: EdgeInsets.only(bottom: bottomInset),
                           child: _isLoading
                               ? const Center(child: CircularProgressIndicator())
                               : _filteredProducts.isEmpty
@@ -296,23 +296,36 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen>
                   ),
                 ],
               ),
+
+              /// Bottom navbar (hidden when keyboard opens)
               Positioned(
                 left: 0,
                 right: 0,
                 bottom: 0,
-                child: KeyedSubtree(
-                  key: _navKey,
-                  child: CustomNavBar(
-                    currentIndex: -1,
-                    onTap: _onNavItemTapped,
+                child: AnimatedSlide(
+                  duration: const Duration(milliseconds: 180),
+                  offset: isKeyboardOpen
+                      ? const Offset(0, 1)
+                      : const Offset(0, 0),
+                  child: KeyedSubtree(
+                    key: _navKey,
+                    child: CustomNavBar(
+                      currentIndex: -1,
+                      onTap: _onNavItemTapped,
+                    ),
                   ),
                 ),
               ),
+
+              /// Floating cart button
               AnimatedBuilder(
                 animation: _navController,
                 builder: (_, __) {
                   final inset =
-                      (_navController.value * _navBarHeight) + cartMargin;
+                      (isKeyboardOpen
+                          ? keyboardInset
+                          : _navController.value * _navBarHeight) +
+                      cartMargin;
                   return FloatingCartButton(bottomInset: inset);
                 },
               ),

@@ -12,12 +12,17 @@ class AddAddressScreen extends StatelessWidget {
   const AddAddressScreen({super.key});
 
   static void show(BuildContext context) {
+    final controller = Get.put(AddAddressController());
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => const AddAddressScreen(),
-    );
+    ).whenComplete(() {
+      // Reset whenever dismissed (close button OR swipe down)
+      controller.clearForm();
+    });
   }
 
   @override
@@ -81,7 +86,10 @@ class AddAddressScreen extends StatelessWidget {
                         ),
                       ),
                       GestureDetector(
-                        onTap: () => Navigator.of(context).pop(),
+                        onTap: () {
+                          controller.clearForm(); // clear all fields
+                          Navigator.of(context).pop();
+                        },
                         child: Container(
                           width: 32.w,
                           height: 32.h,
@@ -184,13 +192,30 @@ class AddAddressScreen extends StatelessWidget {
 
                   SizedBox(height: 16.h),
 
-                  Obx(
-                    () => _buildDropdown(
-                      value: controller.selectedCity.value,
-                      hintText: 'Select City',
-                      items: controller.cities,
-                      onChanged: controller.setCity,
-                    ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Obx(
+                          () => _buildDropdown(
+                            value: controller.selectedState.value,
+                            hintText: 'Select State',
+                            items: controller.states,
+                            onChanged: controller.setState,
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 8.w),
+                      Expanded(
+                        child: Obx(
+                          () => _buildDropdown(
+                            value: controller.selectedCity.value,
+                            hintText: 'Select City',
+                            items: controller.cities,
+                            onChanged: controller.setCity,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
 
                   SizedBox(height: 16.h),
@@ -230,7 +255,6 @@ class AddAddressScreen extends StatelessWidget {
                   Obx(
                     () => SizedBox(
                       width: double.infinity,
-                      height: 48.h,
                       child: ElevatedButton(
                         onPressed: controller.isLoading.value
                             ? null
@@ -244,15 +268,30 @@ class AddAddressScreen extends StatelessWidget {
                           elevation: 0,
                         ),
                         child: controller.isLoading.value
-                            ? SizedBox(
-                                width: 20.w,
-                                height: 20.h,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2.w,
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                    Colors.white,
+                            ? Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  SizedBox(
+                                    width: 20.w,
+                                    height: 20.h,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2.w,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white,
+                                      ),
+                                    ),
                                   ),
-                                ),
+                                  SizedBox(width: 12.w),
+                                  Text(
+                                    'Adding address...',
+                                    style: getTextStyle(
+                                      font: CustomFonts.inter,
+                                      fontSize: 16.sp,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
                               )
                             : Text(
                                 'Add New Address',
@@ -349,14 +388,15 @@ class AddAddressScreen extends StatelessWidget {
     required Function(String?) onChanged,
   }) {
     return Container(
-      height: 48.h,
+      //height: 48.h,
       decoration: BoxDecoration(
         color: AppColors.homeGrey,
         borderRadius: BorderRadius.circular(8.r),
         border: Border.all(color: AppColors.cardColor, width: 1.w),
       ),
       child: DropdownButtonFormField<String>(
-        initialValue: value,
+        isExpanded: true,
+        initialValue: value != null && items.contains(value) ? value : null,
         hint: Text(
           hintText,
           style: getTextStyle(
@@ -371,6 +411,7 @@ class AddAddressScreen extends StatelessWidget {
             value: item,
             child: Text(
               item,
+              overflow: TextOverflow.ellipsis,
               style: getTextStyle(
                 font: CustomFonts.inter,
                 fontSize: 14.sp,

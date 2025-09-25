@@ -39,6 +39,18 @@ class ProductIcons {
     AssetImage(ImagePath.tShirt),
     AssetImage(ImagePath.vitaminC),
     AssetImage(ImagePath.waterBottle),
+    AssetImage(ImagePath.amulButter),
+    AssetImage(ImagePath.dairy),
+    AssetImage(ImagePath.freshProduceBox),
+    AssetImage(ImagePath.greenApple),
+    AssetImage(ImagePath.greenTea),
+    AssetImage(ImagePath.oranges),
+    AssetImage(ImagePath.organicChicken),
+    AssetImage(ImagePath.pasta),
+    AssetImage(ImagePath.puriPlatter),
+    AssetImage(ImagePath.sunflowerOil),
+    AssetImage(ImagePath.toothPaste),
+    AssetImage(ImagePath.wheatBread),
   ];
 
   static List<ImageProvider> asProviders() => List<ImageProvider>.from(items);

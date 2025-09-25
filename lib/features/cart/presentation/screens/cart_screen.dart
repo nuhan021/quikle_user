@@ -7,6 +7,7 @@ import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums/order_enums.dart';
 import 'package:quikle_user/core/utils/constants/enums/address_type_enums.dart';
 import 'package:quikle_user/core/utils/constants/enums/delivery_enums.dart';
+import 'package:quikle_user/features/home/presentation/screens/home_content_screen.dart';
 import '../../controllers/cart_controller.dart';
 import '../../data/models/cart_item_model.dart';
 import '../../../home/controllers/home_controller.dart';
@@ -43,7 +44,11 @@ class CartScreen extends StatelessWidget {
         onClearAll: () => _showClearCartDialog(cartController),
       ),
       body: Obx(() {
-        if (!cartController.hasItems) return const EmptyCartScreen();
+        if (!cartController.hasItems) {
+          Future.microtask(() => Get.back());
+          return const SizedBox.shrink();
+        }
+
         return Column(
           children: [
             Expanded(
