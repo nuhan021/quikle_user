@@ -298,7 +298,13 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
                   onCancel: controller.stopVoiceSearch,
                 );
               }),
-              const LiveOrderIndicator(),
+              AnimatedBuilder(
+                animation: _navController,
+                builder: (context, _) {
+                  final inset = (_navController.value * _navBarHeight);
+                  return LiveOrderIndicator(bottomInset: inset);
+                },
+              ),
             ],
           ),
         ),
@@ -444,7 +450,7 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
               crossAxisCount: 3,
               crossAxisSpacing: 8.w,
               mainAxisSpacing: 8.h,
-              childAspectRatio: 0.70.h,
+              childAspectRatio: 0.75.sp,
             ),
             itemCount: controller.displayProducts.length,
             itemBuilder: (context, index) {

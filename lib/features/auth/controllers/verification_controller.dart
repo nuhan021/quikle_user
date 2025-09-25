@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:quikle_user/features/auth/controllers/login_controller.dart';
 import 'package:quikle_user/features/auth/data/services/auth_service.dart';
 import 'package:quikle_user/routes/app_routes.dart';
 
 class VerificationController extends GetxController {
   final RxList<String> otpDigits = List.generate(6, (_) => '').obs;
+  final LoginController loginController = Get.find<LoginController>();
 
   // Read arguments dynamically so the controller works correctly when reused
   String get phone => (Get.arguments is Map && Get.arguments['phone'] != null)
@@ -94,6 +96,9 @@ class VerificationController extends GetxController {
           //   backgroundColor: Colors.green.withValues(alpha: 0.1),
           //   colorText: Colors.green,
           // );
+          loginController.clearInputs();
+          loginController.clearPhone();
+          clearOtp();
           Get.offAllNamed(AppRoute.getWelcome());
         } else {
           errorMessage.value = response.errorMessage;
@@ -131,11 +136,8 @@ class VerificationController extends GetxController {
       final response = await _auth.resendOtp(phone);
 
       if (response.isSuccess) {
-        String message = 'OTP resent successfully';
         if (response.responseData != null &&
-            response.responseData['message'] != null) {
-          message = response.responseData['message'].toString();
-        }
+            response.responseData['message'] != null) {}
 
         // Get.snackbar(
         //   'Success',

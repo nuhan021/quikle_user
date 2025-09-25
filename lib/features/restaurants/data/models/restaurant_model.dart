@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:quikle_user/core/utils/constants/image_path.dart';
 
 class SignatureDish {

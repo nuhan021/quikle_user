@@ -110,7 +110,7 @@ class PrescriptionController extends GetxController {
         'Failed to refresh: $e',
         snackPosition: SnackPosition.BOTTOM,
         duration: const Duration(seconds: 3),
-        backgroundColor: Colors.red.withOpacity(0.8),
+        backgroundColor: Colors.red.withValues(alpha: 0.8),
         colorText: Colors.white,
       );
     } finally {

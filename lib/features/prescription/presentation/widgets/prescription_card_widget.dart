@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -29,7 +28,7 @@ class PrescriptionCardWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -38,7 +37,6 @@ class PrescriptionCardWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          
           PrescriptionHeaderWidget(
             prescription: prescription,
             onDelete: () => _showDeleteDialog(context),
@@ -46,14 +44,12 @@ class PrescriptionCardWidget extends StatelessWidget {
                 Get.toNamed('/prescription-details', arguments: prescription),
           ),
 
-          
           if (prescription.notes?.isNotEmpty == true)
             PrescriptionStatusWidget(
               notes: prescription.notes!,
               status: prescription.status,
             ),
 
-          
           if (prescription.vendorResponses.isNotEmpty) ...[
             Divider(color: Colors.grey.shade200, height: 1),
             ...prescription.vendorResponses.map((response) {

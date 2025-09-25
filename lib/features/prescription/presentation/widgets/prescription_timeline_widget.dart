@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:quikle_user/core/common/styles/global_text_style.dart';
@@ -21,7 +20,7 @@ class PrescriptionTimelineWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: .05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -48,7 +47,6 @@ class PrescriptionTimelineWidget extends StatelessWidget {
 
           SizedBox(height: 16.h),
 
-          
           _buildTimelineStep(
             icon: Icons.cloud_upload,
             title: 'Uploaded',
@@ -80,7 +78,6 @@ class PrescriptionTimelineWidget extends StatelessWidget {
             isLast: true,
           ),
 
-          
           if (prescription.status == PrescriptionStatus.rejected) ...[
             SizedBox(height: 8.h),
             _buildStatusAlert(
@@ -116,7 +113,6 @@ class PrescriptionTimelineWidget extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        
         Column(
           children: [
             Container(
@@ -145,7 +141,6 @@ class PrescriptionTimelineWidget extends StatelessWidget {
 
         SizedBox(width: 12.w),
 
-        
         Expanded(
           child: Padding(
             padding: EdgeInsets.only(bottom: isLast ? 0 : 16.h),
@@ -189,9 +184,9 @@ class PrescriptionTimelineWidget extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(12.w),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: .1),
         borderRadius: BorderRadius.circular(8.r),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: .3)),
       ),
       child: Row(
         children: [
@@ -204,7 +199,7 @@ class PrescriptionTimelineWidget extends StatelessWidget {
                 font: CustomFonts.inter,
                 fontSize: 12.sp,
                 fontWeight: FontWeight.w500,
-                color: color.withOpacity(0.8),
+                color: color.withValues(alpha: .8),
               ),
             ),
           ),

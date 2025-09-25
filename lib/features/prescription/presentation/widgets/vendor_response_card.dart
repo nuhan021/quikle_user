@@ -65,7 +65,7 @@ class _VendorResponseCardState extends State<VendorResponseCard>
         color: bg ?? Colors.grey.shade50,
         borderRadius: BorderRadius.circular(12.r),
         border: Border.all(
-          color: (bg ?? Colors.grey.shade50).withOpacity(0.3),
+          color: (bg ?? Colors.grey.shade50).withValues(alpha: 0.3),
           width: 0.5,
         ),
       ),
@@ -102,7 +102,7 @@ class _VendorResponseCardState extends State<VendorResponseCard>
         borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: .04),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -347,7 +347,7 @@ class _VendorResponseCardState extends State<VendorResponseCard>
                     children: [
                       SizedBox(height: 12.h),
                       ...meds.asMap().entries.map((entry) {
-                        final index = entry.key;
+                        //final index = entry.key;
                         final medicine = entry.value;
                         final medicineKey = GlobalKey();
 
@@ -365,7 +365,7 @@ class _VendorResponseCardState extends State<VendorResponseCard>
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.02),
+                                color: Colors.black.withValues(alpha: .02),
                                 blurRadius: 4,
                                 offset: const Offset(0, 1),
                               ),
@@ -480,10 +480,10 @@ class _VendorResponseCardState extends State<VendorResponseCard>
                                             ),
                                           ).copyWith(
                                             overlayColor:
-                                                MaterialStateProperty.all(
+                                                WidgetStateProperty.all(
                                                   Colors.transparent,
                                                 ),
-                                            side: MaterialStateProperty.all(
+                                            side: WidgetStateProperty.all(
                                               BorderSide.none,
                                             ),
                                           ),

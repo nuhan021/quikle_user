@@ -19,31 +19,35 @@ class AddressBookScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: AppColors.homeGrey,
-      body: Column(
-        children: [
-          const UnifiedProfileAppBar(
-            title: 'Address Book',
-            showActionButton: false,
-          ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            const UnifiedProfileAppBar(
+              title: 'Address Book',
+              showActionButton: false,
+            ),
 
-          Expanded(
-            child: Obx(() {
-              if (controller.isLoading) {
-                return Center(
-                  child: CircularProgressIndicator(color: AppColors.beakYellow),
-                );
-              }
+            Expanded(
+              child: Obx(() {
+                if (controller.isLoading) {
+                  return Center(
+                    child: CircularProgressIndicator(
+                      color: AppColors.beakYellow,
+                    ),
+                  );
+                }
 
-              if (controller.addresses.isEmpty) {
-                return _buildEmptyState(context);
-              }
+                if (controller.addresses.isEmpty) {
+                  return _buildEmptyState(context);
+                }
 
-              return _buildAddressList(context, controller);
-            }),
-          ),
+                return _buildAddressList(context, controller);
+              }),
+            ),
 
-          _buildAddNewAddressButton(context),
-        ],
+            _buildAddNewAddressButton(context),
+          ],
+        ),
       ),
     );
   }
@@ -127,11 +131,8 @@ class AddressBookScreen extends StatelessWidget {
   }
 
   Widget _buildAddNewAddressButton(BuildContext context) {
-    final double gesture = MediaQuery.of(context).viewPadding.bottom;
-    //const double navHeight = kBottomNavigationBarHeight;
-
     return Padding(
-      padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 16.h + gesture),
+      padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 16.h),
       child: SizedBox(
         width: double.infinity,
         child: ElevatedButton.icon(

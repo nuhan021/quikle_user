@@ -24,6 +24,7 @@ class CartController extends GetxController {
   void addToCart(ProductModel product, {bool isUrgent = false}) {
     _cartService.addToCart(product, isUrgent: isUrgent);
     _updateCartData();
+    update(); // Notify GetBuilder widgets
 
     // Get.snackbar(
     //   'Added to Cart',
@@ -35,6 +36,7 @@ class CartController extends GetxController {
   void removeFromCart(CartItemModel cartItem) {
     _cartService.removeFromCart(cartItem);
     _updateCartData();
+    update(); // Notify GetBuilder widgets
 
     // Get.snackbar(
     //   'Removed from Cart',
@@ -46,6 +48,7 @@ class CartController extends GetxController {
   void updateQuantity(CartItemModel cartItem, int newQuantity) {
     _cartService.updateQuantity(cartItem, newQuantity);
     _updateCartData();
+    update(); // Notify GetBuilder widgets
   }
 
   void increaseQuantity(CartItemModel cartItem) {
@@ -59,6 +62,7 @@ class CartController extends GetxController {
   void clearCart() {
     _cartService.clearCart();
     _updateCartData();
+    update(); // Notify GetBuilder widgets
 
     CartBottomSection.clearSelectedAddress();
 
@@ -122,6 +126,7 @@ class CartController extends GetxController {
         removeFromCart(cartItem);
       }
     }
+    update(); // Notify GetBuilder widgets
   }
 
   // Toggle urgent status for a product

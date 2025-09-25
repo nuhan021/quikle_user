@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:quikle_user/core/services/cart_position_service.dart';
 
 class CartAnimationController extends GetxController {
   final List<CartAnimation> _activeAnimations = <CartAnimation>[].obs;
@@ -9,9 +10,58 @@ class CartAnimationController extends GetxController {
 
   void addAnimation(CartAnimation animation) {
     _activeAnimations.add(animation);
-    Future.delayed(animation.duration + const Duration(milliseconds: 150), () {
+    Future.delayed(animation.duration + const Duration(milliseconds: 200), () {
       _activeAnimations.remove(animation);
     });
+  }
+
+  /// Creates and adds a cart animation with automatic target detection
+  void addCartAnimation({
+    required String imagePath,
+    required Offset startPosition,
+    required double startSize,
+    Offset? fallbackTarget,
+  }) {
+    Offset targetPosition;
+
+    // Try to get the actual cart button position
+    try {
+      final positionService = Get.find<CartPositionService>();
+      final cartPosition = positionService.getCartButtonPosition();
+
+      if (cartPosition != null) {
+        targetPosition = cartPosition;
+      } else {
+        // Use fallback position if cart position not available
+        targetPosition = fallbackTarget ?? _getDefaultCartPosition();
+      }
+    } catch (e) {
+      // Service not available, use fallback
+      targetPosition = fallbackTarget ?? _getDefaultCartPosition();
+    }
+
+    final animation = CartAnimation(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      imagePath: imagePath,
+      startPosition: startPosition,
+      endPosition: targetPosition,
+      startSize: startSize,
+      endSize: 32.w, // Slightly larger end size for better visibility
+      duration: const Duration(
+        milliseconds: 1000,
+      ), // Slightly longer for smoother animation
+    );
+
+    addAnimation(animation);
+  }
+
+  Offset _getDefaultCartPosition() {
+    // Fallback position when cart button position cannot be determined
+    final screenSize = Get.size;
+    return Offset(
+      screenSize.width - 48.w, // Adjusted for better positioning
+      screenSize.height - 120.h, // Adjusted for bottom navigation
+    );
   }
 }
 
@@ -32,7 +82,7 @@ class CartAnimation {
     required this.endPosition,
     required this.startSize,
     required this.endSize,
-    this.duration = const Duration(milliseconds: 900),
+    this.duration = const Duration(milliseconds: 1000),
   }) : createdAt = DateTime.now();
 }
 
@@ -76,40 +126,66 @@ class _AnimatedCartImageState extends State<AnimatedCartImage>
       vsync: this,
     );
 
+    // Smoother position animation with custom curve
     _position =
         Tween<Offset>(
           begin: widget.animation.startPosition,
           end: widget.animation.endPosition,
         ).animate(
-          CurvedAnimation(parent: _controller, curve: Curves.easeInOutCubic),
+          CurvedAnimation(
+            parent: _controller,
+            curve: Curves.fastOutSlowIn, // Better curve for natural movement
+          ),
         );
 
+    // Improved size animation with bounce effect
     _size = TweenSequence<double>([
       TweenSequenceItem(
         tween: Tween(
           begin: widget.animation.startSize,
-          end: widget.animation.startSize * 1.15,
-        ),
-        weight: 25,
+          end: widget.animation.startSize * 1.2, // Slightly more expansion
+        ).chain(CurveTween(curve: Curves.easeOut)),
+        weight: 20,
       ),
       TweenSequenceItem(
         tween: Tween(
-          begin: widget.animation.startSize * 1.15,
+          begin: widget.animation.startSize * 1.2,
+          end: widget.animation.startSize * 0.9, // Slight compression
+        ).chain(CurveTween(curve: Curves.easeInOut)),
+        weight: 30,
+      ),
+      TweenSequenceItem(
+        tween: Tween(
+          begin: widget.animation.startSize * 0.9,
           end: widget.animation.endSize,
-        ),
-        weight: 75,
+        ).chain(CurveTween(curve: Curves.easeIn)),
+        weight: 50,
       ),
     ]).animate(_controller);
 
+    // Smoother opacity animation
     _opacity = TweenSequence<double>([
-      TweenSequenceItem(tween: Tween(begin: 1.0, end: 1.0), weight: 75),
-      TweenSequenceItem(tween: Tween(begin: 1.0, end: 0.0), weight: 25),
-    ]).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
+      TweenSequenceItem(tween: Tween(begin: 1.0, end: 1.0), weight: 80),
+      TweenSequenceItem(
+        tween: Tween(
+          begin: 1.0,
+          end: 0.0,
+        ).chain(CurveTween(curve: Curves.easeInCubic)),
+        weight: 20,
+      ),
+    ]).animate(_controller);
 
-    _rotation = Tween(
-      begin: 0.0,
-      end: 0.6,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+    // Gentler rotation for more natural movement
+    _rotation =
+        Tween(
+          begin: 0.0,
+          end: 0.4, // Reduced rotation for smoother effect
+        ).animate(
+          CurvedAnimation(
+            parent: _controller,
+            curve: Curves.easeInOutSine, // Smoother rotation curve
+          ),
+        );
 
     _controller.forward();
   }
@@ -126,6 +202,8 @@ class _AnimatedCartImageState extends State<AnimatedCartImage>
       animation: _controller,
       builder: (_, __) {
         final s = _size.value;
+        final progress = _controller.value;
+
         return Positioned(
           left: _position.value.dx - s / 2,
           top: _position.value.dy - s / 2,
@@ -137,21 +215,50 @@ class _AnimatedCartImageState extends State<AnimatedCartImage>
                 width: s,
                 height: s,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10.r),
+                  borderRadius: BorderRadius.circular(12.r),
                   boxShadow: [
+                    // Dynamic shadow that gets stronger during flight
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.10),
-                      blurRadius: 12.r,
-                      spreadRadius: 2.r,
-                      offset: const Offset(0, 6),
+                      color: Colors.black.withValues(
+                        alpha: 0.15 + (progress * 0.1),
+                      ),
+                      blurRadius: 8.r + (progress * 8.r),
+                      spreadRadius: 1.r + (progress * 2.r),
+                      offset: Offset(0, 4 + (progress * 4)),
+                    ),
+                    // Additional glow effect
+                    BoxShadow(
+                      color: Colors.orange.withValues(alpha: 0.3 * progress),
+                      blurRadius: 16.r,
+                      spreadRadius: 0,
+                      offset: const Offset(0, 0),
                     ),
                   ],
                 ),
                 clipBehavior: Clip.antiAlias,
-                child: Image.asset(
-                  widget.animation.imagePath,
-                  fit: BoxFit.cover,
-                  filterQuality: FilterQuality.high,
+                child: Stack(
+                  children: [
+                    // Product image
+                    Image.asset(
+                      widget.animation.imagePath,
+                      fit: BoxFit.cover,
+                      filterQuality: FilterQuality.high,
+                      width: s,
+                      height: s,
+                    ),
+                    // Subtle overlay for better visibility during animation
+                    Container(
+                      decoration: BoxDecoration(
+                        gradient: RadialGradient(
+                          colors: [
+                            Colors.transparent,
+                            Colors.white.withValues(alpha: 0.1 * progress),
+                          ],
+                          stops: const [0.3, 1.0],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -196,37 +303,17 @@ extension CartAnimationTrigger on Widget {
       sourceTopLeft.dy + sourceBox.size.height / 2,
     );
 
-    Offset targetCenter;
-    if (targetKey != null) {
-      final RenderBox? targetBox =
-          targetKey.currentContext?.findRenderObject() as RenderBox?;
-      if (targetBox != null) {
-        final targetTopLeft = targetBox.localToGlobal(Offset.zero);
-        targetCenter = Offset(
-          targetTopLeft.dx + targetBox.size.width / 2,
-          targetTopLeft.dy + targetBox.size.height / 2,
-        );
-      } else {
-        final s = MediaQuery.of(context).size;
-        targetCenter = Offset(s.width - 50.w, s.height - 90.h);
-      }
-    } else {
-      final s = MediaQuery.of(context).size;
-      targetCenter = Offset(s.width - 50.w, s.height - 90.h);
-    }
+    final startSize = max(28.0, min(sourceBox.size.shortestSide, 80.0));
 
-    final startSize = max(24.0, min(sourceBox.size.shortestSide, 80.0));
-    final endSize = 28.w;
-
-    final animation = CartAnimation(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
+    // Use the new improved animation method
+    controller.addCartAnimation(
       imagePath: imagePath,
       startPosition: sourceCenter,
-      endPosition: targetCenter,
       startSize: startSize,
-      endSize: endSize,
+      fallbackTarget: Offset(
+        MediaQuery.of(context).size.width - 48.w,
+        MediaQuery.of(context).size.height - 120.h,
+      ),
     );
-
-    controller.addAnimation(animation);
   }
 }

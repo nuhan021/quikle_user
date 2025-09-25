@@ -28,32 +28,34 @@ class OrderTrackingScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       body: SafeArea(
-        child: RefreshIndicator(
-          onRefresh: controller.refreshTrackingData,
-          child: SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            child: Column(
-              children: [
-                const OrderTrackingAppBar(),
-                SizedBox(height: 16.h),
-                const OrderTrackingMapSection(),
-
-                SizedBox(height: 12.h),
-
-                OrderTrackingSummary(order: order, controller: controller),
-
-                SizedBox(height: 12.h),
-
-                TimeEstimationSection(controller: controller),
-
-                SizedBox(height: 12.h),
-
-                ProgressSection(controller: controller),
-
-                SizedBox(height: 12.h),
-              ],
+        child: Column(
+          children: [
+            const OrderTrackingAppBar(),
+            Expanded(
+              child: RefreshIndicator(
+                onRefresh: controller.refreshTrackingData,
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  child: Column(
+                    children: [
+                      SizedBox(height: 16.h),
+                      const OrderTrackingMapSection(),
+                      SizedBox(height: 12.h),
+                      OrderTrackingSummary(
+                        order: order,
+                        controller: controller,
+                      ),
+                      SizedBox(height: 12.h),
+                      TimeEstimationSection(controller: controller),
+                      SizedBox(height: 12.h),
+                      ProgressSection(controller: controller),
+                      SizedBox(height: 12.h),
+                    ],
+                  ),
+                ),
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );

@@ -71,9 +71,6 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
         } catch (e) {}
       }
       widget.onAddToCart!();
-
-      // Trigger a rebuild to update the cart section
-      setState(() {});
     }
   }
 
@@ -90,20 +87,16 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
       topLeft.dy + sourceBox.size.height / 2,
     );
 
-    final screen = MediaQuery.of(context).size;
-    final target = Offset(screen.width - 40.w, screen.height - 100.h);
+    // Use the new improved animation method
+    final startSize = sourceBox.size.shortestSide.clamp(28.0, 80.0);
 
-    final startSize = sourceBox.size.shortestSide.clamp(24.0, 80.0);
-    final endSize = 28.w;
-
-    controller.addAnimation(
-      CartAnimation(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        imagePath: widget.product.imagePath,
-        startPosition: center,
-        endPosition: target,
-        startSize: startSize,
-        endSize: endSize,
+    controller.addCartAnimation(
+      imagePath: widget.product.imagePath,
+      startPosition: center,
+      startSize: startSize,
+      fallbackTarget: Offset(
+        MediaQuery.of(context).size.width - 48.w,
+        MediaQuery.of(context).size.height - 120.h,
       ),
     );
   }
@@ -171,7 +164,7 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
   }
 
   Widget _buildImageSection() {
-    final imageHeight = 55.h;
+    final imageHeight = 50.h;
 
     return Stack(
       children: [
@@ -312,47 +305,32 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
   }
 
   Widget _buildCartSection() {
-    // Get current cart state directly without reactive wrappers
-    int currentQuantity = 0;
-    bool currentIsInCart = false;
+    return GetBuilder<CartController>(
+      builder: (cartController) {
+        final currentQuantity = cartController.getProductQuantity(
+          widget.product,
+        );
+        final currentIsInCart = currentQuantity > 0;
 
-    try {
-      final cartController = Get.find<CartController>();
-      currentQuantity = cartController.getProductQuantity(widget.product);
-      currentIsInCart = currentQuantity > 0;
-    } catch (e) {
-      // Cart controller not found
-    }
-
-    if (currentIsInCart) {
-      return QuantitySelector(
-        quantity: currentQuantity,
-        onIncrease: () {
-          try {
-            final cartController = Get.find<CartController>();
-            cartController.addProductToCart(widget.product);
-            // Trigger rebuild by calling setState
-            setState(() {});
-          } catch (e) {
-            // Cart controller not found
-          }
-        },
-        onDecrease: () {
-          try {
-            final cartController = Get.find<CartController>();
-            cartController.removeProductFromCart(widget.product);
-            // Trigger rebuild by calling setState
-            setState(() {});
-          } catch (e) {
-            // Cart controller not found
-          }
-        },
-        fontSize: 12.sp,
-        iconSize: 14.sp,
-      );
-    } else {
-      return _buildAddToCartButton();
-    }
+        if (currentIsInCart) {
+          return QuantitySelector(
+            quantity: currentQuantity,
+            onIncrease: () {
+              cartController.addProductToCart(widget.product);
+            },
+            onDecrease: () {
+              cartController.removeProductFromCart(widget.product);
+            },
+            fontSize: 12.sp,
+            iconSize: 14.sp,
+            enableCartAnimation: widget.enableCartAnimation,
+            productImagePath: widget.product.imagePath,
+          );
+        } else {
+          return _buildAddToCartButton();
+        }
+      },
+    );
   }
 
   Widget _buildAddToCartButton() {
