@@ -56,6 +56,9 @@ dependencies:
   file_picker: ^10.3.3
   open_filex: ^4.7.0
   flutter_local_notifications: ^19.4.2
+  google_maps_flutter: ^2.13.1
+  geolocator: ^14.0.2
+  shimmer: ^3.0.0
 
 dev_dependencies:
   flutter_test:

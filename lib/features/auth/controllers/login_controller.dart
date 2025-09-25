@@ -163,6 +163,10 @@ class LoginController extends GetxController {
     nameController.text = '';
   }
 
+  void clearPhone() {
+    phoneController.text = '';
+  }
+
   @override
   void onClose() {
     phoneController.dispose();

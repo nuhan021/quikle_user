@@ -185,7 +185,7 @@ class FavoritesScreen extends StatelessWidget {
   void _toggleFavorite(product, FavoritesController controller) {
     controller.toggleFavorite(product);
 
-    final isFavorite = controller.isFavorite(product.id);
+    //final isFavorite = controller.isFavorite(product.id);
 
     // Get.snackbar(
     //   isFavorite ? 'Added to Favorites' : 'Removed from Favorites',

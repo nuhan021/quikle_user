@@ -4,7 +4,9 @@ import 'package:get/get.dart';
 import 'package:quikle_user/features/orders/controllers/live_order_controller.dart';
 
 class LiveOrderIndicator extends StatefulWidget {
-  const LiveOrderIndicator({super.key});
+  final double bottomInset;
+
+  const LiveOrderIndicator({super.key, this.bottomInset = 16.0});
 
   @override
   State<LiveOrderIndicator> createState() => _LiveOrderIndicatorState();
@@ -57,6 +59,8 @@ class _LiveOrderIndicatorState extends State<LiveOrderIndicator>
 
   @override
   Widget build(BuildContext context) {
+    final double systemBottomInset = MediaQuery.of(context).viewPadding.bottom;
+
     return GetBuilder<LiveOrderController>(
       init: LiveOrderController(),
       builder: (controller) {
@@ -69,8 +73,7 @@ class _LiveOrderIndicatorState extends State<LiveOrderIndicator>
 
           return Positioned(
             left: _boundaryPadding,
-            bottom:
-                _boundaryPadding + MediaQuery.of(context).padding.bottom + 55.h,
+            bottom: widget.bottomInset + systemBottomInset,
             child: AnimatedBuilder(
               animation: Listenable.merge([_scaleAnimation, _pulseAnimation]),
               builder: (context, _) {
@@ -120,10 +123,9 @@ class _LiveOrderIndicatorState extends State<LiveOrderIndicator>
                         child: Stack(
                           alignment: Alignment.center,
                           children: [
-                            // Radial gradient background
                             Container(
-                              width: (_outerSize - 18.w),
-                              height: (_outerSize - 18.w),
+                              width: _outerSize - 18.w,
+                              height: _outerSize - 18.w,
                               decoration: BoxDecoration(
                                 gradient: RadialGradient(
                                   colors: [
@@ -139,11 +141,9 @@ class _LiveOrderIndicatorState extends State<LiveOrderIndicator>
                                 shape: BoxShape.circle,
                               ),
                             ),
-
-                            // Main status circle with icon
                             Container(
-                              width: (_outerSize - 28.w),
-                              height: (_outerSize - 28.w),
+                              width: _outerSize - 28.w,
+                              height: _outerSize - 28.w,
                               decoration: BoxDecoration(
                                 color: _getStatusColor(controller.statusText),
                                 shape: BoxShape.circle,
@@ -163,8 +163,6 @@ class _LiveOrderIndicatorState extends State<LiveOrderIndicator>
                                 color: Colors.white,
                               ),
                             ),
-
-                            // Estimated time badge
                             if (controller.estimatedTime.isNotEmpty)
                               Positioned(
                                 bottom: 6.h,
@@ -177,15 +175,6 @@ class _LiveOrderIndicatorState extends State<LiveOrderIndicator>
                                   decoration: BoxDecoration(
                                     color: Colors.black.withValues(alpha: .75),
                                     borderRadius: BorderRadius.circular(8.r),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withValues(
-                                          alpha: .12,
-                                        ),
-                                        blurRadius: 5,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ],
                                   ),
                                   child: Text(
                                     controller.estimatedTime,

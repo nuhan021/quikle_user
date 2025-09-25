@@ -117,7 +117,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
               font: CustomFonts.inter,
               fontSize: 11.sp,
               fontWeight: FontWeight.w400,
-              color: txtColor.withOpacity(.70),
+              color: txtColor.withValues(alpha: .70),
             ),
           ),
         ],

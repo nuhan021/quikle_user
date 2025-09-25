@@ -28,6 +28,7 @@
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
+
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
@@ -46,6 +47,7 @@
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 
+	<!-- Existing permissions -->
 	<key>NSCameraUsageDescription</key>
 	<string>This app needs camera access to capture photos for orders and profile.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
@@ -57,12 +59,31 @@
 	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>This app needs access to speech recognition for voice search functionality.</string>
 
+	<!-- Location permissions -->
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This app needs your location to track your orders in real-time.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>This app needs your location to track your orders even when the app is in background.</string>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>This app uses your location to provide personalized order tracking and recommendations.</string>
+
+	<!-- Notification permissions -->
+	<key>NSUserNotificationUsageDescription</key>
+	<string>This app needs permission to send notifications for order updates and alerts.</string>
+
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>whatsapp</string>
 		<string>tel</string>
 		<string>mailto</string>
 		<string>sms</string>
+	</array>
+
+	<!-- Background modes -->
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
+		<string>fetch</string>
 	</array>
 </dict>
 </plist>

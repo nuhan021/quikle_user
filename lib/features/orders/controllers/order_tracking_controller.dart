@@ -7,7 +7,6 @@ import 'package:quikle_user/features/orders/data/services/order_tracking_service
 class OrderTrackingController extends GetxController {
   final OrderTrackingService _trackingService = OrderTrackingService();
 
-  
   final isLoading = true.obs;
   final hasError = false.obs;
   final errorMessage = ''.obs;
@@ -17,17 +16,15 @@ class OrderTrackingController extends GetxController {
   final estimatedTime = ''.obs;
   final deliveryPersonLocation = Rx<Map<String, dynamic>?>(null);
 
-  
   OrderModel? _order;
   OrderModel get order => _order!;
 
-  
   Timer? _locationTimer;
 
   @override
   void onInit() {
     super.onInit();
-    
+
     if (Get.arguments != null && Get.arguments is OrderModel) {
       _order = Get.arguments as OrderModel;
       loadTrackingData();
@@ -41,9 +38,7 @@ class OrderTrackingController extends GetxController {
     super.onClose();
   }
 
-  
   void initializeWithOrder(OrderModel orderModel) {
-    
     if (_order == null) {
       _order = orderModel;
       loadTrackingData();
@@ -51,16 +46,13 @@ class OrderTrackingController extends GetxController {
     }
   }
 
-  
   Future<void> loadTrackingData() async {
-    
     if (_order == null) return;
 
     try {
       isLoading.value = true;
       hasError.value = false;
 
-      
       await Future.wait([
         _loadOrderTrackingData(),
         _loadDeliverySteps(),
@@ -75,38 +67,32 @@ class OrderTrackingController extends GetxController {
     }
   }
 
-  
   Future<void> refreshTrackingData() async {
     await loadTrackingData();
-    Get.snackbar(
-      'Updated',
-      'Tracking data refreshed',
-      snackPosition: SnackPosition.BOTTOM,
-      duration: const Duration(seconds: 2),
-    );
+    // Get.snackbar(
+    //   'Updated',
+    //   'Tracking data refreshed',
+    //   snackPosition: SnackPosition.BOTTOM,
+    //   duration: const Duration(seconds: 2),
+    // );
   }
 
-  
   Future<void> _loadOrderTrackingData() async {
     final data = await _trackingService.getOrderTrackingData(order.orderId);
     trackingData.value = data;
   }
 
-  
   Future<void> _loadDeliverySteps() async {
     final steps = await _trackingService.getDeliverySteps(order);
     deliverySteps.value = steps;
   }
 
-  
   Future<void> _loadEstimatedTime() async {
     final time = await _trackingService.getEstimatedDeliveryTime(order);
     estimatedTime.value = time;
   }
 
-  
   void _startLocationUpdates() {
-    
     if (_order != null && order.status == OrderStatus.outForDelivery) {
       _locationTimer = Timer.periodic(
         const Duration(seconds: 30),
@@ -115,7 +101,6 @@ class OrderTrackingController extends GetxController {
     }
   }
 
-  
   Future<void> _updateDeliveryPersonLocation() async {
     try {
       final location = await _trackingService.getDeliveryPersonLocation(
@@ -129,7 +114,6 @@ class OrderTrackingController extends GetxController {
     }
   }
 
-  
   double get progressPercentage {
     if (_order == null) return 0.0;
 
@@ -149,7 +133,6 @@ class OrderTrackingController extends GetxController {
     }
   }
 
-  
   String get statusText {
     if (_order == null) return 'Processing';
 
@@ -169,7 +152,6 @@ class OrderTrackingController extends GetxController {
     }
   }
 
-  
   String get primaryItemName {
     if (_order == null) return 'Order Items';
 
@@ -179,13 +161,11 @@ class OrderTrackingController extends GetxController {
     return 'Order Items';
   }
 
-  
   bool get isActiveDelivery {
     if (_order == null) return false;
     return order.status == OrderStatus.outForDelivery;
   }
 
-  
   bool get isTrackable {
     if (_order == null) return false;
 
@@ -197,7 +177,6 @@ class OrderTrackingController extends GetxController {
     ].contains(order.status);
   }
 
-  
   String? get nextStepTitle {
     if (_order == null) return null;
 
@@ -229,7 +208,6 @@ class OrderTrackingController extends GetxController {
     return null;
   }
 
-  
   void contactDeliveryPerson() {
     if (trackingData.value != null) {
       final deliveryPerson = trackingData.value!['deliveryPerson'];
@@ -239,18 +217,15 @@ class OrderTrackingController extends GetxController {
           'Calling ${deliveryPerson['name']}...',
           snackPosition: SnackPosition.BOTTOM,
         );
-        
       }
     }
   }
 
-  
   void shareTrackingInfo() {
     Get.snackbar(
       'Sharing',
       'Tracking info shared',
       snackPosition: SnackPosition.BOTTOM,
     );
-    
   }
 }

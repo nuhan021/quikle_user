@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/common/widgets/common_app_bar.dart';
-import 'package:quikle_user/features/orders/controllers/order_tracking_controller.dart';
 
 class OrderTrackingAppBar extends StatelessWidget
     implements PreferredSizeWidget {

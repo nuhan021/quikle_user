@@ -18,31 +18,33 @@ class HelpSupportScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: AppColors.homeGrey,
-      body: Column(
-        children: [
-          const UnifiedProfileAppBar(
-            title: 'Help & Support',
-            showActionButton: false,
-          ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            const UnifiedProfileAppBar(
+              title: 'Help & Support',
+              showActionButton: false,
+            ),
 
-          Expanded(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.all(16.w),
-              child: Column(
-                children: [
-                  _buildReportIssueSection(controller),
+            Expanded(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.all(16.w),
+                child: Column(
+                  children: [
+                    _buildReportIssueSection(controller),
 
-                  SizedBox(height: 24.h),
+                    SizedBox(height: 24.h),
 
-                  _buildFaqSection(controller),
+                    _buildFaqSection(controller),
 
-                  SizedBox(height: 24.h),
-                  _buildRecentSupportHistorySection(controller),
-                ],
+                    SizedBox(height: 24.h),
+                    _buildRecentSupportHistorySection(controller),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -65,7 +67,6 @@ class HelpSupportScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          
           Text(
             'Report an Issue',
             style: getTextStyle(
@@ -197,7 +198,6 @@ class HelpSupportScreen extends StatelessWidget {
 
           SizedBox(height: 16.h),
 
-          
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -294,7 +294,6 @@ class HelpSupportScreen extends StatelessWidget {
 
           SizedBox(height: 24.h),
 
-          
           Obx(
             () => GestureDetector(
               onTap: controller.isSubmitting.value
@@ -365,7 +364,6 @@ class HelpSupportScreen extends StatelessWidget {
           Container(height: 1.h, color: const Color(0xFFEEEEEE)),
           SizedBox(height: 12.h),
 
-          
           Obx(
             () => Column(
               children: controller.faqs.asMap().entries.map((entry) {
@@ -458,7 +456,6 @@ class HelpSupportScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        
         Text(
           'Recent Support History',
           style: getTextStyle(

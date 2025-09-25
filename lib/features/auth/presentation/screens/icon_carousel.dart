@@ -112,28 +112,26 @@ class _IconRowMarqueeState extends State<IconRowMarquee>
 class _FigmaBox extends StatelessWidget {
   final ImageProvider image;
   final double size;
-  final double heightFactor; // new: multiplier for height
 
-  const _FigmaBox({
-    required this.image,
-    required this.size,
-    this.heightFactor = 1.3, // default: 30% taller
-  });
+  const _FigmaBox({required this.image, required this.size});
 
   @override
   Widget build(BuildContext context) {
-    final boxHeight = size * heightFactor;
+    final boxHeight = size * 1.3;
 
     return Container(
       width: size,
       height: boxHeight,
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
+        color: Colors.white.withValues(alpha: .1),
         borderRadius: BorderRadius.circular(boxHeight * 0.2), // rounded corners
-        border: Border.all(color: Colors.white.withOpacity(0.15), width: 1),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: .15),
+          width: 1,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: .05),
             blurRadius: 6,
             offset: const Offset(0, 3),
           ),
