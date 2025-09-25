@@ -509,12 +509,25 @@ class LoginScreen extends StatelessWidget {
             child: IconRowMarquee(
               images: icons,
               speed: 24,
-              offsetSlots: index * 0.25,
+              //offsetSlots: index * 0.25,
+              offsetSlots: _getOfferSlots(index),
             ),
           ),
         );
       }).toList(),
     );
+  }
+
+  double _getOfferSlots(int index) {
+    if (index == 0) {
+      return 0.90;
+    } else if (index == 1) {
+      return 0.40;
+    } else if (index == 2) {
+      return 0.65;
+    } else {
+      return 0.15;
+    }
   }
 
   /// Build content section (logo, text fields, button)

@@ -111,37 +111,40 @@ class _IconRowMarqueeState extends State<IconRowMarquee>
 
 class _FigmaBox extends StatelessWidget {
   final ImageProvider image;
-  final double size; // new parameter for bg color
+  final double size;
+  final double heightFactor; // new: multiplier for height
 
-  const _FigmaBox({required this.image, required this.size});
+  const _FigmaBox({
+    required this.image,
+    required this.size,
+    this.heightFactor = 1.3, // default: 30% taller
+  });
 
   @override
   Widget build(BuildContext context) {
+    final boxHeight = size * heightFactor;
+
     return Container(
       width: size,
-      height: size,
+      height: boxHeight,
       decoration: BoxDecoration(
-        color: Color(0x1AFFFFFF),
-        borderRadius: BorderRadius.circular(size * 0.3), // soft corners
-        border: Border.all(
-          color: Colors.white.withValues(alpha: .15),
-          width: 1,
-        ),
+        color: Colors.white.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(boxHeight * 0.2), // rounded corners
+        border: Border.all(color: Colors.white.withOpacity(0.15), width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: .05),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 6,
+            offset: const Offset(0, 3),
           ),
         ],
       ),
       child: Center(
-        child: Container(
-          width: size * 0.7,
-          height: size * 0.7,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(size * 0.35), // round image
-            image: DecorationImage(image: image, fit: BoxFit.cover),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(boxHeight * 0.15),
+          child: Image(
+            image: image, // image unchanged
+            fit: BoxFit.cover,
           ),
         ),
       ),
