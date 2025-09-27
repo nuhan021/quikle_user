@@ -7,7 +7,6 @@ import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums/order_enums.dart';
 import 'package:quikle_user/core/utils/constants/enums/address_type_enums.dart';
 import 'package:quikle_user/core/utils/constants/enums/delivery_enums.dart';
-import 'package:quikle_user/features/home/presentation/screens/home_content_screen.dart';
 import '../../controllers/cart_controller.dart';
 import '../../data/models/cart_item_model.dart';
 import '../../../home/controllers/home_controller.dart';
@@ -15,7 +14,6 @@ import '../widgets/cart_app_bar.dart';
 import '../widgets/cart_items_section.dart';
 import '../widgets/you_may_like_section.dart';
 import '../widgets/cart_bottom_section.dart';
-import '../widgets/empty_cart_screen.dart';
 import '../../../payout/presentation/widgets/order_summary_section.dart';
 import '../../../payout/presentation/widgets/delivery_options_section.dart';
 import '../../../payout/presentation/widgets/coupon_section.dart';
@@ -145,7 +143,7 @@ class CartScreen extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () {
-              Get.back();
+              //Get.back();
 
               _simulatePaymentSuccess(payoutController);
             },

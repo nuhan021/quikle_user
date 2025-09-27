@@ -4,14 +4,38 @@ import 'package:get/get.dart';
 import 'package:quikle_user/core/utils/constants/image_path.dart';
 import 'package:quikle_user/features/cart/controllers/cart_controller.dart';
 import 'package:quikle_user/features/cart/presentation/screens/cart_screen.dart';
+import 'package:quikle_user/core/services/cart_position_service.dart';
 
-class FloatingCartButton extends StatelessWidget {
+class FloatingCartButton extends StatefulWidget {
   const FloatingCartButton({super.key, this.bottomInset = 16.0});
   final double bottomInset;
 
   @override
+  State<FloatingCartButton> createState() => _FloatingCartButtonState();
+}
+
+class _FloatingCartButtonState extends State<FloatingCartButton> {
+  final GlobalKey _cartButtonKey = GlobalKey();
+
+  @override
+  void initState() {
+    super.initState();
+    // Register the cart button key with the position service
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      try {
+        final positionService = Get.find<CartPositionService>();
+        positionService.setCartButtonKey(_cartButtonKey);
+      } catch (e) {
+        // Service not yet initialized, will be set later
+        Get.put(CartPositionService()).setCartButtonKey(_cartButtonKey);
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final cartController = Get.find<CartController>();
+    final double systemBottomInset = MediaQuery.of(context).viewPadding.bottom;
 
     return Obx(() {
       if (!cartController.hasItems) {
@@ -19,20 +43,19 @@ class FloatingCartButton extends StatelessWidget {
       }
 
       return Positioned(
-        bottom: MediaQuery.of(context).padding.bottom + 80.h,
+        bottom: widget.bottomInset + systemBottomInset,
         right: 16.w,
         child: GestureDetector(
+          key: _cartButtonKey, // Add the key here
           onTap: () => Get.to(() => const CartScreen()),
           child: SizedBox(
-            width: 56.w,
-            height: 56.w,
+            width: 64.w,
+            height: 64.w,
             child: Stack(
               children: [
-                // Cart Icon
                 Center(
                   child: Image.asset(ImagePath.cartImage, fit: BoxFit.cover),
                 ),
-                // Badge
                 Positioned(
                   right: 8.w,
                   top: 8.h,

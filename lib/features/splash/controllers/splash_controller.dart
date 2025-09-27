@@ -27,8 +27,6 @@ class SplashController extends GetxController {
     await video.play();
     isReady.value = true;
     video.addListener(_progressWatcher);
-
-    // Call _listenDuration to handle the video stopping after 3 seconds
     video.addListener(_listenDuration);
   }
 
@@ -45,7 +43,6 @@ class SplashController extends GetxController {
     ellipseTop.value = _ellipseTopPlaying;
   }
 
-  // New method to check video position and stop after 3 seconds
   void _listenDuration() {
     final v = video.value;
     if (v.isInitialized && v.position >= playDuration) {

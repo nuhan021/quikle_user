@@ -10,17 +10,17 @@ class PrescriptionService {
   static final List<PrescriptionModel> _prescriptions = [];
 
   // ---------- Helpers (handy for future real uploads) ----------
-  bool _isPdfPath(String path) => path.toLowerCase().endsWith('.pdf');
+  //bool _isPdfPath(String path) => path.toLowerCase().endsWith('.pdf');
 
-  String _inferMime(String path) {
-    final p = path.toLowerCase();
-    if (p.endsWith('.pdf')) return 'application/pdf';
-    if (p.endsWith('.png')) return 'image/png';
-    if (p.endsWith('.jpg') || p.endsWith('.jpeg')) return 'image/jpeg';
-    if (p.endsWith('.heic')) return 'image/heic';
-    if (p.endsWith('.webp')) return 'image/webp';
-    return 'application/octet-stream';
-  }
+  // String _inferMime(String path) {
+  //   final p = path.toLowerCase();
+  //   if (p.endsWith('.pdf')) return 'application/pdf';
+  //   if (p.endsWith('.png')) return 'image/png';
+  //   if (p.endsWith('.jpg') || p.endsWith('.jpeg')) return 'image/jpeg';
+  //   if (p.endsWith('.heic')) return 'image/heic';
+  //   if (p.endsWith('.webp')) return 'image/webp';
+  //   return 'application/octet-stream';
+  // }
 
   // ---------- Public API ----------
   Future<PrescriptionModel> uploadPrescription({
@@ -34,7 +34,7 @@ class PrescriptionService {
     final prescriptionId = 'presc_${DateTime.now().millisecondsSinceEpoch}';
 
     // (Optional) Use MIME for debug/logging (kept here for future real API)
-    final mime = _inferMime(imageFile.path);
+    //final mime = _inferMime(imageFile.path);
     // print('Uploading file ${imageFile.path} with mime: $mime');
 
     final prescription = PrescriptionModel(

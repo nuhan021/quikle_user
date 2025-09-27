@@ -12,28 +12,36 @@ class OfferBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 150.h,
-      child: CarouselSlider(
-        options: CarouselOptions(
-          height: 150.h,
-          autoPlay: true,
-          autoPlayInterval: const Duration(seconds: 3),
-          autoPlayAnimationDuration: const Duration(milliseconds: 800),
-          enlargeCenterPage: true,
-          viewportFraction: 1.0,
-        ),
-        items: imagePaths.map((path) {
-          return Builder(
-            builder: (BuildContext context) {
-              return ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Image.asset(path, fit: BoxFit.cover, width: 360.w),
-              );
-            },
-          );
-        }).toList(),
+    final double bannerHeight = 200.h;
+
+    return CarouselSlider(
+      options: CarouselOptions(
+        height: bannerHeight,
+        autoPlay: true,
+        autoPlayInterval: const Duration(seconds: 3),
+        autoPlayAnimationDuration: const Duration(milliseconds: 800),
+        enlargeCenterPage: true,
+        viewportFraction: 1.0,
+        //aspectRatio: aspectRatio,
       ),
+      items: imagePaths.map((path) {
+        return Builder(
+          builder: (BuildContext context) {
+            return Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8.w),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12.r),
+                child: Container(
+                  width: double.infinity,
+                  height: bannerHeight,
+                  color: Colors.grey[200],
+                  child: Image.asset(path, fit: BoxFit.cover),
+                ),
+              ),
+            );
+          },
+        );
+      }).toList(),
     );
   }
 }

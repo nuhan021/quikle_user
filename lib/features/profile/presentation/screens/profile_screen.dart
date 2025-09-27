@@ -196,7 +196,7 @@ class ProfileScreen extends StatelessWidget {
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop();
+                Get.offAllNamed(AppRoute.getLoginScreen());
                 Get.snackbar(
                   'Signed Out',
                   'You have been successfully signed out',

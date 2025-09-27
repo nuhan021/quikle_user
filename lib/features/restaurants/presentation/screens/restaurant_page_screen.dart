@@ -329,7 +329,13 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen>
                   return FloatingCartButton(bottomInset: inset);
                 },
               ),
-              const LiveOrderIndicator(),
+              AnimatedBuilder(
+                animation: _navController,
+                builder: (context, _) {
+                  final inset = (_navController.value * _navBarHeight);
+                  return LiveOrderIndicator(bottomInset: inset);
+                },
+              ),
             ],
           ),
         ),

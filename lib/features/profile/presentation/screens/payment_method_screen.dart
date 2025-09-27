@@ -16,55 +16,57 @@ class PaymentMethodScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: AppColors.homeGrey,
-      body: Column(
-        children: [
-          const UnifiedProfileAppBar(
-            title: 'Payment Method',
-            showActionButton: false,
-          ),
-          Expanded(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.w),
-              child: Column(
-                children: [
-                  Expanded(
-                    child: Obx(() {
-                      return ListView.builder(
-                        itemCount: controller.paymentMethods.length,
-                        itemBuilder: (context, index) {
-                          final paymentMethod =
-                              controller.paymentMethods[index];
-                          return PaymentMethodListItem(
-                            paymentMethod: paymentMethod,
-                            onRemove: paymentMethod.isRemovable
-                                ? () => controller.removePaymentMethod(
-                                    paymentMethod.id,
-                                  )
-                                : null,
+      body: SafeArea(
+        child: Column(
+          children: [
+            const UnifiedProfileAppBar(
+              title: 'Payment Method',
+              showActionButton: false,
+            ),
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: Obx(() {
+                        return ListView.builder(
+                          itemCount: controller.paymentMethods.length,
+                          itemBuilder: (context, index) {
+                            final paymentMethod =
+                                controller.paymentMethods[index];
+                            return PaymentMethodListItem(
+                              paymentMethod: paymentMethod,
+                              onRemove: paymentMethod.isRemovable
+                                  ? () => controller.removePaymentMethod(
+                                      paymentMethod.id,
+                                    )
+                                  : null,
+                            );
+                          },
+                        );
+                      }),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 24.h),
+                      child: AddPaymentMethodButton(
+                        onTap: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                'Add new payment method functionality coming soon!',
+                              ),
+                            ),
                           );
                         },
-                      );
-                    }),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(bottom: 24.h),
-                    child: AddPaymentMethodButton(
-                      onTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                              'Add new payment method functionality coming soon!',
-                            ),
-                          ),
-                        );
-                      },
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

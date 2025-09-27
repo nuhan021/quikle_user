@@ -51,121 +51,129 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
         showBackButton: true,
         showActionButton: true,
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.all(16.w),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  children: [
-                    SizedBox(height: 14.h),
-                    const ProfileCard(
-                      name: 'Aanya Desai',
-                      email: 'anyadesai@gmail.com',
-                    ),
-                    SizedBox(height: 24.h),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12.r),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0x0A616161),
-                            blurRadius: 8.r,
-                            offset: Offset(0, 2.h),
-                            spreadRadius: 0,
-                          ),
-                        ],
-                      ),
-                      padding: EdgeInsets.all(16.w),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                _isEditing ? 'Edit Profile' : 'My Profile',
-                                style: getTextStyle(
-                                  font: CustomFonts.obviously,
-                                  fontSize: 18.sp,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppColors.textPrimary,
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: _isEditing
-                                    ? _saveProfile
-                                    : _enableEditing,
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 16.w,
-                                    vertical: 8.h,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.textPrimary,
-                                    borderRadius: BorderRadius.circular(20.r),
-                                  ),
-                                  child: Text(
-                                    _isEditing ? 'Save' : 'Edit',
-                                    style: getTextStyle(
-                                      font: CustomFonts.inter,
-                                      fontSize: 12.sp,
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
+      body: SafeArea(
+        bottom: true,
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16.w),
+          child: Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.only(top: 14.h, bottom: 16.h),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                        const ProfileCard(
+                          name: 'Aanya Desai',
+                          email: 'anyadesai@gmail.com',
+                        ),
+                        SizedBox(height: 24.h),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12.r),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0x0A616161),
+                                blurRadius: 8.r,
+                                offset: Offset(0, 2.h),
+                                spreadRadius: 0,
                               ),
                             ],
                           ),
-                          SizedBox(height: 24.h),
-                          _buildEditableField(
-                            controller: _nameController,
-                            label: 'Full Name',
-                            enabled: _isEditing,
+                          padding: EdgeInsets.all(16.w),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    _isEditing ? 'Edit Profile' : 'My Profile',
+                                    style: getTextStyle(
+                                      font: CustomFonts.obviously,
+                                      fontSize: 18.sp,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.textPrimary,
+                                    ),
+                                  ),
+                                  GestureDetector(
+                                    onTap: _isEditing
+                                        ? _saveProfile
+                                        : _enableEditing,
+                                    child: Container(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 16.w,
+                                        vertical: 8.h,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.textPrimary,
+                                        borderRadius: BorderRadius.circular(
+                                          20.r,
+                                        ),
+                                      ),
+                                      child: Text(
+                                        _isEditing ? 'Save' : 'Edit',
+                                        style: getTextStyle(
+                                          font: CustomFonts.inter,
+                                          fontSize: 12.sp,
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 24.h),
+                              _buildEditableField(
+                                controller: _nameController,
+                                label: 'Full Name',
+                                enabled: _isEditing,
+                              ),
+                              SizedBox(height: 20.h),
+                              _buildEditableField(
+                                controller: _emailController,
+                                label: 'Email Address',
+                                enabled: _isEditing,
+                              ),
+                              SizedBox(height: 20.h),
+                              _buildEditableField(
+                                controller: _phoneController,
+                                label: 'Phone Number',
+                                enabled: _isEditing,
+                              ),
+                              SizedBox(height: 20.h),
+                              _buildEditableField(
+                                controller: _address1Controller,
+                                label: 'Address Line 1',
+                                enabled: _isEditing,
+                              ),
+                              SizedBox(height: 20.h),
+                              _buildEditableField(
+                                controller: _address2Controller,
+                                label: 'Address Line 2',
+                                enabled: _isEditing,
+                              ),
+                              SizedBox(height: 20.h),
+                              _buildEditableField(
+                                controller: _postalCodeController,
+                                label: 'Postal Code',
+                                enabled: _isEditing,
+                              ),
+                            ],
                           ),
-                          SizedBox(height: 20.h),
-                          _buildEditableField(
-                            controller: _emailController,
-                            label: 'Email Address',
-                            enabled: _isEditing,
-                          ),
-                          SizedBox(height: 20.h),
-                          _buildEditableField(
-                            controller: _phoneController,
-                            label: 'Phone Number',
-                            enabled: _isEditing,
-                          ),
-                          SizedBox(height: 20.h),
-                          _buildEditableField(
-                            controller: _address1Controller,
-                            label: 'Address Line 1',
-                            enabled: _isEditing,
-                          ),
-                          SizedBox(height: 20.h),
-                          _buildEditableField(
-                            controller: _address2Controller,
-                            label: 'Address Line 2',
-                            enabled: _isEditing,
-                          ),
-                          SizedBox(height: 20.h),
-                          _buildEditableField(
-                            controller: _postalCodeController,
-                            label: 'Postal Code',
-                            enabled: _isEditing,
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
-            ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

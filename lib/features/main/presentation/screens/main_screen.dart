@@ -29,7 +29,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   static const double _showDistance = 44.0;
   static const double _minDelta = 1.2;
   static const int _debounceMs = 320;
-  static const int _cooldownMs = 350;
+  static const int _coolDownMS = 350;
   final Duration _hideDur = const Duration(milliseconds: 360);
   final Duration _showDur = const Duration(milliseconds: 420);
   final Curve _hideCurve = Curves.easeInCubic;
@@ -81,7 +81,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   bool _canToggle() {
     if (_lastToggleAt == null) return true;
     return DateTime.now().difference(_lastToggleAt!) >
-        Duration(milliseconds: _cooldownMs);
+        Duration(milliseconds: _coolDownMS);
   }
 
   void _showNav({bool animated = true}) {
@@ -147,7 +147,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) => _measureNavBarHeight());
-    const double cartMargin = 16.0;
+    //const double cartMargin = 16.0;
 
     return CartAnimationWrapper(
       child: Scaffold(
@@ -195,13 +195,18 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
               AnimatedBuilder(
                 animation: _navController,
                 builder: (context, _) {
-                  final inset =
-                      (_navController.value * _navBarHeight) + cartMargin;
+                  final inset = (_navController.value * _navBarHeight);
                   return FloatingCartButton(bottomInset: inset);
                 },
               ),
 
-              const LiveOrderIndicator(),
+              AnimatedBuilder(
+                animation: _navController,
+                builder: (context, _) {
+                  final inset = (_navController.value * _navBarHeight);
+                  return LiveOrderIndicator(bottomInset: inset);
+                },
+              ),
             ],
           ),
         ),

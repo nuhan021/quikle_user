@@ -34,7 +34,7 @@ class SearchAndFiltersSection extends StatelessWidget {
               borderRadius: BorderRadius.circular(6.r),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.grey.withOpacity(0.1),
+                  color: Colors.grey.withValues(alpha: .1),
                   blurRadius: 8,
                   offset: const Offset(0, 4),
                 ),

@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:quikle_user/core/common/styles/global_text_style.dart';
@@ -27,7 +26,9 @@ class PrescriptionHeaderWidget extends StatelessWidget {
           Container(
             padding: EdgeInsets.all(8.w),
             decoration: BoxDecoration(
-              color: _getStatusColor(prescription.status).withOpacity(0.1),
+              color: _getStatusColor(
+                prescription.status,
+              ).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8.r),
             ),
             child: Icon(
@@ -72,7 +73,9 @@ class PrescriptionHeaderWidget extends StatelessWidget {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      _getStatusColor(prescription.status).withOpacity(0.8),
+                      _getStatusColor(
+                        prescription.status,
+                      ).withValues(alpha: 0.8),
                       _getStatusColor(prescription.status),
                     ],
                     begin: Alignment.topLeft,
@@ -83,7 +86,7 @@ class PrescriptionHeaderWidget extends StatelessWidget {
                     BoxShadow(
                       color: _getStatusColor(
                         prescription.status,
-                      ).withOpacity(0.3),
+                      ).withValues(alpha: 0.3),
                       blurRadius: 4,
                       offset: const Offset(0, 2),
                     ),
