@@ -17,6 +17,7 @@ import '../widgets/cart_bottom_section.dart';
 import '../../../payout/presentation/widgets/order_summary_section.dart';
 import '../../../payout/presentation/widgets/delivery_options_section.dart';
 import '../../../payout/presentation/widgets/coupon_section.dart';
+import '../../../payout/presentation/widgets/receiver_details.dart';
 import '../../../payout/controllers/payout_controller.dart';
 import '../../../profile/controllers/payment_method_controller.dart';
 import '../../../orders/controllers/orders_controller.dart';
@@ -55,6 +56,9 @@ class CartScreen extends StatelessWidget {
                 child: Column(
                   children: [
                     SizedBox(height: 16.h),
+                    // Receiver details single-line row
+                    const ReceiverDetails(),
+                    SizedBox(height: 12.h),
                     const CartItemsSection(),
                     SizedBox(height: 19.h),
                     YouMayLikeSection(
@@ -63,6 +67,10 @@ class CartScreen extends StatelessWidget {
                       onProductTap: (p) =>
                           Get.toNamed('/product-details', arguments: p),
                     ),
+                    SizedBox(height: 12.h),
+                    // Receiver details single-line row
+                    const ReceiverDetails(),
+                    SizedBox(height: 12.h),
                     //SizedBox(height: 19.h),
                     const DeliveryOptionsSection(),
                     SizedBox(height: 19.h),
@@ -213,6 +221,18 @@ class CartScreen extends StatelessWidget {
             isSelected: true,
           );
 
+      // Apply receiver override if provided
+      ShippingAddressModel finalShippingAddress = shippingAddress;
+      if (payoutController.isDifferentReceiver &&
+          payoutController.receiverName.isNotEmpty) {
+        finalShippingAddress = shippingAddress.copyWith(
+          name: payoutController.receiverName,
+          phoneNumber: payoutController.receiverPhone.isNotEmpty
+              ? payoutController.receiverPhone
+              : shippingAddress.phoneNumber,
+        );
+      }
+
       print('Creating order with ${orderItems.length} items');
       for (var item in orderItems) {
         print(
@@ -242,7 +262,7 @@ class CartScreen extends StatelessWidget {
         orderId: orderId,
         userId: 'user123',
         items: orderItems,
-        shippingAddress: shippingAddress,
+        shippingAddress: finalShippingAddress,
         deliveryOption: deliveryOption,
         paymentMethod: payoutPaymentMethod,
         subtotal: subtotal,

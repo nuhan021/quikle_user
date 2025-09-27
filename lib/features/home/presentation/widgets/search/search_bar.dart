@@ -20,14 +20,14 @@ class SearchBar extends StatelessWidget {
         Get.put(ProductSearchController());
 
     return Container(
-      decoration: const BoxDecoration(color: Color(0x33CFCFCF)),
+      //decoration: const BoxDecoration(color: Color(0x33CFCFCF)),
       padding: EdgeInsets.only(top: 12.h, left: 16.w, right: 16.w),
       child: GestureDetector(
         onTap: onTap,
         child: Container(
           padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.h),
           decoration: BoxDecoration(
-            color: const Color(0xFFF8F9FA),
+            color: Colors.white,
             borderRadius: BorderRadius.circular(8.r),
           ),
           child: Row(
