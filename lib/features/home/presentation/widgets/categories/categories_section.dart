@@ -36,7 +36,7 @@ class CategoriesSection extends StatelessWidget {
         return Container(
           width: double.infinity,
           padding: EdgeInsets.symmetric(vertical: 16.h),
-          decoration: const BoxDecoration(color: Color(0x33CFCFCF)),
+          //decoration: const BoxDecoration(color: Color(0x33CFCFCF)),
           child: SizedBox(
             height: listHeight,
             child: ListView.builder(
