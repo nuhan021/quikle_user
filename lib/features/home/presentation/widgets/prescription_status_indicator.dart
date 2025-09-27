@@ -129,7 +129,7 @@ class PrescriptionStatusIndicator extends StatelessWidget {
     switch (status) {
       case PrescriptionStatus.uploaded:
         return _StatusMeta(
-          message: 'Your request was submitted — awaiting review',
+          message: 'Prescription uploaded - In review',
           icon: Icons.cloud_upload,
           color: Colors.blue,
         );
@@ -141,13 +141,13 @@ class PrescriptionStatusIndicator extends StatelessWidget {
         );
       case PrescriptionStatus.responded:
         return _StatusMeta(
-          message: 'Request approved — medicines are available',
+          message: 'Request approved - Awaiting actions',
           icon: Icons.check_circle,
           color: Colors.green,
         );
       case PrescriptionStatus.rejected:
         return _StatusMeta(
-          message: 'Request rejected — see details',
+          message: 'Request rejected — See details',
           icon: Icons.cancel,
           color: Colors.red,
         );

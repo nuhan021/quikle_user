@@ -87,23 +87,20 @@ class _HomeContentScreenState extends State<HomeContentScreen>
                   ),
                 ),
 
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.w),
-                  child: Column(
-                    children: [
-                      custom_search.SearchBar(
-                        onTap: controller.onSearchPressed,
-                        onVoiceTap: controller.onVoiceSearchPressed,
-                      ),
-                      //12.verticalSpace,
-                      CategoriesSection(
-                        categories: controller.categories,
-                        onCategoryTap: controller.onCategoryPressed,
-                        selectedCategoryId: controller.selectedCategoryId,
-                        showTitle: true,
-                      ),
-                    ],
-                  ),
+                Column(
+                  children: [
+                    custom_search.SearchBar(
+                      onTap: controller.onSearchPressed,
+                      onVoiceTap: controller.onVoiceSearchPressed,
+                    ),
+                    //12.verticalSpace,
+                    CategoriesSection(
+                      categories: controller.categories,
+                      onCategoryTap: controller.onCategoryPressed,
+                      selectedCategoryId: controller.selectedCategoryId,
+                      showTitle: true,
+                    ),
+                  ],
                 ),
                 Expanded(
                   child: Obx(
