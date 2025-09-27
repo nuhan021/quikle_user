@@ -27,6 +27,10 @@ class PayoutController extends GetxController {
   final _appliedCoupon = Rxn<Map<String, dynamic>>();
   final _isProcessingPayment = false.obs;
   final _couponController = TextEditingController();
+  // Receiver details (for ordering to same address but different receiver)
+  final _isDifferentReceiver = false.obs;
+  final _receiverNameController = TextEditingController();
+  final _receiverPhoneController = TextEditingController();
 
   List<DeliveryOptionModel> get deliveryOptions => _deliveryOptions;
   TextEditingController get deliveryPreferenceController =>
@@ -47,6 +51,13 @@ class PayoutController extends GetxController {
   TextEditingController get couponController => _couponController;
 
   bool get canApplyCoupon => _couponCode.value.trim().isNotEmpty;
+
+  // Receiver getters
+  bool get isDifferentReceiver => _isDifferentReceiver.value;
+  TextEditingController get receiverNameController => _receiverNameController;
+  TextEditingController get receiverPhoneController => _receiverPhoneController;
+  String get receiverName => _receiverNameController.text.trim();
+  String get receiverPhone => _receiverPhoneController.text.trim();
 
   DeliveryOptionModel? get selectedDeliveryOption =>
       _deliveryOptions.firstWhereOrNull((option) => option.isSelected);
@@ -126,11 +137,55 @@ class PayoutController extends GetxController {
     _couponController.removeListener(_syncCouponText);
     _couponController.dispose();
     _deliveryPreferenceController.dispose();
+    _receiverNameController.dispose();
+    _receiverPhoneController.dispose();
     super.onClose();
   }
 
   void _syncCouponText() {
     _couponCode.value = _couponController.text;
+  }
+
+  // Receiver helpers
+  void toggleDifferentReceiver() {
+    _isDifferentReceiver.value = !_isDifferentReceiver.value;
+    if (!_isDifferentReceiver.value) {
+      _receiverNameController.clear();
+      _receiverPhoneController.clear();
+    }
+  }
+
+  void setReceiverDetails(String name, String phone) {
+    _receiverNameController.text = name;
+    _receiverPhoneController.text = phone;
+  }
+
+  void clearReceiverDetails() {
+    _isDifferentReceiver.value = false;
+    _receiverNameController.clear();
+    _receiverPhoneController.clear();
+  }
+
+  String? getReceiverValidationError() {
+    if (!_isDifferentReceiver.value) return null;
+    if (receiverName.isEmpty) return 'Please enter receiver name';
+    if (receiverPhone.isEmpty) return 'Please enter receiver phone number';
+    if (receiverPhone.length < 10) return 'Please enter a valid phone number';
+    return null;
+  }
+
+  String getCurrentReceiverName() {
+    if (isDifferentReceiver && receiverName.isNotEmpty) return receiverName;
+    final selected = selectedShippingAddress;
+    if (selected != null) return selected.name;
+    return 'You';
+  }
+
+  String getCurrentReceiverPhone() {
+    if (isDifferentReceiver && receiverPhone.isNotEmpty) return receiverPhone;
+    final selected = selectedShippingAddress;
+    if (selected != null) return selected.phoneNumber;
+    return '';
   }
 
   void _loadInitialData() {
@@ -290,11 +345,24 @@ class PayoutController extends GetxController {
       );
 
       if (paymentResult['success'] == true) {
+        // Determine final shipping address to attach to order.
+        // If user provided a different receiver, copy the selected address but
+        // replace name and phone number.
+        ShippingAddressModel finalShippingAddress = selectedShippingAddress!;
+        if (isDifferentReceiver && receiverName.isNotEmpty) {
+          finalShippingAddress = selectedShippingAddress!.copyWith(
+            name: receiverName,
+            phoneNumber: receiverPhone.isNotEmpty
+                ? receiverPhone
+                : selectedShippingAddress!.phoneNumber,
+          );
+        }
+
         final order = OrderModel(
           orderId: orderId,
           userId: _userController.currentUserId ?? 'unknown_user',
           items: _cartController.cartItems,
-          shippingAddress: selectedShippingAddress!,
+          shippingAddress: finalShippingAddress,
           deliveryOption: selectedDeliveryOption!,
           paymentMethod: selectedPaymentMethod!,
           subtotal: subtotal,
