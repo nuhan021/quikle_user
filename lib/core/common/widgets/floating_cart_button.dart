@@ -37,6 +37,16 @@ class _FloatingCartButtonState extends State<FloatingCartButton> {
     final cartController = Get.find<CartController>();
     final double systemBottomInset = MediaQuery.of(context).viewPadding.bottom;
 
+    // Update cart position whenever the button position changes
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      try {
+        final positionService = Get.find<CartPositionService>();
+        positionService.setCartButtonKey(_cartButtonKey);
+      } catch (e) {
+        // Service not available
+      }
+    });
+
     return Obx(() {
       if (!cartController.hasItems) {
         return const SizedBox.shrink();
