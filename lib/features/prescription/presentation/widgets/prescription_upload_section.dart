@@ -288,15 +288,15 @@ class PrescriptionUploadSection extends StatelessWidget {
                                             PrescriptionStatus.uploaded
                                         ? Icons.cloud_upload
                                         : prescription.status ==
-                                              PrescriptionStatus.processing
-                                        ? Icons.hourglass_empty
+                                              PrescriptionStatus.underReview
+                                        ? Icons.schedule
                                         : prescription.status ==
-                                              PrescriptionStatus.responded
-                                        ? Icons.check_circle
+                                              PrescriptionStatus.valid
+                                        ? Icons.check_circle_outline
                                         : prescription.status ==
-                                              PrescriptionStatus.expired
-                                        ? Icons.access_time
-                                        : Icons.cancel,
+                                              PrescriptionStatus.invalid
+                                        ? Icons.error_outline
+                                        : Icons.local_pharmacy,
                                     size: 14.sp,
                                     color: _getStatusColor(prescription.status),
                                   ),
@@ -364,14 +364,14 @@ class PrescriptionUploadSection extends StatelessWidget {
     switch (status) {
       case PrescriptionStatus.uploaded:
         return Colors.blue;
-      case PrescriptionStatus.processing:
+      case PrescriptionStatus.underReview:
         return Colors.orange;
-      case PrescriptionStatus.responded:
+      case PrescriptionStatus.valid:
         return Colors.green;
-      case PrescriptionStatus.expired:
+      case PrescriptionStatus.invalid:
         return Colors.red;
-      case PrescriptionStatus.rejected:
-        return Colors.red;
+      case PrescriptionStatus.medicinesReady:
+        return Colors.green;
     }
   }
 }

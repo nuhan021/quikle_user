@@ -80,7 +80,7 @@ class PrescriptionService {
     final prescriptionMedicines = <ProductModel>[];
 
     for (final prescription in userPrescriptions) {
-      if (prescription.status == PrescriptionStatus.responded) {
+      if (prescription.status == PrescriptionStatus.medicinesReady) {
         for (final response in prescription.vendorResponses) {
           if (response.status == VendorResponseStatus.approved ||
               response.status == VendorResponseStatus.partiallyApproved) {
@@ -123,7 +123,7 @@ class PrescriptionService {
     final prescriptionMedicines = <ProductModel>[];
 
     final recentPrescription = userPrescriptions
-        .where((p) => p.status == PrescriptionStatus.responded)
+        .where((p) => p.status == PrescriptionStatus.medicinesReady)
         .firstOrNull;
 
     if (recentPrescription != null) {
@@ -182,14 +182,17 @@ class PrescriptionService {
       'uploaded': prescriptions
           .where((p) => p.status == PrescriptionStatus.uploaded)
           .length,
-      'processing': prescriptions
-          .where((p) => p.status == PrescriptionStatus.processing)
+      'underReview': prescriptions
+          .where((p) => p.status == PrescriptionStatus.underReview)
           .length,
-      'responded': prescriptions
-          .where((p) => p.status == PrescriptionStatus.responded)
+      'valid': prescriptions
+          .where((p) => p.status == PrescriptionStatus.valid)
           .length,
-      'expired': prescriptions
-          .where((p) => p.status == PrescriptionStatus.expired)
+      'invalid': prescriptions
+          .where((p) => p.status == PrescriptionStatus.invalid)
+          .length,
+      'medicinesReady': prescriptions
+          .where((p) => p.status == PrescriptionStatus.medicinesReady)
           .length,
     };
   }
@@ -202,13 +205,40 @@ class PrescriptionService {
       );
       if (prescriptionIndex != -1) {
         _prescriptions[prescriptionIndex] = _prescriptions[prescriptionIndex]
-            .copyWith(status: PrescriptionStatus.processing);
+            .copyWith(status: PrescriptionStatus.underReview);
 
         Future.delayed(const Duration(seconds: 10), () {
-          _generateMockVendorResponses(prescriptionId);
+          _validatePrescription(prescriptionId);
         });
       }
     });
+  }
+
+  void _validatePrescription(String prescriptionId) {
+    final random = Random();
+    final prescriptionIndex = _prescriptions.indexWhere(
+      (p) => p.id == prescriptionId,
+    );
+
+    if (prescriptionIndex != -1) {
+      // 90% chance of being valid, 10% invalid for demo
+      final isValid = random.nextDouble() > 0.1;
+
+      _prescriptions[prescriptionIndex] = _prescriptions[prescriptionIndex]
+          .copyWith(
+            status: isValid
+                ? PrescriptionStatus.valid
+                : PrescriptionStatus.invalid,
+          );
+
+      if (isValid) {
+        // If valid, proceed to check medicines after a delay
+        Future.delayed(const Duration(seconds: 8), () {
+          _generateMockVendorResponses(prescriptionId);
+        });
+      }
+      // If invalid, the process stops here
+    }
   }
 
   void _generateMockVendorResponses(String prescriptionId) {
@@ -286,7 +316,7 @@ class PrescriptionService {
     if (prescriptionIndex != -1) {
       _prescriptions[prescriptionIndex] = _prescriptions[prescriptionIndex]
           .copyWith(
-            status: PrescriptionStatus.responded,
+            status: PrescriptionStatus.medicinesReady,
             vendorResponses: responses,
           );
     }

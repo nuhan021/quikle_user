@@ -4,6 +4,86 @@ import 'package:quikle_user/core/common/styles/global_text_style.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 import 'package:quikle_user/features/prescription/data/models/prescription_model.dart';
 
+class PrescriptionStatusBadge extends StatelessWidget {
+  final PrescriptionStatus status;
+  final double? fontSize;
+  final bool showIcon;
+
+  const PrescriptionStatusBadge({
+    super.key,
+    required this.status,
+    this.fontSize,
+    this.showIcon = true,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+      decoration: BoxDecoration(
+        color: _getStatusColor(status).withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(20.r),
+        border: Border.all(
+          color: _getStatusColor(status).withValues(alpha: 0.3),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (showIcon) ...[
+            Icon(
+              _getStatusIcon(status),
+              color: _getStatusColor(status),
+              size: (fontSize ?? 12.sp) + 2,
+            ),
+            SizedBox(width: 6.w),
+          ],
+          Text(
+            status.displayName,
+            style: getTextStyle(
+              font: CustomFonts.inter,
+              fontSize: fontSize ?? 12.sp,
+              fontWeight: FontWeight.w600,
+              color: _getStatusColor(status),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Color _getStatusColor(PrescriptionStatus status) {
+    switch (status) {
+      case PrescriptionStatus.uploaded:
+        return Colors.blue;
+      case PrescriptionStatus.underReview:
+        return Colors.orange;
+      case PrescriptionStatus.valid:
+        return Colors.green;
+      case PrescriptionStatus.invalid:
+        return Colors.red;
+      case PrescriptionStatus.medicinesReady:
+        return Colors.green;
+    }
+  }
+
+  IconData _getStatusIcon(PrescriptionStatus status) {
+    switch (status) {
+      case PrescriptionStatus.uploaded:
+        return Icons.cloud_upload;
+      case PrescriptionStatus.underReview:
+        return Icons.schedule;
+      case PrescriptionStatus.valid:
+        return Icons.check_circle_outline;
+      case PrescriptionStatus.invalid:
+        return Icons.error_outline;
+      case PrescriptionStatus.medicinesReady:
+        return Icons.local_pharmacy;
+    }
+  }
+}
+
 class VendorResponseStatusBadge extends StatelessWidget {
   final VendorResponseStatus status;
   final double? fontSize;

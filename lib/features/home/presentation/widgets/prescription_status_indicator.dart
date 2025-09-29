@@ -70,19 +70,53 @@ class PrescriptionStatusIndicator extends StatelessWidget {
                     ),
                     SizedBox(width: 12.w),
 
-                    // Single concise message
+                    // Header and sub-header message
                     Expanded(
-                      child: Text(
-                        isRefreshing ? 'Updating status...' : meta.message,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: getTextStyle(
-                          font: CustomFonts.inter,
-                          fontSize: 14.sp,
-                          fontWeight: FontWeight.w700, // bolder
-                          color: AppColors.ebonyBlack,
-                        ),
-                      ),
+                      child: isRefreshing
+                          ? Text(
+                              'Updating status...',
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: getTextStyle(
+                                font: CustomFonts.inter,
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.ebonyBlack,
+                              ),
+                            )
+                          : Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  meta.header,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: getTextStyle(
+                                    font: CustomFonts.inter,
+                                    fontSize: 14.sp,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.ebonyBlack,
+                                  ),
+                                ),
+                                if (meta.subHeader.isNotEmpty) ...[
+                                  SizedBox(height: 2.h),
+                                  Text(
+                                    meta.subHeader,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: getTextStyle(
+                                      font: CustomFonts.inter,
+                                      fontSize: 12.sp,
+                                      fontWeight: FontWeight.w500,
+                                      color: AppColors.ebonyBlack.withValues(
+                                        alpha: 0.7,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
                     ),
 
                     // View action
@@ -116,12 +150,11 @@ class PrescriptionStatusIndicator extends StatelessWidget {
     });
   }
 
-  /// Pick the most recent, non-expired prescription.
+  /// Pick the most recent, non-invalid prescription.
   PrescriptionModel? _latestActive(List<PrescriptionModel> list) {
     if (list.isEmpty) return null;
-    final filtered =
-        list.where((p) => p.status != PrescriptionStatus.expired).toList()
-          ..sort((a, b) => b.uploadedAt.compareTo(a.uploadedAt));
+    final filtered = list.toList()
+      ..sort((a, b) => b.uploadedAt.compareTo(a.uploadedAt));
     return filtered.isEmpty ? null : filtered.first;
   }
 
@@ -129,34 +162,38 @@ class PrescriptionStatusIndicator extends StatelessWidget {
     switch (status) {
       case PrescriptionStatus.uploaded:
         return _StatusMeta(
-          message: 'Prescription uploaded - In review',
+          header: 'Prescription Uploaded',
+          subHeader: '',
           icon: Icons.cloud_upload,
           color: Colors.blue,
         );
-      case PrescriptionStatus.processing:
+      case PrescriptionStatus.underReview:
         return _StatusMeta(
-          message: 'Your request is processing — verifying medicines',
-          icon: Icons.hourglass_empty,
+          header: 'Prescription Uploaded',
+          subHeader: 'Under Review',
+          icon: Icons.schedule,
           color: Colors.orange,
         );
-      case PrescriptionStatus.responded:
+      case PrescriptionStatus.valid:
         return _StatusMeta(
-          message: 'Request approved - Awaiting actions',
-          icon: Icons.check_circle,
+          header: 'Prescription Valid',
+          subHeader: 'Checking medicines',
+          icon: Icons.check_circle_outline,
           color: Colors.green,
         );
-      case PrescriptionStatus.rejected:
+      case PrescriptionStatus.invalid:
         return _StatusMeta(
-          message: 'Request rejected — See details',
-          icon: Icons.cancel,
+          header: 'Prescription Invalid',
+          subHeader: 'Expired date/Incomplete/Unclear/etc',
+          icon: Icons.error_outline,
           color: Colors.red,
         );
-      case PrescriptionStatus.expired:
-        // Not shown (filtered out)
+      case PrescriptionStatus.medicinesReady:
         return _StatusMeta(
-          message: 'Expired',
-          icon: Icons.access_time,
-          color: Colors.grey,
+          header: 'Medicines Ready',
+          subHeader: 'View List',
+          icon: Icons.local_pharmacy,
+          color: Colors.green,
         );
     }
   }
@@ -168,11 +205,13 @@ class PrescriptionStatusIndicator extends StatelessWidget {
 }
 
 class _StatusMeta {
-  final String message;
+  final String header;
+  final String subHeader;
   final IconData icon;
   final Color color;
   const _StatusMeta({
-    required this.message,
+    required this.header,
+    required this.subHeader,
     required this.icon,
     required this.color,
   });
