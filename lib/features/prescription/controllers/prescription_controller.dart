@@ -71,7 +71,8 @@ class PrescriptionController extends GetxController {
     return prescriptions.any(
       (p) =>
           p.status == PrescriptionStatus.uploaded ||
-          p.status == PrescriptionStatus.processing,
+          p.status == PrescriptionStatus.underReview ||
+          p.status == PrescriptionStatus.valid,
     );
   }
 
@@ -462,9 +463,10 @@ class PrescriptionController extends GetxController {
       } catch (e) {
         // Prescription not found in previous list (new prescription)
         // Only send notification for newly processed prescriptions, not newly uploaded ones
-        if (currentPrescription.status == PrescriptionStatus.processing ||
-            currentPrescription.status == PrescriptionStatus.responded ||
-            currentPrescription.status == PrescriptionStatus.rejected) {
+        if (currentPrescription.status == PrescriptionStatus.underReview ||
+            currentPrescription.status == PrescriptionStatus.valid ||
+            currentPrescription.status == PrescriptionStatus.invalid ||
+            currentPrescription.status == PrescriptionStatus.medicinesReady) {
           _sendStatusChangeNotification(currentPrescription);
         }
       }
@@ -475,23 +477,27 @@ class PrescriptionController extends GetxController {
   void _sendStatusChangeNotification(PrescriptionModel prescription) {
     // Only send notifications for meaningful status changes
     switch (prescription.status) {
-      case PrescriptionStatus.processing:
+      case PrescriptionStatus.underReview:
         PrescriptionNotificationService.showPrescriptionStatusNotification(
           prescription: prescription,
         );
         break;
-      case PrescriptionStatus.responded:
+      case PrescriptionStatus.valid:
         PrescriptionNotificationService.showPrescriptionStatusNotification(
           prescription: prescription,
         );
         break;
-      case PrescriptionStatus.rejected:
+      case PrescriptionStatus.invalid:
+        PrescriptionNotificationService.showPrescriptionStatusNotification(
+          prescription: prescription,
+        );
+        break;
+      case PrescriptionStatus.medicinesReady:
         PrescriptionNotificationService.showPrescriptionStatusNotification(
           prescription: prescription,
         );
         break;
       case PrescriptionStatus.uploaded:
-      case PrescriptionStatus.expired:
         // Don't send notifications for these statuses
         break;
     }

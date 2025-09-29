@@ -117,29 +117,29 @@ class PrescriptionNotificationService {
           body:
               'Your prescription has been uploaded successfully. Pharmacies will review it shortly.',
         );
-      case PrescriptionStatus.processing:
+      case PrescriptionStatus.underReview:
         return const _NotificationData(
           title: '⏳ Prescription Under Review',
           body:
-              'Pharmacies are reviewing your prescription. You will be notified when medicines are available.',
+              'A pharmacy has opened your prescription for review. You will be notified when medicines are available.',
         );
-      case PrescriptionStatus.responded:
+      case PrescriptionStatus.valid:
         return const _NotificationData(
-          title: '💊 Medicines Available',
+          title: '✅ Prescription Valid',
           body:
-              'Pharmacies have shared availability and prices for your medicines. Review them now and place your order.',
+              'Your prescription is valid. We are checking medicine availability.',
         );
-      case PrescriptionStatus.rejected:
+      case PrescriptionStatus.invalid:
         return const _NotificationData(
-          title: '❌ Prescription Issue',
+          title: '❌ Prescription Invalid',
           body:
-              'We could not process your prescription. Please check and upload a valid one or contact support.',
+              'We could not validate your prescription. Please check and upload a valid one or contact support.',
         );
-      case PrescriptionStatus.expired:
+      case PrescriptionStatus.medicinesReady:
         return const _NotificationData(
-          title: '⏰ Prescription Expired',
+          title: '💊 Medicines Ready',
           body:
-              'Your prescription has expired. Upload a new prescription to order your medicines.',
+              'Medicines are ready for your order. Review them now and place your order.',
         );
     }
   }
