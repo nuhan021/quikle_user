@@ -4,6 +4,48 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:quikle_user/core/services/cart_position_service.dart';
 
+/// Custom Tween that gets the real-time cart position during animation
+class _DynamicPositionTween extends Tween<Offset> {
+  final Offset originalEnd;
+  static Offset? _cachedCartPosition;
+  static DateTime? _lastCacheTime;
+  static const Duration _cacheValidDuration = Duration(
+    milliseconds: 16,
+  ); // ~60fps
+
+  _DynamicPositionTween({required Offset begin, required this.originalEnd})
+    : super(begin: begin, end: originalEnd);
+
+  @override
+  Offset lerp(double t) {
+    // Get the current cart position with caching for performance
+    Offset currentEnd = originalEnd;
+    final now = DateTime.now();
+
+    // Use cached position if it's recent enough
+    if (_cachedCartPosition != null &&
+        _lastCacheTime != null &&
+        now.difference(_lastCacheTime!) < _cacheValidDuration) {
+      currentEnd = _cachedCartPosition!;
+    } else {
+      // Get fresh position
+      try {
+        final positionService = Get.find<CartPositionService>();
+        final cartPosition = positionService.getCartButtonPosition();
+        if (cartPosition != null) {
+          currentEnd = cartPosition;
+          _cachedCartPosition = cartPosition;
+          _lastCacheTime = now;
+        }
+      } catch (e) {
+        // Use original end position if service is not available
+      }
+    }
+
+    return Offset.lerp(begin!, currentEnd, t)!;
+  }
+}
+
 class CartAnimationController extends GetxController {
   final List<CartAnimation> _activeAnimations = <CartAnimation>[].obs;
   List<CartAnimation> get activeAnimations => _activeAnimations;
@@ -126,16 +168,13 @@ class _AnimatedCartImageState extends State<AnimatedCartImage>
       vsync: this,
     );
 
-    // Smoother position animation with custom curve
+    // Create a position animation that gets updated position dynamically
     _position =
-        Tween<Offset>(
+        _DynamicPositionTween(
           begin: widget.animation.startPosition,
-          end: widget.animation.endPosition,
+          originalEnd: widget.animation.endPosition,
         ).animate(
-          CurvedAnimation(
-            parent: _controller,
-            curve: Curves.fastOutSlowIn, // Better curve for natural movement
-          ),
+          CurvedAnimation(parent: _controller, curve: Curves.fastOutSlowIn),
         );
 
     // Improved size animation with bounce effect
