@@ -374,11 +374,8 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
           padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 6.h),
           decoration: BoxDecoration(
             color: Colors.white,
-            border: Border.all(
-              color: Colors.red.shade400, // 🔴 red border for urgency
-              width: 1.5,
-            ),
-            borderRadius: BorderRadius.circular(6.r),
+            border: Border.all(color: Colors.red.shade400, width: 1.5),
+            borderRadius: BorderRadius.circular(12.r),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,

@@ -145,7 +145,8 @@ class _PrescriptionDetailsScreenState extends State<PrescriptionDetailsScreen> {
                     );
                   }).toList(),
                   SizedBox(height: 30.h),
-                ],
+                ] else
+                  SizedBox(height: 30.h),
               ],
             ),
           ),

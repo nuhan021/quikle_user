@@ -43,7 +43,7 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
 
     _navController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 260),
+      duration: const Duration(milliseconds: 500),
       value: 1.0,
     );
 
@@ -268,7 +268,7 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
                     sizeFactor: _navController,
                     child: SafeArea(
                       top: false,
-                      bottom: false,
+                      bottom: true,
                       child: KeyedSubtree(
                         key: _navKey,
                         child: CustomNavBar(
