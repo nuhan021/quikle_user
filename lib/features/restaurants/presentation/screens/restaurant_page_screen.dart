@@ -4,7 +4,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:quikle_user/core/common/styles/global_text_style.dart';
-import 'package:quikle_user/core/common/widgets/cart_animation_overlay.dart';
 import 'package:quikle_user/core/common/widgets/custom_navbar.dart';
 import 'package:quikle_user/core/common/widgets/floating_cart_button.dart';
 import 'package:quikle_user/core/common/widgets/unified_product_card.dart';
@@ -358,7 +357,7 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen>
                   sizeFactor: _navController,
                   child: SafeArea(
                     top: false,
-                    bottom: false,
+                    bottom: true,
                     child: KeyedSubtree(
                       key: _navKey,
                       child: CustomNavBar(

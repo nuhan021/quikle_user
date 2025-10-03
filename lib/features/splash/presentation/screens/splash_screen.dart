@@ -47,8 +47,7 @@ class SplashScreen extends GetView<SplashController> {
                   duration: const Duration(milliseconds: 600),
                   curve: Curves.easeInOut,
                   decoration: BoxDecoration(
-                    color: Colors
-                        .white, // 👈 Background becomes white during animation
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(isReady ? 48.r : 0),
                   ),
                   child: ClipRRect(

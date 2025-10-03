@@ -241,7 +241,7 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
                     sizeFactor: _navController,
                     child: SafeArea(
                       top: false,
-                      bottom: false,
+                      bottom: true,
                       child: KeyedSubtree(
                         key: _navKey,
                         child: CustomNavBar(
@@ -273,7 +273,13 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
                   onCancel: controller.stopVoiceSearch,
                 );
               }),
-              const LiveOrderIndicator(),
+              AnimatedBuilder(
+                animation: _navController,
+                builder: (_, __) {
+                  final inset = (_navController.value * _navBarHeight);
+                  return LiveOrderIndicator(bottomInset: inset);
+                },
+              ),
             ],
           ),
         ),
