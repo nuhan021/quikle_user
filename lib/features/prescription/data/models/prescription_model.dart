@@ -208,15 +208,15 @@ extension PrescriptionStatusExtension on PrescriptionStatus {
   String get displayName {
     switch (this) {
       case PrescriptionStatus.uploaded:
-        return 'Prescription Uploaded';
+        return 'Uploaded';
       case PrescriptionStatus.underReview:
-        return 'Prescription Uploaded';
+        return 'Reviewing';
       case PrescriptionStatus.valid:
-        return 'Prescription Valid';
+        return 'Valid';
       case PrescriptionStatus.invalid:
-        return 'Prescription Invalid';
+        return 'Invalid';
       case PrescriptionStatus.medicinesReady:
-        return 'Medicines Ready';
+        return 'Ready';
     }
   }
 
