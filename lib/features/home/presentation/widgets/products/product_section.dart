@@ -92,6 +92,7 @@ class ProductSection extends StatelessWidget {
               crossAxisSpacing: 8.w,
               mainAxisSpacing: 8.h,
               childAspectRatio: 0.75.sp,
+              //childAspectRatio: categoryTitle == "Medicines" ? 0.6.sp : 0.75.sp,
             ),
             itemCount: visibleCount,
             itemBuilder: (context, index) {

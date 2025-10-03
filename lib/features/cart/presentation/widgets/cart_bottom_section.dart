@@ -102,7 +102,7 @@ class CartBottomSection extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Delivering to $addressTypeText',
+                          '$addressTypeText',
                           style: getTextStyle(
                             font: CustomFonts.inter,
                             fontSize: 16.sp,

@@ -284,7 +284,7 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
           _buildUrgentDeliveryOption(),
         ],
 
-        SizedBox(height: 15.h),
+        SizedBox(height: 8.h),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -370,50 +370,59 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
       builder: (cartController) {
         bool isUrgent = cartController.isProductUrgent(widget.product);
 
-        return Row(
-          children: [
-            Icon(Icons.local_hospital_outlined, size: 10.sp, color: Colors.red),
-            SizedBox(width: 4.w),
-            Text(
-              'Urgent',
-              style: getTextStyle(
-                font: CustomFonts.inter,
-                fontSize: 9.sp,
-                fontWeight: FontWeight.w500,
-                color: Colors.red.shade600,
-              ),
+        return Container(
+          padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 6.h),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(
+              color: Colors.red.shade400, // 🔴 red border for urgency
+              width: 1.5,
             ),
-            SizedBox(width: 4.w),
-            GestureDetector(
-              onTap: () {
-                if (cartController.isProductInCart(widget.product)) {
-                  cartController.toggleProductUrgentStatus(widget.product);
-                } else {
-                  // Add to cart with urgent flag
-                  cartController.addProductToCart(
-                    widget.product,
-                    isUrgent: true,
-                  );
-                  _triggerCartAnimation();
-                }
-              },
-              child: Container(
-                width: 12.w,
-                height: 12.w,
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: isUrgent ? Colors.red : Colors.grey,
-                    width: 1.5,
-                  ),
-                  borderRadius: BorderRadius.circular(3.r),
-                  color: isUrgent ? Colors.red : Colors.transparent,
+            borderRadius: BorderRadius.circular(6.r),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Urgent',
+                style: getTextStyle(
+                  font: CustomFonts.inter,
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.red.shade600,
                 ),
-                child: isUrgent
-                    ? Icon(Icons.check, size: 8.sp, color: Colors.white)
-                    : null,
               ),
-            ),
-          ],
+              SizedBox(width: 12.w),
+              GestureDetector(
+                onTap: () {
+                  if (cartController.isProductInCart(widget.product)) {
+                    cartController.toggleProductUrgentStatus(widget.product);
+                  } else {
+                    cartController.addProductToCart(
+                      widget.product,
+                      isUrgent: true,
+                    );
+                    _triggerCartAnimation();
+                  }
+                },
+                child: Container(
+                  width: 16.w,
+                  height: 16.w,
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: isUrgent ? Colors.red : Colors.grey,
+                      width: 2,
+                    ),
+                    borderRadius: BorderRadius.circular(3.r),
+                    color: isUrgent ? Colors.red : Colors.transparent,
+                  ),
+                  child: isUrgent
+                      ? Icon(Icons.check, size: 8.sp, color: Colors.white)
+                      : null,
+                ),
+              ),
+            ],
+          ),
         );
       },
     );
