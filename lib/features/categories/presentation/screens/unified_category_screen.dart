@@ -268,7 +268,7 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
                     sizeFactor: _navController,
                     child: SafeArea(
                       top: false,
-                      bottom: false,
+                      bottom: true,
                       child: KeyedSubtree(
                         key: _navKey,
                         child: CustomNavBar(

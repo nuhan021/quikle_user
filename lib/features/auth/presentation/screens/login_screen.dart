@@ -17,15 +17,6 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<LoginController>();
-    final base = ProductIcons.asProviders();
-
-    final rowSpacing = 12.h;
-    final maxRows = _calculateCarouselRows(context);
-
-    final gradientHeight = MediaQuery.of(context).size.height * 0.4;
-
-    final totalRowSpacing = rowSpacing * (maxRows - 1);
-    final rowHeight = (gradientHeight - totalRowSpacing) / maxRows;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: const SystemUiOverlayStyle(
@@ -33,72 +24,72 @@ class LoginScreen extends StatelessWidget {
         statusBarIconBrightness: Brightness.light,
       ),
       child: Scaffold(
-        resizeToAvoidBottomInset: false,
+        resizeToAvoidBottomInset: true,
         backgroundColor: Colors.black,
         body: SafeArea(
-          child: Stack(
-            children: [
-              Positioned(
-                top: 10,
-                left: 0,
-                right: 0,
-                child: ClipRect(
-                  child: SizedBox(
-                    height: gradientHeight,
-                    child: _buildCarouselSection(
-                      _generateCarouselData(base, maxRows),
-                      rowHeight,
-                      rowSpacing,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                  child: IntrinsicHeight(
+                    child: Column(
+                      children: [
+                        _buildTopSection(context),
+                        Expanded(child: _buildContentSection(controller)),
+                      ],
                     ),
                   ),
                 ),
-              ),
-
-              Positioned.fill(
-                child: Builder(
-                  builder: (context) {
-                    final logoTopOffset =
-                        MediaQuery.of(context).size.height * 0.35;
-                    final logoHeight = 40.w;
-                    final gradientEndOffset = logoTopOffset + logoHeight / 2;
-
-                    return Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          stops: [
-                            gradientEndOffset /
-                                MediaQuery.of(context).size.height,
-                            (gradientEndOffset + 20) /
-                                MediaQuery.of(context).size.height,
-                            (gradientEndOffset + 40) /
-                                MediaQuery.of(context).size.height,
-                            (gradientEndOffset + 60) /
-                                MediaQuery.of(context).size.height,
-                          ],
-                          colors: [
-                            Colors.transparent,
-                            Colors.black.withValues(alpha: 0.4),
-                            Colors.black.withValues(alpha: 0.7),
-                            Colors.black.withValues(alpha: 0.9),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-
-              Positioned.fill(
-                top: MediaQuery.of(context).size.height * 0.4,
-                child: SingleChildScrollView(
-                  child: _buildContentSection(controller),
-                ),
-              ),
-            ],
+              );
+            },
           ),
         ),
+      ),
+    );
+  }
+
+  // ------------------ TOP SECTION ------------------
+  Widget _buildTopSection(BuildContext context) {
+    final base = ProductIcons.asProviders();
+    final maxRows = _calculateCarouselRows(context);
+    final rowSpacing = 12.h;
+    final gradientHeight = MediaQuery.of(context).size.height * 0.4;
+
+    final totalRowSpacing = rowSpacing * (maxRows - 1);
+    final rowHeight = (gradientHeight - totalRowSpacing) / maxRows;
+
+    return SizedBox(
+      height: gradientHeight,
+      child: Stack(
+        children: [
+          ClipRect(
+            child: SizedBox(
+              height: gradientHeight,
+              child: _buildCarouselSection(
+                _generateCarouselData(base, maxRows),
+                rowHeight,
+                rowSpacing,
+              ),
+            ),
+          ),
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                stops: const [0.5, 0.7, 0.85, 1],
+                colors: [
+                  Colors.transparent,
+                  Colors.black.withValues(alpha: 0.4),
+                  Colors.black.withValues(alpha: 0.7),
+                  Colors.black.withValues(alpha: 0.9),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -141,9 +132,7 @@ class LoginScreen extends StatelessWidget {
             height: rowHeight,
             child: IconRowMarquee(
               images: icons,
-
               speed: 24,
-              //offsetSlots: index * 0.25,
               offsetSlots: _getOfferSlots(index),
             ),
           ),
@@ -153,17 +142,13 @@ class LoginScreen extends StatelessWidget {
   }
 
   double _getOfferSlots(int index) {
-    if (index == 0) {
-      return 0.90;
-    } else if (index == 1) {
-      return 0.40;
-    } else if (index == 2) {
-      return 0.65;
-    } else {
-      return 0.15;
-    }
+    if (index == 0) return 0.90;
+    if (index == 1) return 0.40;
+    if (index == 2) return 0.65;
+    return 0.15;
   }
 
+  // ------------------ CONTENT SECTION ------------------
   Widget _buildContentSection(LoginController controller) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16.w),
