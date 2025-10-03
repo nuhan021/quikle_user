@@ -1,7 +1,6 @@
 import 'package:get/get.dart';
 import 'package:quikle_user/features/auth/presentation/screens/splash_wrapper.dart';
 import 'package:quikle_user/features/auth/presentation/screens/verification_scree.dart';
-import 'package:quikle_user/features/auth/presentation/screens/welcome_screen.dart';
 import 'package:quikle_user/features/main/presentation/screens/main_screen.dart';
 import 'package:quikle_user/features/profile/presentation/screens/my_profile_screen.dart';
 import 'package:quikle_user/features/splash/presentation/screens/splash_screen.dart';
@@ -9,7 +8,6 @@ import 'package:quikle_user/features/auth/presentation/screens/login_screen.dart
 import 'package:quikle_user/features/cart/presentation/screens/cart_screen.dart';
 import 'package:quikle_user/features/product/presentation/screens/product_details_screen.dart';
 import 'package:quikle_user/features/categories/presentation/screens/category_detail_screen.dart';
-import 'package:quikle_user/features/categories/presentation/screens/subcategory_products_screen.dart';
 import 'package:quikle_user/features/categories/presentation/screens/grocery_navigation_screen.dart';
 import 'package:quikle_user/features/categories/presentation/screens/unified_category_screen.dart';
 import 'package:quikle_user/features/categories/presentation/screens/category_products_screen.dart';
@@ -126,10 +124,6 @@ class AppRoute {
     GetPage(
       name: _categoryProducts,
       page: () => const CategoryProductsScreen(),
-    ),
-    GetPage(
-      name: _subcategoryProducts,
-      page: () => const SubcategoryProductsScreen(),
     ),
     GetPage(
       name: _groceryNavigation,

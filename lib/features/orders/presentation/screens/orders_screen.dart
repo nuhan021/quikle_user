@@ -9,6 +9,7 @@ import 'package:quikle_user/features/orders/presentation/widgets/brief_order_car
 import 'package:quikle_user/features/orders/presentation/screens/order_invoice_screen.dart';
 import 'package:quikle_user/features/orders/presentation/screens/order_tracking_screen.dart';
 import 'package:quikle_user/features/profile/presentation/widgets/unified_profile_app_bar.dart';
+import 'package:shimmer/shimmer.dart';
 
 class OrdersScreen extends StatelessWidget {
   const OrdersScreen({super.key});
@@ -16,6 +17,7 @@ class OrdersScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final OrdersController controller = Get.put(OrdersController());
+
     return Scaffold(
       body: SafeArea(
         bottom: false,
@@ -25,15 +27,11 @@ class OrdersScreen extends StatelessWidget {
               title: 'My Orders',
               showBackButton: false,
             ),
-
             Expanded(
               child: Obx(() {
                 if (controller.isLoading.value) {
-                  return Center(
-                    child: CircularProgressIndicator(
-                      color: AppColors.beakYellow,
-                    ),
-                  );
+                  // 👇 Show shimmer skeleton list here
+                  return _buildShimmerList();
                 }
 
                 if (controller.error.value.isNotEmpty) {
@@ -160,6 +158,7 @@ class OrdersScreen extends StatelessWidget {
                   );
                 }
 
+                // ✅ Actual order list
                 return RefreshIndicator(
                   onRefresh: controller.refreshOrders,
                   color: AppColors.beakYellow,
@@ -187,6 +186,78 @@ class OrdersScreen extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  /// ✨ Shimmer skeleton list that mimics order cards
+  Widget _buildShimmerList() {
+    return ListView.builder(
+      itemCount: 5,
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+      itemBuilder: (context, index) {
+        return Shimmer.fromColors(
+          baseColor: Colors.grey.shade300,
+          highlightColor: Colors.grey.shade100,
+          child: Container(
+            margin: EdgeInsets.only(bottom: 16.h),
+            padding: EdgeInsets.all(16.w),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12.r),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Left image placeholder
+                Container(
+                  width: 60.w,
+                  height: 60.w,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                ),
+                SizedBox(width: 12.w),
+
+                // Right content shimmer lines
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        height: 14.h,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(4.r),
+                        ),
+                      ),
+                      SizedBox(height: 8.h),
+                      Container(
+                        height: 12.h,
+                        width: 120.w,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(4.r),
+                        ),
+                      ),
+                      SizedBox(height: 8.h),
+                      Container(
+                        height: 10.h,
+                        width: 80.w,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(4.r),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

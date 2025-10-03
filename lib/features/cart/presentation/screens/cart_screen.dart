@@ -66,6 +66,7 @@ class CartScreen extends StatelessWidget {
                       onProductTap: (p) =>
                           Get.toNamed('/product-details', arguments: p),
                     ),
+                    SizedBox(height: 19.h),
                     const DeliveryOptionsSection(),
                     SizedBox(height: 19.h),
                     const CouponSection(),

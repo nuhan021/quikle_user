@@ -1,6 +1,8 @@
 import 'package:get/get.dart';
 import 'package:video_player/video_player.dart';
 
+import '../../auth/presentation/screens/login_screen.dart';
+
 class SplashController extends GetxController {
   late final VideoPlayerController video;
   final RxBool isReady = false.obs;
@@ -47,7 +49,8 @@ class SplashController extends GetxController {
     final v = video.value;
     if (v.isInitialized && v.position >= playDuration) {
       video.pause();
-      showLogin.value = true;
+      // showLogin.value = true;
+      Get.off(() => const LoginScreen());
       video.removeListener(_listenDuration);
     }
   }

@@ -283,7 +283,6 @@ class PrescriptionUploadSection extends StatelessWidget {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Icon(
-                                    // small icon to match status
                                     prescription.status ==
                                             PrescriptionStatus.uploaded
                                         ? Icons.cloud_upload
@@ -302,7 +301,6 @@ class PrescriptionUploadSection extends StatelessWidget {
                                   ),
                                   SizedBox(width: 6.w),
                                   Text(
-                                    // concise status labels: Uploaded, Processing, Responded, Expired, Rejected
                                     prescription.status.displayName,
                                     style: getTextStyle(
                                       font: CustomFonts.inter,
