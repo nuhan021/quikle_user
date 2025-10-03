@@ -65,6 +65,7 @@ class CategoryDetailScreen extends StatelessWidget {
                     if (controller.recommendedProducts.isNotEmpty) ...[
                       ProductGridSection(
                         title: 'Recommended for You',
+                        categoryName: controller.categoryTitle.value,
                         products: controller.recommendedProducts,
                         onProductTap: controller.onProductTap,
                         onAddToCart: controller.onAddToCart,

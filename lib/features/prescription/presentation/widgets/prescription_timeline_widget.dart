@@ -57,43 +57,49 @@ class PrescriptionTimelineWidget extends StatelessWidget {
           ),
 
           _buildTimelineStep(
-            icon: Icons.hourglass_empty,
-            title: 'Processing',
-            description: 'Pharmacies are reviewing your prescription',
+            icon: Icons.schedule,
+            title: 'Under Review',
+            description: 'A pharmacy is reviewing your prescription',
             isCompleted:
                 prescription.status.index >=
-                PrescriptionStatus.processing.index,
-            isActive: prescription.status == PrescriptionStatus.processing,
+                PrescriptionStatus.underReview.index,
+            isActive: prescription.status == PrescriptionStatus.underReview,
             color: Colors.orange,
           ),
 
           _buildTimelineStep(
-            icon: Icons.check_circle,
-            title: 'Responded',
-            description: 'Pharmacies have provided responses',
+            icon: Icons.check_circle_outline,
+            title: 'Validation',
+            description: 'Checking prescription validity',
             isCompleted:
-                prescription.status.index >= PrescriptionStatus.responded.index,
-            isActive: prescription.status == PrescriptionStatus.responded,
-            color: Colors.green,
-            isLast: true,
+                prescription.status.index >= PrescriptionStatus.valid.index ||
+                prescription.status == PrescriptionStatus.invalid,
+            isActive:
+                prescription.status == PrescriptionStatus.valid ||
+                prescription.status == PrescriptionStatus.invalid,
+            color: prescription.status == PrescriptionStatus.invalid
+                ? Colors.red
+                : Colors.green,
           ),
 
-          if (prescription.status == PrescriptionStatus.rejected) ...[
-            SizedBox(height: 8.h),
-            _buildStatusAlert(
-              icon: Icons.cancel,
-              message:
-                  'Prescription has been rejected. Please contact support.',
-              color: Colors.red,
+          if (prescription.status == PrescriptionStatus.medicinesReady)
+            _buildTimelineStep(
+              icon: Icons.local_pharmacy,
+              title: 'Medicines Ready',
+              description: 'Medicines are ready for order',
+              isCompleted: true,
+              isActive: true,
+              color: Colors.green,
+              isLast: true,
             ),
-          ],
 
-          if (prescription.status == PrescriptionStatus.expired) ...[
+          if (prescription.status == PrescriptionStatus.invalid) ...[
             SizedBox(height: 8.h),
             _buildStatusAlert(
-              icon: Icons.access_time,
-              message: 'Prescription has expired. Please upload a new one.',
-              color: Colors.orange,
+              icon: Icons.error_outline,
+              message:
+                  'Prescription is invalid. Please check and upload a valid one.',
+              color: Colors.red,
             ),
           ],
         ],

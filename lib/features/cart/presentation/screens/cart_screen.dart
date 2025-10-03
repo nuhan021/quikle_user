@@ -56,7 +56,6 @@ class CartScreen extends StatelessWidget {
                 child: Column(
                   children: [
                     SizedBox(height: 16.h),
-                    // Receiver details single-line row
                     const ReceiverDetails(),
                     SizedBox(height: 12.h),
                     const CartItemsSection(),
@@ -67,11 +66,6 @@ class CartScreen extends StatelessWidget {
                       onProductTap: (p) =>
                           Get.toNamed('/product-details', arguments: p),
                     ),
-                    SizedBox(height: 12.h),
-                    // Receiver details single-line row
-                    const ReceiverDetails(),
-                    SizedBox(height: 12.h),
-                    //SizedBox(height: 19.h),
                     const DeliveryOptionsSection(),
                     SizedBox(height: 19.h),
                     const CouponSection(),

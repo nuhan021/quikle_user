@@ -329,6 +329,7 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
         if (controller.displayProducts.isNotEmpty)
           ProductGridSection(
             title: controller.productsTitle.value,
+            categoryName: controller.categoryTitle.value,
             products: controller.displayProducts,
             onProductTap: controller.onProductTap,
             onAddToCart: controller.onAddToCart,
@@ -344,6 +345,7 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
           ProductGridSection(
             title: 'Recommended for You',
             products: controller.recommendedProducts,
+            categoryName: controller.categoryTitle.value,
             onProductTap: controller.onProductTap,
             onAddToCart: controller.onAddToCart,
             onFavoriteToggle: controller.onFavoriteToggle,
@@ -371,6 +373,7 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
     if (controller.displayProducts.isNotEmpty) {
       return ProductGridSection(
         title: controller.productsTitle.value,
+        categoryName: controller.categoryTitle.value,
         products: controller.displayProducts,
         onProductTap: controller.onProductTap,
         onAddToCart: controller.onAddToCart,

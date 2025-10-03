@@ -209,14 +209,14 @@ class PrescriptionHeaderWidget extends StatelessWidget {
     switch (status) {
       case PrescriptionStatus.uploaded:
         return Colors.blue;
-      case PrescriptionStatus.processing:
+      case PrescriptionStatus.underReview:
         return Colors.orange;
-      case PrescriptionStatus.responded:
+      case PrescriptionStatus.valid:
         return Colors.green;
-      case PrescriptionStatus.expired:
+      case PrescriptionStatus.invalid:
         return Colors.red;
-      case PrescriptionStatus.rejected:
-        return Colors.red;
+      case PrescriptionStatus.medicinesReady:
+        return Colors.green;
     }
   }
 
@@ -224,14 +224,14 @@ class PrescriptionHeaderWidget extends StatelessWidget {
     switch (status) {
       case PrescriptionStatus.uploaded:
         return Icons.cloud_upload;
-      case PrescriptionStatus.processing:
-        return Icons.hourglass_empty;
-      case PrescriptionStatus.responded:
-        return Icons.check_circle;
-      case PrescriptionStatus.expired:
-        return Icons.access_time;
-      case PrescriptionStatus.rejected:
-        return Icons.cancel;
+      case PrescriptionStatus.underReview:
+        return Icons.schedule;
+      case PrescriptionStatus.valid:
+        return Icons.check_circle_outline;
+      case PrescriptionStatus.invalid:
+        return Icons.error_outline;
+      case PrescriptionStatus.medicinesReady:
+        return Icons.local_pharmacy;
     }
   }
 }

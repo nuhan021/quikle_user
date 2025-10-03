@@ -3,9 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
+import 'package:quikle_user/features/auth/presentation/screens/verification_scree.dart';
 import 'package:video_player/video_player.dart';
 import '../../controllers/splash_controller.dart';
-import '../widgets/box_skeleton.dart';
 import '../../../auth/presentation/screens/login_screen.dart';
 
 class SplashScreen extends GetView<SplashController> {
@@ -25,23 +25,34 @@ class SplashScreen extends GetView<SplashController> {
         statusBarIconBrightness: Brightness.dark,
       ),
       child: Scaffold(
-        backgroundColor: Colors.white,
         body: Stack(
           clipBehavior: Clip.none,
           children: [
-            Positioned(
-              left: 81.w,
-              top: 295.5.h,
-              child: Obx(() {
-                if (!controller.isReady.value) {
-                  return BoxSkeleton(width: 230.w, height: 221.h, radius: 48.r);
-                }
-                final vc = controller.video;
-                return ClipRRect(
-                  borderRadius: BorderRadius.circular(48.r),
-                  child: SizedBox(
-                    width: 230.w,
-                    height: 221.h,
+            /// Base white background
+            Container(color: Colors.white),
+
+            /// Video with white background, starts full screen then shrinks
+            Obx(() {
+              final isReady = controller.isReady.value;
+              final vc = controller.video;
+
+              return AnimatedPositioned(
+                duration: const Duration(milliseconds: 600),
+                curve: Curves.easeInOut,
+                left: isReady ? 81.w : 0,
+                top: isReady ? 295.5.h : 0,
+                width: isReady ? 230.w : 1.sw,
+                height: isReady ? 221.h : 1.sh,
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 600),
+                  curve: Curves.easeInOut,
+                  decoration: BoxDecoration(
+                    color: Colors
+                        .white, // 👈 Background becomes white during animation
+                    borderRadius: BorderRadius.circular(isReady ? 48.r : 0),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(isReady ? 48.r : 0),
                     child: FittedBox(
                       fit: BoxFit.cover,
                       child: SizedBox(
@@ -51,15 +62,23 @@ class SplashScreen extends GetView<SplashController> {
                       ),
                     ),
                   ),
-                );
-              }),
-            ),
+                ),
+              );
+            }),
+
+            /// Black ellipse animation
+            /// Black ellipse animation
             Obx(() {
+              final bottomInset = MediaQuery.of(
+                context,
+              ).padding.bottom; // safe bottom padding
+
               return AnimatedPositioned(
                 duration: const Duration(milliseconds: 450),
                 curve: Curves.easeInOut,
                 left: _ellipseLeft.w,
-                top: controller.ellipseTop.value.h,
+                // add the safe area offset here
+                top: controller.ellipseTop.value.h - bottomInset,
                 child: ClipOval(
                   child: SizedBox(
                     width: 708.w,
@@ -69,6 +88,8 @@ class SplashScreen extends GetView<SplashController> {
                 ),
               );
             }),
+
+            /// Text on ellipse
             Obx(() {
               final double textTop =
                   (controller.ellipseTop.value + _textOffsetFromEllipseTop).h;
@@ -112,6 +133,8 @@ class SplashScreen extends GetView<SplashController> {
                 ),
               );
             }),
+
+            /// Login slide-up
             Obx(() {
               return AnimatedPositioned(
                 duration: const Duration(milliseconds: 600),
@@ -130,8 +153,7 @@ class SplashScreen extends GetView<SplashController> {
                             topRight: Radius.circular(24),
                           ),
                   ),
-
-                  child: const LoginScreen(),
+                  child: const VerificationScreen(),
                 ),
               );
             }),

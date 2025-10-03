@@ -17,12 +17,14 @@ class ProductGridSection extends StatelessWidget {
   final int maxItems;
   final int crossAxisCount;
   final bool showViewAll;
+  final String categoryName;
   final bool isGroceryCategory;
   final Map<String, ShopModel>? shops;
 
   const ProductGridSection({
     super.key,
     required this.title,
+    required this.categoryName,
     required this.products,
     required this.onProductTap,
     required this.onAddToCart,
@@ -38,7 +40,7 @@ class ProductGridSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (products.isEmpty) return const SizedBox.shrink();
-
+    final bool isMedicalCategory = categoryName.toLowerCase() == 'medicines';
     final displayProducts = products.take(maxItems).toList();
 
     return Column(
@@ -92,7 +94,10 @@ class ProductGridSection extends StatelessWidget {
             crossAxisCount: crossAxisCount,
             crossAxisSpacing: 8.w,
             mainAxisSpacing: 8.h,
-            childAspectRatio: crossAxisCount == 3 ? 0.8.h : 1.2.h,
+            // childAspectRatio: crossAxisCount == 3 ? 0.8.h : 1.2.h,
+            childAspectRatio: crossAxisCount == 3
+                ? (isMedicalCategory ? 0.7.sp : 0.8.sp)
+                : (isMedicalCategory ? 1.0.sp : 1.2.sp),
           ),
           itemCount: displayProducts.length,
           itemBuilder: (context, index) {
