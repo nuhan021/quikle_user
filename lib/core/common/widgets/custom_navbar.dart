@@ -19,14 +19,14 @@ class CustomNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final media = MediaQuery.of(context);
-    final systemBottom = media.systemGestureInsets.bottom;
+    final bottomInset = media.padding.bottom;
 
     return Container(
       padding: EdgeInsets.only(
         top: 8.h,
         left: 8.w,
         right: 8.w,
-        bottom: systemBottom > 0 ? systemBottom : 8.h,
+        bottom: bottomInset > 0 ? bottomInset : 8.h,
       ),
       decoration: BoxDecoration(
         color: Colors.black,
@@ -62,10 +62,10 @@ class CustomNavBar extends StatelessWidget {
           ),
           _NavItem(
             iconAsset: ImagePath.profile,
-            label: 'Anna',
+            label: 'Profile',
             isSelected: currentIndex == 3,
             onTap: () => onTap(3),
-            isProfile: true, // mark as profile
+            isProfile: true,
           ),
         ],
       ),
@@ -97,7 +97,7 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final iconSize = 24.w; // slightly bigger for profile
+    final iconSize = 22.w;
 
     return Expanded(
       child: GestureDetector(
@@ -113,15 +113,6 @@ class _NavItem extends StatelessWidget {
                         child: Container(
                           width: iconSize,
                           height: iconSize,
-                          decoration: BoxDecoration(
-                            border: isSelected
-                                ? Border.all(
-                                    color: AppColors.beakYellow,
-                                    width: 2.w,
-                                  )
-                                : null,
-                            shape: BoxShape.circle,
-                          ),
                           child: Image.asset(iconAsset!, fit: BoxFit.cover),
                         ),
                       )
@@ -129,9 +120,6 @@ class _NavItem extends StatelessWidget {
                         iconAsset!,
                         width: iconSize,
                         height: iconSize,
-                        color: isSelected
-                            ? AppColors.beakYellow
-                            : AppColors.eggshellWhite,
                         errorBuilder: (context, error, stackTrace) => Icon(
                           fallbackIcon ?? Iconsax.user,
                           size: iconSize,

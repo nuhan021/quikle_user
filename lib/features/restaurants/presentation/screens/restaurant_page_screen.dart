@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -28,7 +29,9 @@ class RestaurantPageScreen extends StatefulWidget {
 
 class _RestaurantPageScreenState extends State<RestaurantPageScreen>
     with TickerProviderStateMixin {
+  late AnimationController _barAnim;
   late AnimationController _navController;
+  final ScrollController _scroll = ScrollController();
   final GlobalKey _navKey = GlobalKey();
   double _navBarHeight = 0.0;
 
@@ -53,17 +56,35 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen>
   @override
   void initState() {
     super.initState();
+
+    _barAnim = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+      value: 1,
+    );
+
     _navController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 260),
-      value: 1.0,
+      duration: const Duration(milliseconds: 500),
+      value: 1,
     );
+
+    _scroll.addListener(() {
+      if (_scroll.offset > 8 && _barAnim.value == 1) {
+        _barAnim.reverse();
+      } else if (_scroll.offset <= 8 && _barAnim.value == 0) {
+        _barAnim.forward();
+      }
+    });
+
     _initializeData();
   }
 
   @override
   void dispose() {
+    _barAnim.dispose();
     _navController.dispose();
+    _scroll.dispose();
     super.dispose();
   }
 
@@ -83,15 +104,15 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen>
   }
 
   void _initializeData() {
-    final arguments = Get.arguments as Map<String, dynamic>;
-    restaurant = arguments['restaurant'];
+    final args = Get.arguments as Map<String, dynamic>;
+    restaurant = args['restaurant'];
     _loadProducts();
   }
 
   void _loadProducts() {
     setState(() => _isLoading = true);
     _restaurantProducts = _productService.allProducts
-        .where((product) => product.shopId == restaurant.id)
+        .where((p) => p.shopId == restaurant.id)
         .toList();
     _filterProducts(_selectedCategory);
     setState(() => _isLoading = false);
@@ -102,34 +123,40 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen>
       _selectedCategory = category;
       if (category == 'All') {
         _filteredProducts = _restaurantProducts;
-      } else if (category == 'Appetizers') {
-        _filteredProducts = _restaurantProducts
-            .where((product) => product.productType == 'appetizer')
-            .toList();
-      } else if (category == 'Biryani') {
-        _filteredProducts = _restaurantProducts
-            .where((product) => product.subcategoryId == 'food_biryani')
-            .toList();
-      } else if (category == 'Main Course') {
-        _filteredProducts = _restaurantProducts
-            .where((product) => product.productType == 'main_course')
-            .toList();
-      } else if (category == 'Breads') {
-        _filteredProducts = _restaurantProducts
-            .where((product) => product.productType == 'bread')
-            .toList();
-      } else if (category == 'Desserts') {
-        _filteredProducts = _restaurantProducts
-            .where((product) => product.productType == 'dessert')
-            .toList();
-      } else if (category == 'Beverages') {
-        _filteredProducts = _restaurantProducts
-            .where((product) => product.productType == 'beverage')
-            .toList();
       } else {
-        _filteredProducts = _restaurantProducts;
+        _filteredProducts = _restaurantProducts
+            .where(
+              (p) =>
+                  p.productType?.toLowerCase() == category.toLowerCase() ||
+                  p.subcategoryId?.toLowerCase() == category.toLowerCase(),
+            )
+            .toList();
       }
     });
+  }
+
+  bool _onScrollNotification(ScrollNotification n) {
+    if (n is UserScrollNotification) {
+      if (n.direction == ScrollDirection.reverse &&
+          _navController.value != 0.0 &&
+          _navController.status != AnimationStatus.reverse) {
+        _navController.reverse();
+      } else if (n.direction == ScrollDirection.forward &&
+          _navController.value != 1.0 &&
+          _navController.status != AnimationStatus.forward) {
+        _navController.forward();
+      } else if (n.direction == ScrollDirection.idle) {
+        if (_navController.value != 1.0) {
+          _navController.forward();
+        }
+      }
+    }
+    if (n is ScrollEndNotification) {
+      if (_navController.value != 1.0) {
+        _navController.forward();
+      }
+    }
+    return false;
   }
 
   void _onFavoriteToggle(ProductModel product) {
@@ -139,14 +166,14 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen>
       FavoritesController.addToGlobalFavorites(product.id);
     }
 
-    final isFavorite = FavoritesController.isProductFavorite(product.id);
-    final updatedProduct = product.copyWith(isFavorite: isFavorite);
+    final isFav = FavoritesController.isProductFavorite(product.id);
+    final updated = product.copyWith(isFavorite: isFav);
 
     final idx = _restaurantProducts.indexWhere((p) => p.id == product.id);
-    if (idx != -1) _restaurantProducts[idx] = updatedProduct;
+    if (idx != -1) _restaurantProducts[idx] = updated;
 
     final fIdx = _filteredProducts.indexWhere((p) => p.id == product.id);
-    if (fIdx != -1) _filteredProducts[fIdx] = updatedProduct;
+    if (fIdx != -1) _filteredProducts[fIdx] = updated;
 
     setState(() {});
   }
@@ -164,35 +191,51 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen>
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) => _measureNavBarHeight());
-    const double cartMargin = 16.0;
     final keyboardInset = MediaQuery.of(context).viewInsets.bottom;
     final isKeyboardOpen = keyboardInset > 0;
+    const double cartMargin = 16.0;
 
-    return CartAnimationWrapper(
-      child: AnnotatedRegion<SystemUiOverlayStyle>(
-        value: const SystemUiOverlayStyle(
-          statusBarColor: Colors.transparent,
-          statusBarIconBrightness: Brightness.dark,
-        ),
-        child: Scaffold(
-          backgroundColor: const Color(0xFFF5F5F5),
-          body: Stack(
-            children: [
-              Column(
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+      ),
+    );
+
+    return Scaffold(
+      backgroundColor: AppColors.homeGrey,
+      body: NotificationListener<ScrollNotification>(
+        onNotification: _onScrollNotification,
+        child: Stack(
+          children: [
+            SafeArea(
+              child: Column(
                 children: [
-                  CommonAppBar(
-                    title: restaurant.name,
-                    subtitle: restaurant.address,
-                    showBackButton: true,
-                    showNotification: false,
-                    showProfile: false,
-                    onBackTap: () => Get.back(),
+                  // ✅ AppBar animation (same as home)
+                  ClipRect(
+                    child: SizeTransition(
+                      axisAlignment: -1,
+                      sizeFactor: _barAnim,
+                      child: CommonAppBar(
+                        title: restaurant.name,
+                        subtitle: restaurant.address,
+                        showBackButton: true,
+                        showNotification: false,
+                        showProfile: false,
+                        onBackTap: () => Get.back(),
+                      ),
+                    ),
                   ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 0),
-                    child: Column(
-                      children: [
-                        Container(
+
+                  // ✅ Fixed Search + Category section (grouped like home)
+                  Column(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 16.w,
+                          vertical: 12.h,
+                        ),
+                        child: Container(
                           height: 48.h,
                           decoration: BoxDecoration(
                             color: Colors.white,
@@ -213,6 +256,7 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen>
                                     border: InputBorder.none,
                                     enabledBorder: InputBorder.none,
                                     focusedBorder: InputBorder.none,
+
                                     contentPadding: EdgeInsets.symmetric(
                                       horizontal: 16.w,
                                     ),
@@ -230,169 +274,169 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen>
                             ],
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 24.h),
-                  SizedBox(
-                    height: 30.h,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      padding: EdgeInsets.symmetric(horizontal: 16.w),
-                      itemCount: _categories.length,
-                      itemBuilder: (_, idx) {
-                        final cat = _categories[idx];
-                        final sel = cat == _selectedCategory;
-                        return GestureDetector(
-                          onTap: () => _filterProducts(cat),
-                          child: Container(
-                            margin: EdgeInsets.only(right: 8.w),
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 12.w,
-                              vertical: 8.h,
-                            ),
-                            decoration: BoxDecoration(
-                              color: sel ? AppColors.beakYellow : Colors.white,
-                              borderRadius: BorderRadius.circular(4.r),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withValues(alpha: .1),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 2),
+                      ),
+
+                      SizedBox(
+                        height: 30.h,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          padding: EdgeInsets.symmetric(horizontal: 16.w),
+                          itemCount: _categories.length,
+                          itemBuilder: (_, idx) {
+                            final cat = _categories[idx];
+                            final sel = cat == _selectedCategory;
+                            return GestureDetector(
+                              onTap: () => _filterProducts(cat),
+                              child: Container(
+                                margin: EdgeInsets.only(right: 8.w),
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 12.w,
+                                  vertical: 8.h,
                                 ),
-                              ],
-                            ),
-                            child: Text(
-                              cat,
-                              style: getTextStyle(
-                                font: CustomFonts.inter,
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.black,
+                                decoration: BoxDecoration(
+                                  color: sel
+                                      ? AppColors.beakYellow
+                                      : Colors.white,
+                                  borderRadius: BorderRadius.circular(4.r),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey.withValues(alpha: .1),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: Text(
+                                  cat,
+                                  style: getTextStyle(
+                                    font: CustomFonts.inter,
+                                    fontSize: 12.sp,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.black,
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
                   ),
+                  16.verticalSpace,
+                  // ✅ Scrollable product list
                   Expanded(
-                    child: AnimatedBuilder(
-                      animation: _navController,
-                      builder: (_, __) {
-                        final bottomInset = isKeyboardOpen
-                            ? 0.0
-                            : _navController.value * _navBarHeight;
-                        return Padding(
-                          padding: EdgeInsets.only(bottom: bottomInset),
-                          child: _isLoading
-                              ? const Center(child: CircularProgressIndicator())
-                              : _filteredProducts.isEmpty
-                              ? _emptyState()
-                              : _productGrid(),
-                        );
-                      },
-                    ),
+                    child: _isLoading
+                        ? const Center(child: CircularProgressIndicator())
+                        : _filteredProducts.isEmpty
+                        ? _emptyState()
+                        : SingleChildScrollView(
+                            controller: _scroll,
+                            padding: EdgeInsets.only(
+                              left: 16.w,
+                              right: 16.w,
+                              bottom: _navBarHeight,
+                            ),
+                            child: _buildGrid(),
+                          ),
                   ),
                 ],
               ),
+            ),
 
-              /// Bottom navbar (hidden when keyboard opens)
-              Positioned(
-                left: 0,
-                right: 0,
-                bottom: 0,
-                child: AnimatedSlide(
-                  duration: const Duration(milliseconds: 180),
-                  offset: isKeyboardOpen
-                      ? const Offset(0, 1)
-                      : const Offset(0, 0),
-                  child: KeyedSubtree(
-                    key: _navKey,
-                    child: CustomNavBar(
-                      currentIndex: -1,
-                      onTap: _onNavItemTapped,
+            // ✅ Navbar (category-style)
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: AnimatedSlide(
+                duration: const Duration(milliseconds: 180),
+                offset: isKeyboardOpen
+                    ? const Offset(0, 1)
+                    : const Offset(0, 0),
+                child: SizeTransition(
+                  axisAlignment: 1.0,
+                  sizeFactor: _navController,
+                  child: SafeArea(
+                    top: false,
+                    bottom: false,
+                    child: KeyedSubtree(
+                      key: _navKey,
+                      child: CustomNavBar(
+                        currentIndex: -1,
+                        onTap: _onNavItemTapped,
+                      ),
                     ),
                   ),
                 ),
               ),
-
-              /// Floating cart button
-              AnimatedBuilder(
-                animation: _navController,
-                builder: (_, __) {
-                  final inset =
-                      (isKeyboardOpen
-                          ? keyboardInset
-                          : _navController.value * _navBarHeight) +
-                      cartMargin;
-                  return FloatingCartButton(bottomInset: inset);
-                },
-              ),
-              AnimatedBuilder(
-                animation: _navController,
-                builder: (context, _) {
-                  final inset = (_navController.value * _navBarHeight);
-                  return LiveOrderIndicator(bottomInset: inset);
-                },
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _emptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.restaurant_menu,
-            size: 64.sp,
-            color: const Color(0xFFB8B8B8),
-          ),
-          SizedBox(height: 16.h),
-          Text(
-            'No items found',
-            style: getTextStyle(
-              font: CustomFonts.obviously,
-              fontSize: 16.sp,
-              fontWeight: FontWeight.w500,
-              color: const Color(0xFFB8B8B8),
             ),
-          ),
-        ],
+
+            AnimatedBuilder(
+              animation: _navController,
+              builder: (_, __) {
+                final inset =
+                    (isKeyboardOpen
+                        ? keyboardInset
+                        : _navController.value * _navBarHeight) +
+                    cartMargin;
+                return FloatingCartButton(bottomInset: inset);
+              },
+            ),
+
+            AnimatedBuilder(
+              animation: _navController,
+              builder: (_, __) {
+                final inset = (_navController.value * _navBarHeight);
+                return LiveOrderIndicator(bottomInset: inset);
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _productGrid() {
-    return SingleChildScrollView(
-      padding: EdgeInsets.symmetric(horizontal: 16.w),
-      child: GridView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3,
-          crossAxisSpacing: 8.w,
-          mainAxisSpacing: 8.h,
-          childAspectRatio: 0.7.h,
+  Widget _emptyState() => Center(
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(Icons.restaurant_menu, size: 64.sp, color: Colors.grey),
+        SizedBox(height: 16.h),
+        Text(
+          'No items found',
+          style: getTextStyle(
+            font: CustomFonts.obviously,
+            fontSize: 16.sp,
+            fontWeight: FontWeight.w500,
+            color: Colors.grey,
+          ),
         ),
-        itemCount: _filteredProducts.length,
-        itemBuilder: (_, idx) {
-          final prod = _filteredProducts[idx];
-          return UnifiedProductCard(
-            product: prod,
-            onTap: () => _onProductTap(prod),
-            onAddToCart: () => _onAddToCart(prod),
-            onFavoriteToggle: () => _onFavoriteToggle(prod),
-            variant: ProductCardVariant.category,
-            isGroceryCategory: false,
-          );
-        },
+      ],
+    ),
+  );
+
+  Widget _buildGrid() {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        crossAxisSpacing: 8.w,
+        mainAxisSpacing: 8.h,
+        childAspectRatio: 0.7.h,
       ),
+      itemCount: _filteredProducts.length,
+      itemBuilder: (_, idx) {
+        final prod = _filteredProducts[idx];
+        return UnifiedProductCard(
+          product: prod,
+          onTap: () => _onProductTap(prod),
+          onAddToCart: () => _onAddToCart(prod),
+          onFavoriteToggle: () => _onFavoriteToggle(prod),
+          variant: ProductCardVariant.category,
+          isGroceryCategory: false,
+        );
+      },
     );
   }
 }

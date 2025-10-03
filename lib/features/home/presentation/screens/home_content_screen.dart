@@ -33,7 +33,7 @@ class _HomeContentScreenState extends State<HomeContentScreen>
 
     _barAnim = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 220),
+      duration: const Duration(milliseconds: 500),
       value: 1,
     );
 
