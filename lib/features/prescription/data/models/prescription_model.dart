@@ -188,7 +188,13 @@ class PrescriptionResponseModel {
   }
 }
 
-enum PrescriptionStatus { uploaded, processing, responded, expired, rejected }
+enum PrescriptionStatus {
+  uploaded,
+  underReview,
+  valid,
+  invalid,
+  medicinesReady,
+}
 
 enum VendorResponseStatus {
   pending,
@@ -202,15 +208,30 @@ extension PrescriptionStatusExtension on PrescriptionStatus {
   String get displayName {
     switch (this) {
       case PrescriptionStatus.uploaded:
-        return 'Uploaded';
-      case PrescriptionStatus.processing:
-        return 'Verifying';
-      case PrescriptionStatus.responded:
-        return 'Available';
-      case PrescriptionStatus.expired:
-        return 'Expired';
-      case PrescriptionStatus.rejected:
-        return 'Rejected';
+        return 'Prescription Uploaded';
+      case PrescriptionStatus.underReview:
+        return 'Prescription Uploaded';
+      case PrescriptionStatus.valid:
+        return 'Prescription Valid';
+      case PrescriptionStatus.invalid:
+        return 'Prescription Invalid';
+      case PrescriptionStatus.medicinesReady:
+        return 'Medicines Ready';
+    }
+  }
+
+  String get subHeader {
+    switch (this) {
+      case PrescriptionStatus.uploaded:
+        return '';
+      case PrescriptionStatus.underReview:
+        return 'Under Review';
+      case PrescriptionStatus.valid:
+        return 'Checking medicines';
+      case PrescriptionStatus.invalid:
+        return 'Expired date/Incomplete/Unclear/etc';
+      case PrescriptionStatus.medicinesReady:
+        return 'View List';
     }
   }
 
@@ -218,14 +239,14 @@ extension PrescriptionStatusExtension on PrescriptionStatus {
     switch (this) {
       case PrescriptionStatus.uploaded:
         return 'Your prescription has been uploaded successfully';
-      case PrescriptionStatus.processing:
-        return 'Pharmacies are verifying medicine availability';
-      case PrescriptionStatus.responded:
-        return 'Medicines are available from pharmacies';
-      case PrescriptionStatus.expired:
-        return 'Prescription has expired';
-      case PrescriptionStatus.rejected:
-        return 'Prescription could not be verified';
+      case PrescriptionStatus.underReview:
+        return 'A pharmacy has opened your prescription for review';
+      case PrescriptionStatus.valid:
+        return 'Prescription is valid, checking medicine availability';
+      case PrescriptionStatus.invalid:
+        return 'Prescription could not be validated';
+      case PrescriptionStatus.medicinesReady:
+        return 'Medicines are ready for your order';
     }
   }
 }

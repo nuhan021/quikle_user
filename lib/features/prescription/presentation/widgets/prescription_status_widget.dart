@@ -58,14 +58,14 @@ class PrescriptionStatusWidget extends StatelessWidget {
     switch (status) {
       case PrescriptionStatus.uploaded:
         return Colors.blue;
-      case PrescriptionStatus.processing:
+      case PrescriptionStatus.underReview:
         return Colors.orange;
-      case PrescriptionStatus.responded:
+      case PrescriptionStatus.valid:
         return Colors.green;
-      case PrescriptionStatus.expired:
+      case PrescriptionStatus.invalid:
         return Colors.red;
-      case PrescriptionStatus.rejected:
-        return Colors.red;
+      case PrescriptionStatus.medicinesReady:
+        return Colors.green;
     }
   }
 }
