@@ -5,6 +5,8 @@ import 'package:quikle_user/features/auth/controllers/login_controller.dart';
 import 'package:quikle_user/features/auth/data/services/auth_service.dart';
 import 'package:quikle_user/routes/app_routes.dart';
 
+import '../presentation/screens/splash_wrapper.dart';
+
 class VerificationController extends GetxController {
   final RxList<String> otpDigits = List.generate(6, (_) => '').obs;
   final LoginController loginController = Get.find<LoginController>();
@@ -99,7 +101,8 @@ class VerificationController extends GetxController {
           loginController.clearInputs();
           loginController.clearPhone();
           clearOtp();
-          Get.offAllNamed(AppRoute.getWelcome());
+          // Get.offAllNamed(AppRoute.getWelcome());
+          Get.offAll(() => const SplashWrapper());
         } else {
           errorMessage.value = response.errorMessage;
           Get.snackbar(

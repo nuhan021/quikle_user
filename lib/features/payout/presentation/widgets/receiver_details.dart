@@ -18,32 +18,42 @@ class ReceiverDetails extends StatelessWidget {
       final receiverName = payoutController.getCurrentReceiverName();
       final receiverPhone = payoutController.getCurrentReceiverPhone();
 
-      return Row(
-        children: [
-          Expanded(
-            child: Text(
-              'Order for $receiverName ${receiverPhone.isNotEmpty ? "($receiverPhone)" : ""}',
-              style: getTextStyle(
-                font: CustomFonts.inter,
-                fontSize: 14.sp,
-                fontWeight: FontWeight.w400,
-                color: AppColors.ebonyBlack,
+      return Container(
+        padding: EdgeInsets.symmetric(horizontal: 12.w),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border.all(color: AppColors.ebonyBlack, width: 1.8),
+          borderRadius: BorderRadius.circular(8.r),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                '$receiverName ${receiverPhone.isNotEmpty ? "($receiverPhone)" : ""}',
+                style: getTextStyle(
+                  font: CustomFonts.inter,
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.ebonyBlack,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
-          ),
-          TextButton(
-            onPressed: () => _showReceiverModal(context),
-            child: Text(
-              'Change',
-              style: getTextStyle(
-                font: CustomFonts.inter,
-                fontSize: 14.sp,
-                fontWeight: FontWeight.w500,
-                color: AppColors.beakYellow,
+            TextButton(
+              onPressed: () => _showReceiverModal(context),
+              child: Text(
+                'Change',
+                style: getTextStyle(
+                  font: CustomFonts.inter,
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.beakYellow,
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       );
     });
   }

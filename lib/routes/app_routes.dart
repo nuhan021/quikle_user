@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:quikle_user/features/auth/presentation/screens/splash_wrapper.dart';
 import 'package:quikle_user/features/auth/presentation/screens/verification_scree.dart';
 import 'package:quikle_user/features/auth/presentation/screens/welcome_screen.dart';
 import 'package:quikle_user/features/main/presentation/screens/main_screen.dart';
@@ -61,6 +62,7 @@ class AppRoute {
   static const String _orderInvoice = '/order-invoice';
   static const String _prescriptionList = '/prescription-list';
   static const String _prescriptionDetails = '/prescription-details';
+  static const String splashWrapper = '/splashWrapper';
 
   static String getSplashScreen() => _splash;
   static String getLoginScreen() => _login;
@@ -93,12 +95,13 @@ class AppRoute {
   static String getOrderInvoice() => _orderInvoice;
   static String getPrescriptionList() => _prescriptionList;
   static String getPrescriptionDetails() => _prescriptionDetails;
+  static String getSplashWrapper() => splashWrapper;
 
   static final List<GetPage<dynamic>> routes = <GetPage>[
     GetPage(name: _splash, page: () => const SplashScreen()),
     GetPage(name: _login, page: () => const LoginScreen()),
     GetPage(name: _verify, page: () => const VerificationScreen()),
-    GetPage(name: _welcome, page: () => const WelcomeScreen()),
+    //GetPage(name: _welcome, page: () => const WelcomeScreen()),
     GetPage(
       name: _home,
       page: () {
@@ -165,7 +168,7 @@ class AppRoute {
       name: _prescriptionDetails,
       page: () => const PrescriptionDetailsScreen(),
     ),
-
+    GetPage(name: AppRoute.splashWrapper, page: () => const SplashWrapper()),
     // GetPage(
     //   name: _home,
     //   page: () => const _PlaceholderHome(),

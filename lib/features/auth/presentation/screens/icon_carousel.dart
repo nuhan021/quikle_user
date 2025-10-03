@@ -5,10 +5,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class IconRowMarquee extends StatefulWidget {
   final List<ImageProvider> images;
-  final double boxSize; // square card size (logical)
-  final double gap; // gap between cards
-  final double speed; // px/sec
-  final double offsetSlots; // e.g., 0.5 = half-slot visual phase
+  final double boxSize;
+  final double gap;
+  final double speed;
+  final double offsetSlots;
   final bool reverse;
 
   const IconRowMarquee({
@@ -31,7 +31,6 @@ class _IconRowMarqueeState extends State<IconRowMarquee>
   late final Ticker _ticker;
   double _lastTs = 0;
 
-  // layout
   double _slotW = 0;
   double _itemW = 0;
   double _spacing = 0;
@@ -63,7 +62,6 @@ class _IconRowMarqueeState extends State<IconRowMarquee>
     final period = widget.images.length * _slotW;
     if (period <= 0) return;
 
-    // keep near center to avoid drift
     final center = period * 500;
     if ((next - center).abs() > period * 400) {
       next = center + (next - center) % period;
@@ -82,7 +80,6 @@ class _IconRowMarqueeState extends State<IconRowMarquee>
     _spacing = widget.gap.w;
     _slotW = _itemW + _spacing;
 
-    // phase as *padding*, not scroll offset
     final phasePx = ((_slotW > 0) ? (widget.offsetSlots % 1) * _slotW : 0.0);
 
     final leftPad = widget.reverse ? _spacing / 2 : _spacing / 2 + phasePx;
@@ -117,14 +114,14 @@ class _FigmaBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final boxHeight = size * 1.3;
+    final boxHeight = size;
 
     return Container(
       width: size,
       height: boxHeight,
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: .1),
-        borderRadius: BorderRadius.circular(boxHeight * 0.2), // rounded corners
+        borderRadius: BorderRadius.circular(12.r),
         border: Border.all(
           color: Colors.white.withValues(alpha: .15),
           width: 1,
@@ -137,14 +134,9 @@ class _FigmaBox extends StatelessWidget {
           ),
         ],
       ),
-      child: Center(
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(boxHeight * 0.15),
-          child: Image(
-            image: image, // image unchanged
-            fit: BoxFit.cover,
-          ),
-        ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12.r),
+        child: Image(image: image, fit: BoxFit.cover),
       ),
     );
   }
