@@ -111,6 +111,7 @@ class _HomeContentScreenState extends State<HomeContentScreen>
                             color: AppColors.primary,
                             child: ListView(
                               controller: _scroll,
+                              physics: const ClampingScrollPhysics(),
                               padding: EdgeInsets.only(top: 12.h, bottom: 24.h),
                               children: [
                                 // Prescription Status Indicator
@@ -139,6 +140,7 @@ class _HomeContentScreenState extends State<HomeContentScreen>
                                   )
                                 else
                                   _buildFilteredSection(),
+                                SizedBox(height: 50.h),
                               ],
                             ),
                           ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:quikle_user/core/common/styles/global_text_style.dart';
+import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 import 'package:quikle_user/core/utils/constants/image_path.dart';
 import '../../controllers/payout_controller.dart';
@@ -242,13 +243,14 @@ class DeliveryOptionsSection extends StatelessWidget {
               value: controller.isUrgentDelivery,
               onChanged: (value) => controller.toggleUrgentDelivery(),
               activeThumbColor: Colors.white,
-              activeTrackColor: Colors.black,
+              activeTrackColor: AppColors.beakYellow, // active: red track
               inactiveThumbColor: Colors.white,
-              inactiveTrackColor: Colors.black,
+              inactiveTrackColor: AppColors.ebonyBlack, // inactive: grey track
             );
           }),
+
           SizedBox(width: 8.w),
-          Icon(Icons.info_outline, size: 16.sp, color: const Color(0xFFE03E1A)),
+          Icon(Icons.info_outline, size: 16.sp, color: Colors.red),
         ],
       ),
     );

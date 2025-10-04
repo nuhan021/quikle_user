@@ -453,7 +453,9 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
               crossAxisCount: 3,
               crossAxisSpacing: 8.w,
               mainAxisSpacing: 8.h,
-              childAspectRatio: 0.75.sp,
+              childAspectRatio: controller.isMedicineCategory
+                  ? 0.6.sp
+                  : 0.75.sp,
             ),
             itemCount: controller.displayProducts.length,
             itemBuilder: (context, index) {
@@ -466,6 +468,9 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
                 onFavoriteToggle: () => controller.onFavoriteToggle(product),
                 isGroceryCategory: controller.isGroceryCategory,
                 shop: shop,
+                cardAspectRatio: controller.isMedicineCategory
+                    ? 0.6.sp
+                    : 0.75.sp,
               );
             },
           ),

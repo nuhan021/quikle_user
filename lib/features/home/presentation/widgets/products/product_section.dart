@@ -2,10 +2,10 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:quikle_user/core/common/styles/global_text_style.dart';
+import 'package:quikle_user/core/common/widgets/unified_product_card.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 import '../../../data/models/product_model.dart';
-import 'product_item.dart';
 
 class ProductSection extends StatelessWidget {
   final ProductSectionModel section;
@@ -91,19 +91,22 @@ class ProductSection extends StatelessWidget {
               crossAxisCount: 3,
               crossAxisSpacing: 8.w,
               mainAxisSpacing: 8.h,
-              childAspectRatio: 0.75.sp,
-              //childAspectRatio: categoryTitle == "Medicines" ? 0.6.sp : 0.75.sp,
+              // childAspectRatio: 0.75.sp,
+              childAspectRatio: categoryTitle == "Medicines" ? 0.65.sp : 0.8.sp,
             ),
             itemCount: visibleCount,
             itemBuilder: (context, index) {
               final product = section.products[index];
-              return ProductItem(
+              return UnifiedProductCard(
                 product: product,
                 onTap: () => onProductTap(product),
                 onAddToCart: () => onAddToCart(product),
                 onFavoriteToggle: onFavoriteToggle != null
                     ? () => onFavoriteToggle!(product)
                     : null,
+                cardAspectRatio: categoryTitle == "Medicines"
+                    ? 0.65.sp
+                    : 0.8.sp,
               );
             },
           ),

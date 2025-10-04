@@ -96,7 +96,7 @@ class _QuantitySelectorState extends State<QuantitySelector> {
             GestureDetector(
               onTap: widget.onDecrease,
               child: Container(
-                //width: 24.w,
+                width: 24.w,
                 height: 24.h,
                 decoration: BoxDecoration(
                   color: Colors.transparent,
@@ -127,7 +127,7 @@ class _QuantitySelectorState extends State<QuantitySelector> {
               onTap: _handleIncrease,
               child: Container(
                 width: 24.w,
-                // height: 24.h,
+                height: 24.h,
                 decoration: BoxDecoration(
                   color: Colors.transparent,
                   borderRadius: BorderRadius.circular(12.r),

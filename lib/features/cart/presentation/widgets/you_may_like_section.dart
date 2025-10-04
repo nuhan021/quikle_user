@@ -38,8 +38,11 @@ class _YouMayLikeSectionState extends State<YouMayLikeSection> {
     try {
       final allProducts = await _homeService.fetchAllProducts();
       allProducts.shuffle();
+      final nonMedicineProducts = allProducts
+          .where((p) => !p.isMedicine)
+          .toList();
       setState(() {
-        _products = allProducts.take(6).toList();
+        _products = nonMedicineProducts.take(6).toList();
         _isLoading = false;
       });
     } catch (e) {
@@ -81,7 +84,7 @@ class _YouMayLikeSectionState extends State<YouMayLikeSection> {
               crossAxisCount: 3,
               crossAxisSpacing: 8.w,
               mainAxisSpacing: 8.h,
-              childAspectRatio: 0.7.sp,
+              childAspectRatio: 0.75.sp,
             ),
             itemCount: _products.length,
             itemBuilder: (context, index) {
@@ -94,6 +97,7 @@ class _YouMayLikeSectionState extends State<YouMayLikeSection> {
                 onFavoriteToggle: () => widget.onFavoriteToggle?.call(product),
                 variant: ProductCardVariant.youMayLike,
                 isGroceryCategory: true,
+                cardAspectRatio: 0.75.sp,
               );
             },
           ),

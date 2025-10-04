@@ -4,7 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:get/get.dart';
 
 class WhatsAppService {
-  static const String _whatsappBusinessNumber = '+1234567890';
+  static const String _whatsappBusinessNumber = '+8801867316696';
 
   static Future<void> requestCustomOrder({
     required String searchQuery,

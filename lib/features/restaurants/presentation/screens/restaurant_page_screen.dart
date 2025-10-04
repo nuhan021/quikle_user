@@ -422,7 +422,7 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen>
         crossAxisCount: 3,
         crossAxisSpacing: 8.w,
         mainAxisSpacing: 8.h,
-        childAspectRatio: 0.7.h,
+        childAspectRatio: 0.7.sp,
       ),
       itemCount: _filteredProducts.length,
       itemBuilder: (_, idx) {
@@ -434,6 +434,7 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen>
           onFavoriteToggle: () => _onFavoriteToggle(prod),
           variant: ProductCardVariant.category,
           isGroceryCategory: false,
+          cardAspectRatio: 0.75.sp,
         );
       },
     );
