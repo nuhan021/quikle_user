@@ -27,11 +27,13 @@ class UnifiedProductCard extends StatefulWidget {
   final ShopModel? shop;
   final int? quantity;
   final bool enableCartAnimation;
+  final double cardAspectRatio;
 
   const UnifiedProductCard({
     super.key,
     required this.product,
     required this.onTap,
+    required this.cardAspectRatio,
     this.onAddToCart,
     this.onFavoriteToggle,
     this.onRemove,
@@ -101,12 +103,12 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
     );
   }
 
-  double _cardAspectRatio(BuildContext context) {
-    final h = MediaQuery.of(context).size.height;
-    if (h >= 900) return 0.75;
-    if (h >= 780) return 0.70;
-    return 0.65;
-  }
+  // double _cardAspectRatio(BuildContext context) {
+  //   final h = MediaQuery.of(context).size.height;
+  //   if (h >= 900) return 0.75;
+  //   if (h >= 780) return 0.70;
+  //   return 0.65;
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -124,7 +126,7 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
     return GestureDetector(
       onTap: widget.onTap,
       child: AspectRatio(
-        aspectRatio: _cardAspectRatio(context),
+        aspectRatio: widget.cardAspectRatio,
         child: Container(
           decoration: ShapeDecoration(
             color: AppColors.textWhite,
@@ -143,9 +145,13 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
           child: Column(
             //mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              _buildImageSection(),
+              Container(
+                child: _buildImageSection(),
+                //color: AppColors.textWhite,
+                height: 70.h,
+              ),
               Padding(
                 padding: EdgeInsets.fromLTRB(
                   widget.variant == ProductCardVariant.youMayLike ? 6.w : 6.w,
@@ -164,13 +170,13 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
   }
 
   Widget _buildImageSection() {
-    final imageHeight = 50.h;
+    // final imageHeight = 50.h;
 
     return Stack(
       children: [
         Container(
           key: _imageKey,
-          height: imageHeight,
+          // height: imageHeight,
           width: double.infinity,
           decoration: ShapeDecoration(
             shape: RoundedRectangleBorder(

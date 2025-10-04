@@ -91,8 +91,8 @@ class ProductSection extends StatelessWidget {
               crossAxisCount: 3,
               crossAxisSpacing: 8.w,
               mainAxisSpacing: 8.h,
-              childAspectRatio: 0.75.sp,
-              //childAspectRatio: categoryTitle == "Medicines" ? 0.6.sp : 0.75.sp,
+              // childAspectRatio: 0.75.sp,
+              childAspectRatio: categoryTitle == "Medicines" ? 0.65.sp : 0.8.sp,
             ),
             itemCount: visibleCount,
             itemBuilder: (context, index) {
@@ -104,6 +104,9 @@ class ProductSection extends StatelessWidget {
                 onFavoriteToggle: onFavoriteToggle != null
                     ? () => onFavoriteToggle!(product)
                     : null,
+                cardAspectRatio: categoryTitle == "Medicines"
+                    ? 0.65.sp
+                    : 0.8.sp,
               );
             },
           ),

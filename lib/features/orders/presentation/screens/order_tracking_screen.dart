@@ -35,7 +35,7 @@ class OrderTrackingScreen extends StatelessWidget {
               child: RefreshIndicator(
                 onRefresh: controller.refreshTrackingData,
                 child: SingleChildScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(),
+                  physics: const ClampingScrollPhysics(),
                   child: Column(
                     children: [
                       SizedBox(height: 16.h),
