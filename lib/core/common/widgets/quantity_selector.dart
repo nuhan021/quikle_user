@@ -85,62 +85,61 @@ class _QuantitySelectorState extends State<QuantitySelector> {
     return Container(
       decoration: BoxDecoration(
         color: widget.backgroundColor ?? const Color(0xFF4CAF50),
-        borderRadius: BorderRadius.circular(widget.borderRadius ?? 14.r),
+        borderRadius: BorderRadius.circular(widget.borderRadius ?? 8.r),
       ),
-      child: Padding(
-        padding: const EdgeInsets.only(left: 2.0, right: 2.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            // Minus button
-            GestureDetector(
-              onTap: widget.onDecrease,
-              child: Container(
-                width: 24.w,
-                height: 24.h,
-                decoration: BoxDecoration(
-                  color: Colors.transparent,
-                  borderRadius: BorderRadius.circular(12.r),
-                ),
-                child: Icon(
-                  Icons.remove,
-                  color: widget.iconColor ?? Colors.white,
-                  size: widget.iconSize ?? 16.sp,
-                ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          // Minus button
+          GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: widget.onDecrease,
+            child: Container(
+              width: 24.w,
+              height: 24.h,
+              decoration: BoxDecoration(
+                color: Colors.transparent,
+                borderRadius: BorderRadius.circular(12.r),
+              ),
+              child: Icon(
+                Icons.remove,
+                color: widget.iconColor ?? Colors.white,
+                size: widget.iconSize ?? 16.sp,
               ),
             ),
+          ),
 
-            // Quantity display
-            Text(
-              widget.quantity.toString(),
-              style: getTextStyle(
-                font: CustomFonts.inter,
-                fontSize: widget.fontSize ?? 14.sp,
-                fontWeight: FontWeight.w500,
-                color: widget.textColor ?? Colors.white,
-              ),
+          // Quantity display
+          Text(
+            widget.quantity.toString(),
+            style: getTextStyle(
+              font: CustomFonts.inter,
+              fontSize: widget.fontSize ?? 14.sp,
+              fontWeight: FontWeight.w500,
+              color: widget.textColor ?? Colors.white,
             ),
+          ),
 
-            // Plus button
-            GestureDetector(
-              key: _plusButtonKey,
-              onTap: _handleIncrease,
-              child: Container(
-                width: 24.w,
-                height: 24.h,
-                decoration: BoxDecoration(
-                  color: Colors.transparent,
-                  borderRadius: BorderRadius.circular(12.r),
-                ),
-                child: Icon(
-                  Icons.add,
-                  color: widget.iconColor ?? Colors.white,
-                  size: widget.iconSize ?? 16.sp,
-                ),
+          // Plus button
+          GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            key: _plusButtonKey,
+            onTap: _handleIncrease,
+            child: Container(
+              width: 24.w,
+              height: 24.h,
+              decoration: BoxDecoration(
+                color: Colors.transparent,
+                borderRadius: BorderRadius.circular(12.r),
+              ),
+              child: Icon(
+                Icons.add,
+                color: widget.iconColor ?? Colors.white,
+                size: widget.iconSize ?? 16.sp,
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
