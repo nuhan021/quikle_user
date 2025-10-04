@@ -89,97 +89,96 @@ class _CategoriesScreenState extends State<CategoriesScreen>
             ),
             SizedBox(height: 4.h),
             Expanded(
-              child: Obx(
-                () {
-                  if (controller.isLoading) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
+              child: Obx(() {
+                if (controller.isLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                }
 
-                  final listChildren = <Widget>[];
+                final listChildren = <Widget>[];
 
-                  if (controller.isShowingAllCategories) {
-                    listChildren.addAll(
-                      controller.productSections.map(
-                        (section) => ProductSection(
-                          section: section,
-                          onProductTap: controller.onProductPressed,
-                          onAddToCart: controller.onAddToCartPressed,
-                          onViewAllTap: () =>
-                              controller.onViewAllPressed(section.categoryId),
-                          categoryIconPath: controller
-                              .getCategoryIconPath(section.categoryId),
-                          categoryTitle: controller
-                              .getCategoryTitle(section.categoryId),
-                          onFavoriteToggle: controller.onFavoriteToggle,
+                if (controller.isShowingAllCategories) {
+                  listChildren.addAll(
+                    controller.productSections.map(
+                      (section) => ProductSection(
+                        section: section,
+                        onProductTap: controller.onProductPressed,
+                        onAddToCart: controller.onAddToCartPressed,
+                        onViewAllTap: () =>
+                            controller.onViewAllPressed(section.categoryId),
+                        categoryIconPath: controller.getCategoryIconPath(
+                          section.categoryId,
                         ),
+                        categoryTitle: controller.getCategoryTitle(
+                          section.categoryId,
+                        ),
+                        onFavoriteToggle: controller.onFavoriteToggle,
                       ),
-                    );
-                  } else {
-                    listChildren.add(
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 16.w),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            if (controller.filteredProducts.isNotEmpty) ...[
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    controller.categories
-                                        .firstWhere(
-                                          (cat) =>
-                                              cat.id ==
-                                              controller.selectedCategoryId,
-                                        )
-                                        .title,
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                  GestureDetector(
-                                    onTap: () => controller.onViewAllPressed(
-                                      controller.selectedCategoryId,
-                                    ),
-                                    child: const Text(
-                                      'View all',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                        color: Color(0xFFFF6B35),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ] else ...[
-                              const Center(
-                                child: Text(
-                                  'No products found for this category',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.grey,
+                    ),
+                  );
+                } else {
+                  listChildren.add(
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 16.w),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (controller.filteredProducts.isNotEmpty) ...[
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  controller.categories
+                                      .firstWhere(
+                                        (cat) =>
+                                            cat.id ==
+                                            controller.selectedCategoryId,
+                                      )
+                                      .title,
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.black,
                                   ),
                                 ),
+                                GestureDetector(
+                                  onTap: () => controller.onViewAllPressed(
+                                    controller.selectedCategoryId,
+                                  ),
+                                  child: const Text(
+                                    'View all',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                      color: Color(0xFFFF6B35),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ] else ...[
+                            const Center(
+                              child: Text(
+                                'No products found for this category',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.grey,
+                                ),
                               ),
-                            ],
+                            ),
                           ],
-                        ),
+                        ],
                       ),
-                    );
-                  }
-
-                  return ListView(
-                    controller: _scroll,
-                    physics: const BouncingScrollPhysics(),
-                    padding: EdgeInsets.only(bottom: 24.h),
-                    children: listChildren,
+                    ),
                   );
-                },
-              ),
+                }
+
+                return ListView(
+                  controller: _scroll,
+                  physics: const ClampingScrollPhysics(),
+                  padding: EdgeInsets.only(bottom: 24.h),
+                  children: listChildren,
+                );
+              }),
             ),
           ],
         ),
