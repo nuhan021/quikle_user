@@ -140,6 +140,7 @@ class _HomeContentScreenState extends State<HomeContentScreen>
                                   )
                                 else
                                   _buildFilteredSection(),
+                                SizedBox(height: 50.h),
                               ],
                             ),
                           ),

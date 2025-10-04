@@ -52,6 +52,7 @@ class CartScreen extends StatelessWidget {
           children: [
             Expanded(
               child: SingleChildScrollView(
+                physics: const ClampingScrollPhysics(),
                 padding: EdgeInsets.symmetric(horizontal: 16.w),
                 child: Column(
                   children: [

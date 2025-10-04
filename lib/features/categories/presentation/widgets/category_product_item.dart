@@ -10,12 +10,14 @@ class CategoryProductItem extends StatelessWidget {
   final VoidCallback? onFavoriteToggle;
   final bool isGroceryCategory;
   final ShopModel? shop;
+  final double cardAspectRatio;
 
   const CategoryProductItem({
     super.key,
     required this.product,
     required this.onTap,
     required this.onAddToCart,
+    required this.cardAspectRatio,
     this.onFavoriteToggle,
     this.isGroceryCategory = false,
     this.shop,
@@ -31,6 +33,7 @@ class CategoryProductItem extends StatelessWidget {
       variant: ProductCardVariant.category,
       isGroceryCategory: isGroceryCategory,
       shop: shop,
+      cardAspectRatio: cardAspectRatio,
     );
   }
 }

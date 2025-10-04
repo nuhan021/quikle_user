@@ -27,8 +27,6 @@ class CategoriesSection extends StatelessWidget {
         final bool hasBounded =
             constraints.hasBoundedHeight && constraints.maxHeight.isFinite;
 
-        // Never give less than one item’s height.
-
         final double listHeight = hasBounded
             ? math.max(kHeight, constraints.maxHeight - verticalPad)
             : kHeight;
@@ -41,7 +39,7 @@ class CategoriesSection extends StatelessWidget {
             height: listHeight,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              physics: const BouncingScrollPhysics(),
+              physics: const ClampingScrollPhysics(),
               padding: EdgeInsets.symmetric(horizontal: 16.w),
               itemCount: categories.length,
               itemBuilder: (context, index) {

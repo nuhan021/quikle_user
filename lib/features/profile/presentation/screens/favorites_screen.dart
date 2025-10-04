@@ -164,6 +164,7 @@ class FavoritesScreen extends StatelessWidget {
                   onAddToCart: () => _addToCart(product, cartController),
                   onFavoriteToggle: () => _toggleFavorite(product, controller),
                   enableCartAnimation: true,
+                  cardAspectRatio: 0.75.sp,
                 );
               },
             ),

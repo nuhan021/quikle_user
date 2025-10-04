@@ -236,7 +236,7 @@ class _RestaurantMenuScreenState extends State<RestaurantMenuScreen> {
                                         crossAxisCount: 2,
                                         crossAxisSpacing: 8.w,
                                         mainAxisSpacing: 8.h,
-                                        childAspectRatio: 0.75,
+                                        childAspectRatio: 0.75.sp,
                                       ),
                                   itemCount: _categoryProducts.length,
                                   itemBuilder: (context, index) {
@@ -251,6 +251,7 @@ class _RestaurantMenuScreenState extends State<RestaurantMenuScreen> {
                                       },
                                       onAddToCart: () {},
                                       onFavoriteToggle: () {},
+                                      cardAspectRatio: 0.75.sp,
                                     );
                                   },
                                 ),

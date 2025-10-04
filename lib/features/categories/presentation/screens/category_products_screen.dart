@@ -313,7 +313,7 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
           crossAxisCount: 3,
           crossAxisSpacing: 8.w,
           mainAxisSpacing: 8.h,
-          childAspectRatio: 0.75.h,
+          childAspectRatio: 0.75.sp,
         ),
         itemCount: controller.displayProducts.length,
         itemBuilder: (context, index) {
@@ -327,6 +327,7 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
             onFavoriteToggle: () => controller.onFavoriteToggle(product),
             isGroceryCategory: controller.isGroceryCategory,
             shop: shop,
+            cardAspectRatio: 0.75.sp,
           );
         },
       ),
