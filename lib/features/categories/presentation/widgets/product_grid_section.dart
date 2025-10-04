@@ -96,7 +96,7 @@ class ProductGridSection extends StatelessWidget {
             mainAxisSpacing: 8.h,
             // childAspectRatio: crossAxisCount == 3 ? 0.8.h : 1.2.h,
             childAspectRatio: crossAxisCount == 3
-                ? (isMedicalCategory ? 0.7.sp : 0.8.sp)
+                ? (isMedicalCategory ? 0.65.sp : 0.8.sp)
                 : (isMedicalCategory ? 1.0.sp : 1.2.sp),
           ),
           itemCount: displayProducts.length,
@@ -111,6 +111,9 @@ class ProductGridSection extends StatelessWidget {
               onFavoriteToggle: () => onFavoriteToggle(product),
               isGroceryCategory: isGroceryCategory,
               shop: shop,
+              cardAspectRatio: crossAxisCount == 3
+                  ? (isMedicalCategory ? 0.65.sp : 0.8.sp)
+                  : (isMedicalCategory ? 1.0.sp : 1.2.sp),
             );
           },
         ),

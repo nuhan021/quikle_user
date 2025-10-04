@@ -30,16 +30,15 @@ class LoginScreen extends StatelessWidget {
           child: LayoutBuilder(
             builder: (context, constraints) {
               return SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
+                physics: const ClampingScrollPhysics(),
                 child: ConstrainedBox(
                   constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                  child: IntrinsicHeight(
-                    child: Column(
-                      children: [
-                        _buildTopSection(context),
-                        Expanded(child: _buildContentSection(controller)),
-                      ],
-                    ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _buildTopSection(context),
+                      _buildContentSection(controller),
+                    ],
                   ),
                 ),
               );

@@ -20,13 +20,11 @@ class _FloatingCartButtonState extends State<FloatingCartButton> {
   @override
   void initState() {
     super.initState();
-    // Register the cart button key with the position service
     WidgetsBinding.instance.addPostFrameCallback((_) {
       try {
         final positionService = Get.find<CartPositionService>();
         positionService.setCartButtonKey(_cartButtonKey);
       } catch (e) {
-        // Service not yet initialized, will be set later
         Get.put(CartPositionService()).setCartButtonKey(_cartButtonKey);
       }
     });
@@ -36,15 +34,11 @@ class _FloatingCartButtonState extends State<FloatingCartButton> {
   Widget build(BuildContext context) {
     final cartController = Get.find<CartController>();
     final double systemBottomInset = MediaQuery.of(context).viewPadding.bottom;
-
-    // Update cart position whenever the button position changes
     WidgetsBinding.instance.addPostFrameCallback((_) {
       try {
         final positionService = Get.find<CartPositionService>();
         positionService.setCartButtonKey(_cartButtonKey);
-      } catch (e) {
-        // Service not available
-      }
+      } catch (e) {}
     });
 
     return Obx(() {
@@ -53,10 +47,10 @@ class _FloatingCartButtonState extends State<FloatingCartButton> {
       }
 
       return Positioned(
-        bottom: widget.bottomInset + systemBottomInset,
+        bottom: widget.bottomInset + systemBottomInset + 4.h,
         right: 16.w,
         child: GestureDetector(
-          key: _cartButtonKey, // Add the key here
+          key: _cartButtonKey,
           onTap: () => Get.to(() => const CartScreen()),
           child: SizedBox(
             width: 64.w,

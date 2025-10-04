@@ -26,10 +26,9 @@ class MinimalSubcategoriesSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // ✔ Reduced vertical padding under header
         Container(
           width: double.infinity,
-          padding: EdgeInsets.symmetric(vertical: 4.h), // was 8.h
+          padding: EdgeInsets.symmetric(vertical: 4.h),
           decoration: const BoxDecoration(
             border: Border(
               bottom: BorderSide(width: 3, color: Color(0xFFEDEDED)),
@@ -46,19 +45,16 @@ class MinimalSubcategoriesSection extends StatelessWidget {
           ),
         ),
 
-        // (Optional) keep it minimal; remove or keep tiny spacing
-        SizedBox(height: 4.h), // was 6.h
-        // ✔ Fixed height, no hidden ListView padding, non-primary
+        SizedBox(height: 4.h),
         SizedBox(
-          height: 60.h, // was 65.h
+          height: 60.h,
           width: double.infinity,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             primary: false,
             padding: EdgeInsets.zero,
-            itemCount: subcategories.length + 1, // +1 for "All" option
+            itemCount: subcategories.length + 1,
             itemBuilder: (context, index) {
-              // First item is "All"
               if (index == 0) {
                 final isSelected = selectedSubcategory == null;
                 return GestureDetector(
@@ -112,8 +108,6 @@ class MinimalSubcategoriesSection extends StatelessWidget {
                   ),
                 );
               }
-
-              // Remaining items are subcategories
               final subcategory = subcategories[index - 1];
               final isSelected = selectedSubcategory?.id == subcategory.id;
 
@@ -126,7 +120,6 @@ class MinimalSubcategoriesSection extends StatelessWidget {
                     children: [
                       Container(
                         height: 38.h,
-                        //width: 38.h, // ensures consistent chip size
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(12.r),
                           border: isSelected
@@ -152,7 +145,6 @@ class MinimalSubcategoriesSection extends StatelessWidget {
                       ),
                       SizedBox(height: 4.h),
                       SizedBox(
-                        //width: 56.w, // keeps label on one line nicely
                         child: Text(
                           subcategory.title,
                           textAlign: TextAlign.center,

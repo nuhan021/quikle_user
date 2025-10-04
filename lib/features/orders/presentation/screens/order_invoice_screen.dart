@@ -34,6 +34,8 @@ class OrderInvoiceScreen extends StatelessWidget {
             ),
             Expanded(
               child: SingleChildScrollView(
+                // physics: const ClampingScrollPhysics(),
+                physics: const ClampingScrollPhysics(),
                 padding: EdgeInsets.all(16.w),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

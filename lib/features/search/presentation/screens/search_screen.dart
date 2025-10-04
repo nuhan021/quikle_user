@@ -283,7 +283,7 @@ class SearchScreen extends StatelessWidget {
                 crossAxisCount: 3,
                 crossAxisSpacing: 8.w,
                 mainAxisSpacing: 8.h,
-                childAspectRatio: 0.7,
+                childAspectRatio: 0.6.sp,
               ),
               itemCount: controller.searchResults.length,
               itemBuilder: (context, index) {
@@ -294,6 +294,7 @@ class SearchScreen extends StatelessWidget {
                   onAddToCart: () => controller.onAddToCartPressed(product),
                   onFavoriteToggle: () => controller.onFavoriteToggle(product),
                   variant: ProductCardVariant.category,
+                  cardAspectRatio: 0.6.sp,
                 );
               },
             ),
