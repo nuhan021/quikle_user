@@ -84,7 +84,7 @@ class _YouMayLikeSectionState extends State<YouMayLikeSection> {
               crossAxisCount: 3,
               crossAxisSpacing: 8.w,
               mainAxisSpacing: 8.h,
-              childAspectRatio: 0.75.sp,
+              childAspectRatio: 0.70,
             ),
             itemCount: _products.length,
             itemBuilder: (context, index) {
@@ -97,7 +97,6 @@ class _YouMayLikeSectionState extends State<YouMayLikeSection> {
                 onFavoriteToggle: () => widget.onFavoriteToggle?.call(product),
                 variant: ProductCardVariant.youMayLike,
                 isGroceryCategory: true,
-                cardAspectRatio: 0.75.sp,
               );
             },
           ),

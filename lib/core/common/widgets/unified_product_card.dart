@@ -27,13 +27,11 @@ class UnifiedProductCard extends StatefulWidget {
   final ShopModel? shop;
   final int? quantity;
   final bool enableCartAnimation;
-  final double cardAspectRatio;
 
   const UnifiedProductCard({
     super.key,
     required this.product,
     required this.onTap,
-    required this.cardAspectRatio,
     this.onAddToCart,
     this.onFavoriteToggle,
     this.onRemove,
@@ -118,97 +116,78 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
   Widget _buildVerticalCard() {
     return GestureDetector(
       onTap: widget.onTap,
-      child: AspectRatio(
-        aspectRatio: widget.cardAspectRatio,
-        child: Container(
-          decoration: ShapeDecoration(
-            color: AppColors.textWhite,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8.r),
-            ),
-            shadows: [
-              BoxShadow(
-                color: AppColors.cardColor,
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-                spreadRadius: 0,
-              ),
-            ],
+      child: Container(
+        decoration: ShapeDecoration(
+          color: AppColors.textWhite,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8.r),
           ),
-          child: Column(
-            //mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Container(
-                child: _buildImageSection(),
-                //color: AppColors.textWhite,
-                height: 70.h,
-              ),
-              Padding(
-                padding: EdgeInsets.fromLTRB(
-                  widget.variant == ProductCardVariant.youMayLike ? 6.w : 6.w,
-                  widget.variant == ProductCardVariant.youMayLike ? 6.w : 6.w,
-                  widget.variant == ProductCardVariant.youMayLike ? 6.w : 6.w,
-                  6.w, // tighter bottom padding
-                ),
-
+          shadows: [
+            BoxShadow(
+              color: AppColors.cardColor,
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+              spreadRadius: 0,
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Flexible image section - takes available space
+            Flexible(flex: 5, fit: FlexFit.tight, child: _buildImageSection()),
+            // Product info section - shrinks to content
+            Flexible(
+              flex: 4,
+              fit: FlexFit.loose,
+              child: Padding(
+                padding: EdgeInsets.all(6.w),
                 child: _buildProductInfo(),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 
   Widget _buildImageSection() {
-    // final imageHeight = 50.h;
-
     return Stack(
       children: [
         Container(
           key: _imageKey,
-          // height: imageHeight,
           width: double.infinity,
+          height: double.infinity,
           decoration: ShapeDecoration(
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(
-                top: Radius.circular(
-                  widget.variant == ProductCardVariant.youMayLike ? 4.r : 4.r,
-                ),
-              ),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(8.r)),
             ),
           ),
           clipBehavior: Clip.antiAlias,
-          child: Align(
-            alignment: Alignment.topCenter,
-            child: Image.asset(
-              widget.product.imagePath,
-              fit: BoxFit.cover,
-              filterQuality: FilterQuality.high,
-            ),
+          child: Image.asset(
+            widget.product.imagePath,
+            fit: BoxFit.contain,
+            filterQuality: FilterQuality.high,
           ),
         ),
 
         // OTC Badge
         if (widget.product.isMedicine && widget.product.isOTC)
           Positioned(
-            // top: widget.variant == ProductCardVariant.youMayLike ? 0.h : 0.h,
-            left: 6.w,
+            top: 4.h,
+            left: 4.w,
             child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.h),
+              padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
               decoration: BoxDecoration(
                 color: AppColors.grocery,
-                borderRadius: BorderRadius.circular(3.r),
+                borderRadius: BorderRadius.circular(4.r),
               ),
               child: Text(
                 'OTC',
                 style: getTextStyle(
                   font: CustomFonts.inter,
-                  fontSize: widget.variant == ProductCardVariant.youMayLike
-                      ? 8.sp
-                      : 7.sp,
+                  fontSize: 8.sp,
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
                 ),
@@ -217,8 +196,8 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
           ),
         if (widget.onFavoriteToggle != null)
           Positioned(
-            top: 0.h,
-            right: 6.w,
+            top: 4.h,
+            right: 4.w,
             child: GestureDetector(
               onTap: widget.onFavoriteToggle,
               child: Obx(() {
@@ -227,7 +206,7 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
                 );
                 return Icon(
                   isFavorite ? Icons.favorite : Icons.favorite_border,
-                  size: 20.sp,
+                  size: 18.sp,
                   color: isFavorite ? Colors.red : Colors.black54,
                 );
               }),
@@ -240,63 +219,76 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
   Widget _buildProductInfo() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.max,
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Text(
-          widget.product.title,
-          style: getTextStyle(
-            font: CustomFonts.inter,
-            fontSize: 12.sp,
-            fontWeight: FontWeight.w500,
-            color: AppColors.ebonyBlack,
+        // Product title - flexible
+        Flexible(
+          child: Text(
+            widget.product.title,
+            style: getTextStyle(
+              font: CustomFonts.inter,
+              fontSize: 11.sp,
+              fontWeight: FontWeight.w500,
+              color: AppColors.ebonyBlack,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
         ),
 
-        SizedBox(height: 4.h),
+        SizedBox(height: 3.h),
 
+        // Rating and category info
         if (widget.variant == ProductCardVariant.category ||
             widget.variant == ProductCardVariant.youMayLike) ...[
           Row(
             children: [
-              const Icon(Icons.star, color: Colors.orange, size: 12),
+              Icon(Icons.star, color: Colors.orange, size: 10.sp),
               SizedBox(width: 2.w),
               Text(
                 '${widget.product.rating}',
                 style: getTextStyle(
                   font: CustomFonts.inter,
-                  fontSize: 10.sp,
+                  fontSize: 9.sp,
                   fontWeight: FontWeight.w500,
                   color: AppColors.ebonyBlack,
                 ),
               ),
-              SizedBox(width: 8.w),
+              SizedBox(width: 4.w),
               Expanded(child: _buildCategorySpecificInfo()),
             ],
           ),
+          SizedBox(height: 4.h),
         ],
 
         // Urgent delivery option for medicine items only
         if (widget.product.isMedicine && widget.onAddToCart != null) ...[
-          SizedBox(height: 6.h),
           _buildUrgentDeliveryOption(),
+          SizedBox(height: 4.h),
         ],
 
-        SizedBox(height: 8.h),
+        // Price and cart button
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text(
-              widget.product.price,
-              style: getTextStyle(
-                font: CustomFonts.inter,
-                fontSize: 14.sp,
-                fontWeight: FontWeight.w600,
-                color: AppColors.ebonyBlack,
+            Flexible(
+              child: Text(
+                widget.product.price,
+                style: getTextStyle(
+                  font: CustomFonts.inter,
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.ebonyBlack,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
-            if (widget.onAddToCart != null) _buildCartSection(),
+            if (widget.onAddToCart != null) ...[
+              SizedBox(width: 4.w),
+              _buildCartSection(),
+            ],
           ],
         ),
       ],
@@ -337,28 +329,20 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
       key: _cartButtonKey,
       onTap: widget.product.canAddToCart ? _handleAddToCart : null,
       child: Container(
-        //width: 24.w,
-        height: 24.w,
+        width: 22.w,
+        height: 22.w,
         decoration: BoxDecoration(
           color: widget.product.canAddToCart
               ? Colors.transparent
               : Colors.grey.withValues(alpha: 0.3),
-          borderRadius: BorderRadius.circular(6.r),
+          borderRadius: BorderRadius.circular(4.r),
         ),
         clipBehavior: Clip.antiAlias,
-        child: Center(
-          child: Image.asset(
-            ImagePath.cartIcon,
-            width: widget.variant == ProductCardVariant.youMayLike
-                ? 22.w
-                : null,
-            height: widget.variant == ProductCardVariant.youMayLike
-                ? 22.w
-                : null,
-            fit: BoxFit.cover,
-            filterQuality: FilterQuality.high,
-            color: widget.product.canAddToCart ? null : Colors.grey,
-          ),
+        child: Image.asset(
+          ImagePath.cartIcon,
+          fit: BoxFit.contain,
+          filterQuality: FilterQuality.high,
+          color: widget.product.canAddToCart ? null : Colors.grey,
         ),
       ),
     );
@@ -379,24 +363,28 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
             }
           },
           child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 10.h),
+            padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 4.h),
             decoration: BoxDecoration(
               color: isUrgent ? Color(0xFFFFEBEE) : Colors.white,
-              border: Border.all(color: Colors.red, width: 1.5),
-              borderRadius: BorderRadius.circular(20.r),
+              border: Border.all(color: Colors.red, width: 1),
+              borderRadius: BorderRadius.circular(12.r),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.access_time, size: 12.sp, color: Colors.red),
-                SizedBox(width: 2.w),
-                Text(
-                  'Urgent Delivery',
-                  style: getTextStyle(
-                    font: CustomFonts.inter,
-                    fontSize: 9.sp,
-                    fontWeight: FontWeight.w800,
-                    color: Colors.red,
+                Icon(Icons.access_time, size: 10.sp, color: Colors.red),
+                SizedBox(width: 3.w),
+                Flexible(
+                  child: Text(
+                    'Urgent Delivery',
+                    style: getTextStyle(
+                      font: CustomFonts.inter,
+                      fontSize: 8.sp,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.red,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
@@ -410,15 +398,16 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
   Widget _buildCategorySpecificInfo() {
     if (widget.isGroceryCategory) {
       return Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.scale_outlined, color: AppColors.featherGrey, size: 10.w),
+          Icon(Icons.scale_outlined, color: AppColors.featherGrey, size: 9.sp),
           SizedBox(width: 2.w),
           Flexible(
             child: Text(
               widget.product.weight ?? '1 piece',
               style: getTextStyle(
                 font: CustomFonts.inter,
-                fontSize: 10.sp,
+                fontSize: 8.sp,
                 color: AppColors.featherGrey,
               ),
               maxLines: 1,
@@ -429,15 +418,16 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
       );
     } else {
       return Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.access_time, color: AppColors.featherGrey, size: 10.w),
+          Icon(Icons.access_time, color: AppColors.featherGrey, size: 9.sp),
           SizedBox(width: 2.w),
           Flexible(
             child: Text(
               widget.shop?.deliveryTime ?? '30 Min',
               style: getTextStyle(
                 font: CustomFonts.inter,
-                fontSize: 10.sp,
+                fontSize: 8.sp,
                 color: AppColors.featherGrey,
               ),
               maxLines: 1,

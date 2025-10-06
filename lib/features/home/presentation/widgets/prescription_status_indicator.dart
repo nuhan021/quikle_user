@@ -184,7 +184,7 @@ class PrescriptionStatusIndicator extends StatelessWidget {
       case PrescriptionStatus.invalid:
         return _StatusMeta(
           header: 'Prescription Invalid',
-          subHeader: 'Expired date/Incomplete/Unclear/etc',
+          subHeader: 'Tap to view details',
           icon: Icons.error_outline,
           color: Colors.red,
         );
