@@ -114,105 +114,106 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
   }
 
   Widget _buildVerticalCard() {
-    return GestureDetector(
-      onTap: widget.onTap,
-      child: Container(
-        decoration: ShapeDecoration(
-          color: AppColors.textWhite,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8.r),
+    return Container(
+      decoration: ShapeDecoration(
+        color: AppColors.textWhite,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
+        shadows: [
+          BoxShadow(
+            color: AppColors.cardColor,
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+            spreadRadius: 0,
           ),
-          shadows: [
-            BoxShadow(
-              color: AppColors.cardColor,
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-              spreadRadius: 0,
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Flexible(flex: 4, fit: FlexFit.loose, child: _buildImageSection()),
+          Flexible(
+            flex: 3,
+            fit: FlexFit.loose,
+            child: Padding(
+              padding: EdgeInsets.all(6.w),
+              child: _buildProductInfo(),
             ),
-          ],
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Flexible image section - takes available space
-            Flexible(flex: 5, fit: FlexFit.tight, child: _buildImageSection()),
-            // Product info section - shrinks to content
-            Flexible(
-              flex: 4,
-              fit: FlexFit.loose,
-              child: Padding(
-                padding: EdgeInsets.all(6.w),
-                child: _buildProductInfo(),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildImageSection() {
-    return Stack(
-      children: [
-        Container(
-          key: _imageKey,
-          width: double.infinity,
-          height: double.infinity,
-          decoration: ShapeDecoration(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(8.r)),
+    return GestureDetector(
+      onTap: widget
+          .onTap, // 👈 entire top section (image + white area) is clickable
+      behavior:
+          HitTestBehavior.opaque, // ensures even empty space inside is tappable
+      child: Stack(
+        children: [
+          Container(
+            key: _imageKey,
+            width: double.infinity,
+            height: double.infinity,
+            decoration: ShapeDecoration(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(8.r)),
+              ),
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: Image.asset(
+              widget.product.imagePath,
+              fit: BoxFit.contain,
+              filterQuality: FilterQuality.high,
             ),
           ),
-          clipBehavior: Clip.antiAlias,
-          child: Image.asset(
-            widget.product.imagePath,
-            fit: BoxFit.contain,
-            filterQuality: FilterQuality.high,
-          ),
-        ),
 
-        // OTC Badge
-        if (widget.product.isMedicine && widget.product.isOTC)
-          Positioned(
-            top: 4.h,
-            left: 4.w,
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
-              decoration: BoxDecoration(
-                color: AppColors.grocery,
-                borderRadius: BorderRadius.circular(4.r),
-              ),
-              child: Text(
-                'OTC',
-                style: getTextStyle(
-                  font: CustomFonts.inter,
-                  fontSize: 8.sp,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
+          // OTC badge
+          if (widget.product.isMedicine && widget.product.isOTC)
+            Positioned(
+              top: 4.h,
+              left: 4.w,
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+                decoration: BoxDecoration(
+                  color: AppColors.grocery,
+                  borderRadius: BorderRadius.circular(4.r),
+                ),
+                child: Text(
+                  'OTC',
+                  style: getTextStyle(
+                    font: CustomFonts.inter,
+                    fontSize: 8.sp,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ),
-          ),
-        if (widget.onFavoriteToggle != null)
-          Positioned(
-            top: 4.h,
-            right: 4.w,
-            child: GestureDetector(
-              onTap: widget.onFavoriteToggle,
-              child: Obx(() {
-                final isFavorite = FavoritesController.isProductFavorite(
-                  widget.product.id,
-                );
-                return Icon(
-                  isFavorite ? Icons.favorite : Icons.favorite_border,
-                  size: 18.sp,
-                  color: isFavorite ? Colors.red : Colors.black54,
-                );
-              }),
+
+          // Favorite icon
+          if (widget.onFavoriteToggle != null)
+            Positioned(
+              top: 4.h,
+              right: 4.w,
+              child: GestureDetector(
+                onTap: widget.onFavoriteToggle,
+                child: Obx(() {
+                  final isFavorite = FavoritesController.isProductFavorite(
+                    widget.product.id,
+                  );
+                  return Icon(
+                    isFavorite ? Icons.favorite : Icons.favorite_border,
+                    size: 18.sp,
+                    color: isFavorite ? Colors.red : Colors.black54,
+                  );
+                }),
+              ),
             ),
-          ),
-      ],
+        ],
+      ),
     );
   }
 

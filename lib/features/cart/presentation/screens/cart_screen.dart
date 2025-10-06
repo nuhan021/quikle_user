@@ -324,49 +324,55 @@ class CartScreen extends StatelessWidget {
     final paymentMethodController = Get.find<PaymentMethodController>();
 
     Get.bottomSheet(
-      Container(
-        padding: EdgeInsets.all(16.w),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),
-        ),
-        child: Obx(() {
-          final paymentMethods = paymentMethodController.paymentMethods;
+      SafeArea(
+        top: false, // allow full sheet up to status bar
+        child: Container(
+          padding: EdgeInsets.all(16.w),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),
+          ),
+          child: Obx(() {
+            final paymentMethods = paymentMethodController.paymentMethods;
 
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'Select Payment Method',
-                style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w600),
+            return SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Select Payment Method',
+                    style: TextStyle(
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  SizedBox(height: 16.h),
+
+                  ...paymentMethods.map((method) {
+                    return ListTile(
+                      leading: method.type.iconPath != null
+                          ? Image.asset(
+                              method.type.iconPath!,
+                              width: 24,
+                              height: 24,
+                            )
+                          : const Icon(Icons.payment),
+                      title: Text(method.type.displayName),
+                      onTap: () {
+                        paymentMethodController.selectPaymentMethod(method);
+                        Get.back();
+                      },
+                    );
+                  }).toList(),
+                ],
               ),
-              SizedBox(height: 16.h),
-
-              ...paymentMethods.map((method) {
-                return ListTile(
-                  leading: method.type.iconPath != null
-                      ? Image.asset(
-                          method.type.iconPath!,
-                          width: 24,
-                          height: 24,
-                        )
-                      : Icon(Icons.payment),
-                  title: Text(method.type.displayName),
-                  onTap: () {
-                    paymentMethodController.selectPaymentMethod(method);
-                    Get.back();
-                    // Get.snackbar(
-                    //   'Payment Method Selected',
-                    //   method.type.displayName,
-                    //   duration: const Duration(seconds: 1),
-                    // );
-                  },
-                );
-              }).toList(),
-            ],
-          );
-        }),
+            );
+          }),
+        ),
       ),
+      isScrollControlled: true, // 👈 full height if needed, goes above nav bar
+      backgroundColor: Colors.transparent,
     );
   }
 }
