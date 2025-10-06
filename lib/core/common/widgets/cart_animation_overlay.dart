@@ -159,6 +159,7 @@ class _AnimatedCartImageState extends State<AnimatedCartImage>
   late Animation<double> _size;
   late Animation<double> _opacity;
   late Animation<double> _rotation;
+  late VoidCallback _tickListener;
 
   @override
   void initState() {
@@ -226,84 +227,86 @@ class _AnimatedCartImageState extends State<AnimatedCartImage>
           ),
         );
 
+    _tickListener = () {
+      if (mounted) {
+        setState(() {});
+      }
+    };
+    _controller.addListener(_tickListener);
     _controller.forward();
   }
 
   @override
   void dispose() {
+    _controller.removeListener(_tickListener);
     _controller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (_, __) {
-        final s = _size.value;
-        final progress = _controller.value;
+    final s = _size.value;
+    final progress = _controller.value;
 
-        return Positioned(
-          left: _position.value.dx - s / 2,
-          top: _position.value.dy - s / 2,
-          child: Transform.rotate(
-            angle: _rotation.value,
-            child: Opacity(
-              opacity: _opacity.value,
-              child: Container(
-                width: s,
-                height: s,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12.r),
-                  boxShadow: [
-                    // Dynamic shadow that gets stronger during flight
-                    BoxShadow(
-                      color: Colors.black.withValues(
-                        alpha: 0.15 + (progress * 0.1),
-                      ),
-                      blurRadius: 8.r + (progress * 8.r),
-                      spreadRadius: 1.r + (progress * 2.r),
-                      offset: Offset(0, 4 + (progress * 4)),
-                    ),
-                    // Additional glow effect
-                    BoxShadow(
-                      color: Colors.orange.withValues(alpha: 0.3 * progress),
-                      blurRadius: 16.r,
-                      spreadRadius: 0,
-                      offset: const Offset(0, 0),
-                    ),
-                  ],
+    return Positioned(
+      left: _position.value.dx - s / 2,
+      top: _position.value.dy - s / 2,
+      child: Transform.rotate(
+        angle: _rotation.value,
+        child: Opacity(
+          opacity: _opacity.value,
+          child: Container(
+            width: s,
+            height: s,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12.r),
+              boxShadow: [
+                // Dynamic shadow that gets stronger during flight
+                BoxShadow(
+                  color: Colors.black.withValues(
+                    alpha: 0.15 + (progress * 0.1),
+                  ),
+                  blurRadius: 8.r + (progress * 8.r),
+                  spreadRadius: 1.r + (progress * 2.r),
+                  offset: Offset(0, 4 + (progress * 4)),
                 ),
-                clipBehavior: Clip.antiAlias,
-                child: Stack(
-                  children: [
-                    // Product image
-                    Image.asset(
-                      widget.animation.imagePath,
-                      fit: BoxFit.cover,
-                      filterQuality: FilterQuality.high,
-                      width: s,
-                      height: s,
-                    ),
-                    // Subtle overlay for better visibility during animation
-                    Container(
-                      decoration: BoxDecoration(
-                        gradient: RadialGradient(
-                          colors: [
-                            Colors.transparent,
-                            Colors.white.withValues(alpha: 0.1 * progress),
-                          ],
-                          stops: const [0.3, 1.0],
-                        ),
-                      ),
-                    ),
-                  ],
+                // Additional glow effect
+                BoxShadow(
+                  color: Colors.orange.withValues(alpha: 0.3 * progress),
+                  blurRadius: 16.r,
+                  spreadRadius: 0,
+                  offset: const Offset(0, 0),
                 ),
-              ),
+              ],
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: Stack(
+              children: [
+                // Product image
+                Image.asset(
+                  widget.animation.imagePath,
+                  fit: BoxFit.cover,
+                  filterQuality: FilterQuality.high,
+                  width: s,
+                  height: s,
+                ),
+                // Subtle overlay for better visibility during animation
+                Container(
+                  decoration: BoxDecoration(
+                    gradient: RadialGradient(
+                      colors: [
+                        Colors.transparent,
+                        Colors.white.withValues(alpha: 0.1 * progress),
+                      ],
+                      stops: const [0.3, 1.0],
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 }

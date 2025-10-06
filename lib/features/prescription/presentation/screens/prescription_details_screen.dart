@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:quikle_user/core/common/styles/global_text_style.dart';
@@ -31,7 +32,12 @@ class _PrescriptionDetailsScreenState extends State<PrescriptionDetailsScreen> {
   Widget build(BuildContext context) {
     final controller = Get.find<PrescriptionController>();
     final prescription = Get.arguments as PrescriptionModel;
-
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+      ),
+    );
     return CartAnimationWrapper(
       child: Scaffold(
         backgroundColor: AppColors.backgroundLight,
@@ -50,17 +56,10 @@ class _PrescriptionDetailsScreenState extends State<PrescriptionDetailsScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 PrescriptionImageCardWidget(prescription: prescription),
-
                 SizedBox(height: 8.h),
-
                 PrescriptionInfoCardWidget(prescription: prescription),
-
                 SizedBox(height: 8.h),
-
-                PrescriptionTimelineWidget(prescription: prescription),
-
                 if (prescription.vendorResponses.isNotEmpty) ...[
-                  SizedBox(height: 8.h),
                   Text(
                     'Store Responses',
                     style: getTextStyle(
@@ -71,7 +70,6 @@ class _PrescriptionDetailsScreenState extends State<PrescriptionDetailsScreen> {
                     ),
                   ),
                   SizedBox(height: 8.h),
-
                   ...prescription.vendorResponses.map((response) {
                     if (response.status == VendorResponseStatus.approved ||
                         response.status ==
@@ -144,22 +142,17 @@ class _PrescriptionDetailsScreenState extends State<PrescriptionDetailsScreen> {
                       ),
                     );
                   }).toList(),
-                  SizedBox(height: 30.h),
-                ] else
-                  SizedBox(height: 30.h),
+                  SizedBox(height: 8.h),
+                ],
+                PrescriptionTimelineWidget(prescription: prescription),
+                SizedBox(height: 30.h),
               ],
             ),
           ),
         ),
-
-        floatingActionButton: SafeArea(
-          child: Padding(
-            padding: EdgeInsets.only(right: 16.w, bottom: 16.h),
-            child: Container(
-              key: _cartFabKey,
-              child: const FloatingCartButton(),
-            ),
-          ),
+        floatingActionButton: Container(
+          key: _cartFabKey,
+          child: const FloatingCartButton(),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       ),

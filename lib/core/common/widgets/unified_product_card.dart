@@ -103,13 +103,6 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
     );
   }
 
-  // double _cardAspectRatio(BuildContext context) {
-  //   final h = MediaQuery.of(context).size.height;
-  //   if (h >= 900) return 0.75;
-  //   if (h >= 780) return 0.70;
-  //   return 0.65;
-  // }
-
   @override
   Widget build(BuildContext context) {
     switch (widget.variant) {
@@ -376,55 +369,38 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
       builder: (cartController) {
         bool isUrgent = cartController.isProductUrgent(widget.product);
 
-        return Container(
-          padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 6.h),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border.all(color: Colors.red.shade400, width: 1.5),
-            borderRadius: BorderRadius.circular(12.r),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'Urgent',
-                style: getTextStyle(
-                  font: CustomFonts.inter,
-                  fontSize: 12.sp,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.red.shade600,
-                ),
-              ),
-              SizedBox(width: 12.w),
-              GestureDetector(
-                onTap: () {
-                  if (cartController.isProductInCart(widget.product)) {
-                    cartController.toggleProductUrgentStatus(widget.product);
-                  } else {
-                    cartController.addProductToCart(
-                      widget.product,
-                      isUrgent: true,
-                    );
-                    _triggerCartAnimation();
-                  }
-                },
-                child: Container(
-                  width: 16.w,
-                  height: 16.w,
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: isUrgent ? Colors.red : Colors.grey,
-                      width: 2,
-                    ),
-                    borderRadius: BorderRadius.circular(3.r),
-                    color: isUrgent ? Colors.red : Colors.transparent,
+        return GestureDetector(
+          onTap: () {
+            if (cartController.isProductInCart(widget.product)) {
+              cartController.toggleProductUrgentStatus(widget.product);
+            } else {
+              cartController.addProductToCart(widget.product, isUrgent: true);
+              _triggerCartAnimation();
+            }
+          },
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 10.h),
+            decoration: BoxDecoration(
+              color: isUrgent ? Color(0xFFFFEBEE) : Colors.white,
+              border: Border.all(color: Colors.red, width: 1.5),
+              borderRadius: BorderRadius.circular(20.r),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.access_time, size: 12.sp, color: Colors.red),
+                SizedBox(width: 2.w),
+                Text(
+                  'Urgent Delivery',
+                  style: getTextStyle(
+                    font: CustomFonts.inter,
+                    fontSize: 9.sp,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.red,
                   ),
-                  child: isUrgent
-                      ? Icon(Icons.check, size: 8.sp, color: Colors.white)
-                      : null,
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },

@@ -100,6 +100,7 @@ class _HomeContentScreenState extends State<HomeContentScreen>
                       selectedCategoryId: controller.selectedCategoryId,
                       showTitle: true,
                     ),
+                    const PrescriptionStatusIndicator(),
                   ],
                 ),
                 Expanded(
@@ -115,8 +116,6 @@ class _HomeContentScreenState extends State<HomeContentScreen>
                               padding: EdgeInsets.only(top: 12.h, bottom: 24.h),
                               children: [
                                 // Prescription Status Indicator
-                                const PrescriptionStatusIndicator(),
-                                8.verticalSpace,
                                 Center(child: OfferBanner()),
                                 12.verticalSpace,
                                 if (controller.isShowingAllCategories)
@@ -150,7 +149,6 @@ class _HomeContentScreenState extends State<HomeContentScreen>
             ),
           ),
 
-          // Voice search overlay
           Obx(() {
             if (!controller.isListening) return const SizedBox.shrink();
             return VoiceSearchOverlay(
