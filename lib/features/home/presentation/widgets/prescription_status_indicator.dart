@@ -49,8 +49,8 @@ class PrescriptionStatusIndicator extends StatelessWidget {
                   children: [
                     // Left icon
                     Container(
-                      width: 36.w,
-                      height: 36.w,
+                      width: 24.w,
+                      height: 24.w,
                       decoration: BoxDecoration(
                         color: meta.color.withValues(alpha: .20),
                         borderRadius: BorderRadius.circular(8.r),
@@ -94,7 +94,7 @@ class PrescriptionStatusIndicator extends StatelessWidget {
                                   overflow: TextOverflow.ellipsis,
                                   style: getTextStyle(
                                     font: CustomFonts.inter,
-                                    fontSize: 14.sp,
+                                    fontSize: 12.sp,
                                     fontWeight: FontWeight.w700,
                                     color: AppColors.ebonyBlack,
                                   ),
@@ -107,7 +107,7 @@ class PrescriptionStatusIndicator extends StatelessWidget {
                                     overflow: TextOverflow.ellipsis,
                                     style: getTextStyle(
                                       font: CustomFonts.inter,
-                                      fontSize: 12.sp,
+                                      fontSize: 10.sp,
                                       fontWeight: FontWeight.w500,
                                       color: AppColors.ebonyBlack.withValues(
                                         alpha: 0.7,
