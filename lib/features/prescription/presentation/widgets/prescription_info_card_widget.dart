@@ -51,6 +51,7 @@ class PrescriptionInfoCardWidget extends StatelessWidget {
 
           SizedBox(height: 16.h),
 
+          _buildInfoRow('Status', _getStatusText(prescription.status)),
           _buildInfoRow('File Name', prescription.fileName),
           _buildInfoRow('Uploaded Date', _formatDate(prescription.uploadedAt)),
           _buildInfoRow(
@@ -58,7 +59,9 @@ class PrescriptionInfoCardWidget extends StatelessWidget {
             prescription.id.substring(0, 8) + '...',
           ),
 
-          if (prescription.notes?.isNotEmpty == true)
+          // Show regular notes for non-invalid prescriptions
+          if (prescription.status != PrescriptionStatus.invalid &&
+              prescription.notes?.isNotEmpty == true)
             _buildInfoRow('Notes', prescription.notes!),
         ],
       ),
@@ -120,6 +123,21 @@ class PrescriptionInfoCardWidget extends StatelessWidget {
       return '${difference.inDays} days ago';
     } else {
       return '${date.day}/${date.month}/${date.year}';
+    }
+  }
+
+  String _getStatusText(PrescriptionStatus status) {
+    switch (status) {
+      case PrescriptionStatus.uploaded:
+        return 'Uploaded';
+      case PrescriptionStatus.underReview:
+        return 'Under Review';
+      case PrescriptionStatus.valid:
+        return 'Valid';
+      case PrescriptionStatus.invalid:
+        return 'Invalid';
+      case PrescriptionStatus.medicinesReady:
+        return 'Medicines Ready';
     }
   }
 }

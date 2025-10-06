@@ -151,7 +151,7 @@ class FavoritesScreen extends StatelessWidget {
                 crossAxisCount: 3,
                 crossAxisSpacing: 8.w,
                 mainAxisSpacing: 8.h,
-                childAspectRatio: 0.75.sp,
+                childAspectRatio: 0.70,
               ),
               itemCount: controller.favoriteProducts.length,
               itemBuilder: (context, index) {
@@ -164,7 +164,6 @@ class FavoritesScreen extends StatelessWidget {
                   onAddToCart: () => _addToCart(product, cartController),
                   onFavoriteToggle: () => _toggleFavorite(product, controller),
                   enableCartAnimation: true,
-                  cardAspectRatio: 0.75.sp,
                 );
               },
             ),
