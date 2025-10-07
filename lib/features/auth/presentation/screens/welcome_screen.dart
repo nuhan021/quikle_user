@@ -40,7 +40,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       ),
     );
 
-    _pulseAnim = Tween<double>(begin: 1.0, end: 1.08).animate(
+    _pulseAnim = Tween<double>(begin: 1.0, end: 1.15).animate(
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
 
@@ -50,7 +50,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
 
     _fadeController.forward();
 
-    Future.delayed(const Duration(seconds: 4), () async {
+    Future.delayed(const Duration(milliseconds: 3500), () async {
       if (mounted) {
         await _fadeController.reverse();
         if (mounted) widget.onFinish();
