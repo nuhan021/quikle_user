@@ -24,6 +24,8 @@ class HomeContentScreen extends StatefulWidget {
 class _HomeContentScreenState extends State<HomeContentScreen> {
   final HomeController controller = Get.find<HomeController>();
   final ScrollController _scroll = ScrollController();
+  final PrescriptionController _prescriptionController =
+      Get.find<PrescriptionController>();
 
   @override
   void dispose() {
@@ -35,7 +37,7 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
     // Refresh both home data and prescription data
     await Future.wait([
       controller.refreshData(),
-      Get.find<PrescriptionController>().refreshData(),
+      _prescriptionController.refreshData(),
     ]);
   }
 
@@ -48,10 +50,10 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
       ),
     );
 
-    final double categoriesHeaderHeight =
-        CategoriesSection.kHeight + 32.h; // list height + vertical padding
+    final double categoriesHeaderHeight = CategoriesSection.kHeight + 32.h;
     final double searchBarHeight = custom_search.SearchBar.kPreferredHeight;
-    final double filtersHeaderHeight = searchBarHeight + categoriesHeaderHeight;
+    final double baseFiltersHeaderHeight =
+        searchBarHeight + categoriesHeaderHeight;
 
     return Scaffold(
       backgroundColor: AppColors.homeGrey,
@@ -68,41 +70,60 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                 ),
                 slivers: [
                   const SliverToBoxAdapter(child: HomeAppBar()),
-                  SliverPersistentHeader(
-                    pinned: true,
-                    delegate: FixedWidgetHeaderDelegate(
-                      minExtent: filtersHeaderHeight,
-                      maxExtent: filtersHeaderHeight,
-                      backgroundColor: AppColors.homeGrey,
-                      shouldAddElevation: true,
-                      builder: (context, shrinkOffset, overlapsContent) {
-                        return Container(
-                          color: AppColors.homeGrey,
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              custom_search.SearchBar(
-                                onTap: controller.onSearchPressed,
-                                onVoiceTap: controller.onVoiceSearchPressed,
-                              ),
-                              Obx(
-                                () => CategoriesSection(
-                                  categories: controller.categories,
-                                  onCategoryTap: controller.onCategoryPressed,
-                                  selectedCategoryId:
-                                      controller.selectedCategoryId,
-                                  showTitle: true,
+                  Obx(() {
+                    final bool hasIndicator =
+                        PrescriptionStatusIndicator.hasVisibleStatus(
+                          _prescriptionController.prescriptions,
+                        );
+                    final double filtersHeaderHeight =
+                        baseFiltersHeaderHeight +
+                        (hasIndicator
+                            ? PrescriptionStatusIndicator.kPreferredHeight
+                            : 0);
+
+                    return SliverPersistentHeader(
+                      pinned: true,
+                      delegate: FixedWidgetHeaderDelegate(
+                        minExtent: filtersHeaderHeight,
+                        maxExtent: filtersHeaderHeight,
+                        backgroundColor: AppColors.homeGrey,
+                        shouldAddElevation: true,
+                        builder: (context, shrinkOffset, overlapsContent) {
+                          return SizedBox(
+                            height: filtersHeaderHeight,
+                            child: Container(
+                              color: AppColors.homeGrey,
+                              child: Align(
+                                alignment: Alignment.topCenter,
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    custom_search.SearchBar(
+                                      onTap: controller.onSearchPressed,
+                                      onVoiceTap:
+                                          controller.onVoiceSearchPressed,
+                                    ),
+                                    Obx(
+                                      () => CategoriesSection(
+                                        categories: controller.categories,
+                                        onCategoryTap:
+                                            controller.onCategoryPressed,
+                                        selectedCategoryId:
+                                            controller.selectedCategoryId,
+                                        showTitle: true,
+                                      ),
+                                    ),
+                                    if (hasIndicator)
+                                      const PrescriptionStatusIndicator(),
+                                  ],
                                 ),
                               ),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  const SliverToBoxAdapter(
-                    child: PrescriptionStatusIndicator(),
-                  ),
+                            ),
+                          );
+                        },
+                      ),
+                    );
+                  }),
                   Obx(() {
                     if (controller.isLoading) {
                       return const SliverFillRemaining(

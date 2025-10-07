@@ -10,12 +10,25 @@ import 'package:quikle_user/features/prescription/data/models/prescription_model
 class PrescriptionStatusIndicator extends StatelessWidget {
   const PrescriptionStatusIndicator({super.key});
 
+  static double get kPreferredHeight => 80.h;
+
+  static PrescriptionModel? latestActive(List<PrescriptionModel> list) {
+    if (list.isEmpty) return null;
+    final filtered = list.toList()
+      ..sort((a, b) => b.uploadedAt.compareTo(a.uploadedAt));
+    return filtered.isEmpty ? null : filtered.first;
+  }
+
+  static bool hasVisibleStatus(List<PrescriptionModel> list) {
+    return latestActive(list) != null;
+  }
+
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<PrescriptionController>();
 
     return Obx(() {
-      final latest = _latestActive(controller.prescriptions);
+      final latest = latestActive(controller.prescriptions);
       if (latest == null) return const SizedBox.shrink();
 
       final meta = _metaFor(latest.status);
@@ -148,14 +161,6 @@ class PrescriptionStatusIndicator extends StatelessWidget {
         ),
       );
     });
-  }
-
-  /// Pick the most recent, non-invalid prescription.
-  PrescriptionModel? _latestActive(List<PrescriptionModel> list) {
-    if (list.isEmpty) return null;
-    final filtered = list.toList()
-      ..sort((a, b) => b.uploadedAt.compareTo(a.uploadedAt));
-    return filtered.isEmpty ? null : filtered.first;
   }
 
   _StatusMeta _metaFor(PrescriptionStatus status) {

@@ -107,27 +107,23 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                     return SliverPadding(
                       padding: EdgeInsets.only(bottom: 100.h),
                       sliver: SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                          (context, index) {
-                            final section = controller.productSections[index];
-                            return ProductSection(
-                              section: section,
-                              onProductTap: controller.onProductPressed,
-                              onAddToCart: controller.onAddToCartPressed,
-                              onViewAllTap: () => controller.onViewAllPressed(
-                                section.categoryId,
-                              ),
-                              categoryIconPath: controller.getCategoryIconPath(
-                                section.categoryId,
-                              ),
-                              categoryTitle: controller.getCategoryTitle(
-                                section.categoryId,
-                              ),
-                              onFavoriteToggle: controller.onFavoriteToggle,
-                            );
-                          },
-                          childCount: controller.productSections.length,
-                        ),
+                        delegate: SliverChildBuilderDelegate((context, index) {
+                          final section = controller.productSections[index];
+                          return ProductSection(
+                            section: section,
+                            onProductTap: controller.onProductPressed,
+                            onAddToCart: controller.onAddToCartPressed,
+                            onViewAllTap: () =>
+                                controller.onViewAllPressed(section.categoryId),
+                            categoryIconPath: controller.getCategoryIconPath(
+                              section.categoryId,
+                            ),
+                            categoryTitle: controller.getCategoryTitle(
+                              section.categoryId,
+                            ),
+                            onFavoriteToggle: controller.onFavoriteToggle,
+                          );
+                        }, childCount: controller.productSections.length),
                       ),
                     );
                   }
