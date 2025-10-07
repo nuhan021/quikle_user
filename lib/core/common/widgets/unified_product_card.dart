@@ -131,7 +131,7 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Flexible(flex: 4, fit: FlexFit.loose, child: _buildImageSection()),
+          Flexible(flex: 3, fit: FlexFit.loose, child: _buildImageSection()),
           Flexible(
             flex: 3,
             fit: FlexFit.loose,
@@ -228,8 +228,8 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
             widget.product.title,
             style: getTextStyle(
               font: CustomFonts.inter,
-              fontSize: 11.sp,
-              fontWeight: FontWeight.w500,
+              fontSize: 12.sp,
+              fontWeight: FontWeight.w600,
               color: AppColors.ebonyBlack,
             ),
             maxLines: 1,
@@ -237,7 +237,7 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
           ),
         ),
 
-        SizedBox(height: 3.h),
+        SizedBox(height: 6.h),
 
         // Rating and category info
         if (widget.variant == ProductCardVariant.category ||
@@ -364,28 +364,28 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
             }
           },
           child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 4.h),
+            width: double.infinity,
+            padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 6.h),
             decoration: BoxDecoration(
               color: isUrgent ? Color(0xFFFFEBEE) : Colors.white,
               border: Border.all(color: Colors.red, width: 1),
               borderRadius: BorderRadius.circular(12.r),
             ),
             child: Row(
-              mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(Icons.access_time, size: 10.sp, color: Colors.red),
-                SizedBox(width: 3.w),
-                Flexible(
+                Expanded(
                   child: Text(
                     'Urgent Delivery',
                     style: getTextStyle(
                       font: CustomFonts.inter,
-                      fontSize: 8.sp,
+                      fontSize: 9.sp,
                       fontWeight: FontWeight.w700,
                       color: Colors.red,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
                   ),
                 ),
               ],
