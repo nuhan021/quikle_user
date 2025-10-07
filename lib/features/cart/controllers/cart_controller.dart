@@ -9,11 +9,13 @@ class CartController extends GetxController {
   final _cartItems = <CartItemModel>[].obs;
   final _totalItems = 0.obs;
   final _totalAmount = 0.0.obs;
+  final _isPlacingOrder = false.obs;
   List<CartItemModel> get cartItems => _cartItems;
   RxList<CartItemModel> get cartItemsObservable => _cartItems;
   int get totalItems => _totalItems.value;
   double get totalAmount => _totalAmount.value;
   bool get hasItems => _cartItems.isNotEmpty;
+  bool get isPlacingOrder => _isPlacingOrder.value;
 
   @override
   void onInit() {
@@ -77,6 +79,10 @@ class CartController extends GetxController {
     _cartItems.value = _cartService.cartItems;
     _totalItems.value = _cartService.totalItems;
     _totalAmount.value = _cartService.totalAmount;
+  }
+
+  void setPlacingOrder(bool value) {
+    _isPlacingOrder.value = value;
   }
 
   void onCheckout() {
