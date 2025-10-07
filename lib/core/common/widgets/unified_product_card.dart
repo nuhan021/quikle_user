@@ -87,7 +87,6 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
       topLeft.dy + sourceBox.size.height / 2,
     );
 
-    // Use the new improved animation method
     final startSize = sourceBox.size.shortestSide.clamp(28.0, 80.0);
 
     controller.addCartAnimation(
@@ -147,10 +146,8 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
 
   Widget _buildImageSection() {
     return GestureDetector(
-      onTap: widget
-          .onTap, // 👈 entire top section (image + white area) is clickable
-      behavior:
-          HitTestBehavior.opaque, // ensures even empty space inside is tappable
+      onTap: widget.onTap,
+      behavior: HitTestBehavior.opaque,
       child: Stack(
         children: [
           Container(
@@ -170,7 +167,6 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
             ),
           ),
 
-          // OTC badge
           if (widget.product.isMedicine && widget.product.isOTC)
             Positioned(
               top: 4.h,
@@ -193,7 +189,6 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
               ),
             ),
 
-          // Favorite icon
           if (widget.onFavoriteToggle != null)
             Positioned(
               top: 4.h,
@@ -222,7 +217,6 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Product title - flexible
         Flexible(
           child: Text(
             widget.product.title,
@@ -239,7 +233,6 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
 
         SizedBox(height: 6.h),
 
-        // Rating and category info
         if (widget.variant == ProductCardVariant.category ||
             widget.variant == ProductCardVariant.youMayLike) ...[
           Row(
@@ -262,13 +255,11 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
           SizedBox(height: 4.h),
         ],
 
-        // Urgent delivery option for medicine items only
         if (widget.product.isMedicine && widget.onAddToCart != null) ...[
           _buildUrgentDeliveryOption(),
           SizedBox(height: 4.h),
         ],
 
-        // Price and cart button
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -313,8 +304,8 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
             onDecrease: () {
               cartController.removeProductFromCart(widget.product);
             },
-            fontSize: 12.sp,
-            iconSize: 14.sp,
+            fontSize: 10.sp,
+            iconSize: 12.sp,
             enableCartAnimation: widget.enableCartAnimation,
             productImagePath: widget.product.imagePath,
           );

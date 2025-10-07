@@ -9,14 +9,12 @@ class QuantitySelector extends StatefulWidget {
   final int quantity;
   final VoidCallback onIncrease;
   final VoidCallback onDecrease;
-  final double? width;
-  final double? height;
-  final double? borderRadius;
   final Color? backgroundColor;
   final Color? textColor;
   final Color? iconColor;
   final double? fontSize;
   final double? iconSize;
+  final double? borderRadius;
   final bool enableCartAnimation;
   final String? productImagePath;
 
@@ -25,14 +23,12 @@ class QuantitySelector extends StatefulWidget {
     required this.quantity,
     required this.onIncrease,
     required this.onDecrease,
-    this.width,
-    this.height,
-    this.borderRadius,
     this.backgroundColor,
     this.textColor,
     this.iconColor,
     this.fontSize,
     this.iconSize,
+    this.borderRadius,
     this.enableCartAnimation = false,
     this.productImagePath,
   });
@@ -70,9 +66,7 @@ class _QuantitySelectorState extends State<QuantitySelector> {
           MediaQuery.of(context).size.height - 120.h,
         ),
       );
-    } catch (e) {
-      // Animation failed, continue with normal operation
-    }
+    } catch (_) {}
   }
 
   void _handleIncrease() {
@@ -83,63 +77,60 @@ class _QuantitySelectorState extends State<QuantitySelector> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      height: 22.w,
+      padding: EdgeInsets.symmetric(horizontal: 4.w),
       decoration: BoxDecoration(
         color: widget.backgroundColor ?? const Color(0xFF4CAF50),
-        borderRadius: BorderRadius.circular(widget.borderRadius ?? 8.r),
+        borderRadius: BorderRadius.circular(widget.borderRadius ?? 4.r),
       ),
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Minus button
-          GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: widget.onDecrease,
-            child: Container(
-              width: 24.w,
-              height: 24.h,
-              decoration: BoxDecoration(
-                color: Colors.transparent,
-                borderRadius: BorderRadius.circular(12.r),
+          _buildButton(icon: Icons.remove, onTap: widget.onDecrease),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 4.w),
+            child: Text(
+              widget.quantity.toString(),
+              style: getTextStyle(
+                font: CustomFonts.inter,
+                fontSize: widget.fontSize ?? 10.sp,
+                fontWeight: FontWeight.w600,
+                color: widget.textColor ?? Colors.white,
               ),
-              child: Icon(
-                Icons.remove,
-                color: widget.iconColor ?? Colors.white,
-                size: widget.iconSize ?? 16.sp,
-              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
-
-          // Quantity display
-          Text(
-            widget.quantity.toString(),
-            style: getTextStyle(
-              font: CustomFonts.inter,
-              fontSize: widget.fontSize ?? 14.sp,
-              fontWeight: FontWeight.w500,
-              color: widget.textColor ?? Colors.white,
-            ),
-          ),
-
-          // Plus button
-          GestureDetector(
-            behavior: HitTestBehavior.opaque,
+          _buildButton(
             key: _plusButtonKey,
+            icon: Icons.add,
             onTap: _handleIncrease,
-            child: Container(
-              width: 24.w,
-              height: 24.h,
-              decoration: BoxDecoration(
-                color: Colors.transparent,
-                borderRadius: BorderRadius.circular(12.r),
-              ),
-              child: Icon(
-                Icons.add,
-                color: widget.iconColor ?? Colors.white,
-                size: widget.iconSize ?? 16.sp,
-              ),
-            ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildButton({
+    Key? key,
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      key: key,
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: SizedBox(
+        width: 18.w,
+        height: double.infinity,
+        child: Center(
+          child: Icon(
+            icon,
+            color: widget.iconColor ?? Colors.white,
+            size: widget.iconSize ?? 12.sp,
+          ),
+        ),
       ),
     );
   }
