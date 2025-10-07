@@ -241,8 +241,10 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
                                     const PrescriptionUploadSection(),
                                   ],
                                   SizedBox(height: 16.h),
-                                  OfferBanner(),
-                                  SizedBox(height: 16.h),
+                                  if (!controller.isMedicineCategory) ...[
+                                    OfferBanner(),
+                                    SizedBox(height: 16.h),
+                                  ],
                                   _buildContent(controller),
                                 ],
                               ),

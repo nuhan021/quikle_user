@@ -7,6 +7,7 @@ import 'package:quikle_user/core/common/styles/global_text_style.dart';
 import 'package:quikle_user/core/common/widgets/custom_navbar.dart';
 import 'package:quikle_user/core/common/widgets/floating_cart_button.dart';
 import 'package:quikle_user/core/common/widgets/unified_product_card.dart';
+import 'package:quikle_user/core/common/widgets/cart_animation_overlay.dart';
 import 'package:quikle_user/core/data/services/product_data_service.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
@@ -201,195 +202,199 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen>
       ),
     );
 
-    return Scaffold(
-      backgroundColor: AppColors.homeGrey,
-      body: NotificationListener<ScrollNotification>(
-        onNotification: _onScrollNotification,
-        child: Stack(
-          children: [
-            SafeArea(
-              child: Column(
-                children: [
-                  // ✅ AppBar animation (same as home)
-                  ClipRect(
-                    child: SizeTransition(
-                      axisAlignment: -1,
-                      sizeFactor: _barAnim,
-                      child: CommonAppBar(
-                        title: restaurant.name,
-                        subtitle: restaurant.address,
-                        showBackButton: true,
-                        showNotification: false,
-                        showProfile: false,
-                        onBackTap: () => Get.back(),
+    return CartAnimationWrapper(
+      child: Scaffold(
+        backgroundColor: AppColors.homeGrey,
+        body: NotificationListener<ScrollNotification>(
+          onNotification: _onScrollNotification,
+          child: Stack(
+            children: [
+              SafeArea(
+                child: Column(
+                  children: [
+                    // ✅ AppBar animation (same as home)
+                    ClipRect(
+                      child: SizeTransition(
+                        axisAlignment: -1,
+                        sizeFactor: _barAnim,
+                        child: CommonAppBar(
+                          title: restaurant.name,
+                          subtitle: restaurant.address,
+                          showBackButton: true,
+                          showNotification: false,
+                          showProfile: false,
+                          onBackTap: () => Get.back(),
+                        ),
                       ),
                     ),
-                  ),
 
-                  // ✅ Fixed Search + Category section (grouped like home)
-                  Column(
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 16.w,
-                          vertical: 12.h,
-                        ),
-                        child: Container(
-                          height: 48.h,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(8.r),
+                    // ✅ Fixed Search + Category section (grouped like home)
+                    Column(
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 16.w,
+                            vertical: 12.h,
                           ),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: TextField(
-                                  decoration: InputDecoration(
-                                    hintText: 'Search',
-                                    hintStyle: getTextStyle(
-                                      font: CustomFonts.manrope,
-                                      fontSize: 14.sp,
-                                      fontWeight: FontWeight.w500,
-                                      color: const Color(0xFFB8B8B8),
-                                    ),
-                                    border: InputBorder.none,
-                                    enabledBorder: InputBorder.none,
-                                    focusedBorder: InputBorder.none,
-
-                                    contentPadding: EdgeInsets.symmetric(
-                                      horizontal: 16.w,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.only(right: 14.w),
-                                child: Icon(
-                                  Icons.mic_outlined,
-                                  size: 20.sp,
-                                  color: const Color(0xFFB8B8B8),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-
-                      SizedBox(
-                        height: 30.h,
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          padding: EdgeInsets.symmetric(horizontal: 16.w),
-                          itemCount: _categories.length,
-                          itemBuilder: (_, idx) {
-                            final cat = _categories[idx];
-                            final sel = cat == _selectedCategory;
-                            return GestureDetector(
-                              onTap: () => _filterProducts(cat),
-                              child: Container(
-                                margin: EdgeInsets.only(right: 8.w),
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 12.w,
-                                  vertical: 8.h,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: sel
-                                      ? AppColors.beakYellow
-                                      : Colors.white,
-                                  borderRadius: BorderRadius.circular(4.r),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey.withValues(alpha: .1),
-                                      blurRadius: 8,
-                                      offset: const Offset(0, 2),
-                                    ),
-                                  ],
-                                ),
-                                child: Text(
-                                  cat,
-                                  style: getTextStyle(
-                                    font: CustomFonts.inter,
-                                    fontSize: 12.sp,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                  16.verticalSpace,
-                  // ✅ Scrollable product list
-                  Expanded(
-                    child: _isLoading
-                        ? const Center(child: CircularProgressIndicator())
-                        : _filteredProducts.isEmpty
-                        ? _emptyState()
-                        : SingleChildScrollView(
-                            controller: _scroll,
-                            padding: EdgeInsets.only(
-                              left: 16.w,
-                              right: 16.w,
-                              bottom: _navBarHeight,
+                          child: Container(
+                            height: 48.h,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(8.r),
                             ),
-                            child: _buildGrid(),
-                          ),
-                  ),
-                ],
-              ),
-            ),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: TextField(
+                                    decoration: InputDecoration(
+                                      hintText: 'Search',
+                                      hintStyle: getTextStyle(
+                                        font: CustomFonts.manrope,
+                                        fontSize: 14.sp,
+                                        fontWeight: FontWeight.w500,
+                                        color: const Color(0xFFB8B8B8),
+                                      ),
+                                      border: InputBorder.none,
+                                      enabledBorder: InputBorder.none,
+                                      focusedBorder: InputBorder.none,
 
-            // ✅ Navbar (category-style)
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: AnimatedSlide(
-                duration: const Duration(milliseconds: 180),
-                offset: isKeyboardOpen
-                    ? const Offset(0, 1)
-                    : const Offset(0, 0),
-                child: SizeTransition(
-                  axisAlignment: 1.0,
-                  sizeFactor: _navController,
-                  child: SafeArea(
-                    top: false,
-                    bottom: true,
-                    child: KeyedSubtree(
-                      key: _navKey,
-                      child: CustomNavBar(
-                        currentIndex: -1,
-                        onTap: _onNavItemTapped,
+                                      contentPadding: EdgeInsets.symmetric(
+                                        horizontal: 16.w,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.only(right: 14.w),
+                                  child: Icon(
+                                    Icons.mic_outlined,
+                                    size: 20.sp,
+                                    color: const Color(0xFFB8B8B8),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+
+                        SizedBox(
+                          height: 30.h,
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            padding: EdgeInsets.symmetric(horizontal: 16.w),
+                            itemCount: _categories.length,
+                            itemBuilder: (_, idx) {
+                              final cat = _categories[idx];
+                              final sel = cat == _selectedCategory;
+                              return GestureDetector(
+                                onTap: () => _filterProducts(cat),
+                                child: Container(
+                                  margin: EdgeInsets.only(right: 8.w),
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 12.w,
+                                    vertical: 8.h,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: sel
+                                        ? AppColors.beakYellow
+                                        : Colors.white,
+                                    borderRadius: BorderRadius.circular(4.r),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey.withValues(
+                                          alpha: .1,
+                                        ),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Text(
+                                    cat,
+                                    style: getTextStyle(
+                                      font: CustomFonts.inter,
+                                      fontSize: 12.sp,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                    16.verticalSpace,
+                    // ✅ Scrollable product list
+                    Expanded(
+                      child: _isLoading
+                          ? const Center(child: CircularProgressIndicator())
+                          : _filteredProducts.isEmpty
+                          ? _emptyState()
+                          : SingleChildScrollView(
+                              controller: _scroll,
+                              padding: EdgeInsets.only(
+                                left: 16.w,
+                                right: 16.w,
+                                bottom: _navBarHeight,
+                              ),
+                              child: _buildGrid(),
+                            ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // ✅ Navbar (category-style)
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: AnimatedSlide(
+                  duration: const Duration(milliseconds: 180),
+                  offset: isKeyboardOpen
+                      ? const Offset(0, 1)
+                      : const Offset(0, 0),
+                  child: SizeTransition(
+                    axisAlignment: 1.0,
+                    sizeFactor: _navController,
+                    child: SafeArea(
+                      top: false,
+                      bottom: true,
+                      child: KeyedSubtree(
+                        key: _navKey,
+                        child: CustomNavBar(
+                          currentIndex: -1,
+                          onTap: _onNavItemTapped,
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
-            ),
 
-            AnimatedBuilder(
-              animation: _navController,
-              builder: (_, __) {
-                final inset =
-                    (isKeyboardOpen
-                        ? keyboardInset
-                        : _navController.value * _navBarHeight) +
-                    cartMargin;
-                return FloatingCartButton(bottomInset: inset);
-              },
-            ),
+              AnimatedBuilder(
+                animation: _navController,
+                builder: (_, __) {
+                  final inset =
+                      (isKeyboardOpen
+                          ? keyboardInset
+                          : _navController.value * _navBarHeight) +
+                      cartMargin;
+                  return FloatingCartButton(bottomInset: inset);
+                },
+              ),
 
-            AnimatedBuilder(
-              animation: _navController,
-              builder: (_, __) {
-                final inset = (_navController.value * _navBarHeight);
-                return LiveOrderIndicator(bottomInset: inset);
-              },
-            ),
-          ],
+              AnimatedBuilder(
+                animation: _navController,
+                builder: (_, __) {
+                  final inset = (_navController.value * _navBarHeight);
+                  return LiveOrderIndicator(bottomInset: inset);
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
