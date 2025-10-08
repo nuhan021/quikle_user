@@ -24,41 +24,44 @@ class TopRestaurantsSection extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          style: getTextStyle(
-            font: CustomFonts.obviously,
-            fontSize: 14.sp,
-            fontWeight: FontWeight.w600,
-            color: AppColors.ebonyBlack,
-          ),
-        ),
-        SizedBox(height: 16.h),
-
-        SizedBox(
-          height: 300.h, // enough height for 2 rows
-          child: GridView.builder(
-            scrollDirection: Axis.horizontal,
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2, // 2 rows
-              //mainAxisSpacing: 2.w,
-              crossAxisSpacing: 8.h,
-              childAspectRatio: 0.8,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: getTextStyle(
+              font: CustomFonts.obviously,
+              fontSize: 14.sp,
+              fontWeight: FontWeight.w600,
+              color: AppColors.ebonyBlack,
             ),
-            itemCount: restaurants.length,
-            itemBuilder: (context, index) {
-              final restaurant = restaurants[index];
-              return RestaurantCard(
-                restaurant: restaurant,
-                onTap: () => onRestaurantTap(restaurant),
-              );
-            },
           ),
-        ),
-      ],
+          SizedBox(height: 16.h),
+
+          SizedBox(
+            height: 300.h,
+            child: GridView.builder(
+              scrollDirection: Axis.horizontal,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2, // 2 rows
+                //mainAxisSpacing: 2.w,
+                crossAxisSpacing: 8.h,
+                childAspectRatio: 0.8,
+              ),
+              itemCount: restaurants.length,
+              itemBuilder: (context, index) {
+                final restaurant = restaurants[index];
+                return RestaurantCard(
+                  restaurant: restaurant,
+                  onTap: () => onRestaurantTap(restaurant),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
