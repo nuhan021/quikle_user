@@ -43,13 +43,13 @@ class CustomNavBar extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           _NavItem(
-            icon: Iconsax.home_2,
+            iconAsset: ImagePath.homeNav,
             label: 'Home',
             isSelected: currentIndex == 0,
             onTap: () => onTap(0),
           ),
           _NavItem(
-            icon: Iconsax.bag_2,
+            iconAsset: ImagePath.orderIcon,
             label: 'All Orders',
             isSelected: currentIndex == 1,
             onTap: () => onTap(1),
@@ -101,6 +101,7 @@ class _NavItem extends StatelessWidget {
 
     return Expanded(
       child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
         onTap: onTap,
         child: Padding(
           padding: EdgeInsets.symmetric(vertical: 4.h),

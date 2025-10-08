@@ -1,17 +1,20 @@
+import 'dart:async';
 import 'package:get/get.dart';
 import 'package:video_player/video_player.dart';
-
 import '../../auth/presentation/screens/login_screen.dart';
 
 class SplashController extends GetxController {
   late final VideoPlayerController video;
   final RxBool isReady = false.obs;
+  final RxBool shouldShrink = false.obs;
 
   static const double _ellipseTopIdle = 812.0;
   static const double _ellipseTopPlaying = 666.0;
   final RxDouble ellipseTop = _ellipseTopIdle.obs;
+  final RxBool showEllipse = false.obs;
   final RxBool showLogin = false.obs;
 
+  final Duration shrinkDelay = const Duration(milliseconds: 20);
   final Duration ellipseTriggerAt = const Duration(seconds: 2);
   final Duration playDuration = const Duration(seconds: 3);
   bool _ellipseMoved = false;
@@ -25,9 +28,15 @@ class SplashController extends GetxController {
   Future<void> _initVideo() async {
     video = VideoPlayerController.asset('assets/videos/splash_intro.mp4');
     await video.initialize();
+    // await video.setPlaybackSpeed(0.1);
     await video.setVolume(0);
     await video.play();
     isReady.value = true;
+
+    Future.delayed(shrinkDelay, () {
+      shouldShrink.value = true;
+    });
+
     video.addListener(_progressWatcher);
     video.addListener(_listenDuration);
   }
@@ -42,6 +51,7 @@ class SplashController extends GetxController {
   }
 
   void startEllipseAnimation() {
+    showEllipse.value = true;
     ellipseTop.value = _ellipseTopPlaying;
   }
 
@@ -49,7 +59,6 @@ class SplashController extends GetxController {
     final v = video.value;
     if (v.isInitialized && v.position >= playDuration) {
       video.pause();
-      // showLogin.value = true;
       Get.off(() => const LoginScreen());
       video.removeListener(_listenDuration);
     }

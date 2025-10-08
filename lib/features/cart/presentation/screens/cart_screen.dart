@@ -23,10 +23,10 @@ import '../../../profile/controllers/payment_method_controller.dart';
 import '../../../orders/controllers/orders_controller.dart';
 import '../../../orders/controllers/live_order_controller.dart';
 import '../../../orders/data/models/order_model.dart';
-import '../../../payout/presentation/widgets/order_success_dialog.dart';
 import '../../../payout/data/models/delivery_option_model.dart';
 import '../../../profile/data/models/shipping_address_model.dart';
 import '../../../payout/data/models/payment_method_model.dart' as payout;
+import 'package:lottie/lottie.dart';
 
 class CartScreen extends StatelessWidget {
   const CartScreen({super.key});
@@ -43,7 +43,7 @@ class CartScreen extends StatelessWidget {
         onClearAll: () => _showClearCartDialog(cartController),
       ),
       body: Obx(() {
-        if (!cartController.hasItems) {
+        if (!cartController.hasItems && !cartController.isPlacingOrder) {
           Future.microtask(() => Get.back());
           return const SizedBox.shrink();
         }
@@ -81,8 +81,9 @@ class CartScreen extends StatelessWidget {
             SafeArea(
               top: false,
               child: CartBottomSection(
-                onPlaceOrder: () =>
-                    _handlePlaceOrder(cartController, payoutController),
+                onPlaceOrder: () {
+                  _handlePlaceOrder(cartController, payoutController);
+                },
                 onPaymentMethodTap: _showPaymentMethods,
                 totalAmount: payoutController.totalAmount,
               ),
@@ -114,10 +115,10 @@ class CartScreen extends StatelessWidget {
     );
   }
 
-  void _handlePlaceOrder(
+  Future<void> _handlePlaceOrder(
     CartController cartController,
     PayoutController payoutController,
-  ) {
+  ) async {
     if (cartController.hasItems) {
       final paymentMethodController = Get.find<PaymentMethodController>();
       final selectedPaymentMethod =
@@ -132,31 +133,8 @@ class CartScreen extends StatelessWidget {
         return;
       }
 
-      _processPayment(selectedPaymentMethod, payoutController);
+      await _placeOrder(payoutController);
     }
-  }
-
-  void _processPayment(
-    dynamic paymentMethod,
-    PayoutController payoutController,
-  ) {
-    Get.dialog(
-      AlertDialog(
-        title: const Text('Processing Payment'),
-        content: Text('Redirecting to ${paymentMethod.type.displayName}...'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              //Get.back();
-
-              _simulatePaymentSuccess(payoutController);
-            },
-            child: const Text('Simulate Success'),
-          ),
-          TextButton(onPressed: () => Get.back(), child: const Text('Cancel')),
-        ],
-      ),
-    );
   }
 
   String generateOrderId() {
@@ -165,7 +143,7 @@ class CartScreen extends StatelessWidget {
     return random4Digits.toString();
   }
 
-  void _simulatePaymentSuccess(PayoutController payoutController) async {
+  Future<void> _placeOrder(PayoutController payoutController) async {
     final cartController = Get.find<CartController>();
     final paymentMethodController = Get.find<PaymentMethodController>();
     final selectedPaymentMethod = paymentMethodController.selectedPaymentMethod;
@@ -180,6 +158,8 @@ class CartScreen extends StatelessWidget {
       );
       return;
     }
+
+    cartController.setPlacingOrder(true);
 
     try {
       final orderItems = List<CartItemModel>.from(cartController.cartItems);
@@ -217,7 +197,7 @@ class CartScreen extends StatelessWidget {
             isSelected: true,
           );
 
-      // Apply receiver override if provided
+      // Override receiver if provided
       ShippingAddressModel finalShippingAddress = shippingAddress;
       if (payoutController.isDifferentReceiver &&
           payoutController.receiverName.isNotEmpty) {
@@ -228,23 +208,6 @@ class CartScreen extends StatelessWidget {
               : shippingAddress.phoneNumber,
         );
       }
-
-      print('Creating order with ${orderItems.length} items');
-      for (var item in orderItems) {
-        print(
-          'Item: ${item.product.title}, Quantity: ${item.quantity}, Price: ${item.product.price}',
-        );
-      }
-
-      print(
-        'Order totals - Subtotal: \$${subtotal.toStringAsFixed(2)}, Delivery: \$${deliveryFee.toStringAsFixed(2)}, Discount: \$${discountAmount.toStringAsFixed(2)}, Total: \$${total.toStringAsFixed(2)}',
-      );
-      print(
-        'Selected delivery option: ${deliveryOption.title} (\$${deliveryOption.price.toStringAsFixed(2)})',
-      );
-      print(
-        'Selected shipping address: ${shippingAddress.name} - ${shippingAddress.address}',
-      );
 
       final orderId = generateOrderId();
       final transactionId = 'TXN_${DateTime.now().millisecondsSinceEpoch}';
@@ -295,28 +258,48 @@ class CartScreen extends StatelessWidget {
 
       cartController.clearCart();
 
-      Get.dialog(
-        OrderSuccessDialog(
-          order: order,
-          transactionId: transactionId,
-          onContinue: () {
-            Get.back();
-            // Return to previous route instead of forcing home
-            if (Get.previousRoute.isNotEmpty) {
-              Get.back();
-            } else {
-              Get.offAllNamed('/home');
-            }
-          },
-        ),
-        barrierDismissible: false,
-      );
+      if (Get.isDialogOpen ?? false) {
+        Get.back();
+      }
+
+      await _showSuccessDialog();
+      Get.offAllNamed('/home');
     } catch (e) {
+      if (Get.isDialogOpen ?? false) {
+        Get.back();
+      }
       Get.snackbar(
         'Error',
         'Failed to place order. Please try again.',
         duration: const Duration(seconds: 3),
       );
+    } finally {
+      cartController.setPlacingOrder(false);
+    }
+  }
+
+  Future<void> _showSuccessDialog() async {
+    Get.dialog(
+      Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Lottie.asset(
+              'assets/json/Success.json',
+              width: 400,
+              height: 400,
+              repeat: false,
+            ),
+          ],
+        ),
+      ),
+      barrierDismissible: false,
+    );
+
+    await Future.delayed(const Duration(seconds: 2));
+
+    if (Get.isDialogOpen ?? false) {
+      Get.back();
     }
   }
 
@@ -324,49 +307,55 @@ class CartScreen extends StatelessWidget {
     final paymentMethodController = Get.find<PaymentMethodController>();
 
     Get.bottomSheet(
-      Container(
-        padding: EdgeInsets.all(16.w),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),
-        ),
-        child: Obx(() {
-          final paymentMethods = paymentMethodController.paymentMethods;
+      SafeArea(
+        top: false, // allow full sheet up to status bar
+        child: Container(
+          padding: EdgeInsets.all(16.w),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),
+          ),
+          child: Obx(() {
+            final paymentMethods = paymentMethodController.paymentMethods;
 
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'Select Payment Method',
-                style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w600),
+            return SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Select Payment Method',
+                    style: TextStyle(
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  SizedBox(height: 16.h),
+
+                  ...paymentMethods.map((method) {
+                    return ListTile(
+                      leading: method.type.iconPath != null
+                          ? Image.asset(
+                              method.type.iconPath!,
+                              width: 24,
+                              height: 24,
+                            )
+                          : const Icon(Icons.payment),
+                      title: Text(method.type.displayName),
+                      onTap: () {
+                        paymentMethodController.selectPaymentMethod(method);
+                        Get.back();
+                      },
+                    );
+                  }).toList(),
+                ],
               ),
-              SizedBox(height: 16.h),
-
-              ...paymentMethods.map((method) {
-                return ListTile(
-                  leading: method.type.iconPath != null
-                      ? Image.asset(
-                          method.type.iconPath!,
-                          width: 24,
-                          height: 24,
-                        )
-                      : Icon(Icons.payment),
-                  title: Text(method.type.displayName),
-                  onTap: () {
-                    paymentMethodController.selectPaymentMethod(method);
-                    Get.back();
-                    // Get.snackbar(
-                    //   'Payment Method Selected',
-                    //   method.type.displayName,
-                    //   duration: const Duration(seconds: 1),
-                    // );
-                  },
-                );
-              }).toList(),
-            ],
-          );
-        }),
+            );
+          }),
+        ),
       ),
+      isScrollControlled: true, // 👈 full height if needed, goes above nav bar
+      backgroundColor: Colors.transparent,
     );
   }
 }

@@ -145,7 +145,7 @@ class _VendorResponseCardState extends State<VendorResponseCard>
                           Text(
                             widget.response.vendorName,
                             style: _labelStyle(
-                              size: 16.sp,
+                              size: 14.sp,
                               weight: FontWeight.w700,
                               color: Colors.grey.shade800,
                             ),
@@ -164,7 +164,7 @@ class _VendorResponseCardState extends State<VendorResponseCard>
                               Text(
                                 'Verified Pharmacy',
                                 style: _labelStyle(
-                                  size: 11.sp,
+                                  size: 10.sp,
                                   weight: FontWeight.w500,
                                   color: Colors.green.shade600,
                                 ),
@@ -206,14 +206,14 @@ class _VendorResponseCardState extends State<VendorResponseCard>
                           children: [
                             Image.asset(
                               ImagePath.cartIcon,
-                              width: 16.w,
-                              height: 16.w,
+                              width: 12.w,
+                              height: 12.w,
                             ),
                             SizedBox(width: 8.w),
                             Text(
                               'Add All',
                               style: _labelStyle(
-                                size: 12.sp,
+                                size: 10.sp,
                                 weight: FontWeight.w600,
                                 color: Colors.white,
                               ),

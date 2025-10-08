@@ -10,12 +10,25 @@ import 'package:quikle_user/features/prescription/data/models/prescription_model
 class PrescriptionStatusIndicator extends StatelessWidget {
   const PrescriptionStatusIndicator({super.key});
 
+  static double get kPreferredHeight => 80.h;
+
+  static PrescriptionModel? latestActive(List<PrescriptionModel> list) {
+    if (list.isEmpty) return null;
+    final filtered = list.toList()
+      ..sort((a, b) => b.uploadedAt.compareTo(a.uploadedAt));
+    return filtered.isEmpty ? null : filtered.first;
+  }
+
+  static bool hasVisibleStatus(List<PrescriptionModel> list) {
+    return latestActive(list) != null;
+  }
+
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<PrescriptionController>();
 
     return Obx(() {
-      final latest = _latestActive(controller.prescriptions);
+      final latest = latestActive(controller.prescriptions);
       if (latest == null) return const SizedBox.shrink();
 
       final meta = _metaFor(latest.status);
@@ -49,8 +62,8 @@ class PrescriptionStatusIndicator extends StatelessWidget {
                   children: [
                     // Left icon
                     Container(
-                      width: 36.w,
-                      height: 36.w,
+                      width: 24.w,
+                      height: 24.w,
                       decoration: BoxDecoration(
                         color: meta.color.withValues(alpha: .20),
                         borderRadius: BorderRadius.circular(8.r),
@@ -94,7 +107,7 @@ class PrescriptionStatusIndicator extends StatelessWidget {
                                   overflow: TextOverflow.ellipsis,
                                   style: getTextStyle(
                                     font: CustomFonts.inter,
-                                    fontSize: 14.sp,
+                                    fontSize: 12.sp,
                                     fontWeight: FontWeight.w700,
                                     color: AppColors.ebonyBlack,
                                   ),
@@ -107,7 +120,7 @@ class PrescriptionStatusIndicator extends StatelessWidget {
                                     overflow: TextOverflow.ellipsis,
                                     style: getTextStyle(
                                       font: CustomFonts.inter,
-                                      fontSize: 12.sp,
+                                      fontSize: 10.sp,
                                       fontWeight: FontWeight.w500,
                                       color: AppColors.ebonyBlack.withValues(
                                         alpha: 0.7,
@@ -150,14 +163,6 @@ class PrescriptionStatusIndicator extends StatelessWidget {
     });
   }
 
-  /// Pick the most recent, non-invalid prescription.
-  PrescriptionModel? _latestActive(List<PrescriptionModel> list) {
-    if (list.isEmpty) return null;
-    final filtered = list.toList()
-      ..sort((a, b) => b.uploadedAt.compareTo(a.uploadedAt));
-    return filtered.isEmpty ? null : filtered.first;
-  }
-
   _StatusMeta _metaFor(PrescriptionStatus status) {
     switch (status) {
       case PrescriptionStatus.uploaded:
@@ -184,7 +189,7 @@ class PrescriptionStatusIndicator extends StatelessWidget {
       case PrescriptionStatus.invalid:
         return _StatusMeta(
           header: 'Prescription Invalid',
-          subHeader: 'Expired date/Incomplete/Unclear/etc',
+          subHeader: 'Tap to view details',
           icon: Icons.error_outline,
           color: Colors.red,
         );

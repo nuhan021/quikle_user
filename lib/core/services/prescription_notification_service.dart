@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:quikle_user/features/prescription/data/models/prescription_model.dart';
+import 'package:quikle_user/features/prescription/controllers/prescription_controller.dart';
+import 'package:quikle_user/features/prescription/data/services/prescription_service.dart';
 
 class PrescriptionNotificationService {
   static final FlutterLocalNotificationsPlugin _localNotifications =
       FlutterLocalNotificationsPlugin();
+  static final PrescriptionService _prescriptionService = PrescriptionService();
 
   static bool _isInitialized = false;
 
@@ -61,8 +64,67 @@ class PrescriptionNotificationService {
     if (payload != null && payload.startsWith('prescription_')) {
       // Navigate to prescription details
       final prescriptionId = payload.replaceFirst('prescription_', '');
-      Get.toNamed('/prescription-details', arguments: prescriptionId);
+      Future.microtask(() => _handlePrescriptionTap(prescriptionId));
     }
+  }
+
+  static Future<void> _handlePrescriptionTap(String prescriptionId) async {
+    try {
+      PrescriptionModel? prescription;
+
+      if (Get.isRegistered<PrescriptionController>()) {
+        final controller = Get.find<PrescriptionController>();
+        prescription = _findPrescriptionById(
+          controller.prescriptions,
+          prescriptionId,
+        );
+
+        if (prescription == null) {
+          await controller.loadUserPrescriptions(silent: true);
+          prescription = _findPrescriptionById(
+            controller.prescriptions,
+            prescriptionId,
+          );
+        }
+
+        if (prescription != null) {
+          controller.selectedPrescription.value = prescription;
+        }
+      }
+
+      prescription ??= await _prescriptionService.getPrescriptionById(
+        prescriptionId,
+      );
+
+      if (prescription != null) {
+        Get.toNamed('/prescription-details', arguments: prescription);
+      } else {
+        Get.toNamed('/prescription-list');
+        Get.snackbar(
+          'Prescription not found',
+          'Please check your prescriptions list.',
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      }
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Unable to open prescription: $e',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
+  }
+
+  static PrescriptionModel? _findPrescriptionById(
+    List<PrescriptionModel> prescriptions,
+    String id,
+  ) {
+    for (final prescription in prescriptions) {
+      if (prescription.id == id) {
+        return prescription;
+      }
+    }
+    return null;
   }
 
   // Show notification for prescription status update

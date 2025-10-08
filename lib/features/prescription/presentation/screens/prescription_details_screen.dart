@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:quikle_user/core/common/styles/global_text_style.dart';
@@ -31,7 +32,12 @@ class _PrescriptionDetailsScreenState extends State<PrescriptionDetailsScreen> {
   Widget build(BuildContext context) {
     final controller = Get.find<PrescriptionController>();
     final prescription = Get.arguments as PrescriptionModel;
-
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+      ),
+    );
     return CartAnimationWrapper(
       child: Scaffold(
         backgroundColor: AppColors.backgroundLight,
@@ -50,17 +56,18 @@ class _PrescriptionDetailsScreenState extends State<PrescriptionDetailsScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 PrescriptionImageCardWidget(prescription: prescription),
-
                 SizedBox(height: 8.h),
-
                 PrescriptionInfoCardWidget(prescription: prescription),
-
                 SizedBox(height: 8.h),
 
-                PrescriptionTimelineWidget(prescription: prescription),
+                // Show rejection reason as separate box for invalid prescriptions
+                if (prescription.status == PrescriptionStatus.invalid &&
+                    prescription.notes?.isNotEmpty == true) ...[
+                  _buildRejectionReasonBox(prescription.notes!),
+                  SizedBox(height: 8.h),
+                ],
 
                 if (prescription.vendorResponses.isNotEmpty) ...[
-                  SizedBox(height: 8.h),
                   Text(
                     'Store Responses',
                     style: getTextStyle(
@@ -71,7 +78,6 @@ class _PrescriptionDetailsScreenState extends State<PrescriptionDetailsScreen> {
                     ),
                   ),
                   SizedBox(height: 8.h),
-
                   ...prescription.vendorResponses.map((response) {
                     if (response.status == VendorResponseStatus.approved ||
                         response.status ==
@@ -144,22 +150,17 @@ class _PrescriptionDetailsScreenState extends State<PrescriptionDetailsScreen> {
                       ),
                     );
                   }).toList(),
-                  SizedBox(height: 30.h),
-                ] else
-                  SizedBox(height: 30.h),
+                  SizedBox(height: 8.h),
+                ],
+                PrescriptionTimelineWidget(prescription: prescription),
+                SizedBox(height: 30.h),
               ],
             ),
           ),
         ),
-
-        floatingActionButton: SafeArea(
-          child: Padding(
-            padding: EdgeInsets.only(right: 16.w, bottom: 16.h),
-            child: Container(
-              key: _cartFabKey,
-              child: const FloatingCartButton(),
-            ),
-          ),
+        floatingActionButton: Container(
+          key: _cartFabKey,
+          child: const FloatingCartButton(),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       ),
@@ -227,5 +228,119 @@ class _PrescriptionDetailsScreenState extends State<PrescriptionDetailsScreen> {
       case VendorResponseStatus.expired:
         return Colors.grey;
     }
+  }
+
+  Widget _buildRejectionReasonBox(String reason) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(16.w),
+      decoration: BoxDecoration(
+        color: Colors.red.shade50,
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(color: Colors.red.shade200, width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.error_outline,
+                color: Colors.red.shade700,
+                size: 20.sp,
+              ),
+              SizedBox(width: 8.w),
+              Text(
+                'Rejection Reason',
+                style: getTextStyle(
+                  font: CustomFonts.inter,
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.red.shade700,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 12.h),
+          Text(
+            reason,
+            style: getTextStyle(
+              font: CustomFonts.inter,
+              fontSize: 13.sp,
+              fontWeight: FontWeight.w500,
+              color: AppColors.textPrimary,
+            ),
+          ),
+          SizedBox(height: 16.h),
+          Container(
+            padding: EdgeInsets.all(12.w),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(6.r),
+              border: Border.all(color: Colors.red.shade200, width: 1),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      Icons.lightbulb_outline,
+                      color: Colors.orange.shade700,
+                      size: 18.sp,
+                    ),
+                    SizedBox(width: 8.w),
+                    Text(
+                      'Suggested Actions',
+                      style: getTextStyle(
+                        font: CustomFonts.inter,
+                        fontSize: 13.sp,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.orange.shade700,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 8.h),
+                _buildActionPoint(
+                  '• Ensure the prescription is clear and readable',
+                ),
+                _buildActionPoint(
+                  '• Check that the prescription date is not expired',
+                ),
+                _buildActionPoint(
+                  '• Verify all required information is visible',
+                ),
+                _buildActionPoint(
+                  '• Upload a new prescription with corrections',
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionPoint(String text) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 4.h),
+      child: Text(
+        text,
+        style: getTextStyle(
+          font: CustomFonts.inter,
+          fontSize: 12.sp,
+          fontWeight: FontWeight.w500,
+          color: AppColors.textPrimary,
+        ),
+      ),
+    );
   }
 }

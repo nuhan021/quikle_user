@@ -7,6 +7,7 @@ import 'package:quikle_user/core/common/styles/global_text_style.dart';
 import 'package:quikle_user/core/common/widgets/custom_navbar.dart';
 import 'package:quikle_user/core/common/widgets/floating_cart_button.dart';
 import 'package:quikle_user/core/common/widgets/unified_product_card.dart';
+import 'package:quikle_user/core/common/widgets/cart_animation_overlay.dart';
 import 'package:quikle_user/core/data/services/product_data_service.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
@@ -18,6 +19,7 @@ import 'package:quikle_user/features/orders/presentation/widgets/live_order_indi
 import 'package:quikle_user/features/profile/controllers/favorites_controller.dart';
 import 'package:quikle_user/features/restaurants/data/models/restaurant_model.dart';
 import 'package:quikle_user/routes/app_routes.dart';
+import 'package:quikle_user/core/common/widgets/slivers/fixed_widget_header_delegate.dart';
 
 class RestaurantPageScreen extends StatefulWidget {
   const RestaurantPageScreen({super.key});
@@ -28,7 +30,6 @@ class RestaurantPageScreen extends StatefulWidget {
 
 class _RestaurantPageScreenState extends State<RestaurantPageScreen>
     with TickerProviderStateMixin {
-  late AnimationController _barAnim;
   late AnimationController _navController;
   final ScrollController _scroll = ScrollController();
   final GlobalKey _navKey = GlobalKey();
@@ -56,32 +57,17 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen>
   void initState() {
     super.initState();
 
-    _barAnim = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 500),
-      value: 1,
-    );
-
     _navController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
       value: 1,
     );
 
-    _scroll.addListener(() {
-      if (_scroll.offset > 8 && _barAnim.value == 1) {
-        _barAnim.reverse();
-      } else if (_scroll.offset <= 8 && _barAnim.value == 0) {
-        _barAnim.forward();
-      }
-    });
-
     _initializeData();
   }
 
   @override
   void dispose() {
-    _barAnim.dispose();
     _navController.dispose();
     _scroll.dispose();
     super.dispose();
@@ -193,6 +179,8 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen>
     final keyboardInset = MediaQuery.of(context).viewInsets.bottom;
     final isKeyboardOpen = keyboardInset > 0;
     const double cartMargin = 16.0;
+    final double bottomPadding =
+        isKeyboardOpen ? keyboardInset : _navBarHeight + cartMargin;
 
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
@@ -201,20 +189,21 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen>
       ),
     );
 
-    return Scaffold(
-      backgroundColor: AppColors.homeGrey,
-      body: NotificationListener<ScrollNotification>(
-        onNotification: _onScrollNotification,
-        child: Stack(
-          children: [
-            SafeArea(
-              child: Column(
-                children: [
-                  // ✅ AppBar animation (same as home)
-                  ClipRect(
-                    child: SizeTransition(
-                      axisAlignment: -1,
-                      sizeFactor: _barAnim,
+    return CartAnimationWrapper(
+      child: Scaffold(
+        backgroundColor: AppColors.homeGrey,
+        body: NotificationListener<ScrollNotification>(
+          onNotification: _onScrollNotification,
+          child: Stack(
+            children: [
+              SafeArea(
+                child: CustomScrollView(
+                  controller: _scroll,
+                  physics: const AlwaysScrollableScrollPhysics(
+                    parent: ClampingScrollPhysics(),
+                  ),
+                  slivers: [
+                    SliverToBoxAdapter(
                       child: CommonAppBar(
                         title: restaurant.name,
                         subtitle: restaurant.address,
@@ -224,219 +213,231 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen>
                         onBackTap: () => Get.back(),
                       ),
                     ),
-                  ),
-
-                  // ✅ Fixed Search + Category section (grouped like home)
-                  Column(
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 16.w,
-                          vertical: 12.h,
-                        ),
-                        child: Container(
-                          height: 48.h,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(8.r),
-                          ),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: TextField(
-                                  decoration: InputDecoration(
-                                    hintText: 'Search',
-                                    hintStyle: getTextStyle(
-                                      font: CustomFonts.manrope,
-                                      fontSize: 14.sp,
-                                      fontWeight: FontWeight.w500,
-                                      color: const Color(0xFFB8B8B8),
+                    SliverPersistentHeader(
+                      pinned: true,
+                      delegate: FixedWidgetHeaderDelegate(
+                        minExtent: _headerExtent,
+                        maxExtent: _headerExtent,
+                        backgroundColor: AppColors.homeGrey,
+                        shouldAddElevation: true,
+                        builder: (context, shrink, overlaps) {
+                          return Container(
+                            color: AppColors.homeGrey,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 16.w,
+                                    vertical: 12.h,
+                                  ),
+                                  child: Container(
+                                    height: 48.h,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(8.r),
                                     ),
-                                    border: InputBorder.none,
-                                    enabledBorder: InputBorder.none,
-                                    focusedBorder: InputBorder.none,
-
-                                    contentPadding: EdgeInsets.symmetric(
-                                      horizontal: 16.w,
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          child: TextField(
+                                            decoration: InputDecoration(
+                                              hintText: 'Search',
+                                              hintStyle: getTextStyle(
+                                                font: CustomFonts.manrope,
+                                                fontSize: 14.sp,
+                                                fontWeight: FontWeight.w500,
+                                                color: const Color(0xFFB8B8B8),
+                                              ),
+                                              border: InputBorder.none,
+                                              enabledBorder: InputBorder.none,
+                                              focusedBorder: InputBorder.none,
+                                              contentPadding: EdgeInsets.symmetric(
+                                                horizontal: 16.w,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: EdgeInsets.only(right: 14.w),
+                                          child: Icon(
+                                            Icons.mic_outlined,
+                                            size: 20.sp,
+                                            color: const Color(0xFFB8B8B8),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.only(right: 14.w),
-                                child: Icon(
-                                  Icons.mic_outlined,
-                                  size: 20.sp,
-                                  color: const Color(0xFFB8B8B8),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-
-                      SizedBox(
-                        height: 30.h,
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          padding: EdgeInsets.symmetric(horizontal: 16.w),
-                          itemCount: _categories.length,
-                          itemBuilder: (_, idx) {
-                            final cat = _categories[idx];
-                            final sel = cat == _selectedCategory;
-                            return GestureDetector(
-                              onTap: () => _filterProducts(cat),
-                              child: Container(
-                                margin: EdgeInsets.only(right: 8.w),
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 12.w,
-                                  vertical: 8.h,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: sel
-                                      ? AppColors.beakYellow
-                                      : Colors.white,
-                                  borderRadius: BorderRadius.circular(4.r),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey.withValues(alpha: .1),
-                                      blurRadius: 8,
-                                      offset: const Offset(0, 2),
-                                    ),
-                                  ],
-                                ),
-                                child: Text(
-                                  cat,
-                                  style: getTextStyle(
-                                    font: CustomFonts.inter,
-                                    fontSize: 12.sp,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.black,
+                                SizedBox(
+                                  height: 30.h,
+                                  child: ListView.builder(
+                                    scrollDirection: Axis.horizontal,
+                                    padding: EdgeInsets.symmetric(horizontal: 16.w),
+                                    itemCount: _categories.length,
+                                    itemBuilder: (_, idx) {
+                                      final cat = _categories[idx];
+                                      final sel = cat == _selectedCategory;
+                                      return GestureDetector(
+                                        onTap: () => _filterProducts(cat),
+                                        child: Container(
+                                          margin: EdgeInsets.only(right: 8.w),
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: 12.w,
+                                            vertical: 8.h,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: sel
+                                                ? AppColors.beakYellow
+                                                : Colors.white,
+                                            borderRadius: BorderRadius.circular(4.r),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.grey.withValues(alpha: .1),
+                                                blurRadius: 8,
+                                                offset: const Offset(0, 2),
+                                              ),
+                                            ],
+                                          ),
+                                          child: Text(
+                                            cat,
+                                            style: getTextStyle(
+                                              font: CustomFonts.inter,
+                                              fontSize: 12.sp,
+                                              fontWeight: FontWeight.w500,
+                                              color: Colors.black,
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    },
                                   ),
                                 ),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                  16.verticalSpace,
-                  // ✅ Scrollable product list
-                  Expanded(
-                    child: _isLoading
-                        ? const Center(child: CircularProgressIndicator())
-                        : _filteredProducts.isEmpty
-                        ? _emptyState()
-                        : SingleChildScrollView(
-                            controller: _scroll,
-                            padding: EdgeInsets.only(
-                              left: 16.w,
-                              right: 16.w,
-                              bottom: _navBarHeight,
+                                SizedBox(height: 4.h),
+                              ],
                             ),
-                            child: _buildGrid(),
+                          );
+                        },
+                      ),
+                    ),
+                    SliverToBoxAdapter(child: 16.verticalSpace),
+                    if (_isLoading)
+                      const SliverFillRemaining(
+                        hasScrollBody: false,
+                        child: Center(child: CircularProgressIndicator()),
+                      )
+                    else if (_filteredProducts.isEmpty)
+                      SliverFillRemaining(
+                        hasScrollBody: false,
+                        child: _emptyState(),
+                      )
+                    else
+                      SliverPadding(
+                        padding: EdgeInsets.only(
+                          left: 16.w,
+                          right: 16.w,
+                          bottom: bottomPadding,
+                        ),
+                        sliver: SliverGrid(
+                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3,
+                            crossAxisSpacing: 8.w,
+                            mainAxisSpacing: 8.h,
+                            childAspectRatio: 0.70,
                           ),
-                  ),
-                ],
+                          delegate: SliverChildBuilderDelegate(
+                            (context, idx) {
+                              final prod = _filteredProducts[idx];
+                              return UnifiedProductCard(
+                                product: prod,
+                                onTap: () => _onProductTap(prod),
+                                onAddToCart: () => _onAddToCart(prod),
+                                onFavoriteToggle: () => _onFavoriteToggle(prod),
+                                variant: ProductCardVariant.category,
+                                isGroceryCategory: false,
+                              );
+                            },
+                            childCount: _filteredProducts.length,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ),
-            ),
 
-            // ✅ Navbar (category-style)
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: AnimatedSlide(
-                duration: const Duration(milliseconds: 180),
-                offset: isKeyboardOpen
-                    ? const Offset(0, 1)
-                    : const Offset(0, 0),
-                child: SizeTransition(
-                  axisAlignment: 1.0,
-                  sizeFactor: _navController,
-                  child: SafeArea(
-                    top: false,
-                    bottom: true,
-                    child: KeyedSubtree(
-                      key: _navKey,
-                      child: CustomNavBar(
-                        currentIndex: -1,
-                        onTap: _onNavItemTapped,
+              // ✅ Navbar (category-style)
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: AnimatedSlide(
+                  duration: const Duration(milliseconds: 180),
+                  offset: isKeyboardOpen
+                      ? const Offset(0, 1)
+                      : const Offset(0, 0),
+                  child: SizeTransition(
+                    axisAlignment: 1.0,
+                    sizeFactor: _navController,
+                    child: SafeArea(
+                      top: false,
+                      bottom: true,
+                      child: KeyedSubtree(
+                        key: _navKey,
+                        child: CustomNavBar(
+                          currentIndex: -1,
+                          onTap: _onNavItemTapped,
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
-            ),
 
-            AnimatedBuilder(
-              animation: _navController,
-              builder: (_, __) {
-                final inset =
-                    (isKeyboardOpen
-                        ? keyboardInset
-                        : _navController.value * _navBarHeight) +
-                    cartMargin;
-                return FloatingCartButton(bottomInset: inset);
-              },
-            ),
+              AnimatedBuilder(
+                animation: _navController,
+                builder: (_, __) {
+                  final inset =
+                      (isKeyboardOpen
+                          ? keyboardInset
+                          : _navController.value * _navBarHeight) +
+                      cartMargin;
+                  return FloatingCartButton(bottomInset: inset);
+                },
+              ),
 
-            AnimatedBuilder(
-              animation: _navController,
-              builder: (_, __) {
-                final inset = (_navController.value * _navBarHeight);
-                return LiveOrderIndicator(bottomInset: inset);
-              },
-            ),
-          ],
+              AnimatedBuilder(
+                animation: _navController,
+                builder: (_, __) {
+                  final inset = (_navController.value * _navBarHeight);
+                  return LiveOrderIndicator(bottomInset: inset);
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _emptyState() => Center(
-    child: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(Icons.restaurant_menu, size: 64.sp, color: Colors.grey),
-        SizedBox(height: 16.h),
-        Text(
-          'No items found',
-          style: getTextStyle(
-            font: CustomFonts.obviously,
-            fontSize: 16.sp,
-            fontWeight: FontWeight.w500,
-            color: Colors.grey,
-          ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.restaurant_menu, size: 64.sp, color: Colors.grey),
+            SizedBox(height: 16.h),
+            Text(
+              'No items found',
+              style: getTextStyle(
+                font: CustomFonts.obviously,
+                fontSize: 16.sp,
+                fontWeight: FontWeight.w500,
+                color: Colors.grey,
+              ),
+            ),
+          ],
         ),
-      ],
-    ),
-  );
+      );
 
-  Widget _buildGrid() {
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        crossAxisSpacing: 8.w,
-        mainAxisSpacing: 8.h,
-        childAspectRatio: 0.7.sp,
-      ),
-      itemCount: _filteredProducts.length,
-      itemBuilder: (_, idx) {
-        final prod = _filteredProducts[idx];
-        return UnifiedProductCard(
-          product: prod,
-          onTap: () => _onProductTap(prod),
-          onAddToCart: () => _onAddToCart(prod),
-          onFavoriteToggle: () => _onFavoriteToggle(prod),
-          variant: ProductCardVariant.category,
-          isGroceryCategory: false,
-          cardAspectRatio: 0.75.sp,
-        );
-      },
-    );
-  }
+  double get _headerExtent => (48.h + 24.h) + 30.h + 4.h;
 }

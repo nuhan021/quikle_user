@@ -41,101 +41,107 @@ class SearchScreen extends StatelessWidget {
       ),
       body: Stack(
         children: [
-          Column(
-            children: [
-              Container(
-                padding: EdgeInsets.all(16.w),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Container(
-                        height: 48.h,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF8F9FA),
-                          borderRadius: BorderRadius.circular(8.r),
-                        ),
-                        child: Row(
-                          children: [
-                            SizedBox(width: 16.w),
-                            Icon(Icons.search, color: Colors.grey, size: 20.w),
-                            SizedBox(width: 12.w),
-                            Expanded(
-                              child: Obx(
-                                () => TextField(
-                                  controller: controller.searchController,
-                                  onChanged: controller.onSearchChanged,
-                                  decoration: InputDecoration(
-                                    hintText:
-                                        controller.currentPlaceholder.value,
-                                    hintStyle: getTextStyle(
-                                      font: CustomFonts.inter,
-                                      color: Colors.grey,
-                                      fontSize: 16,
+          SafeArea(
+            child: Column(
+              children: [
+                Container(
+                  padding: EdgeInsets.all(16.w),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Container(
+                          height: 48.h,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF8F9FA),
+                            borderRadius: BorderRadius.circular(8.r),
+                          ),
+                          child: Row(
+                            children: [
+                              SizedBox(width: 16.w),
+                              Icon(
+                                Icons.search,
+                                color: Colors.grey,
+                                size: 20.w,
+                              ),
+                              SizedBox(width: 12.w),
+                              Expanded(
+                                child: Obx(
+                                  () => TextField(
+                                    controller: controller.searchController,
+                                    onChanged: controller.onSearchChanged,
+                                    decoration: InputDecoration(
+                                      hintText:
+                                          controller.currentPlaceholder.value,
+                                      hintStyle: getTextStyle(
+                                        font: CustomFonts.inter,
+                                        color: Colors.grey,
+                                        fontSize: 16,
+                                      ),
+                                      border: InputBorder.none,
+                                      enabledBorder: InputBorder.none,
+                                      focusedBorder: InputBorder.none,
                                     ),
-                                    border: InputBorder.none,
-                                    enabledBorder: InputBorder.none,
-                                    focusedBorder: InputBorder.none,
-                                  ),
-                                  style: getTextStyle(
-                                    font: CustomFonts.inter,
-                                    fontSize: 16,
-                                    color: AppColors.ebonyBlack,
+                                    style: getTextStyle(
+                                      font: CustomFonts.inter,
+                                      fontSize: 16,
+                                      color: AppColors.ebonyBlack,
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                            SizedBox(width: 8.w),
-                            Obx(
-                              () => GestureDetector(
-                                onTap: controller.toggleVoiceRecognition,
-                                child: Container(
-                                  padding: EdgeInsets.all(8.w),
-                                  decoration: BoxDecoration(
-                                    color: controller.isListening
-                                        ? AppColors.primary.withValues(
-                                            alpha: 0.1,
-                                          )
-                                        : Colors.transparent,
-                                    borderRadius: BorderRadius.circular(6.r),
-                                  ),
-                                  child: Image.asset(
-                                    ImagePath.voiceIcon,
-                                    height: 20.w,
-                                    width: 20.w,
-                                    color: controller.isListening
-                                        ? AppColors.primary
-                                        : Colors.grey,
+                              SizedBox(width: 8.w),
+                              Obx(
+                                () => GestureDetector(
+                                  onTap: controller.toggleVoiceRecognition,
+                                  child: Container(
+                                    padding: EdgeInsets.all(8.w),
+                                    decoration: BoxDecoration(
+                                      color: controller.isListening
+                                          ? AppColors.primary.withValues(
+                                              alpha: 0.1,
+                                            )
+                                          : Colors.transparent,
+                                      borderRadius: BorderRadius.circular(6.r),
+                                    ),
+                                    child: Image.asset(
+                                      ImagePath.voiceIcon,
+                                      height: 20.w,
+                                      width: 20.w,
+                                      color: controller.isListening
+                                          ? AppColors.primary
+                                          : Colors.grey,
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                            SizedBox(width: 12.w),
-                          ],
+                              SizedBox(width: 12.w),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
 
-              Expanded(
-                child: Obx(() {
-                  if (controller.isLoading) {
-                    return Center(
-                      child: CircularProgressIndicator(
-                        color: AppColors.primary,
-                      ),
-                    );
-                  }
+                Expanded(
+                  child: Obx(() {
+                    if (controller.isLoading) {
+                      return Center(
+                        child: CircularProgressIndicator(
+                          color: AppColors.primary,
+                        ),
+                      );
+                    }
 
-                  if (controller.searchQuery.isEmpty) {
-                    return _buildSuggestionsView(controller);
-                  } else {
-                    return _buildSearchResults(controller);
-                  }
-                }),
-              ),
-            ],
+                    if (controller.searchQuery.isEmpty) {
+                      return _buildSuggestionsView(controller);
+                    } else {
+                      return _buildSearchResults(controller);
+                    }
+                  }),
+                ),
+              ],
+            ),
           ),
 
           Obx(() {
@@ -283,7 +289,7 @@ class SearchScreen extends StatelessWidget {
                 crossAxisCount: 3,
                 crossAxisSpacing: 8.w,
                 mainAxisSpacing: 8.h,
-                childAspectRatio: 0.6.sp,
+                childAspectRatio: 0.60,
               ),
               itemCount: controller.searchResults.length,
               itemBuilder: (context, index) {
@@ -294,7 +300,6 @@ class SearchScreen extends StatelessWidget {
                   onAddToCart: () => controller.onAddToCartPressed(product),
                   onFavoriteToggle: () => controller.onFavoriteToggle(product),
                   variant: ProductCardVariant.category,
-                  cardAspectRatio: 0.6.sp,
                 );
               },
             ),
