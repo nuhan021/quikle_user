@@ -23,7 +23,6 @@ import '../../../profile/controllers/payment_method_controller.dart';
 import '../../../orders/controllers/orders_controller.dart';
 import '../../../orders/controllers/live_order_controller.dart';
 import '../../../orders/data/models/order_model.dart';
-import '../../../payout/presentation/widgets/order_success_dialog.dart';
 import '../../../payout/data/models/delivery_option_model.dart';
 import '../../../profile/data/models/shipping_address_model.dart';
 import '../../../payout/data/models/payment_method_model.dart' as payout;
