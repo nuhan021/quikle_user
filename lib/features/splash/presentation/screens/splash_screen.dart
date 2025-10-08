@@ -76,11 +76,11 @@ class SplashScreen extends GetView<SplashController> {
             }),
 
             /// Black ellipse animation
-            /// Black ellipse animation
             Obx(() {
               final bottomInset = MediaQuery.of(
                 context,
               ).padding.bottom; // safe bottom padding
+              final showEllipse = controller.showEllipse.value;
 
               return AnimatedPositioned(
                 duration: const Duration(milliseconds: 450),
@@ -88,11 +88,16 @@ class SplashScreen extends GetView<SplashController> {
                 left: _ellipseLeft.w,
                 // add the safe area offset here
                 top: controller.ellipseTop.value.h - bottomInset,
-                child: ClipOval(
-                  child: SizedBox(
-                    width: 708.w,
-                    height: 331.h,
-                    child: Container(color: Colors.black),
+                child: AnimatedOpacity(
+                  duration: const Duration(milliseconds: 250),
+                  curve: Curves.easeInOut,
+                  opacity: showEllipse ? 1 : 0,
+                  child: ClipOval(
+                    child: SizedBox(
+                      width: 708.w,
+                      height: 331.h,
+                      child: Container(color: Colors.black),
+                    ),
                   ),
                 ),
               );
@@ -102,40 +107,46 @@ class SplashScreen extends GetView<SplashController> {
             Obx(() {
               final double textTop =
                   (controller.ellipseTop.value + _textOffsetFromEllipseTop).h;
+              final showEllipse = controller.showEllipse.value;
               return AnimatedPositioned(
                 duration: const Duration(milliseconds: 450),
                 curve: Curves.easeInOut,
                 left: _textLeft.w,
                 top: textTop,
-                child: SizedBox(
-                  width: _textWidth.w,
-                  height: _textHeight.h,
-                  child: Center(
-                    child: RichText(
-                      textAlign: TextAlign.center,
-                      text: TextSpan(
-                        children: [
-                          TextSpan(
-                            text: 'Things delivered ',
-                            style: TextStyle(
-                              fontFamily: 'Obviously',
-                              fontWeight: FontWeight.w500,
-                              fontSize: 18.sp,
-                              height: 1.3,
-                              color: AppColors.eggshellWhite,
+                child: AnimatedOpacity(
+                  duration: const Duration(milliseconds: 250),
+                  curve: Curves.easeInOut,
+                  opacity: showEllipse ? 1 : 0,
+                  child: SizedBox(
+                    width: _textWidth.w,
+                    height: _textHeight.h,
+                    child: Center(
+                      child: RichText(
+                        textAlign: TextAlign.center,
+                        text: TextSpan(
+                          children: [
+                            TextSpan(
+                              text: 'Things delivered ',
+                              style: TextStyle(
+                                fontFamily: 'Obviously',
+                                fontWeight: FontWeight.w500,
+                                fontSize: 18.sp,
+                                height: 1.3,
+                                color: AppColors.eggshellWhite,
+                              ),
                             ),
-                          ),
-                          TextSpan(
-                            text: 'Quickly',
-                            style: TextStyle(
-                              fontFamily: 'Obviously',
-                              fontWeight: FontWeight.w500,
-                              fontSize: 18.sp,
-                              height: 1.3,
-                              color: AppColors.beakYellow,
+                            TextSpan(
+                              text: 'Quickly',
+                              style: TextStyle(
+                                fontFamily: 'Obviously',
+                                fontWeight: FontWeight.w500,
+                                fontSize: 18.sp,
+                                height: 1.3,
+                                color: AppColors.beakYellow,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
