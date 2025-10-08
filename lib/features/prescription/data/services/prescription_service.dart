@@ -92,7 +92,7 @@ class PrescriptionService {
                   title: '${medicine.brandName} ${medicine.medicineName}',
                   description: '${medicine.dosage} - Prescription Medicine',
                   price: medicine.medicinePrice.toStringAsFixed(2),
-                  imagePath: ImagePath.medicineIcon,
+                  imagePath: ImagePath.vitaminC,
                   categoryId: '3',
                   subcategoryId: 'medicine_prescription',
                   shopId: response.vendorId,
@@ -137,7 +137,7 @@ class PrescriptionService {
                 title: '${medicine.brandName} ${medicine.medicineName}',
                 description: '${medicine.dosage} - Prescription Medicine',
                 price: medicine.medicinePrice.toStringAsFixed(2),
-                imagePath: ImagePath.medicineIcon,
+                imagePath: ImagePath.vitaminC,
                 categoryId: '3',
                 subcategoryId: 'medicine_prescription',
                 shopId: response.vendorId,
@@ -215,29 +215,39 @@ class PrescriptionService {
   }
 
   void _validatePrescription(String prescriptionId) {
-    final random = Random();
     final prescriptionIndex = _prescriptions.indexWhere(
       (p) => p.id == prescriptionId,
     );
 
     if (prescriptionIndex != -1) {
-      // 90% chance of being valid, 10% invalid for demo
-      final isValid = random.nextDouble() > 0.1;
-
-      _prescriptions[prescriptionIndex] = _prescriptions[prescriptionIndex]
-          .copyWith(
-            status: isValid
-                ? PrescriptionStatus.valid
-                : PrescriptionStatus.invalid,
-          );
+      final random = Random();
+      final isValid = random.nextDouble() >= 0.5;
 
       if (isValid) {
-        // If valid, proceed to check medicines after a delay
+        _prescriptions[prescriptionIndex] = _prescriptions[prescriptionIndex]
+            .copyWith(status: PrescriptionStatus.valid);
+
         Future.delayed(const Duration(seconds: 8), () {
           _generateMockVendorResponses(prescriptionId);
         });
+      } else {
+        final mockRejectionReasons = [
+          'The prescription image is too blurry and the text cannot be read clearly. Please upload a clearer photo.',
+          'The prescription has expired. Please upload a current prescription dated within the last 6 months.',
+          'Doctor\'s signature is missing or not clearly visible. A valid prescription must have a licensed doctor\'s signature.',
+          'Patient name on the prescription does not match the account holder name. Please ensure the prescription is in your name.',
+          'The prescription appears to be incomplete. Some medicine details and dosage information are not visible.',
+        ];
+
+        final rejectionReason =
+            mockRejectionReasons[random.nextInt(mockRejectionReasons.length)];
+
+        _prescriptions[prescriptionIndex] = _prescriptions[prescriptionIndex]
+            .copyWith(
+              status: PrescriptionStatus.invalid,
+              notes: rejectionReason,
+            );
       }
-      // If invalid, the process stops here
     }
   }
 

@@ -6,7 +6,6 @@ import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/features/auth/presentation/screens/verification_scree.dart';
 import 'package:video_player/video_player.dart';
 import '../../controllers/splash_controller.dart';
-import '../../../auth/presentation/screens/login_screen.dart';
 
 class SplashScreen extends GetView<SplashController> {
   const SplashScreen({super.key});
@@ -28,30 +27,36 @@ class SplashScreen extends GetView<SplashController> {
         body: Stack(
           clipBehavior: Clip.none,
           children: [
-            /// Base white background
             Container(color: Colors.white),
 
-            /// Video with white background, starts full screen then shrinks
+            /// Video animation
             Obx(() {
               final isReady = controller.isReady.value;
+              final shouldShrink = controller.shouldShrink.value;
               final vc = controller.video;
+
+              if (!isReady) return const SizedBox.shrink();
 
               return AnimatedPositioned(
                 duration: const Duration(milliseconds: 600),
-                curve: Curves.easeInOut,
-                left: isReady ? 81.w : 0,
-                top: isReady ? 295.5.h : 0,
-                width: isReady ? 230.w : 1.sw,
-                height: isReady ? 221.h : 1.sh,
+                curve: Curves.easeInOutCubic,
+                left: shouldShrink ? 81.w : 0,
+                top: shouldShrink ? 295.5.h : 0,
+                width: shouldShrink ? 250.w : 1.sw,
+                height: shouldShrink ? 240.h : 1.sh,
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 600),
-                  curve: Curves.easeInOut,
+                  curve: Curves.easeInOutCubic,
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(isReady ? 48.r : 0),
+                    borderRadius: BorderRadius.circular(
+                      shouldShrink ? 48.r : 0,
+                    ),
                   ),
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(isReady ? 48.r : 0),
+                    borderRadius: BorderRadius.circular(
+                      shouldShrink ? 48.r : 0,
+                    ),
                     child: FittedBox(
                       fit: BoxFit.cover,
                       child: SizedBox(
@@ -66,23 +71,25 @@ class SplashScreen extends GetView<SplashController> {
             }),
 
             /// Black ellipse animation
-            /// Black ellipse animation
             Obx(() {
-              final bottomInset = MediaQuery.of(
-                context,
-              ).padding.bottom; // safe bottom padding
+              final bottomInset = MediaQuery.of(context).padding.bottom;
+              final showEllipse = controller.showEllipse.value;
 
               return AnimatedPositioned(
                 duration: const Duration(milliseconds: 450),
                 curve: Curves.easeInOut,
                 left: _ellipseLeft.w,
-                // add the safe area offset here
                 top: controller.ellipseTop.value.h - bottomInset,
-                child: ClipOval(
-                  child: SizedBox(
-                    width: 708.w,
-                    height: 331.h,
-                    child: Container(color: Colors.black),
+                child: AnimatedOpacity(
+                  duration: const Duration(milliseconds: 250),
+                  curve: Curves.easeInOut,
+                  opacity: showEllipse ? 1 : 0,
+                  child: ClipOval(
+                    child: SizedBox(
+                      width: 708.w,
+                      height: 331.h,
+                      child: Container(color: Colors.black),
+                    ),
                   ),
                 ),
               );
@@ -92,40 +99,46 @@ class SplashScreen extends GetView<SplashController> {
             Obx(() {
               final double textTop =
                   (controller.ellipseTop.value + _textOffsetFromEllipseTop).h;
+              final showEllipse = controller.showEllipse.value;
               return AnimatedPositioned(
                 duration: const Duration(milliseconds: 450),
                 curve: Curves.easeInOut,
                 left: _textLeft.w,
                 top: textTop,
-                child: SizedBox(
-                  width: _textWidth.w,
-                  height: _textHeight.h,
-                  child: Center(
-                    child: RichText(
-                      textAlign: TextAlign.center,
-                      text: TextSpan(
-                        children: [
-                          TextSpan(
-                            text: 'Things delivered ',
-                            style: TextStyle(
-                              fontFamily: 'Obviously',
-                              fontWeight: FontWeight.w500,
-                              fontSize: 18.sp,
-                              height: 1.3,
-                              color: AppColors.eggshellWhite,
+                child: AnimatedOpacity(
+                  duration: const Duration(milliseconds: 250),
+                  curve: Curves.easeInOut,
+                  opacity: showEllipse ? 1 : 0,
+                  child: SizedBox(
+                    width: _textWidth.w,
+                    height: _textHeight.h,
+                    child: Center(
+                      child: RichText(
+                        textAlign: TextAlign.center,
+                        text: TextSpan(
+                          children: [
+                            TextSpan(
+                              text: 'Things delivered ',
+                              style: TextStyle(
+                                fontFamily: 'Obviously',
+                                fontWeight: FontWeight.w500,
+                                fontSize: 18.sp,
+                                height: 1.3,
+                                color: AppColors.eggshellWhite,
+                              ),
                             ),
-                          ),
-                          TextSpan(
-                            text: 'Quickly',
-                            style: TextStyle(
-                              fontFamily: 'Obviously',
-                              fontWeight: FontWeight.w500,
-                              fontSize: 18.sp,
-                              height: 1.3,
-                              color: AppColors.beakYellow,
+                            TextSpan(
+                              text: 'Quickly',
+                              style: TextStyle(
+                                fontFamily: 'Obviously',
+                                fontWeight: FontWeight.w500,
+                                fontSize: 18.sp,
+                                height: 1.3,
+                                color: AppColors.beakYellow,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),

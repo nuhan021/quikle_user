@@ -46,45 +46,49 @@ class _FloatingCartButtonState extends State<FloatingCartButton> {
         return const SizedBox.shrink();
       }
 
-      return Positioned(
-        bottom: widget.bottomInset + systemBottomInset + 4.h,
-        right: 16.w,
-        child: GestureDetector(
-          key: _cartButtonKey,
-          onTap: () => Get.to(() => const CartScreen()),
-          child: SizedBox(
-            width: 64.w,
-            height: 64.w,
-            child: Stack(
-              children: [
-                Center(
-                  child: Image.asset(ImagePath.cartImage, fit: BoxFit.cover),
-                ),
-                Positioned(
-                  right: 8.w,
-                  top: 8.h,
-                  child: Container(
-                    padding: EdgeInsets.all(4.w),
-                    decoration: BoxDecoration(
-                      color: Colors.red,
-                      borderRadius: BorderRadius.circular(10.r),
-                    ),
-                    constraints: BoxConstraints(
-                      minWidth: 16.w,
-                      minHeight: 16.h,
-                    ),
-                    child: Text(
-                      '${cartController.totalItems}',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 10.sp,
-                        fontWeight: FontWeight.bold,
+      final double bottomPadding = widget.bottomInset + systemBottomInset + 4.h;
+
+      return Padding(
+        padding: EdgeInsets.only(bottom: bottomPadding, right: 16.w),
+        child: Align(
+          alignment: Alignment.bottomRight,
+          child: GestureDetector(
+            key: _cartButtonKey,
+            onTap: () => Get.to(() => const CartScreen()),
+            child: SizedBox(
+              width: 64.w,
+              height: 64.w,
+              child: Stack(
+                children: [
+                  Center(
+                    child: Image.asset(ImagePath.cartImage, fit: BoxFit.cover),
+                  ),
+                  Positioned(
+                    right: 8.w,
+                    top: 8.h,
+                    child: Container(
+                      padding: EdgeInsets.all(4.w),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(10.r),
                       ),
-                      textAlign: TextAlign.center,
+                      constraints: BoxConstraints(
+                        minWidth: 16.w,
+                        minHeight: 16.h,
+                      ),
+                      child: Text(
+                        '${cartController.totalItems}',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 10.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

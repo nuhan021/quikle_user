@@ -39,5 +39,3 @@ class StorageService {
   // Getter for token
   static String? get token => _preferences?.getString(_tokenKey);
 }
-
-

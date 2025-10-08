@@ -5,20 +5,21 @@ import 'package:iconsax/iconsax.dart';
 import 'package:quikle_user/core/common/styles/global_text_style.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
+import 'package:smart_restart/smart_restart.dart';
 
 class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
-  // ─────────────────── New field ───────────────────
   final String? subtitle;
-
   final String title;
   final Widget? titleWidget;
   final VoidCallback? onNotificationTap;
   final VoidCallback? onProfileTap;
   final VoidCallback? onBackTap;
+
   final bool showBackButton;
   final List<Widget>? actions;
   final bool showNotification;
   final bool showProfile;
+  final bool showRestartButton; // ← new
   final Color backgroundColor;
   final Widget? addressWidget;
   final bool isFromHome;
@@ -26,7 +27,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
   const CommonAppBar({
     super.key,
     required this.title,
-    this.subtitle, // ← added
+    this.subtitle,
     this.titleWidget,
     this.onNotificationTap,
     this.onProfileTap,
@@ -35,6 +36,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.actions,
     this.showNotification = true,
     this.showProfile = true,
+    this.showRestartButton = false, // ← default off
     this.backgroundColor = Colors.white,
     this.addressWidget,
     this.isFromHome = false,
@@ -61,6 +63,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
     }
 
     final items = <Widget>[];
+
     if (showNotification) {
       items.add(
         IconButton(
@@ -69,11 +72,23 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
       );
     }
+
     if (showProfile) {
       items.add(
         IconButton(
           icon: Icon(Iconsax.profile_circle, color: _iconColor, size: 24.sp),
           onPressed: onProfileTap,
+        ),
+      );
+    }
+
+    if (showRestartButton) {
+      items.add(
+        IconButton(
+          icon: Icon(Icons.restart_alt, color: _iconColor, size: 24.sp),
+          onPressed: () {
+            SmartRestart.restart(); // ← restart action
+          },
         ),
       );
     }
@@ -88,7 +103,6 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
     return Row(mainAxisSize: MainAxisSize.min, children: items);
   }
 
-  // ─────────────────── Helper to build title / subtitle ───────────────────
   Widget _buildTitleArea(Color txtColor) {
     if (titleWidget != null) return titleWidget!;
 
@@ -169,10 +183,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
                 else
                   SizedBox(width: 12.w),
 
-                // Title area
                 Expanded(child: _buildTitleArea(_iconColor)),
-
-                // Actions / trailing icons
                 _buildTrailing(),
               ],
             ),
