@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -38,7 +39,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen>
     super.initState();
     _navController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 260),
+      duration: const Duration(milliseconds: 500),
       value: 1.0,
     );
   }
@@ -64,10 +65,30 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen>
     NavbarNavigationHelper.navigateToTab(index);
   }
 
+  bool _onScrollNotification(ScrollNotification notification) {
+    if (notification is UserScrollNotification) {
+      if (notification.direction == ScrollDirection.reverse &&
+          _navController.value != 0.0 &&
+          _navController.status != AnimationStatus.reverse) {
+        _navController.reverse();
+      } else if (notification.direction == ScrollDirection.forward &&
+          _navController.value != 1.0 &&
+          _navController.status != AnimationStatus.forward) {
+        _navController.forward();
+      } else if (notification.direction == ScrollDirection.idle &&
+          _navController.value != 1.0) {
+        _navController.forward();
+      }
+    }
+    if (notification is ScrollEndNotification && _navController.value != 1.0) {
+      _navController.forward();
+    }
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) => _measureNavBarHeight());
-    const double cartMargin = 16.0;
 
     final keyboardInset = MediaQuery.of(context).viewInsets.bottom;
     final isKeyboardOpen = keyboardInset > 0;
@@ -109,79 +130,86 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen>
                                 ? const Center(
                                     child: CircularProgressIndicator(),
                                   )
-                                : SingleChildScrollView(
-                                    physics: const ClampingScrollPhysics(),
-                                    padding: EdgeInsets.all(16.sp),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        if (controller.product != null)
-                                          ProductImageWidget(
-                                            imagePath:
-                                                controller.product!.imagePath,
-                                            isFavorite:
-                                                controller.product!.isFavorite,
-                                            onFavoriteToggle:
-                                                controller.onFavoriteToggle,
+                                : NotificationListener<ScrollNotification>(
+                                    onNotification: _onScrollNotification,
+                                    child: SingleChildScrollView(
+                                      physics: const ClampingScrollPhysics(),
+                                      padding: EdgeInsets.all(16.sp),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          if (controller.product != null)
+                                            ProductImageWidget(
+                                              imagePath:
+                                                  controller.product!.imagePath,
+                                              isFavorite: controller
+                                                  .product!
+                                                  .isFavorite,
+                                              onFavoriteToggle:
+                                                  controller.onFavoriteToggle,
+                                            ),
+                                          SizedBox(height: 24.h),
+                                          if (controller.product != null)
+                                            ProductInfoWidget(
+                                              title: controller.product!.title,
+                                              rating:
+                                                  controller.product!.rating,
+                                              reviewCount: 500,
+                                              price: controller.product!.price,
+                                              originalPrice: '\$3.99',
+                                              discount: '26% OFF',
+                                            ),
+                                          SizedBox(height: 16.h),
+                                          if (controller.shop != null)
+                                            StoreInfoWidget(
+                                              shop: controller.shop!,
+                                            ),
+                                          SizedBox(height: 24.h),
+                                          DescriptionWidget(
+                                            description: controller.description,
                                           ),
-                                        SizedBox(height: 24.h),
-                                        if (controller.product != null)
-                                          ProductInfoWidget(
-                                            title: controller.product!.title,
-                                            rating: controller.product!.rating,
-                                            reviewCount: 500,
-                                            price: controller.product!.price,
-                                            originalPrice: '\$3.99',
-                                            discount: '26% OFF',
+                                          SizedBox(height: 16.h),
+                                          _buildAddToCartButton(
+                                            enabled:
+                                                controller
+                                                    .product
+                                                    ?.canAddToCart ??
+                                                true,
+                                            onPressed: controller.onAddToCart,
                                           ),
-                                        SizedBox(height: 16.h),
-                                        if (controller.shop != null)
-                                          StoreInfoWidget(
-                                            shop: controller.shop!,
+                                          SizedBox(height: 24.h),
+                                          ReviewsWidget(
+                                            rating:
+                                                controller.product?.rating ??
+                                                4.8,
+                                            reviews: controller.reviews,
+                                            ratingDistribution:
+                                                controller.ratingDistribution,
+                                            onSeeAll:
+                                                controller.onSeeAllReviews,
+                                            onWriteReview:
+                                                controller.onWriteReview,
                                           ),
-                                        SizedBox(height: 24.h),
-                                        DescriptionWidget(
-                                          description: controller.description,
-                                        ),
-                                        SizedBox(height: 16.h),
-                                        _buildAddToCartButton(
-                                          enabled:
-                                              controller
-                                                  .product
-                                                  ?.canAddToCart ??
-                                              true,
-                                          onPressed: controller.onAddToCart,
-                                        ),
-                                        SizedBox(height: 24.h),
-                                        ReviewsWidget(
-                                          rating:
-                                              controller.product?.rating ?? 4.8,
-                                          reviews: controller.reviews,
-                                          ratingDistribution:
-                                              controller.ratingDistribution,
-                                          onSeeAll: controller.onSeeAllReviews,
-                                          onWriteReview:
-                                              controller.onWriteReview,
-                                        ),
-                                        SizedBox(height: 24.h),
-                                        QuestionsWidget(
-                                          questions: controller.questions,
-                                          onAskQuestion:
-                                              controller.onAskQuestion,
-                                          onReply: controller.onReplyToQuestion,
-                                        ),
-                                        SizedBox(height: 24.h),
-                                        YouMayLikeSection(
-                                          onAddToCart: (p) => controller
-                                              .addToCartFromSimilar(p),
-                                          onFavoriteToggle: (p) => controller
-                                              .onFavoriteToggleFromSimilar(p),
-                                          onProductTap: (p) =>
-                                              controller.onSimilarProductTap(p),
-                                        ),
-                                        // SizedBox(height: 24.h),
-                                      ],
+                                          SizedBox(height: 24.h),
+                                          QuestionsWidget(
+                                            questions: controller.questions,
+                                            onAskQuestion:
+                                                controller.onAskQuestion,
+                                            onReply:
+                                                controller.onReplyToQuestion,
+                                          ),
+                                          SizedBox(height: 24.h),
+                                          YouMayLikeSection(
+                                            onAddToCart: (p) => controller
+                                                .addToCartFromSimilar(p),
+                                            onFavoriteToggle: (p) => controller
+                                                .onFavoriteToggleFromSimilar(p),
+                                            onProductTap: (p) => controller
+                                                .onSimilarProductTap(p),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                           ),
@@ -202,25 +230,30 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen>
                   offset: isKeyboardOpen
                       ? const Offset(0, 1)
                       : const Offset(0, 0),
-                  child: KeyedSubtree(
-                    key: _navKey,
-                    child: CustomNavBar(
-                      currentIndex: -1,
-                      onTap: _onNavItemTapped,
+                  child: SizeTransition(
+                    axisAlignment: 1.0,
+                    sizeFactor: _navController,
+                    child: SafeArea(
+                      top: false,
+                      bottom: true,
+                      child: KeyedSubtree(
+                        key: _navKey,
+                        child: CustomNavBar(
+                          currentIndex: -1,
+                          onTap: _onNavItemTapped,
+                        ),
+                      ),
                     ),
                   ),
                 ),
               ),
 
-              /// Floating Cart Button with proper inset
               AnimatedBuilder(
                 animation: _navController,
-                builder: (context, _) {
-                  final inset =
-                      (isKeyboardOpen
-                          ? keyboardInset
-                          : _navController.value * _navBarHeight) +
-                      cartMargin;
+                builder: (_, __) {
+                  final inset = isKeyboardOpen
+                      ? keyboardInset
+                      : (_navController.value * _navBarHeight);
                   return FloatingCartButton(bottomInset: inset);
                 },
               ),
