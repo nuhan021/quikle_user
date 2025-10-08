@@ -134,6 +134,7 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
                         controller.selectedSubcategory.value?.id ?? 'none';
 
                     return CustomScrollView(
+                      physics: const ClampingScrollPhysics(),
                       controller: _scroll,
                       slivers: [
                         // 🔸 AppBar

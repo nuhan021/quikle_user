@@ -131,6 +131,7 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
                         controller.selectedSubcategory.value?.id ?? 'none';
 
                     return CustomScrollView(
+                      physics: const ClampingScrollPhysics(),
                       controller: _scroll,
                       slivers: [
                         SliverToBoxAdapter(
