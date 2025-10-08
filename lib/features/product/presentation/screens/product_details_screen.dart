@@ -3,10 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:quikle_user/core/common/widgets/cart_animation_overlay.dart';
+import 'package:quikle_user/core/common/widgets/common_app_bar.dart';
 import 'package:quikle_user/core/common/widgets/custom_navbar.dart';
 import 'package:quikle_user/core/common/widgets/floating_cart_button.dart';
-import 'package:quikle_user/core/common/styles/global_text_style.dart';
-import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/navigation/navbar_navigation_helper.dart';
 import 'package:quikle_user/features/cart/presentation/widgets/you_may_like_section.dart';
@@ -86,56 +85,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen>
         ),
         child: Scaffold(
           backgroundColor: AppColors.homeGrey,
-          appBar: PreferredSize(
-            preferredSize: Size.fromHeight(60.h),
-            child: Container(
-              width: double.infinity,
-              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.vertical(
-                  bottom: Radius.circular(20),
-                ),
-                border: Border(
-                  bottom: BorderSide(color: AppColors.gradientColor, width: 2),
-                ),
-              ),
-              child: SafeArea(
-                child: Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () => Get.back(),
-                      child: Icon(
-                        Icons.arrow_back,
-                        color: AppColors.ebonyBlack,
-                        size: 20.sp,
-                      ),
-                    ),
-                    SizedBox(width: 10.w),
-                    Expanded(
-                      child: Text(
-                        'Product Details',
-                        style: getTextStyle(
-                          font: CustomFonts.obviously,
-                          fontSize: 18.sp,
-                          fontWeight: FontWeight.w500,
-                          color: AppColors.ebonyBlack,
-                          lineHeight: 1.3,
-                        ),
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: controller.onShareProduct,
-                      child: Icon(
-                        Icons.share,
-                        color: AppColors.ebonyBlack,
-                        size: 24.sp,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+          appBar: CommonAppBar(
+            title: "Product Details",
+            showBackButton: true,
+            showNotification: false,
+            showProfile: false,
           ),
           body: Stack(
             children: [
@@ -156,6 +110,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen>
                                     child: CircularProgressIndicator(),
                                   )
                                 : SingleChildScrollView(
+                                    physics: const ClampingScrollPhysics(),
                                     padding: EdgeInsets.all(16.sp),
                                     child: Column(
                                       crossAxisAlignment:
@@ -225,7 +180,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen>
                                           onProductTap: (p) =>
                                               controller.onSimilarProductTap(p),
                                         ),
-                                        SizedBox(height: 24.h),
+                                        // SizedBox(height: 24.h),
                                       ],
                                     ),
                                   ),
