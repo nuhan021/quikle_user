@@ -6,7 +6,6 @@ import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/features/auth/presentation/screens/verification_scree.dart';
 import 'package:video_player/video_player.dart';
 import '../../controllers/splash_controller.dart';
-import '../../../auth/presentation/screens/login_screen.dart';
 
 class SplashScreen extends GetView<SplashController> {
   const SplashScreen({super.key});
@@ -31,27 +30,38 @@ class SplashScreen extends GetView<SplashController> {
             /// Base white background
             Container(color: Colors.white),
 
-            /// Video with white background, starts full screen then shrinks
+            /// Video with white background, starts full screen then shrinks smoothly after 2 seconds
             Obx(() {
               final isReady = controller.isReady.value;
+              final shouldShrink = controller.shouldShrink.value;
               final vc = controller.video;
+
+              if (!isReady) {
+                // Return empty container while video is loading
+                return const SizedBox.shrink();
+              }
 
               return AnimatedPositioned(
                 duration: const Duration(milliseconds: 600),
-                curve: Curves.easeInOut,
-                left: isReady ? 81.w : 0,
-                top: isReady ? 295.5.h : 0,
-                width: isReady ? 230.w : 1.sw,
-                height: isReady ? 221.h : 1.sh,
+                curve: Curves.easeInOutCubic,
+                left: shouldShrink ? 81.w : 0,
+                top: shouldShrink ? 295.5.h : 0,
+                width: shouldShrink ? 250.w : 1.sw,
+                height: shouldShrink ? 240.h : 1.sh,
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 600),
-                  curve: Curves.easeInOut,
+                  curve: Curves.easeInOutCubic,
                   decoration: BoxDecoration(
+                    // color: Colors.white,
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(isReady ? 48.r : 0),
+                    borderRadius: BorderRadius.circular(
+                      shouldShrink ? 48.r : 0,
+                    ),
                   ),
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(isReady ? 48.r : 0),
+                    borderRadius: BorderRadius.circular(
+                      shouldShrink ? 48.r : 0,
+                    ),
                     child: FittedBox(
                       fit: BoxFit.cover,
                       child: SizedBox(
