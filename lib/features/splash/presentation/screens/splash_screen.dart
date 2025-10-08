@@ -27,19 +27,15 @@ class SplashScreen extends GetView<SplashController> {
         body: Stack(
           clipBehavior: Clip.none,
           children: [
-            /// Base white background
             Container(color: Colors.white),
 
-            /// Video with white background, starts full screen then shrinks smoothly after 2 seconds
+            /// Video animation
             Obx(() {
               final isReady = controller.isReady.value;
               final shouldShrink = controller.shouldShrink.value;
               final vc = controller.video;
 
-              if (!isReady) {
-                // Return empty container while video is loading
-                return const SizedBox.shrink();
-              }
+              if (!isReady) return const SizedBox.shrink();
 
               return AnimatedPositioned(
                 duration: const Duration(milliseconds: 600),
@@ -52,7 +48,6 @@ class SplashScreen extends GetView<SplashController> {
                   duration: const Duration(milliseconds: 600),
                   curve: Curves.easeInOutCubic,
                   decoration: BoxDecoration(
-                    // color: Colors.white,
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(
                       shouldShrink ? 48.r : 0,
@@ -77,16 +72,13 @@ class SplashScreen extends GetView<SplashController> {
 
             /// Black ellipse animation
             Obx(() {
-              final bottomInset = MediaQuery.of(
-                context,
-              ).padding.bottom; // safe bottom padding
+              final bottomInset = MediaQuery.of(context).padding.bottom;
               final showEllipse = controller.showEllipse.value;
 
               return AnimatedPositioned(
                 duration: const Duration(milliseconds: 450),
                 curve: Curves.easeInOut,
                 left: _ellipseLeft.w,
-                // add the safe area offset here
                 top: controller.ellipseTop.value.h - bottomInset,
                 child: AnimatedOpacity(
                   duration: const Duration(milliseconds: 250),
