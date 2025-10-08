@@ -11,6 +11,7 @@ class SplashController extends GetxController {
   static const double _ellipseTopIdle = 812.0;
   static const double _ellipseTopPlaying = 666.0;
   final RxDouble ellipseTop = _ellipseTopIdle.obs;
+  final RxBool showEllipse = false.obs;
   final RxBool showLogin = false.obs;
 
   final Duration shrinkTriggerAt = const Duration(milliseconds: 200);
@@ -56,6 +57,7 @@ class SplashController extends GetxController {
   }
 
   void startEllipseAnimation() {
+    showEllipse.value = true;
     ellipseTop.value = _ellipseTopPlaying;
   }
 
