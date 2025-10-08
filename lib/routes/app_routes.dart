@@ -8,7 +8,6 @@ import 'package:quikle_user/features/auth/presentation/screens/login_screen.dart
 import 'package:quikle_user/features/cart/presentation/screens/cart_screen.dart';
 import 'package:quikle_user/features/product/presentation/screens/product_details_screen.dart';
 import 'package:quikle_user/features/categories/presentation/screens/category_detail_screen.dart';
-import 'package:quikle_user/features/categories/presentation/screens/grocery_navigation_screen.dart';
 import 'package:quikle_user/features/categories/presentation/screens/unified_category_screen.dart';
 import 'package:quikle_user/features/categories/presentation/screens/category_products_screen.dart';
 import 'package:quikle_user/features/restaurants/presentation/screens/category_restaurants_screen.dart';
@@ -125,10 +124,10 @@ class AppRoute {
       name: _categoryProducts,
       page: () => const CategoryProductsScreen(),
     ),
-    GetPage(
-      name: _groceryNavigation,
-      page: () => const GroceryNavigationScreen(),
-    ),
+    // GetPage(
+    //   name: _groceryNavigation,
+    //   page: () => const GroceryNavigationScreen(),
+    // ),
     GetPage(name: _checkout, page: () => const CheckoutScreen()),
     GetPage(name: _favorites, page: () => const FavoritesScreen()),
     GetPage(name: _addressBook, page: () => const AddressBookScreen()),

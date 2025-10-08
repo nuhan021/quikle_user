@@ -30,7 +30,6 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
   final GlobalKey _navKey = GlobalKey();
   double _navBarHeight = 0.0;
 
-  late final AnimationController _barAnim;
   final ScrollController _scroll = ScrollController();
 
   @override
@@ -39,29 +38,14 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
 
     _navController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 260),
+      duration: const Duration(milliseconds: 500),
       value: 1.0,
     );
-
-    _barAnim = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 220),
-      value: 1.0,
-    );
-
-    _scroll.addListener(() {
-      if (_scroll.offset > 8 && _barAnim.value == 1.0) {
-        _barAnim.reverse();
-      } else if (_scroll.offset <= 8 && _barAnim.value == 0.0) {
-        _barAnim.forward();
-      }
-    });
   }
 
   @override
   void dispose() {
     _scroll.dispose();
-    _barAnim.dispose();
     _navController.dispose();
     super.dispose();
   }
@@ -82,6 +66,27 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
     NavbarNavigationHelper.navigateToTab(index);
   }
 
+  bool _onScrollNotification(ScrollNotification notification) {
+    if (notification is UserScrollNotification) {
+      if (notification.direction == ScrollDirection.reverse &&
+          _navController.value != 0.0 &&
+          _navController.status != AnimationStatus.reverse) {
+        _navController.reverse();
+      } else if (notification.direction == ScrollDirection.forward &&
+          _navController.value != 1.0 &&
+          _navController.status != AnimationStatus.forward) {
+        _navController.forward();
+      } else if (notification.direction == ScrollDirection.idle &&
+          _navController.value != 1.0) {
+        _navController.forward();
+      }
+    }
+    if (notification is ScrollEndNotification && _navController.value != 1.0) {
+      _navController.forward();
+    }
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(
@@ -92,7 +97,6 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
     );
 
     WidgetsBinding.instance.addPostFrameCallback((_) => _measureNavBarHeight());
-    const double cartMargin = 16.0;
 
     final controller = Get.put(CategoryProductsController());
     final searchController = TextEditingController();
@@ -111,16 +115,26 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
           body: Stack(
             children: [
               SafeArea(
-                top: true,
-                bottom: false,
-                child: Column(
-                  children: [
-                    ClipRect(
-                      child: SizeTransition(
-                        axisAlignment: -1,
-                        sizeFactor: _barAnim,
-                        child: Obx(
-                          () => CommonAppBar(
+                child: NotificationListener<ScrollNotification>(
+                  onNotification: _onScrollNotification,
+                  child: Obx(() {
+                    final hasSubcategories =
+                        controller.subcategories.isNotEmpty;
+                    final searchBlockHeight =
+                        SearchAndFiltersSection.kPreferredHeight + 16.h;
+                    final subcategoriesHeight = hasSubcategories
+                        ? MinimalSubcategoriesSection.kPreferredHeight
+                        : 0.0;
+                    final totalHeaderHeight =
+                        searchBlockHeight + subcategoriesHeight;
+                    final selectedSubcategoryId =
+                        controller.selectedSubcategory.value?.id ?? 'none';
+
+                    return CustomScrollView(
+                      controller: _scroll,
+                      slivers: [
+                        SliverToBoxAdapter(
+                          child: CommonAppBar(
                             title: controller.categoryTitle.value,
                             showNotification: false,
                             showProfile: false,
@@ -128,102 +142,115 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
                             addressWidget: AddressWidget(),
                           ),
                         ),
-                      ),
-                    ),
-
-                    Expanded(
-                      child: AnimatedBuilder(
-                        animation: _navController,
-                        builder: (context, _) {
-                          final bottomInset = isKeyboardOpen
-                              ? 0.0
-                              : _navController.value * _navBarHeight;
-
-                          return Padding(
-                            padding: EdgeInsets.only(
-                              bottom: bottomInset,
-                              left: 16.w,
-                              right: 16.w,
+                        SliverPersistentHeader(
+                          pinned: true,
+                          delegate: _CategoryHeaderDelegate(
+                            searchSection: SizedBox(
+                              height: searchBlockHeight,
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 16.w,
+                                  vertical: 8.h,
+                                ),
+                                child: SearchAndFiltersSection(
+                                  searchController: searchController,
+                                  onSearchChanged: controller.onSearchChanged,
+                                  onVoiceTap: controller.onVoiceSearchPressed,
+                                  dynamicHint: controller.currentPlaceholder,
+                                ),
+                              ),
                             ),
-                            child: Obx(() {
-                              if (controller.isLoading.value) {
-                                return const Center(
-                                  child: CircularProgressIndicator(),
+                            subcategoriesSection: hasSubcategories
+                                ? SizedBox(
+                                    height: subcategoriesHeight,
+                                    child: Padding(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 16.w,
+                                      ),
+                                      child: MinimalSubcategoriesSection(
+                                        categoryIconPath:
+                                            controller.currentCategory.iconPath,
+                                        subcategories: controller.subcategories,
+                                        selectedSubcategory: controller
+                                            .selectedSubcategory
+                                            .value,
+                                        onSubcategoryTap:
+                                            controller.onSubcategoryTap,
+                                      ),
+                                    ),
+                                  )
+                                : const SizedBox.shrink(),
+                            totalHeight: totalHeaderHeight,
+                            rebuildToken: [
+                              hasSubcategories,
+                              selectedSubcategoryId,
+                              controller.currentPlaceholder.value,
+                            ].join('|'),
+                          ),
+                        ),
+                        if (controller.isLoading.value)
+                          const SliverFillRemaining(
+                            hasScrollBody: false,
+                            child: Center(child: CircularProgressIndicator()),
+                          )
+                        else if (controller.displayProducts.isEmpty)
+                          SliverFillRemaining(
+                            hasScrollBody: false,
+                            child: Center(
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(vertical: 10.h),
+                                child: Text(
+                                  'No products available',
+                                  style: TextStyle(
+                                    color: AppColors.featherGrey,
+                                    fontSize: 16.sp,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
+                          )
+                        else
+                          SliverPadding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 16.w,
+                              vertical: 12.h,
+                            ),
+                            sliver: SliverGrid(
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 3,
+                                    crossAxisSpacing: 8.w,
+                                    mainAxisSpacing: 8.h,
+                                    childAspectRatio: 0.70,
+                                  ),
+                              delegate: SliverChildBuilderDelegate((
+                                context,
+                                index,
+                              ) {
+                                final product =
+                                    controller.displayProducts[index];
+                                final shop = controller.getShopForProduct(
+                                  product,
                                 );
-                              }
 
-                              return Column(
-                                children: [
-                                  SizedBox(height: 8.h),
-                                  SearchAndFiltersSection(
-                                    searchController: searchController,
-                                    onSearchChanged: controller.onSearchChanged,
-                                    onVoiceTap: controller.onVoiceSearchPressed,
-                                    dynamicHint: controller.currentPlaceholder,
-                                  ),
-                                  SizedBox(height: 12.h),
-
-                                  MinimalSubcategoriesSection(
-                                    subcategories: controller.subcategories,
-                                    selectedSubcategory:
-                                        controller.selectedSubcategory.value,
-                                    onSubcategoryTap:
-                                        controller.onSubcategoryTap,
-                                    categoryIconPath:
-                                        controller.currentCategory.iconPath,
-                                  ),
-
-                                  SizedBox(height: 12.h),
-
-                                  Expanded(
-                                    child:
-                                        NotificationListener<
-                                          ScrollNotification
-                                        >(
-                                          onNotification: (notification) {
-                                            if (notification
-                                                is UserScrollNotification) {
-                                              if (notification.direction ==
-                                                      ScrollDirection.reverse &&
-                                                  _navController.value != 0.0 &&
-                                                  _navController.status !=
-                                                      AnimationStatus.reverse) {
-                                                _navController.reverse();
-                                              } else if (notification
-                                                          .direction ==
-                                                      ScrollDirection.forward &&
-                                                  _navController.value != 1.0 &&
-                                                  _navController.status !=
-                                                      AnimationStatus.forward) {
-                                                _navController.forward();
-                                              } else if (notification
-                                                      .direction ==
-                                                  ScrollDirection.idle) {
-                                                if (_navController.value !=
-                                                    1.0) {
-                                                  _navController.forward();
-                                                }
-                                              }
-                                            }
-                                            if (notification
-                                                is ScrollEndNotification) {
-                                              if (_navController.value != 1.0) {
-                                                _navController.forward();
-                                              }
-                                            }
-                                            return false;
-                                          },
-                                          child: _buildProductsGrid(controller),
-                                        ),
-                                  ),
-                                ],
-                              );
-                            }),
-                          );
-                        },
-                      ),
-                    ),
-                  ],
+                                return CategoryProductItem(
+                                  product: product,
+                                  onTap: () => controller.onProductTap(product),
+                                  onAddToCart: () =>
+                                      controller.onAddToCart(product),
+                                  onFavoriteToggle: () =>
+                                      controller.onFavoriteToggle(product),
+                                  isGroceryCategory:
+                                      controller.isGroceryCategory,
+                                  shop: shop,
+                                );
+                              }, childCount: controller.displayProducts.length),
+                            ),
+                          ),
+                      ],
+                    );
+                  }),
                 ),
               ),
 
@@ -257,11 +284,9 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
               AnimatedBuilder(
                 animation: _navController,
                 builder: (context, _) {
-                  final navSpace = isKeyboardOpen
-                      ? 0.0
+                  final inset = isKeyboardOpen
+                      ? keyboard
                       : (_navController.value * _navBarHeight);
-                  final inset =
-                      (isKeyboardOpen ? keyboard : navSpace) + cartMargin;
                   return FloatingCartButton(bottomInset: inset);
                 },
               ),
@@ -276,7 +301,9 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
               AnimatedBuilder(
                 animation: _navController,
                 builder: (_, __) {
-                  final inset = (_navController.value * _navBarHeight);
+                  final inset = isKeyboardOpen
+                      ? keyboard
+                      : (_navController.value * _navBarHeight);
                   return LiveOrderIndicator(bottomInset: inset);
                 },
               ),
@@ -286,50 +313,45 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
       ),
     );
   }
+}
 
-  Widget _buildProductsGrid(CategoryProductsController controller) {
-    if (controller.displayProducts.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 10.h),
-          child: Text(
-            'No products available',
-            style: TextStyle(color: AppColors.featherGrey, fontSize: 16.sp),
-            textAlign: TextAlign.center,
-          ),
-        ),
-      );
-    }
+class _CategoryHeaderDelegate extends SliverPersistentHeaderDelegate {
+  final Widget searchSection;
+  final Widget subcategoriesSection;
+  final double totalHeight;
+  final Object? rebuildToken;
 
-    return MediaQuery.removePadding(
-      context: context,
-      removeTop: true,
-      removeBottom: true,
-      child: GridView.builder(
-        controller: _scroll,
-        primary: false,
-        padding: EdgeInsets.zero,
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3,
-          crossAxisSpacing: 8.w,
-          mainAxisSpacing: 8.h,
-          childAspectRatio: 0.70,
-        ),
-        itemCount: controller.displayProducts.length,
-        itemBuilder: (context, index) {
-          final product = controller.displayProducts[index];
-          final shop = controller.getShopForProduct(product);
+  _CategoryHeaderDelegate({
+    required this.searchSection,
+    required this.subcategoriesSection,
+    required this.totalHeight,
+    this.rebuildToken,
+  });
 
-          return CategoryProductItem(
-            product: product,
-            onTap: () => controller.onProductTap(product),
-            onAddToCart: () => controller.onAddToCart(product),
-            onFavoriteToggle: () => controller.onFavoriteToggle(product),
-            isGroceryCategory: controller.isGroceryCategory,
-            shop: shop,
-          );
-        },
+  @override
+  double get minExtent => totalHeight;
+
+  @override
+  double get maxExtent => totalHeight;
+
+  @override
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
+    return Container(
+      color: AppColors.homeGrey,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [searchSection, subcategoriesSection],
       ),
     );
+  }
+
+  @override
+  bool shouldRebuild(covariant _CategoryHeaderDelegate oldDelegate) {
+    return totalHeight != oldDelegate.totalHeight ||
+        rebuildToken != oldDelegate.rebuildToken;
   }
 }
