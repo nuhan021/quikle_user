@@ -50,111 +50,117 @@ class _PrescriptionDetailsScreenState extends State<PrescriptionDetailsScreen> {
         body: RefreshIndicator(
           onRefresh: () => controller.refreshData(),
           color: AppColors.primary,
-          child: SingleChildScrollView(
-            padding: EdgeInsets.all(16.w),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                PrescriptionImageCardWidget(prescription: prescription),
-                SizedBox(height: 8.h),
-                PrescriptionInfoCardWidget(prescription: prescription),
-                SizedBox(height: 8.h),
-
-                // Show rejection reason as separate box for invalid prescriptions
-                if (prescription.status == PrescriptionStatus.invalid &&
-                    prescription.notes?.isNotEmpty == true) ...[
-                  _buildRejectionReasonBox(prescription.notes!),
+          child: Padding(
+            padding: EdgeInsets.only(
+              left: 16.w,
+              right: 16.w,
+              bottom: MediaQuery.of(context).padding.bottom,
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  PrescriptionImageCardWidget(prescription: prescription),
                   SizedBox(height: 8.h),
-                ],
+                  PrescriptionInfoCardWidget(prescription: prescription),
+                  SizedBox(height: 8.h),
 
-                if (prescription.vendorResponses.isNotEmpty) ...[
-                  Text(
-                    'Store Responses',
-                    style: getTextStyle(
-                      font: CustomFonts.inter,
-                      fontSize: 18.sp,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
+                  // Show rejection reason as separate box for invalid prescriptions
+                  if (prescription.status == PrescriptionStatus.invalid &&
+                      prescription.notes?.isNotEmpty == true) ...[
+                    _buildRejectionReasonBox(prescription.notes!),
+                    SizedBox(height: 8.h),
+                  ],
+
+                  if (prescription.vendorResponses.isNotEmpty) ...[
+                    Text(
+                      'Store Responses',
+                      style: getTextStyle(
+                        font: CustomFonts.inter,
+                        fontSize: 18.sp,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary,
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 8.h),
-                  ...prescription.vendorResponses.map((response) {
-                    if (response.status == VendorResponseStatus.approved ||
-                        response.status ==
-                            VendorResponseStatus.partiallyApproved) {
-                      return VendorResponseCard(
-                        response: response,
-                        controller: controller,
-                        onCartAnimation: _triggerCartAnimation,
-                      );
-                    }
+                    SizedBox(height: 8.h),
+                    ...prescription.vendorResponses.map((response) {
+                      if (response.status == VendorResponseStatus.approved ||
+                          response.status ==
+                              VendorResponseStatus.partiallyApproved) {
+                        return VendorResponseCard(
+                          response: response,
+                          controller: controller,
+                          onCartAnimation: _triggerCartAnimation,
+                        );
+                      }
 
-                    return Container(
-                      margin: EdgeInsets.only(bottom: 12.h),
-                      padding: EdgeInsets.all(16.w),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12.r),
-                        border: Border.all(
-                          color: _getVendorStatusColor(
-                            response.status,
-                          ).withValues(alpha: .3),
-                          width: 1,
+                      return Container(
+                        margin: EdgeInsets.only(bottom: 12.h),
+                        padding: EdgeInsets.all(16.w),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12.r),
+                          border: Border.all(
+                            color: _getVendorStatusColor(
+                              response.status,
+                            ).withValues(alpha: .3),
+                            width: 1,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: .05),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
                         ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: .05),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            padding: EdgeInsets.all(8.w),
-                            decoration: BoxDecoration(
-                              color: _getVendorStatusColor(
-                                response.status,
-                              ).withValues(alpha: .1),
-                              borderRadius: BorderRadius.circular(8.r),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: EdgeInsets.all(8.w),
+                              decoration: BoxDecoration(
+                                color: _getVendorStatusColor(
+                                  response.status,
+                                ).withValues(alpha: .1),
+                                borderRadius: BorderRadius.circular(8.r),
+                              ),
+                              child: Icon(
+                                Icons.store,
+                                color: _getVendorStatusColor(response.status),
+                                size: 16.sp,
+                              ),
                             ),
-                            child: Icon(
-                              Icons.store,
-                              color: _getVendorStatusColor(response.status),
-                              size: 16.sp,
-                            ),
-                          ),
-                          SizedBox(width: 12.w),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  response.vendorName,
-                                  style: getTextStyle(
-                                    font: CustomFonts.inter,
-                                    fontSize: 16.sp,
-                                    fontWeight: FontWeight.w700,
-                                    color: AppColors.textPrimary,
+                            SizedBox(width: 12.w),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    response.vendorName,
+                                    style: getTextStyle(
+                                      font: CustomFonts.inter,
+                                      fontSize: 16.sp,
+                                      fontWeight: FontWeight.w700,
+                                      color: AppColors.textPrimary,
+                                    ),
                                   ),
-                                ),
-                                SizedBox(height: 4.h),
-                                VendorResponseStatusBadge(
-                                  status: response.status,
-                                ),
-                              ],
+                                  SizedBox(height: 4.h),
+                                  VendorResponseStatusBadge(
+                                    status: response.status,
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    );
-                  }).toList(),
-                  SizedBox(height: 8.h),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                    SizedBox(height: 8.h),
+                  ],
+                  PrescriptionTimelineWidget(prescription: prescription),
+                  SizedBox(height: 30.h),
                 ],
-                PrescriptionTimelineWidget(prescription: prescription),
-                SizedBox(height: 30.h),
-              ],
+              ),
             ),
           ),
         ),

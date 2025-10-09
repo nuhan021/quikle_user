@@ -18,7 +18,7 @@ class OrderInvoiceScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: AppColors.homeGrey,
       body: SafeArea(
         bottom: false,
         child: Column(
@@ -33,26 +33,33 @@ class OrderInvoiceScreen extends StatelessWidget {
                   : null,
             ),
             Expanded(
-              child: SingleChildScrollView(
-                // physics: const ClampingScrollPhysics(),
-                physics: const ClampingScrollPhysics(),
-                padding: EdgeInsets.all(16.w),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildOrderHeader(),
-                    SizedBox(height: 16.h),
-                    _buildOrderItems(),
-                    SizedBox(height: 16.h),
-                    _buildPricingDetails(),
-                    SizedBox(height: 16.h),
-                    _buildPaymentInfo(),
-                    SizedBox(height: 16.h),
-                    _buildShippingAddress(),
-                    SizedBox(height: 16.h),
-                    _buildDeliveryInfo(),
-                    SizedBox(height: 24.h),
-                  ],
+              child: Padding(
+                padding: EdgeInsets.only(
+                  left: 16.w,
+                  right: 16.w,
+                  bottom: MediaQuery.of(context).padding.bottom,
+                ),
+                child: SingleChildScrollView(
+                  // physics: const ClampingScrollPhysics(),
+                  physics: const ClampingScrollPhysics(),
+                  padding: EdgeInsets.all(16.w),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildOrderHeader(),
+                      SizedBox(height: 16.h),
+                      _buildOrderItems(),
+                      SizedBox(height: 16.h),
+                      _buildPricingDetails(),
+                      SizedBox(height: 16.h),
+                      _buildPaymentInfo(),
+                      SizedBox(height: 16.h),
+                      _buildShippingAddress(),
+                      SizedBox(height: 16.h),
+                      _buildDeliveryInfo(),
+                      SizedBox(height: 24.h),
+                    ],
+                  ),
                 ),
               ),
             ),
