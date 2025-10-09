@@ -100,11 +100,8 @@ class AddressBookScreen extends StatelessWidget {
     );
   }
 
-  // List gets bottom padding so last card never hides behind the fixed button or navbar
   Widget _buildAddressList(BuildContext context, AddressController controller) {
-    // Estimated button height
     final double buttonHeight = 56.h;
-    // Space for gesture pill and your custom navbar
     final double gesture = MediaQuery.of(context).viewPadding.bottom;
     const double navHeight = kBottomNavigationBarHeight;
 
@@ -113,7 +110,7 @@ class AddressBookScreen extends StatelessWidget {
         16.w,
         16.w,
         16.w,
-        // bottom padding ensures scrollable content clears the fixed button and navbar
+
         16.h + buttonHeight + gesture + navHeight,
       ),
       itemCount: controller.addresses.length,
@@ -168,57 +165,59 @@ class AddressBookScreen extends StatelessWidget {
           color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              margin: EdgeInsets.only(top: 8.h),
-              width: 40.w,
-              height: 4.h,
-              decoration: BoxDecoration(
-                color: AppColors.featherGrey,
-                borderRadius: BorderRadius.circular(2.r),
+        child: SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                margin: EdgeInsets.only(top: 8.h),
+                width: 40.w,
+                height: 4.h,
+                decoration: BoxDecoration(
+                  color: AppColors.featherGrey,
+                  borderRadius: BorderRadius.circular(2.r),
+                ),
               ),
-            ),
-            SizedBox(height: 16.h),
-            Text(
-              'Address Options',
-              style: getTextStyle(
-                font: CustomFonts.obviously,
-                fontSize: 18.sp,
-                fontWeight: FontWeight.w500,
-                color: AppColors.ebonyBlack,
+              SizedBox(height: 16.h),
+              Text(
+                'Address Options',
+                style: getTextStyle(
+                  font: CustomFonts.obviously,
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.ebonyBlack,
+                ),
               ),
-            ),
-            SizedBox(height: 24.h),
-            if (!address.isDefault)
+              SizedBox(height: 24.h),
+              if (!address.isDefault)
+                _buildBottomSheetOption(
+                  icon: Iconsax.tick_circle,
+                  title: 'Set as Default',
+                  onTap: () {
+                    Get.back();
+                    controller.setAsDefault(address.id);
+                  },
+                ),
               _buildBottomSheetOption(
-                icon: Iconsax.tick_circle,
-                title: 'Set as Default',
+                icon: Iconsax.edit_2,
+                title: 'Edit Address',
                 onTap: () {
                   Get.back();
-                  controller.setAsDefault(address.id);
+                  _navigateToEditAddress(address);
                 },
               ),
-            _buildBottomSheetOption(
-              icon: Iconsax.edit_2,
-              title: 'Edit Address',
-              onTap: () {
-                Get.back();
-                _navigateToEditAddress(address);
-              },
-            ),
-            _buildBottomSheetOption(
-              icon: Iconsax.trash,
-              title: 'Delete Address',
-              color: AppColors.error,
-              onTap: () {
-                Get.back();
-                _showDeleteConfirmation(address, controller);
-              },
-            ),
-            SizedBox(height: 32.h),
-          ],
+              _buildBottomSheetOption(
+                icon: Iconsax.trash,
+                title: 'Delete Address',
+                color: AppColors.error,
+                onTap: () {
+                  Get.back();
+                  _showDeleteConfirmation(address, controller);
+                },
+              ),
+              SizedBox(height: 32.h),
+            ],
+          ),
         ),
       ),
     );

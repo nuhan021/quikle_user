@@ -110,28 +110,18 @@ class CartItemsSection extends StatelessWidget {
                               ),
                             ),
                             SizedBox(height: 6.h),
-                            Text(
-                              '${cartItem.quantity} unit',
-                              style: getTextStyle(
-                                font: CustomFonts.inter,
-                                fontSize: 14.sp,
-                                fontWeight: FontWeight.w500,
-                                color: AppColors.ebonyBlack,
-                              ),
-                            ),
-                            SizedBox(height: 6.h),
                             Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  'Add to favourite',
+                                  '${cartItem.quantity} unit',
                                   style: getTextStyle(
                                     font: CustomFonts.inter,
-                                    fontSize: 12.sp,
-                                    fontWeight: FontWeight.w400,
-                                    color: AppColors.featherGrey,
+                                    fontSize: 14.sp,
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColors.ebonyBlack,
                                   ),
                                 ),
-                                const Spacer(),
                                 _buildQuantityControls(
                                   cartItem.quantity,
                                   () =>

@@ -196,6 +196,7 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
                                     ),
                                   )
                                 : const SizedBox.shrink(),
+
                             totalHeight: totalHeaderHeight,
                             rebuildToken: [
                               controller.isGroceryCategory,
@@ -233,7 +234,10 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
                                 ),
                                 SizedBox(height: 16.h),
                               ],
-
+                              if (controller.isMedicineCategory) ...[
+                                const PrescriptionUploadSection(),
+                                SizedBox(height: 16.h),
+                              ],
                               // Main content (products)
                               Padding(
                                 padding: EdgeInsets.symmetric(
@@ -337,7 +341,7 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
             shops: controller.shops,
           ),
         if (!controller.isGroceryCategory &&
-            controller.recommendedProducts.isNotEmpty)
+            controller.recommendedProducts.isNotEmpty) ...[
           ProductGridSection(
             title: 'Recommended for You',
             products: controller.recommendedProducts,
@@ -350,6 +354,8 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
             isGroceryCategory: controller.isGroceryCategory,
             shops: controller.shops,
           ),
+          SizedBox(height: 40.h),
+        ],
         if (controller.displayProducts.isEmpty)
           Padding(
             padding: EdgeInsets.symmetric(vertical: 40.h),
