@@ -35,11 +35,11 @@ jobs:
         run: flutter pub run build_runner build --delete-conflicting-outputs
 
       # 5. Build Android APK
-      - name: Build APK
+      - name: Quickle User
         run: flutter build apk --release
 
       # 6. Build iOS (unsigned, no codesign)
-      - name: Build iOS
+      - name: Quickle User
         run: flutter build ios --release --no-codesign
 
       # 7. Package unsigned iOS IPA
