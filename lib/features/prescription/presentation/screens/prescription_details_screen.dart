@@ -62,9 +62,6 @@ class _PrescriptionDetailsScreenState extends State<PrescriptionDetailsScreen> {
                 children: [
                   PrescriptionImageCardWidget(prescription: prescription),
                   SizedBox(height: 8.h),
-                  PrescriptionInfoCardWidget(prescription: prescription),
-                  SizedBox(height: 8.h),
-
                   // Show rejection reason as separate box for invalid prescriptions
                   if (prescription.status == PrescriptionStatus.invalid &&
                       prescription.notes?.isNotEmpty == true) ...[
@@ -157,6 +154,8 @@ class _PrescriptionDetailsScreenState extends State<PrescriptionDetailsScreen> {
                     }).toList(),
                     SizedBox(height: 8.h),
                   ],
+                  PrescriptionInfoCardWidget(prescription: prescription),
+                  SizedBox(height: 8.h),
                   PrescriptionTimelineWidget(prescription: prescription),
                   SizedBox(height: 30.h),
                 ],
