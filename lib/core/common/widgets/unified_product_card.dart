@@ -235,24 +235,29 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
 
         if (widget.variant == ProductCardVariant.category ||
             widget.variant == ProductCardVariant.youMayLike) ...[
-          Row(
-            children: [
-              Icon(Icons.star, color: Colors.orange, size: 10.sp),
-              SizedBox(width: 2.w),
-              Text(
-                '${widget.product.rating}',
-                style: getTextStyle(
-                  font: CustomFonts.inter,
-                  fontSize: 9.sp,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.ebonyBlack,
+          if (widget.isGroceryCategory) ...[
+            _buildCategorySpecificInfo(),
+            SizedBox(height: 4.h),
+          ] else ...[
+            Row(
+              children: [
+                Icon(Icons.star, color: Colors.orange, size: 10.sp),
+                SizedBox(width: 2.w),
+                Text(
+                  '${widget.product.rating}',
+                  style: getTextStyle(
+                    font: CustomFonts.inter,
+                    fontSize: 9.sp,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.ebonyBlack,
+                  ),
                 ),
-              ),
-              SizedBox(width: 4.w),
-              Expanded(child: _buildCategorySpecificInfo()),
-            ],
-          ),
-          SizedBox(height: 4.h),
+                SizedBox(width: 4.w),
+                Expanded(child: _buildCategorySpecificInfo()),
+              ],
+            ),
+            SizedBox(height: 4.h),
+          ],
         ],
 
         if (widget.product.isMedicine && widget.onAddToCart != null) ...[
@@ -392,15 +397,15 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
       return Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.scale_outlined, color: AppColors.featherGrey, size: 9.sp),
-          SizedBox(width: 2.w),
           Flexible(
             child: Text(
-              widget.product.weight ?? '1 piece',
+              //widget.product.weight ?? '1 piece',
+              '[ ${widget.product.weight ?? '1 piece'} ]',
               style: getTextStyle(
                 font: CustomFonts.inter,
-                fontSize: 8.sp,
-                color: AppColors.featherGrey,
+                fontSize: 10.sp,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,

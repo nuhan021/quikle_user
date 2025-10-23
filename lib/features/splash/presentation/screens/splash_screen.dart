@@ -72,14 +72,13 @@ class SplashScreen extends GetView<SplashController> {
 
             /// Black ellipse animation
             Obx(() {
-              final bottomInset = MediaQuery.of(context).padding.bottom;
               final showEllipse = controller.showEllipse.value;
 
               return AnimatedPositioned(
                 duration: const Duration(milliseconds: 450),
                 curve: Curves.easeInOut,
                 left: _ellipseLeft.w,
-                top: controller.ellipseTop.value.h - bottomInset,
+                top: controller.ellipseTop.value.h,
                 child: AnimatedOpacity(
                   duration: const Duration(milliseconds: 250),
                   curve: Curves.easeInOut,
