@@ -86,7 +86,7 @@ class SplashScreen extends GetView<SplashController> {
                   child: ClipOval(
                     child: SizedBox(
                       width: 708.w,
-                      height: 331.h,
+                      height: 431.h,
                       child: Container(color: Colors.black),
                     ),
                   ),
