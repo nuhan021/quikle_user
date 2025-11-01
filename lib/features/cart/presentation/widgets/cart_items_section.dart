@@ -44,14 +44,14 @@ class CartItemsSection extends StatelessWidget {
               itemBuilder: (context, index) {
                 final cartItem = cartController.cartItems[index];
                 final isLast = index == cartController.cartItems.length - 1;
-
+                bool isMedicine = cartItem.isUrgent;
                 return Container(
                   margin: EdgeInsets.only(
-                    left: 16.w,
-                    right: 16.w,
+                    left: 8.w,
+                    right: 8.w,
                     bottom: isLast ? 0 : 8.h,
                   ),
-                  padding: EdgeInsets.all(12.w),
+                  padding: EdgeInsets.only(right: 8.w),
                   decoration: BoxDecoration(
                     color: AppColors.homeGrey,
                     borderRadius: BorderRadius.circular(8.r),
@@ -59,8 +59,8 @@ class CartItemsSection extends StatelessWidget {
                   child: Row(
                     children: [
                       Container(
-                        width: 80.w,
-                        height: 80.w,
+                        width: 70.w,
+                        height: 70.h,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(8.r),
                         ),
@@ -78,50 +78,96 @@ class CartItemsSection extends StatelessWidget {
                           ),
                         ),
                       ),
-                      SizedBox(width: 12.w),
+                      // SizedBox(width: 4.w),
                       Container(
                         width: 1.w,
                         height: 80.h,
                         color: Colors.grey[400],
                       ),
-                      SizedBox(width: 12.w),
+                      SizedBox(width: 8.w),
                       Expanded(
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              cartItem.product.title,
-                              style: getTextStyle(
-                                font: CustomFonts.inter,
-                                fontSize: 16.sp,
-                                fontWeight: FontWeight.w500,
-                                color: AppColors.ebonyBlack,
-                              ),
-                            ),
-                            SizedBox(height: 6.h),
-                            Text(
-                              cartItem.product.price,
-                              style: getTextStyle(
-                                font: CustomFonts.inter,
-                                fontSize: 16.sp,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.ebonyBlack,
-                              ),
-                            ),
-                            SizedBox(height: 6.h),
                             Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(
-                                  '${cartItem.quantity} unit',
-                                  style: getTextStyle(
-                                    font: CustomFonts.inter,
-                                    fontSize: 14.sp,
-                                    fontWeight: FontWeight.w500,
-                                    color: AppColors.ebonyBlack,
+                                Expanded(
+                                  child: Text(
+                                    cartItem.product.title,
+                                    style: getTextStyle(
+                                      font: CustomFonts.inter,
+                                      fontSize: 16.sp,
+                                      fontWeight: FontWeight.w500,
+                                      color: AppColors.ebonyBlack,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
+
+                                if (isMedicine)
+                                  Container(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 6.w,
+                                      vertical: 3.h,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          Colors.red.withValues(alpha: 0.15),
+                                          Colors.red.withValues(alpha: 0.08),
+                                        ],
+                                      ),
+                                      borderRadius: BorderRadius.circular(6.r),
+                                      border: Border.all(
+                                        color: Colors.red.withValues(
+                                          alpha: 0.3,
+                                        ),
+                                        width: 0.5,
+                                      ),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          Icons.access_time,
+                                          size: 12.sp,
+                                          color: Colors.red[700],
+                                        ),
+                                        SizedBox(width: 3.w),
+                                        Text(
+                                          'URGENT',
+                                          style: getTextStyle(
+                                            font: CustomFonts.inter,
+                                            fontSize: 9.sp,
+                                            fontWeight: FontWeight.w700,
+                                            color: Colors.red[700]!,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                              ],
+                            ),
+                            SizedBox(height: 8.h),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Container(
+                                  child: Text(
+                                    '${cartItem.product.price} x ${cartItem.quantity} = ${cartItem.totalPrice.toStringAsFixed(2)}',
+                                    style: getTextStyle(
+                                      font: CustomFonts.inter,
+                                      fontSize: 14.sp,
+                                      fontWeight: FontWeight.w700,
+                                      color: AppColors.ebonyBlack,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+
+                                // Quantity controls
                                 _buildQuantityControls(
                                   cartItem.quantity,
                                   () =>
@@ -153,54 +199,53 @@ class CartItemsSection extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.ebonyBlack,
-        borderRadius: BorderRadius.circular(6.r),
+        borderRadius: BorderRadius.circular(8.r),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.ebonyBlack.withOpacity(0.15),
+            blurRadius: 4,
+            offset: Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          GestureDetector(
-            onTap: onDecrease,
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 6.h),
-              child: Text(
-                '-',
-                style: getTextStyle(
-                  font: CustomFonts.inter,
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.beakYellow,
-                ),
-              ),
-            ),
-          ),
+          _buildControlButton(icon: Icons.remove, onTap: onDecrease),
           Container(
-            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-            child: Text(
-              '$quantity',
-              style: getTextStyle(
-                font: CustomFonts.inter,
-                fontSize: 14.sp,
-                fontWeight: FontWeight.w600,
-                color: AppColors.beakYellow,
-              ),
-            ),
-          ),
-          GestureDetector(
-            onTap: onIncrease,
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 6.h),
+            constraints: BoxConstraints(minWidth: 32.w),
+            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
+            child: Center(
               child: Text(
-                '+',
+                '$quantity',
                 style: getTextStyle(
                   font: CustomFonts.inter,
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.w600,
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.w700,
                   color: AppColors.beakYellow,
                 ),
               ),
             ),
           ),
+          _buildControlButton(icon: Icons.add, onTap: onIncrease),
         ],
+      ),
+    );
+  }
+
+  Widget _buildControlButton({
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.all(4.w),
+        decoration: BoxDecoration(
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(8.r),
+        ),
+        child: Icon(icon, size: 12.sp, color: AppColors.beakYellow),
       ),
     );
   }

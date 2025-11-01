@@ -43,25 +43,29 @@ class CustomNavBar extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           _NavItem(
-            iconAsset: ImagePath.homeNav,
+            inactiveIcon: ImagePath.homeNav,
+            activeIcon: ImagePath.homeActiveNav,
             label: 'Home',
             isSelected: currentIndex == 0,
             onTap: () => onTap(0),
           ),
           _NavItem(
-            iconAsset: ImagePath.orderIcon,
+            inactiveIcon: ImagePath.orderIcon,
+            activeIcon: ImagePath.orderActiveIcon,
             label: 'All Orders',
             isSelected: currentIndex == 1,
             onTap: () => onTap(1),
           ),
           _NavItem(
-            iconAsset: ImagePath.categoryIcon,
+            inactiveIcon: ImagePath.categoryIcon,
+            activeIcon: ImagePath.categoryActiveIcon,
             label: 'Categories',
             isSelected: currentIndex == 2,
             onTap: () => onTap(2),
           ),
           _NavItem(
-            iconAsset: ImagePath.profile,
+            inactiveIcon: ImagePath.profile,
+            activeIcon: ImagePath.profile,
             label: 'Profile',
             isSelected: currentIndex == 3,
             onTap: () => onTap(3),
@@ -74,30 +78,26 @@ class CustomNavBar extends StatelessWidget {
 }
 
 class _NavItem extends StatelessWidget {
-  final IconData? icon;
-  final String? iconAsset;
-  final IconData? fallbackIcon;
+  final String inactiveIcon;
+  final String activeIcon;
   final String label;
   final bool isSelected;
   final Function() onTap;
   final bool isProfile;
 
   const _NavItem({
-    this.icon,
-    this.iconAsset,
-    this.fallbackIcon,
+    required this.inactiveIcon,
+    required this.activeIcon,
     required this.label,
     required this.isSelected,
     required this.onTap,
     this.isProfile = false,
-  }) : assert(
-         icon != null || iconAsset != null || fallbackIcon != null,
-         'Either icon, iconAsset, or fallbackIcon must be provided',
-       );
+  });
 
   @override
   Widget build(BuildContext context) {
     final iconSize = 22.w;
+    final iconToShow = isSelected ? activeIcon : inactiveIcon;
 
     return Expanded(
       child: GestureDetector(
@@ -108,34 +108,26 @@ class _NavItem extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              if (iconAsset != null)
-                isProfile
-                    ? ClipOval(
-                        child: Container(
-                          width: iconSize,
-                          height: iconSize,
-                          child: Image.asset(iconAsset!, fit: BoxFit.cover),
-                        ),
-                      )
-                    : Image.asset(
-                        iconAsset!,
-                        width: iconSize,
-                        height: iconSize,
-                        errorBuilder: (context, error, stackTrace) => Icon(
-                          fallbackIcon ?? Iconsax.user,
-                          size: iconSize,
-                          color: isSelected
-                              ? AppColors.beakYellow
-                              : AppColors.eggshellWhite,
-                        ),
-                      )
+              if (isProfile)
+                ClipOval(
+                  child: Container(
+                    width: iconSize,
+                    height: iconSize,
+                    child: Image.asset(iconToShow, fit: BoxFit.cover),
+                  ),
+                )
               else
-                Icon(
-                  icon!,
-                  size: iconSize,
-                  color: isSelected
-                      ? AppColors.beakYellow
-                      : AppColors.eggshellWhite,
+                Image.asset(
+                  iconToShow,
+                  width: iconSize,
+                  height: iconSize,
+                  errorBuilder: (context, error, stackTrace) => Icon(
+                    Iconsax.user,
+                    size: iconSize,
+                    color: isSelected
+                        ? AppColors.beakYellow
+                        : AppColors.eggshellWhite,
+                  ),
                 ),
               SizedBox(height: 4.h),
               Text(

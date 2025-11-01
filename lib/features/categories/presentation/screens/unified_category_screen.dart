@@ -221,10 +221,15 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
                               controller.showRestaurants.value &&
                               controller.topRestaurants.isNotEmpty;
 
+                          // Show restaurants at top only when "All" is selected
+                          final showRestaurantsAtTop =
+                              showTopRestaurants &&
+                              controller.selectedSubcategory.value == null;
+
                           return SliverList(
                             delegate: SliverChildListDelegate([
-                              // Top Restaurants Section (Food category only)
-                              if (showTopRestaurants) ...[
+                              // Top Restaurants Section (Food category only, when "All" is selected)
+                              if (showRestaurantsAtTop) ...[
                                 SizedBox(height: 10.h),
                                 TopRestaurantsSection(
                                   restaurants: controller.topRestaurants,
@@ -243,7 +248,10 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
                                   horizontal: 16.w,
                                   vertical: 12.h,
                                 ),
-                                child: _buildContent(controller),
+                                child: _buildContent(
+                                  controller,
+                                  showTopRestaurants && !showRestaurantsAtTop,
+                                ),
                               ),
                             ]),
                           );
@@ -311,17 +319,23 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
     );
   }
 
-  Widget _buildContent(UnifiedCategoryController controller) {
+  Widget _buildContent(
+    UnifiedCategoryController controller,
+    bool showRestaurantsInMiddle,
+  ) {
     if (controller.showingAllProducts.value) {
       return _buildAllProductsView(controller);
     }
     if (controller.isGroceryCategory) {
       return _buildGroceryContentView(controller);
     }
-    return _buildDefaultCategoryView(controller);
+    return _buildDefaultCategoryView(controller, showRestaurantsInMiddle);
   }
 
-  Widget _buildDefaultCategoryView(UnifiedCategoryController controller) {
+  Widget _buildDefaultCategoryView(
+    UnifiedCategoryController controller,
+    bool showRestaurantsInMiddle,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -339,6 +353,21 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
             isGroceryCategory: controller.isGroceryCategory,
             shops: controller.shops,
           ),
+
+        // Top 25 Restaurants in the middle (when specific subcategory is selected)
+        if (showRestaurantsInMiddle) ...[
+          SizedBox(height: 16.h),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 0.w),
+            child: TopRestaurantsSection(
+              restaurants: controller.topRestaurants,
+              onRestaurantTap: controller.onRestaurantTap,
+              title: 'Top 25 Restaurants',
+            ),
+          ),
+          SizedBox(height: 16.h),
+        ],
+
         if (!controller.isGroceryCategory &&
             controller.recommendedProducts.isNotEmpty) ...[
           ProductGridSection(
