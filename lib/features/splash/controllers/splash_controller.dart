@@ -8,15 +8,16 @@ class SplashController extends GetxController {
   final RxBool isReady = false.obs;
   final RxBool shouldShrink = false.obs;
 
-  static const double _ellipseTopIdle = 812.0;
-  static const double _ellipseTopPlaying = 666.0;
-  final RxDouble ellipseTop = _ellipseTopIdle.obs;
+  static const double _ellipseTopFinal = 666.0;
+  final RxDouble ellipseTop = _ellipseTopFinal.obs;
+
   final RxBool showEllipse = false.obs;
   final RxBool showLogin = false.obs;
 
   final Duration shrinkDelay = const Duration(milliseconds: 20);
   final Duration ellipseTriggerAt = const Duration(seconds: 2);
   final Duration playDuration = const Duration(seconds: 3);
+
   bool _ellipseMoved = false;
 
   @override
@@ -28,7 +29,6 @@ class SplashController extends GetxController {
   Future<void> _initVideo() async {
     video = VideoPlayerController.asset('assets/videos/splash_intro.mp4');
     await video.initialize();
-    // await video.setPlaybackSpeed(0.1);
     await video.setVolume(0);
     await video.play();
     isReady.value = true;
@@ -45,14 +45,9 @@ class SplashController extends GetxController {
     final v = video.value;
     if (!_ellipseMoved && v.isInitialized && v.position >= ellipseTriggerAt) {
       _ellipseMoved = true;
-      startEllipseAnimation();
+      showEllipse.value = true;
       video.removeListener(_progressWatcher);
     }
-  }
-
-  void startEllipseAnimation() {
-    showEllipse.value = true;
-    ellipseTop.value = _ellipseTopPlaying;
   }
 
   void _listenDuration() {

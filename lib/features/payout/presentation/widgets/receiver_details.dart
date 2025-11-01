@@ -19,11 +19,11 @@ class ReceiverDetails extends StatelessWidget {
       final receiverPhone = payoutController.getCurrentReceiverPhone();
 
       return Container(
-        padding: EdgeInsets.symmetric(horizontal: 12.w),
+        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
         decoration: BoxDecoration(
           color: Colors.white,
           border: Border.all(color: AppColors.ebonyBlack, width: 1.8),
-          borderRadius: BorderRadius.circular(8.r),
+          borderRadius: BorderRadius.circular(26.r),
         ),
         child: Row(
           children: [
@@ -40,15 +40,23 @@ class ReceiverDetails extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            TextButton(
-              onPressed: () => _showReceiverModal(context),
-              child: Text(
-                'Change',
-                style: getTextStyle(
-                  font: CustomFonts.inter,
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.beakYellow,
+            GestureDetector(
+              onTap: () => _showReceiverModal(context),
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                decoration: BoxDecoration(
+                  color: AppColors.beakYellow.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(20.r),
+                  border: Border.all(color: AppColors.beakYellow, width: 1),
+                ),
+                child: Text(
+                  'Change',
+                  style: getTextStyle(
+                    font: CustomFonts.inter,
+                    fontSize: 13.sp,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.beakYellow,
+                  ),
                 ),
               ),
             ),
