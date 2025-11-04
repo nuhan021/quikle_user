@@ -22,10 +22,14 @@ import 'package:quikle_user/features/orders/controllers/live_order_controller.da
 import 'package:quikle_user/features/prescription/controllers/prescription_controller.dart';
 import 'package:quikle_user/core/services/prescription_notification_service.dart';
 
+import '../services/network_controller.dart';
+
 class ControllerBinder extends Bindings {
   @override
   void dependencies() {
     // Services
+
+    Get.put(NetworkController(), permanent: true);
     Get.put<UserService>(UserService(), permanent: true);
     Get.put<AuthService>(AuthService(), permanent: true);
     Get.put<AddressService>(AddressService(), permanent: true);
