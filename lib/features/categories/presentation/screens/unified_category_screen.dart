@@ -239,8 +239,9 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
                                 SizedBox(height: 16.h),
                               ],
                               if (controller.isMedicineCategory) ...[
-                                const PrescriptionUploadSection(),
                                 SizedBox(height: 16.h),
+                                const PrescriptionUploadSection(),
+                                SizedBox(height: 8.h),
                               ],
                               // Main content (products)
                               Padding(
