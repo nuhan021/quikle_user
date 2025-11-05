@@ -40,7 +40,7 @@ class NetworkController extends GetxController {
     if (isConnected) {
       try {
         final lookup = await InternetAddress.lookup(
-          'example.com',
+          'google.com',
         ).timeout(const Duration(seconds: 3));
         hasInternet = lookup.isNotEmpty && lookup.first.rawAddress.isNotEmpty;
       } catch (_) {

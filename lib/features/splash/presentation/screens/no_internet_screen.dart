@@ -41,7 +41,7 @@ class NoInternetScreen extends StatelessWidget {
                   textAlign: TextAlign.center,
                 ),
 
-                const SizedBox(height: 16),
+                SizedBox(height: 16.h),
 
                 Text(
                   "Turn on your mobile network or Wi-Fi to continue ordering",
@@ -54,15 +54,13 @@ class NoInternetScreen extends StatelessWidget {
                   textAlign: TextAlign.center,
                 ),
 
-                const SizedBox(height: 24),
+                SizedBox(height: 24.h),
 
                 Image.asset(
                   'assets/images/special_images/noInternet.png',
-                  height: 300.h,
+                  height: 400.h,
                   fit: BoxFit.contain,
                 ),
-
-                const Spacer(flex: 2),
 
                 Row(
                   children: [
@@ -75,6 +73,7 @@ class NoInternetScreen extends StatelessWidget {
                           );
                         },
                         style: ElevatedButton.styleFrom(
+                          side: BorderSide.none,
                           backgroundColor: const Color(0xFFFFC107),
                           foregroundColor: Colors.black87,
                           elevation: 0,
@@ -83,17 +82,17 @@ class NoInternetScreen extends StatelessWidget {
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
-                        child: const Text(
+                        child: Text(
                           "Enable Network",
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: 16.sp,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
                     ),
 
-                    const SizedBox(width: 16),
+                    SizedBox(width: 16.w),
 
                     // Settings Button
                     Expanded(
@@ -102,6 +101,7 @@ class NoInternetScreen extends StatelessWidget {
                           AppSettings.openAppSettings();
                         },
                         style: ElevatedButton.styleFrom(
+                          side: BorderSide.none,
                           backgroundColor: Colors.black87,
                           foregroundColor: Colors.white,
                           elevation: 0,
@@ -110,10 +110,10 @@ class NoInternetScreen extends StatelessWidget {
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
-                        child: const Text(
+                        child: Text(
                           "Settings",
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: 16.sp,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -122,7 +122,7 @@ class NoInternetScreen extends StatelessWidget {
                   ],
                 ),
 
-                const SizedBox(height: 40),
+                SizedBox(height: 40.h),
               ],
             ),
           ),
