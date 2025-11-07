@@ -8,7 +8,7 @@ import 'package:quikle_user/core/utils/constants/image_path.dart';
 
 class SearchAndFiltersSection extends StatelessWidget {
   /// Fixed height used for SliverPersistentHeader delegate
-  static const double kPreferredHeight = 52.0;
+  static double kPreferredHeight = 52.0.h;
 
   final Function(String)? onSearchChanged;
   final VoidCallback? onVoiceTap;

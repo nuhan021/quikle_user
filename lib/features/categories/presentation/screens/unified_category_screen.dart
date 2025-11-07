@@ -230,7 +230,7 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
                             delegate: SliverChildListDelegate([
                               // Top Restaurants Section (Food category only, when "All" is selected)
                               if (showRestaurantsAtTop) ...[
-                                SizedBox(height: 10.h),
+                                // SizedBox(height: 10.h),
                                 TopRestaurantsSection(
                                   restaurants: controller.topRestaurants,
                                   onRestaurantTap: controller.onRestaurantTap,
@@ -239,7 +239,7 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
                                 SizedBox(height: 16.h),
                               ],
                               if (controller.isMedicineCategory) ...[
-                                SizedBox(height: 16.h),
+                                // SizedBox(height: 16.h),
                                 const PrescriptionUploadSection(),
                                 SizedBox(height: 8.h),
                               ],
