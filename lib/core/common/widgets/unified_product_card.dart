@@ -113,6 +113,8 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
   }
 
   Widget _buildVerticalCard() {
+    final bool isMedicine = widget.product.isMedicine;
+
     return Container(
       decoration: ShapeDecoration(
         color: AppColors.textWhite,
@@ -135,7 +137,9 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
             flex: 3,
             fit: FlexFit.loose,
             child: Padding(
-              padding: EdgeInsets.all(6.w),
+              padding: isMedicine
+                  ? EdgeInsets.only(left: 6.w, right: 6.w)
+                  : EdgeInsets.all(6.w),
               child: _buildProductInfo(),
             ),
           ),

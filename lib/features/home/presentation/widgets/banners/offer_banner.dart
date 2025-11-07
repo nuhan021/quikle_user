@@ -28,7 +28,7 @@ class OfferBanner extends StatelessWidget {
         return Builder(
           builder: (BuildContext context) {
             return Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8.w),
+              padding: EdgeInsets.symmetric(horizontal: 18.w),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(12.r),
                 child: Container(
