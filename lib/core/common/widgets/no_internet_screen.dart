@@ -22,8 +22,6 @@ class NoInternetScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Spacer(flex: 2),
-
               Text(
                 "Oops! Network is off",
                 style: getTextStyle(
@@ -38,7 +36,7 @@ class NoInternetScreen extends StatelessWidget {
               SizedBox(height: 16.h),
 
               Text(
-                "Turn on your mobile network or Wi-Fi to continue ordering",
+                "Turn on your mobile network or Wi-Fi to continue using the app",
                 style: getTextStyle(
                   font: CustomFonts.manrope,
                   fontSize: 16.sp,
@@ -58,29 +56,50 @@ class NoInternetScreen extends StatelessWidget {
 
               Row(
                 children: [
-                  // Retry Button
+                  // Enable Network Button
                   Expanded(
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        AppSettings.openAppSettingsPanel(
-                          AppSettingsPanelType.internetConnectivity,
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        side: BorderSide.none,
-                        backgroundColor: const Color(0xFFFFC107),
-                        foregroundColor: Colors.black87,
-                        elevation: 0,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16.r),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFFFFC107).withOpacity(0.3),
+                            blurRadius: 16,
+                            offset: const Offset(0, 8),
+                            spreadRadius: 0,
+                          ),
+                          BoxShadow(
+                            color: const Color(0xFFFFC107).withOpacity(0.1),
+                            blurRadius: 32,
+                            offset: const Offset(0, 4),
+                            spreadRadius: -8,
+                          ),
+                        ],
                       ),
-                      child: Text(
-                        "Enable Network",
-                        style: TextStyle(
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.w600,
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          AppSettings.openAppSettingsPanel(
+                            AppSettingsPanelType.internetConnectivity,
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          side: BorderSide.none,
+                          backgroundColor: const Color(0xFFFFC107),
+                          foregroundColor: Colors.black87,
+                          elevation: 0,
+                          shadowColor: Colors.transparent,
+                          padding: EdgeInsets.symmetric(vertical: 18.h),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16.r),
+                          ),
+                        ),
+                        child: Text(
+                          "Enable Network",
+                          style: TextStyle(
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.3,
+                          ),
                         ),
                       ),
                     ),
@@ -90,25 +109,46 @@ class NoInternetScreen extends StatelessWidget {
 
                   // Settings Button
                   Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        AppSettings.openAppSettings();
-                      },
-                      style: ElevatedButton.styleFrom(
-                        side: BorderSide.none,
-                        backgroundColor: Colors.black87,
-                        foregroundColor: Colors.white,
-                        elevation: 0,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16.r),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 16,
+                            offset: const Offset(0, 8),
+                            spreadRadius: 0,
+                          ),
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.08),
+                            blurRadius: 32,
+                            offset: const Offset(0, 4),
+                            spreadRadius: -8,
+                          ),
+                        ],
                       ),
-                      child: Text(
-                        "Settings",
-                        style: TextStyle(
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.w600,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          AppSettings.openAppSettings();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.black87,
+                          side: BorderSide.none,
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          shadowColor: Colors.transparent,
+                          padding: EdgeInsets.symmetric(vertical: 18.h),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16.r),
+                          ),
+                        ),
+                        child: Text(
+                          "Settings",
+                          style: TextStyle(
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.3,
+                          ),
                         ),
                       ),
                     ),

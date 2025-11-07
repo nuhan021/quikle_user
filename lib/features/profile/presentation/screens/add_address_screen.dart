@@ -30,9 +30,9 @@ class AddAddressScreen extends StatelessWidget {
     final controller = Get.put(AddAddressController());
 
     return DraggableScrollableSheet(
-      initialChildSize: 0.9,
+      initialChildSize: 0.5,
       minChildSize: 0.5,
-      maxChildSize: 0.95,
+      maxChildSize: 0.8,
       builder: (context, scrollController) {
         return Container(
           decoration: BoxDecoration(
