@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:quikle_user/core/utils/logging/logger.dart';
 import 'package:quikle_user/features/auth/data/services/auth_service.dart';
 import 'package:quikle_user/routes/app_routes.dart';
 
@@ -34,11 +35,7 @@ class LoginController extends GetxController {
       errorMessage.value = '';
 
       try {
-        // Demo override: consider phone length 5-10 digits as existing user
         final phoneTrim = phoneController.text.trim();
-        final digitOnly = phoneTrim.replaceAll(RegExp(r'\D'), '');
-        // Demo rule: any phone with 5 or more digits treated as existing user
-        final isDemoExisting = digitOnly.length >= 5;
 
         // Send OTP to server (pass name only if we're already showing it)
         final response = await _auth.sendOtp(
@@ -46,24 +43,23 @@ class LoginController extends GetxController {
           name: showNameField.value ? nameController.text.trim() : null,
         );
 
-        // If server returned an error, show it and stop
-        if (!response.isSuccess) {
-          errorMessage.value = response.errorMessage;
-          Get.snackbar(
-            'Error',
-            response.errorMessage,
-            snackPosition: SnackPosition.TOP,
-            backgroundColor: Colors.red.withValues(alpha: 0.1),
-            colorText: Colors.red,
-          );
-          isLoading.value = false;
-          return;
-        }
-
+        // // If server returned an error, show it and stop
+        // if (!response.isSuccess) {
+        //   errorMessage.value = response.errorMessage;
+        //   Get.snackbar(
+        //     'Error',
+        //     response.errorMessage,
+        //     snackPosition: SnackPosition.TOP,
+        //     backgroundColor: Colors.red.withValues(alpha: 0.1),
+        //     colorText: Colors.red,
+        //   );
+        //   isLoading.value = false;
+        //   return;
+        // }
         // decide user existence: prefer server response if provided, otherwise apply demo rule
-        bool userExists = isDemoExisting;
-        debugPrint('Phone number: $phoneTrim');
-        debugPrint('LoginController: isDemoExisting=$userExists');
+        bool userExists = true;
+
+        if (response.statusCode == 400) userExists = false;
 
         // try {
         //   if (response.responseData != null &&

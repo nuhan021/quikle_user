@@ -20,9 +20,8 @@ class StorageService {
   }
 
   // Save the token and user ID to local storage
-  static Future<void> saveToken(String token, String id) async {
+  static Future<void> saveToken(String token) async {
     await _preferences?.setString(_tokenKey, token);
-    await _preferences?.setString(_idKey, id);
   }
 
   // Remove the token and user ID from local storage (for logout)
