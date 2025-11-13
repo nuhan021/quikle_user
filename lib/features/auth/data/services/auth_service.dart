@@ -1,5 +1,9 @@
 import 'package:get/get.dart';
 import 'package:quikle_user/core/models/response_data.dart';
+import 'package:quikle_user/core/services/network_caller.dart';
+import 'package:quikle_user/core/services/storage_service.dart';
+import 'package:quikle_user/core/utils/constants/api_constants.dart';
+import 'package:quikle_user/core/utils/logging/logger.dart';
 import 'package:quikle_user/features/user/data/models/user_model.dart';
 import 'package:quikle_user/features/user/data/services/user_service.dart';
 
@@ -14,35 +18,27 @@ class AuthService {
   String get currentToken => _userService.token;
   bool get isLoggedIn => _userService.isLoggedIn;
 
+  final NetworkCaller _networkCaller = NetworkCaller();
+
   // Unified method for sending OTP - handles both login and signup
   Future<ResponseData> sendOtp(String phone, {String? name}) async {
     try {
-      await Future<void>.delayed(const Duration(milliseconds: 500));
-
-      // Mock logic to check if user exists
-      final userExists = await _checkUserExists(phone);
-
-      final mockUser = UserModel(
-        id: userExists ? '1' : '2',
-        name: userExists ? 'Existing User' : (name ?? 'New User'),
-        phone: phone,
-        isVerified: false,
-        createdAt: userExists
-            ? DateTime.now().subtract(const Duration(days: 30))
-            : DateTime.now(),
+      final ResponseData response = await _networkCaller.multipartRequest(
+        ApiConstants.sendOtp,
+        fields: {'phone': phone, 'purpose': 'login'},
       );
-
-      return ResponseData(
-        isSuccess: true,
-        statusCode: 200,
-        errorMessage: '',
-        responseData: {
-          'success': true,
-          'message': 'OTP sent successfully',
-          'userExists': userExists,
-          'data': {'user': mockUser.toJson()},
-        },
-      );
+      if (response.statusCode == 200 && response.isSuccess) {
+        return response;
+      } else if (response.statusCode == 400) {
+        return response;
+      } else {
+        return ResponseData(
+          isSuccess: false,
+          statusCode: response.statusCode,
+          errorMessage: response.errorMessage,
+          responseData: response.responseData,
+        );
+      }
     } catch (e) {
       return ResponseData(
         isSuccess: false,
@@ -51,13 +47,6 @@ class AuthService {
         responseData: null,
       );
     }
-  }
-
-  // Mock method to check if user exists (in real app, this would be an API call)
-  Future<bool> _checkUserExists(String phone) async {
-    await Future<void>.delayed(const Duration(milliseconds: 100));
-    // Mock logic: if phone ends with '1', user exists
-    return phone.endsWith('1') || phone.endsWith('2') || phone.endsWith('3');
   }
 
   // Keep the old methods for backward compatibility
@@ -71,30 +60,29 @@ class AuthService {
 
   Future<ResponseData> verifyOtp(String phone, String otp) async {
     try {
-      await Future<void>.delayed(const Duration(milliseconds: 500));
-
-      final mockUser = UserModel(
-        id: '3',
-        name: 'John Doe',
-        phone: phone,
-        isVerified: true,
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
+      final ResponseData response = await _networkCaller.multipartRequest(
+        ApiConstants.verifyOtp,
+        fields: {'phone': phone, 'otp': otp, 'purpose': 'login'},
       );
 
-      const mockToken = 'mock_jwt_token_here';
+      if (response.statusCode != 200 || !response.isSuccess) {
+        return ResponseData(
+          isSuccess: false,
+          statusCode: response.statusCode,
+          errorMessage: 'Invalid OTP. Please try again.',
+          responseData: null,
+        );
+      }
 
-      await _userService.setUser(mockUser, mockToken);
+      final token = response.responseData?['access_token'] ?? 'mock_token_here';
+
+      StorageService.saveToken(token);
 
       return ResponseData(
         isSuccess: true,
         statusCode: 200,
         errorMessage: '',
-        responseData: {
-          'success': true,
-          'message': 'Phone number verified successfully',
-          'data': {'user': mockUser.toJson(), 'token': mockToken},
-        },
+        responseData: response.responseData,
       );
     } catch (e) {
       return ResponseData(
