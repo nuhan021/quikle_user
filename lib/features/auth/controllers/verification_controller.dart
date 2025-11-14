@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:quikle_user/core/models/response_data.dart';
 import 'package:quikle_user/features/auth/controllers/login_controller.dart';
 import 'package:quikle_user/features/auth/data/services/auth_service.dart';
 
@@ -80,8 +81,16 @@ class VerificationController extends GetxController {
       errorMessage.value = '';
 
       try {
-        // use dynamic getter so latest arguments are considered
-        final response = await _auth.verifyOtp(phone, code);
+        late ResponseData response;
+
+        // Check if this is a signup or login flow
+        if (!isLogin && name != null && name!.isNotEmpty) {
+          // Signup flow - hit the signup API
+          response = await _auth.signupWithOtp(phone, name!, code);
+        } else {
+          // Login flow - hit the verify OTP API
+          response = await _auth.login(phone, code);
+        }
 
         if (response.isSuccess) {
           // String message = 'Phone number verified successfully';
