@@ -1,9 +1,13 @@
 import 'dart:async';
 import 'package:get/get.dart';
+import 'package:quikle_user/core/common/widgets/no_internet_screen.dart';
+import 'package:quikle_user/core/utils/logging/logger.dart';
 import 'package:video_player/video_player.dart';
+import '../../../core/services/network_controller.dart';
 import '../../auth/presentation/screens/login_screen.dart';
 
 class SplashController extends GetxController {
+  final networkController = Get.find<NetworkController>();
   late final VideoPlayerController video;
   final RxBool isReady = false.obs;
   final RxBool shouldShrink = false.obs;
@@ -50,12 +54,21 @@ class SplashController extends GetxController {
     }
   }
 
-  void _listenDuration() {
+  void _listenDuration() async {
     final v = video.value;
     if (v.isInitialized && v.position >= playDuration) {
       video.pause();
-      Get.off(() => const LoginScreen());
       video.removeListener(_listenDuration);
+
+      AppLoggerHelper.debug(
+        'Checking network status from SplashController: ${networkController.hasConnection.value}',
+      );
+
+      if (networkController.hasConnection.value) {
+        Get.off(() => const LoginScreen());
+      } else {
+        Get.off(() => const NoInternetScreen());
+      }
     }
   }
 

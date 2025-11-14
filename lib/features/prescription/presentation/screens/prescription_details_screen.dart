@@ -60,6 +60,7 @@ class _PrescriptionDetailsScreenState extends State<PrescriptionDetailsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  SizedBox(height: 8.h),
                   PrescriptionImageCardWidget(prescription: prescription),
                   SizedBox(height: 8.h),
                   // Show rejection reason as separate box for invalid prescriptions

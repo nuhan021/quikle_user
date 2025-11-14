@@ -8,7 +8,7 @@ import 'package:quikle_user/features/home/data/models/category_model.dart';
 
 class PopularItemsSection extends StatelessWidget {
   /// Fixed height for header delegate: title + horizontal list
-  static const double kPreferredHeight = 100.0;
+  static double kPreferredHeight = 120.0.h;
 
   final List<SubcategoryModel> subcategories;
   final Function(SubcategoryModel?) onSubcategoryTap;
