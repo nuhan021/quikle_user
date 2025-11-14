@@ -145,6 +145,7 @@ class AuthService {
 
   Future<void> logout() async {
     await _userService.clearUser();
+    await StorageService.logoutUser();
   }
 
   Future<ResponseData> resendOtp(String phone) async {
