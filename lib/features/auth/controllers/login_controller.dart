@@ -36,60 +36,62 @@ class LoginController extends GetxController {
 
       try {
         final phoneTrim = phoneController.text.trim();
+        final nameTrim = nameController.text.trim();
 
-        // Send OTP to server (pass name only if we're already showing it)
+        // Determine the purpose based on whether we're showing the name field
+        final purpose = showNameField.value ? 'signup' : 'login';
+
+        // Send OTP to server with appropriate purpose
         final response = await _auth.sendOtp(
           phoneTrim,
-          name: showNameField.value ? nameController.text.trim() : null,
+          name: showNameField.value ? nameTrim : null,
+          purpose: purpose,
         );
 
-        // // If server returned an error, show it and stop
-        // if (!response.isSuccess) {
-        //   errorMessage.value = response.errorMessage;
-        //   Get.snackbar(
-        //     'Error',
-        //     response.errorMessage,
-        //     snackPosition: SnackPosition.TOP,
-        //     backgroundColor: Colors.red.withValues(alpha: 0.1),
-        //     colorText: Colors.red,
-        //   );
-        //   isLoading.value = false;
-        //   return;
-        // }
-        // decide user existence: prefer server response if provided, otherwise apply demo rule
-        bool userExists = true;
+        // Handle success response (200)
+        if (response.statusCode == 200 && response.isSuccess) {
+          final userExists = !showNameField.value;
 
-        if (response.statusCode == 400) userExists = false;
-
-        // try {
-        //   if (response.responseData != null &&
-        //       response.responseData!['userExists'] != null) {
-        //     userExists = response.responseData?['userExists'] ?? isDemoExisting;
-        //   }
-        // } catch (_) {}
-
-        debugPrint('LoginController: isDemoExisting=$userExists');
-
-        // If server (or demo rule) says user does not exist, show name field for registration.
-        if (!userExists && !showNameField.value) {
-          clearInputs();
-          showNameField.value = true;
-          isExistingUser.value = false;
+          Get.toNamed(
+            AppRoute.getVerify(),
+            arguments: {
+              'phone': phoneTrim,
+              'name': showNameField.value ? nameTrim : null,
+              'isLogin': userExists,
+            },
+          );
           isLoading.value = false;
           return;
         }
 
-        // Proceed: hide name field for login flow and navigate to verification
-        showNameField.value = false;
-        isExistingUser.value = true;
-        Get.toNamed(
-          AppRoute.getVerify(),
+        // Handle user not found (400) - show name field for signup
+        if (response.statusCode == 400 && !showNameField.value) {
+          // User doesn't exist, show name field for registration
+          clearInputs();
+          showNameField.value = true;
+          isExistingUser.value = false;
+          isLoading.value = false;
 
-          arguments: {
-            'phone': phoneTrim,
-            'name': showNameField.value ? nameController.text.trim() : null,
-            'isLogin': userExists,
-          },
+          Get.snackbar(
+            'Account Not Found',
+            'Please enter your name to create a new account',
+            snackPosition: SnackPosition.TOP,
+            backgroundColor: Colors.orange.withValues(alpha: 0.1),
+            colorText: Colors.orange,
+          );
+          return;
+        }
+
+        // Handle other errors
+        errorMessage.value = response.errorMessage.isNotEmpty
+            ? response.errorMessage
+            : 'Something went wrong. Please try again.';
+        Get.snackbar(
+          'Error',
+          errorMessage.value,
+          snackPosition: SnackPosition.TOP,
+          backgroundColor: Colors.red.withValues(alpha: 0.1),
+          colorText: Colors.red,
         );
       } catch (e) {
         errorMessage.value = 'Something went wrong. Please try again.';

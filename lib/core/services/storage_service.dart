@@ -1,40 +1,60 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 class StorageService {
-  // Constants for preference keys
+  // Keys
   static const String _tokenKey = 'token';
+  static const String _refreshTokenKey = 'refreshToken';
   static const String _idKey = 'userId';
 
-  // Singleton instance for SharedPreferences
+  // SharedPreferences instance
   static SharedPreferences? _preferences;
 
-  // Initialize SharedPreferences (call this during app startup)
+  // Must be initialized in main() before runApp()
   static Future<void> init() async {
     _preferences = await SharedPreferences.getInstance();
   }
 
-  // Check if a token exists in local storage
+  // =======================
+  // TOKEN METHODS
+  // =======================
+
   static bool hasToken() {
-    final token = _preferences?.getString(_tokenKey);
-    return token != null;
+    return _preferences?.getString(_tokenKey) != null;
   }
 
-  // Save the token and user ID to local storage
   static Future<void> saveToken(String token) async {
     await _preferences?.setString(_tokenKey, token);
   }
 
-  // Remove the token and user ID from local storage (for logout)
-  static Future<void> logoutUser() async {
-    await _preferences?.remove(_tokenKey);
-    await _preferences?.remove(_idKey);
-    // Navigate to the login screen
-    // Get.offAllNamed('/login');
+  static String? get token => _preferences?.getString(_tokenKey);
+
+  // =======================
+  // REFRESH TOKEN
+  // =======================
+
+  static Future<void> saveRefreshToken(String refreshToken) async {
+    await _preferences?.setString(_refreshTokenKey, refreshToken);
   }
 
-  // Getter for user ID
-  static String? get userId => _preferences?.getString(_idKey);
+  static String? get refreshToken => _preferences?.getString(_refreshTokenKey);
 
-  // Getter for token
-  static String? get token => _preferences?.getString(_tokenKey);
+  // =======================
+  // USER ID (INT)
+  // =======================
+
+  static Future<void> saveUserId(int userId) async {
+    await _preferences?.setInt(_idKey, userId);
+  }
+
+  static int? get userId => _preferences?.getInt(_idKey);
+
+  // =======================
+  // LOGOUT
+  // =======================
+
+  static Future<void> logoutUser() async {
+    await _preferences?.remove(_tokenKey);
+    await _preferences?.remove(_refreshTokenKey);
+    await _preferences?.remove(_idKey);
+  }
 }

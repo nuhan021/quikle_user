@@ -3,7 +3,6 @@ import 'package:quikle_user/core/common/widgets/cart_animation_overlay.dart';
 import 'package:quikle_user/core/services/cart_position_service.dart';
 import 'package:quikle_user/features/user/data/services/user_service.dart';
 import 'package:quikle_user/features/user/controllers/user_controller.dart';
-import 'package:quikle_user/features/auth/controllers/auth_controller.dart';
 import 'package:quikle_user/features/auth/controllers/login_controller.dart';
 import 'package:quikle_user/features/auth/controllers/verification_controller.dart';
 import 'package:quikle_user/features/auth/controllers/welcome_controller.dart';
@@ -39,7 +38,6 @@ class ControllerBinder extends Bindings {
       permanent: true,
     );
     Get.put<UserController>(UserController(), permanent: true);
-    Get.put<AuthController>(AuthController(), permanent: true);
 
     // Controllers
     Get.put<SplashController>(SplashController(), permanent: true);
