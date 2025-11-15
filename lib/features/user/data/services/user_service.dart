@@ -13,9 +13,6 @@ class UserService extends GetxController {
   final Rx<UserModel?> _currentUser = Rx<UserModel?>(null);
   Rx<UserModel?> get userRx => _currentUser;
 
-  final token = StorageService.token;
-  final refreshToken = StorageService.refreshToken;
-
   final RxBool _isLoggedIn = false.obs;
 
   UserModel? get currentUser => _currentUser.value;
@@ -29,6 +26,14 @@ class UserService extends GetxController {
   }
 
   Future<void> _loadUser() async {
+    final token = StorageService.token;
+    final refreshToken = StorageService.refreshToken;
+
+    if (token == null || refreshToken == null) {
+      _currentUser.value = null;
+      return;
+    }
+
     try {
       final ResponseData response = await _networkCaller.getRequest(
         ApiConstants.getUserProfile,
@@ -40,15 +45,27 @@ class UserService extends GetxController {
       if (response.statusCode == 200) {
         final user = UserModel.fromJson(response.responseData['data']);
         _currentUser.value = user;
+        _isLoggedIn.value = true;
       } else {
         _currentUser.value = null;
+        _isLoggedIn.value = false;
       }
     } catch (e) {
-      throw Exception('Error loading user from storage: $e');
+      // Don't throw - just log and set user to null
+      print('Error loading user profile: $e');
+      _currentUser.value = null;
+      _isLoggedIn.value = false;
     }
   }
 
+  /// Refresh user data from server
+  Future<void> refreshUser() async {
+    await _loadUser();
+  }
+
   Future<bool> updateProfile(UserModel updatedUser) async {
+    final token = StorageService.token;
+    final refreshToken = StorageService.refreshToken;
     try {
       final ResponseData response = await _networkCaller.putRequest(
         ApiConstants.getUserProfile,
