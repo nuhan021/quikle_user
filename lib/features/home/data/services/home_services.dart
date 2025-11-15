@@ -1,4 +1,7 @@
 import 'dart:async';
+import 'package:quikle_user/core/models/response_data.dart';
+import 'package:quikle_user/core/services/network_caller.dart';
+import 'package:quikle_user/core/utils/constants/api_constants.dart';
 import 'package:quikle_user/core/utils/constants/image_path.dart';
 import 'package:quikle_user/features/home/data/models/category_model.dart';
 import 'package:quikle_user/features/home/data/models/product_model.dart';
@@ -7,42 +10,34 @@ import 'package:quikle_user/core/data/services/product_data_service.dart';
 
 class HomeService {
   final ProductDataService _productService = ProductDataService();
+  final NetworkCaller _networkCaller = NetworkCaller();
 
   Future<List<CategoryModel>> fetchCategories() async {
-    return [
-      const CategoryModel(id: '0', title: 'All', iconPath: ImagePath.allIcon),
-      const CategoryModel(id: '1', title: 'Food', iconPath: ImagePath.foodIcon),
-      const CategoryModel(
-        id: '2',
-        title: 'Groceries',
-        iconPath: ImagePath.groceryIcon,
-      ),
-      const CategoryModel(
-        id: '3',
-        title: 'Medicines',
-        iconPath: ImagePath.medicineIcon,
-      ),
-      const CategoryModel(
-        id: '4',
-        title: 'Cleaning',
-        iconPath: ImagePath.cleaningIcon,
-      ),
-      const CategoryModel(
-        id: '5',
-        title: 'Personal Care',
-        iconPath: ImagePath.personalCareIcon,
-      ),
-      const CategoryModel(
-        id: '6',
-        title: 'Pet Supplies',
-        iconPath: ImagePath.petSuppliesIcon,
-      ),
-      const CategoryModel(
-        id: '7',
-        title: 'Custom',
-        iconPath: ImagePath.customIcon,
-      ),
-    ];
+    final ResponseData response = await _networkCaller.getRequest(
+      ApiConstants.getAllCategories,
+    );
+
+    if (response.isSuccess) {
+      final List data = response.responseData as List;
+
+      final categories = data
+          .map((json) => CategoryModel.fromJson(json))
+          .toList();
+
+      categories.insert(
+        0,
+        const CategoryModel(
+          id: '0',
+          title: 'All',
+          type: 'All',
+          iconPath: ImagePath.allIcon,
+        ),
+      );
+
+      return categories;
+    } else {
+      throw Exception("Failed to load categories: ${response.errorMessage}");
+    }
   }
 
   Future<List<ShopModel>> fetchShops() async {
