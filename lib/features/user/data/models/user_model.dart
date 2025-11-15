@@ -2,90 +2,40 @@ class UserModel {
   final String id;
   final String name;
   final String phone;
-  final bool isVerified;
-  final DateTime createdAt;
-  final DateTime? updatedAt;
+  final String? email;
+  final String? address1;
+  final String? address2;
+  final String? postalCode;
 
   const UserModel({
     required this.id,
     required this.name,
     required this.phone,
-    this.isVerified = false,
-    required this.createdAt,
-    this.updatedAt,
+    this.email,
+    this.address1,
+    this.address2,
+    this.postalCode,
   });
-
-  String get displayName => name;
-
-  bool get isProfileComplete => name.isNotEmpty && phone.isNotEmpty;
-
-  UserModel copyWith({
-    String? id,
-    String? name,
-    String? phone,
-    bool? isVerified,
-    DateTime? createdAt,
-    DateTime? updatedAt,
-  }) {
-    return UserModel(
-      id: id ?? this.id,
-      name: name ?? this.name,
-      phone: phone ?? this.phone,
-      isVerified: isVerified ?? this.isVerified,
-      createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt ?? this.updatedAt,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'phone': phone,
-      'isVerified': isVerified,
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt?.toIso8601String(),
-    };
-  }
-
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
-      id: json['id']?.toString() ?? '',
-      name: json['name']?.toString() ?? '',
-      phone: json['phone']?.toString() ?? json['phoneNumber']?.toString() ?? '',
-      isVerified:
-          json['isVerified'] as bool? ?? json['is_verified'] as bool? ?? false,
-      createdAt:
-          _parseDateTime(json['createdAt'] ?? json['created_at']) ??
-          DateTime.now(),
-      updatedAt: _parseDateTime(json['updatedAt'] ?? json['updated_at']),
+      id: json['user_id'].toString(),
+      name: json['name'] as String,
+      phone: json['phone'] as String,
+      email: json['email'] as String?,
+      address1: json['address_1'] as String?,
+      address2: json['address_2'] as String?,
+      postalCode: json['postal_code'] as String?,
     );
   }
-
-  static DateTime? _parseDateTime(dynamic value) {
-    if (value == null) return null;
-    if (value is DateTime) return value;
-    if (value is String) return DateTime.tryParse(value);
-    return null;
-  }
-
-  @override
-  String toString() {
-    return 'UserModel(id: $id, name: $name, phone: $phone, isVerified: $isVerified)';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    return other is UserModel &&
-        other.id == id &&
-        other.name == name &&
-        other.phone == phone &&
-        other.isVerified == isVerified;
-  }
-
-  @override
-  int get hashCode {
-    return id.hashCode ^ name.hashCode ^ phone.hashCode ^ isVerified.hashCode;
+  Map<String, dynamic> toJson() {
+    return {
+      'user_id': id,
+      'name': name,
+      'phone': phone,
+      'email': email,
+      'address_1': address1,
+      'address_2': address2,
+      'postal_code': postalCode,
+    };
   }
 }

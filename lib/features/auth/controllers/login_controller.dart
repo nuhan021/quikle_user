@@ -165,6 +165,12 @@ class LoginController extends GetxController {
     phoneController.text = '';
   }
 
+  //Log out
+  Future<void> logout() async {
+    await _auth.logout();
+    Get.offAllNamed(AppRoute.getLoginScreen());
+  }
+
   @override
   void onClose() {
     phoneController.dispose();

@@ -24,10 +24,10 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   final GlobalKey _navKey = GlobalKey();
   double _navBarHeight = 0.0;
 
-  final List<Widget> _screens = const [
-    HomeContentScreen(),
-    OrdersScreen(),
-    CategoriesScreen(),
+  final List<Widget> _screens = [
+    const HomeContentScreen(),
+    const OrdersScreen(),
+    const CategoriesScreen(),
     ProfileScreen(),
   ];
 
