@@ -3,6 +3,7 @@ import 'package:quikle_user/core/models/response_data.dart';
 import 'package:quikle_user/core/services/network_caller.dart';
 import 'package:quikle_user/core/services/storage_service.dart';
 import 'package:quikle_user/core/utils/constants/api_constants.dart';
+import 'package:quikle_user/routes/app_routes.dart';
 import '../models/user_model.dart';
 
 class UserService extends GetxController {
@@ -68,5 +69,12 @@ class UserService extends GetxController {
     } catch (e) {
       rethrow;
     }
+  }
+
+  Future<void> logoutUser() async {
+    await StorageService.logoutUser();
+    _currentUser.value = null;
+    _isLoggedIn.value = false;
+    Get.offAllNamed(AppRoute.getLoginScreen());
   }
 }
