@@ -213,7 +213,11 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
   }
 
   Future<void> _loadGroceryMainCategories() async {
-    final mainCategories = await _categoryService.fetchGroceryMainCategories();
+    // Use the same API method as other categories
+    final mainCategories = await _categoryService.fetchSubcategories(
+      currentCategory.id,
+    );
+
     allCategories.value = mainCategories;
     availableSubcategories.value = mainCategories;
     sectionTitle.value = 'Select Category';

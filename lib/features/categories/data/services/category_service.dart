@@ -1,64 +1,46 @@
 import 'dart:async';
+import 'package:quikle_user/core/models/response_data.dart';
+import 'package:quikle_user/core/services/network_caller.dart';
+import 'package:quikle_user/core/utils/constants/api_constants.dart';
 import 'package:quikle_user/core/utils/constants/image_path.dart';
+import 'package:quikle_user/core/utils/logging/logger.dart';
 import 'package:quikle_user/features/categories/data/models/subcategory_model.dart';
 import 'package:quikle_user/features/home/data/models/product_model.dart';
 import 'package:quikle_user/core/data/services/product_data_service.dart';
 
 class CategoryService {
   final ProductDataService _productService = ProductDataService();
+  final NetworkCaller _networkCaller = NetworkCaller();
 
-  Future<List<SubcategoryModel>> fetchFoodSubcategories() async {
-    return [
-      const SubcategoryModel(
-        id: 'food_biryani',
-        title: 'Biryani',
-        description: 'Aromatic rice dishes with spices',
-        iconPath: ImagePath.foodIcon,
-        categoryId: '1',
-        isPopular: true,
-      ),
-      const SubcategoryModel(
-        id: 'food_pizza',
-        title: 'Pizza',
-        description: 'Italian flatbread with toppings',
-        iconPath: ImagePath.foodIcon,
-        categoryId: '1',
-        isPopular: true,
-      ),
-      const SubcategoryModel(
-        id: 'food_burger',
-        title: 'Burger',
-        description: 'Grilled patties in buns',
-        iconPath: ImagePath.foodIcon,
-        categoryId: '1',
-        isPopular: true,
-      ),
-      const SubcategoryModel(
-        id: 'food_sandwich',
-        title: 'Sandwich',
-        description: 'Bread with fillings',
-        iconPath: ImagePath.foodIcon,
-        categoryId: '1',
-        isPopular: false,
-      ),
-      const SubcategoryModel(
-        id: 'food_pasta',
-        title: 'Pasta',
-        description: 'Italian noodles with sauce',
-        iconPath: ImagePath.foodIcon,
-        categoryId: '1',
-        isPopular: false,
-      ),
-      const SubcategoryModel(
-        id: 'food_chinese',
-        title: 'Chinese',
-        description: 'Asian cuisine dishes',
-        iconPath: ImagePath.foodIcon,
-        categoryId: '1',
-        isPopular: false,
-      ),
-    ];
+  Future<List<SubcategoryModel>> _fetchSubcategoriesFromApi(
+    String categoryId,
+  ) async {
+    try {
+      final url = ApiConstants.getSubcategoriesByCategory.replaceAll(
+        '{category_id}',
+        categoryId,
+      );
+
+      final ResponseData response = await _networkCaller.getRequest(url);
+
+      if (response.isSuccess && response.responseData != null) {
+        final responseMap = response.responseData as Map<String, dynamic>;
+        final List data = responseMap['data'] as List;
+        final subcategories = data
+            .map((json) => SubcategoryModel.fromJson(json))
+            .toList();
+        return subcategories;
+      }
+
+      return [];
+    } catch (e) {
+      AppLoggerHelper.error('❌ Error fetching subcategories', e);
+      return [];
+    }
   }
+
+  // ⚠️ DEPRECATED: These methods below are kept for backward compatibility
+  // They will be removed once all controllers are updated to use the API
 
   Future<List<SubcategoryModel>> fetchGroceryMainCategories() async {
     return [
@@ -68,7 +50,6 @@ class CategoryService {
         description: 'Fresh fruits and vegetables',
         iconPath: ImagePath.groceryIcon,
         categoryId: '2',
-        isPopular: true,
       ),
       const SubcategoryModel(
         id: 'grocery_cooking',
@@ -76,7 +57,6 @@ class CategoryService {
         description: 'Cooking essentials and ingredients',
         iconPath: ImagePath.groceryIcon,
         categoryId: '2',
-        isPopular: true,
       ),
       const SubcategoryModel(
         id: 'grocery_meats',
@@ -84,7 +64,6 @@ class CategoryService {
         description: 'Fresh meat and poultry',
         iconPath: ImagePath.groceryIcon,
         categoryId: '2',
-        isPopular: true,
       ),
       const SubcategoryModel(
         id: 'grocery_oils',
@@ -92,7 +71,6 @@ class CategoryService {
         description: 'Cooking oils and vinegars',
         iconPath: ImagePath.groceryIcon,
         categoryId: '2',
-        isPopular: false,
       ),
       const SubcategoryModel(
         id: 'grocery_dairy',
@@ -100,7 +78,6 @@ class CategoryService {
         description: 'Milk, cheese, and dairy products',
         iconPath: ImagePath.groceryIcon,
         categoryId: '2',
-        isPopular: false,
       ),
       const SubcategoryModel(
         id: 'grocery_grains',
@@ -108,7 +85,6 @@ class CategoryService {
         description: 'Rice, flour, and cereals',
         iconPath: ImagePath.groceryIcon,
         categoryId: '2',
-        isPopular: false,
       ),
     ];
   }
@@ -150,219 +126,19 @@ class CategoryService {
     ];
   }
 
-  Future<List<SubcategoryModel>> fetchMedicineSubcategories() async {
-    return [
-      const SubcategoryModel(
-        id: 'medicine_otc',
-        title: 'Pain Killers',
-        description: 'OTC medicines available without prescription',
-        iconPath: ImagePath.medicineIcon,
-        categoryId: '3',
-        isPopular: true,
-      ),
-      const SubcategoryModel(
-        id: 'medicine_vitamins',
-        title: 'Vitamins ',
-        description: 'Vitamins and nutritional supplements',
-        iconPath: ImagePath.medicineIcon,
-        categoryId: '3',
-        isPopular: true,
-      ),
-      const SubcategoryModel(
-        id: 'medicine_firstaid',
-        title: 'First Aid',
-        description: 'First aid supplies and medical equipment',
-        iconPath: ImagePath.medicineIcon,
-        categoryId: '3',
-        isPopular: false,
-      ),
-    ];
-  }
-
-  Future<List<SubcategoryModel>> fetchCleaningSubcategories() async {
-    return [
-      const SubcategoryModel(
-        id: 'cleaning_household',
-        title: 'Household',
-        description: 'General household cleaners',
-        iconPath: ImagePath.cleaningIcon,
-        categoryId: '4',
-        isPopular: true,
-      ),
-      const SubcategoryModel(
-        id: 'cleaning_bathroom',
-        title: 'Bathroom',
-        description: 'Bathroom cleaning supplies',
-        iconPath: ImagePath.cleaningIcon,
-        categoryId: '4',
-        isPopular: true,
-      ),
-      const SubcategoryModel(
-        id: 'cleaning_kitchen',
-        title: 'Kitchen',
-        description: 'Kitchen cleaning products',
-        iconPath: ImagePath.cleaningIcon,
-        categoryId: '4',
-        isPopular: true,
-      ),
-      const SubcategoryModel(
-        id: 'cleaning_laundry',
-        title: 'Laundry',
-        description: 'Laundry detergents and supplies',
-        iconPath: ImagePath.cleaningIcon,
-        categoryId: '4',
-        isPopular: false,
-      ),
-    ];
-  }
-
-  Future<List<SubcategoryModel>> fetchPersonalCareSubcategories() async {
-    return [
-      const SubcategoryModel(
-        id: 'personal_skincare',
-        title: 'Skincare',
-        description: 'Skincare products',
-        iconPath: ImagePath.personalCareIcon,
-        categoryId: '5',
-        isPopular: true,
-      ),
-      const SubcategoryModel(
-        id: 'personal_haircare',
-        title: 'Hair Care',
-        description: 'Hair care products',
-        iconPath: ImagePath.personalCareIcon,
-        categoryId: '5',
-        isPopular: true,
-      ),
-      const SubcategoryModel(
-        id: 'personal_oral',
-        title: 'Oral Care',
-        description: 'Oral hygiene products',
-        iconPath: ImagePath.personalCareIcon,
-        categoryId: '5',
-        isPopular: true,
-      ),
-      const SubcategoryModel(
-        id: 'personal_hygiene',
-        title: 'Personal Hygiene',
-        description: 'Personal hygiene items',
-        iconPath: ImagePath.personalCareIcon,
-        categoryId: '5',
-        isPopular: false,
-      ),
-    ];
-  }
-
-  Future<List<SubcategoryModel>> fetchPetSuppliesSubcategories() async {
-    return [
-      const SubcategoryModel(
-        id: 'pet_food',
-        title: 'Pet Food',
-        description: 'Food for pets',
-        iconPath: ImagePath.petSuppliesIcon,
-        categoryId: '6',
-        isPopular: true,
-      ),
-      const SubcategoryModel(
-        id: 'pet_toys',
-        title: 'Toys',
-        description: 'Pet toys and accessories',
-        iconPath: ImagePath.petSuppliesIcon,
-        categoryId: '6',
-        isPopular: true,
-      ),
-      const SubcategoryModel(
-        id: 'pet_health',
-        title: 'Health',
-        description: 'Pet health products',
-        iconPath: ImagePath.petSuppliesIcon,
-        categoryId: '6',
-        isPopular: true,
-      ),
-      const SubcategoryModel(
-        id: 'pet_grooming',
-        title: 'Grooming',
-        description: 'Pet grooming supplies',
-        iconPath: ImagePath.petSuppliesIcon,
-        categoryId: '6',
-        isPopular: false,
-      ),
-    ];
-  }
-
-  Future<List<SubcategoryModel>> fetchCustomSubcategories() async {
-    return [
-      const SubcategoryModel(
-        id: 'custom_electronics',
-        title: 'Electronics',
-        description: 'Electronic items',
-        iconPath: ImagePath.customIcon,
-        categoryId: '7',
-        isPopular: true,
-      ),
-      const SubcategoryModel(
-        id: 'custom_books',
-        title: 'Books',
-        description: 'Books and magazines',
-        iconPath: ImagePath.customIcon,
-        categoryId: '7',
-        isPopular: true,
-      ),
-      const SubcategoryModel(
-        id: 'custom_gifts',
-        title: 'Gifts',
-        description: 'Gift items',
-        iconPath: ImagePath.customIcon,
-        categoryId: '7',
-        isPopular: true,
-      ),
-      const SubcategoryModel(
-        id: 'custom_other',
-        title: 'Other',
-        description: 'Other custom items',
-        iconPath: ImagePath.customIcon,
-        categoryId: '7',
-        isPopular: false,
-      ),
-    ];
-  }
-
   Future<List<SubcategoryModel>> fetchSubcategories(
     String categoryId, {
     String? parentSubcategoryId,
   }) async {
-    if (categoryId == '1') {
-      return fetchFoodSubcategories();
-    } else if (categoryId == '2') {
-      if (parentSubcategoryId == null) {
-        return fetchGroceryMainCategories();
-      } else if (parentSubcategoryId == 'grocery_produce') {
-        return fetchProduceSubcategories();
-      } else if (parentSubcategoryId == 'grocery_cooking') {
-        return fetchCookingSubcategories();
-      } else if (parentSubcategoryId == 'grocery_meats') {
-        return fetchMeatsSubcategories();
-      } else if (parentSubcategoryId == 'grocery_oils') {
-        return fetchOilsSubcategories();
-      } else if (parentSubcategoryId == 'grocery_dairy') {
-        return fetchDairySubcategories();
-      } else if (parentSubcategoryId == 'grocery_grains') {
-        return fetchGrainsSubcategories();
-      }
-
+    // For subcategories with parent (nested categories), use API with parent filter
+    if (parentSubcategoryId != null) {
+      // TODO: Implement API endpoint for nested subcategories if available
+      // For now, return empty or implement nested logic
       return [];
-    } else if (categoryId == '3') {
-      return fetchMedicineSubcategories();
-    } else if (categoryId == '4') {
-      return fetchCleaningSubcategories();
-    } else if (categoryId == '5') {
-      return fetchPersonalCareSubcategories();
-    } else if (categoryId == '6') {
-      return fetchPetSuppliesSubcategories();
-    } else if (categoryId == '7') {
-      return fetchCustomSubcategories();
     }
-    return [];
+
+    // For all categories, fetch from API
+    return _fetchSubcategoriesFromApi(categoryId);
   }
 
   Future<List<SubcategoryModel>> fetchCookingSubcategories() async {
@@ -559,8 +335,8 @@ class CategoryService {
   Future<List<SubcategoryModel>> fetchPopularSubcategories(
     String categoryId,
   ) async {
-    final subcategories = await fetchSubcategories(categoryId);
-    return subcategories.where((sub) => sub.isPopular).toList();
+    // All subcategories are popular, so just return all subcategories
+    return fetchSubcategories(categoryId);
   }
 
   Future<List<ProductModel>> fetchFeaturedProducts(String categoryId) async {
