@@ -15,6 +15,7 @@ class ProfileController extends GetxController {
   final postalCodeController = TextEditingController();
 
   final isEditing = false.obs;
+  final isSaving = false.obs;
 
   final userService = UserService.instance;
 
@@ -44,17 +45,40 @@ class ProfileController extends GetxController {
 
   void enableEditing() => isEditing.value = true;
 
-  void saveProfile() {
-    if (formKey.currentState!.validate()) {
-      isEditing.value = false;
+  Future<void> saveProfile() async {
+    if (!formKey.currentState!.validate()) return;
 
-      // OPTIONAL: Call API to update profile
-      // userService.updateProfile(...);
+    isSaving.value = true;
+
+    final updatedUser = UserModel(
+      id: userService.currentUser?.id ?? "",
+      name: nameController.text.trim(),
+      email: emailController.text.trim(),
+      phone: phoneController.text.trim(),
+      address1: address1Controller.text.trim(),
+      address2: address2Controller.text.trim(),
+      postalCode: postalCodeController.text.trim(),
+    );
+
+    final success = await userService.updateProfile(updatedUser);
+
+    isSaving.value = false;
+
+    if (success) {
+      isEditing.value = false;
 
       Get.snackbar(
         'Success',
         'Profile updated successfully',
         backgroundColor: Colors.green,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.TOP,
+      );
+    } else {
+      Get.snackbar(
+        'Error',
+        'Failed to update profile',
+        backgroundColor: Colors.red,
         colorText: Colors.white,
         snackPosition: SnackPosition.TOP,
       );

@@ -10,22 +10,20 @@ import 'package:quikle_user/features/profile/presentation/widgets/unified_profil
 
 class MyProfileScreen extends StatelessWidget {
   MyProfileScreen({super.key});
-
   final ProfileController controller = Get.put(ProfileController());
-
   @override
   Widget build(BuildContext context) {
     return Obx(() {
       final isEditing = controller.isEditing.value;
-
+      final isSaving = controller.isSaving.value;
       return Scaffold(
         backgroundColor: AppColors.homeGrey,
         appBar: UnifiedProfileAppBar(
           title: isEditing ? 'Edit Profile' : 'My Profile',
-          actionText: isEditing ? 'Save' : 'Edit',
-          onActionPressed: isEditing
-              ? controller.saveProfile
-              : controller.enableEditing,
+          actionText: isSaving ? 'Saving...' : (isEditing ? 'Save' : 'Edit'),
+          onActionPressed: isSaving
+              ? null
+              : (isEditing ? controller.saveProfile : controller.enableEditing),
           showBackButton: true,
           showActionButton: true,
         ),
@@ -43,7 +41,7 @@ class MyProfileScreen extends StatelessWidget {
                       email: controller.emailController.text,
                     ),
                     SizedBox(height: 24.h),
-                    _buildProfileSection(isEditing),
+                    _buildProfileSection(isEditing, isSaving),
                   ],
                 ),
               ),
@@ -54,7 +52,7 @@ class MyProfileScreen extends StatelessWidget {
     });
   }
 
-  Widget _buildProfileSection(bool isEditing) {
+  Widget _buildProfileSection(bool isEditing, bool isSaving) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -71,7 +69,7 @@ class MyProfileScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildHeader(isEditing),
+          _buildHeader(isEditing, isSaving),
           SizedBox(height: 24.h),
           _buildEditableField(
             controller: controller.nameController,
@@ -113,7 +111,7 @@ class MyProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader(bool isEditing) {
+  Widget _buildHeader(bool isEditing, bool isSaving) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -127,15 +125,17 @@ class MyProfileScreen extends StatelessWidget {
           ),
         ),
         GestureDetector(
-          onTap: isEditing ? controller.saveProfile : controller.enableEditing,
+          onTap: isSaving
+              ? null
+              : (isEditing ? controller.saveProfile : controller.enableEditing),
           child: Container(
             padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
             decoration: BoxDecoration(
-              color: AppColors.textPrimary,
+              color: isSaving ? AppColors.textSecondary : AppColors.textPrimary,
               borderRadius: BorderRadius.circular(20.r),
             ),
             child: Text(
-              isEditing ? 'Save' : 'Edit',
+              isSaving ? 'Saving...' : (isEditing ? 'Save' : 'Edit'),
               style: getTextStyle(
                 font: CustomFonts.inter,
                 fontSize: 12.sp,
