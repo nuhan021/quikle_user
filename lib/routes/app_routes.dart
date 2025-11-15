@@ -144,7 +144,7 @@ class AppRoute {
       page: () => const CategoryRestaurantsScreen(),
     ),
     GetPage(name: _restaurantMenu, page: () => const RestaurantPageScreen()),
-    GetPage(name: _myProfile, page: () => const MyProfileScreen()),
+    GetPage(name: _myProfile, page: () => MyProfileScreen()),
     GetPage(
       name: _orderTracking,
       page: () => OrderTrackingScreen(order: Get.arguments as OrderModel),

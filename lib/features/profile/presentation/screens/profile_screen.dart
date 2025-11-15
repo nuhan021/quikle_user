@@ -5,6 +5,7 @@ import 'package:quikle_user/core/common/styles/global_text_style.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 import 'package:quikle_user/core/utils/constants/image_path.dart';
+import 'package:quikle_user/features/profile/controllers/profile_controller.dart';
 import 'package:quikle_user/features/profile/presentation/screens/language_settings_screen.dart';
 import 'package:quikle_user/features/profile/presentation/widgets/unified_profile_app_bar.dart';
 import 'package:quikle_user/features/profile/presentation/widgets/profile_card.dart';
@@ -18,6 +19,7 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ProfileController controller = Get.put(ProfileController());
     return Scaffold(
       backgroundColor: AppColors.homeGrey,
       body: SafeArea(
@@ -32,9 +34,9 @@ class ProfileScreen extends StatelessWidget {
               child: Column(
                 children: [
                   SizedBox(height: 14.h),
-                  const ProfileCard(
-                    name: 'Aanya Desai',
-                    email: 'anyadesai@gmail.com',
+                  ProfileCard(
+                    name: controller.nameController.text,
+                    email: controller.emailController.text,
                   ),
                   SizedBox(height: 16.h),
 
@@ -112,7 +114,7 @@ class ProfileScreen extends StatelessWidget {
   void _navigateToMyProfile(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const MyProfileScreen()),
+      MaterialPageRoute(builder: (context) => MyProfileScreen()),
     );
   }
 

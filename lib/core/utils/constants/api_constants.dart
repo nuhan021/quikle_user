@@ -11,4 +11,7 @@ class ApiConstants {
 
   //For category api's
   static const String getAllCategories = "$baseUrl/items/categories/";
+
+  //Profile api's
+  static const String getUserProfile = "$baseUrl/customer/profile/";
 }
