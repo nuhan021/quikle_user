@@ -34,10 +34,13 @@ class ProfileScreen extends StatelessWidget {
               child: Column(
                 children: [
                   SizedBox(height: 14.h),
-                  ProfileCard(
-                    name: controller.nameController.text,
-                    email: controller.emailController.text,
-                  ),
+                  Obx(() {
+                    final user = controller.userService.currentUser;
+                    return ProfileCard(
+                      name: user?.name ?? controller.nameController.text,
+                      email: user?.email ?? controller.emailController.text,
+                    );
+                  }),
                   SizedBox(height: 16.h),
 
                   ProfileMenuItem(

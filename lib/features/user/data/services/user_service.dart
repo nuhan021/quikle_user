@@ -46,4 +46,27 @@ class UserService extends GetxController {
       throw Exception('Error loading user from storage: $e');
     }
   }
+
+  Future<bool> updateProfile(UserModel updatedUser) async {
+    try {
+      final ResponseData response = await _networkCaller.postRequest(
+        ApiConstants.getUserProfile,
+        body: updatedUser.toJson(),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'refresh-token': '$refreshToken',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final user = UserModel.fromJson(response.responseData['data']);
+        _currentUser.value = user;
+        return true;
+      }
+
+      return false;
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

@@ -27,4 +27,15 @@ class UserModel {
       postalCode: json['postal_code'] as String?,
     );
   }
+  Map<String, dynamic> toJson() {
+    return {
+      'user_id': id,
+      'name': name,
+      'phone': phone,
+      'email': email,
+      'address_1': address1,
+      'address_2': address2,
+      'postal_code': postalCode,
+    };
+  }
 }
