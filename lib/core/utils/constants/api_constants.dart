@@ -8,4 +8,7 @@ class ApiConstants {
   static const String signup = "$authApi/customer/signup/";
 
   static const String verifyToken = "$authApi/verify-token/";
+
+  //For category api's
+  static const String getAllCategories = "$baseUrl/items/categories/";
 }

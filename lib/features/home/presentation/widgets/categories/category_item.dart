@@ -24,27 +24,7 @@ class CategoryItem extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          SizedBox(
-            width: 44.w,
-            height: 44.h,
-            child: category.iconPath.isNotEmpty
-                ? Image.asset(
-                    category.iconPath,
-                    fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Icon(
-                        Icons.category,
-                        size: 30.sp,
-                        color: const Color(0xFFFF6B35),
-                      );
-                    },
-                  )
-                : Icon(
-                    Icons.category,
-                    size: 30.sp,
-                    color: const Color(0xFFFF6B35),
-                  ),
-          ),
+          SizedBox(width: 44.w, height: 44.h, child: _buildCategoryIcon()),
           SizedBox(height: 6.h),
           Text(
             category.title,
@@ -60,6 +40,37 @@ class CategoryItem extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildCategoryIcon() {
+    if (category.iconPath.startsWith('http')) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(8.r),
+        child: Image.network(
+          category.iconPath,
+          fit: BoxFit.contain,
+          errorBuilder: (context, error, stackTrace) {
+            return Icon(
+              Icons.category,
+              size: 30.sp,
+              color: const Color(0xFFFF6B35),
+            );
+          },
+        ),
+      );
+    }
+
+    return Image.asset(
+      category.iconPath,
+      fit: BoxFit.contain,
+      errorBuilder: (context, error, stackTrace) {
+        return Icon(
+          Icons.category,
+          size: 30.sp,
+          color: const Color(0xFFFF6B35),
+        );
+      },
     );
   }
 }

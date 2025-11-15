@@ -53,9 +53,32 @@ class ProductSection extends StatelessWidget {
                 Row(
                   children: [
                     if (categoryIconPath != null) ...[
-                      Image.asset(categoryIconPath!, width: 28.w, height: 26.h),
+                      categoryIconPath!.startsWith('http')
+                          ? Image.network(
+                              categoryIconPath!,
+                              width: 28.w,
+                              height: 26.h,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => Icon(
+                                Icons.category,
+                                size: 22.sp,
+                                color: Color(0xFFFF6B35),
+                              ),
+                            )
+                          : Image.asset(
+                              categoryIconPath!,
+                              width: 28.w,
+                              height: 26.h,
+                              fit: BoxFit.contain,
+                              errorBuilder: (_, __, ___) => Icon(
+                                Icons.category,
+                                size: 22.sp,
+                                color: Color(0xFFFF6B35),
+                              ),
+                            ),
                       SizedBox(width: 6.w),
                     ],
+
                     Text(
                       categoryTitle ?? 'Unknown Category',
                       style: getTextStyle(
