@@ -49,7 +49,7 @@ class UserService extends GetxController {
 
   Future<bool> updateProfile(UserModel updatedUser) async {
     try {
-      final ResponseData response = await _networkCaller.postRequest(
+      final ResponseData response = await _networkCaller.putRequest(
         ApiConstants.getUserProfile,
         body: updatedUser.toJson(),
         headers: {
