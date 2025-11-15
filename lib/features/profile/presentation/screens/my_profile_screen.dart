@@ -10,7 +10,7 @@ import 'package:quikle_user/features/profile/presentation/widgets/unified_profil
 
 class MyProfileScreen extends StatelessWidget {
   MyProfileScreen({super.key});
-  final ProfileController controller = Get.put(ProfileController());
+  final ProfileController controller = Get.find<ProfileController>();
   @override
   Widget build(BuildContext context) {
     return Obx(() {
