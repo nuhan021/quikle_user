@@ -15,11 +15,11 @@ import 'package:quikle_user/features/profile/presentation/screens/my_profile_scr
 import 'package:quikle_user/features/main/presentation/screens/main_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
+  ProfileScreen({super.key});
+  final ProfileController controller = Get.put(ProfileController());
 
   @override
   Widget build(BuildContext context) {
-    final ProfileController controller = Get.put(ProfileController());
     return Scaffold(
       backgroundColor: AppColors.homeGrey,
       body: SafeArea(
@@ -201,7 +201,7 @@ class ProfileScreen extends StatelessWidget {
             ),
             TextButton(
               onPressed: () {
-                Get.offAllNamed(AppRoute.getLoginScreen());
+                controller.logout();
                 Get.snackbar(
                   'Signed Out',
                   'You have been successfully signed out',

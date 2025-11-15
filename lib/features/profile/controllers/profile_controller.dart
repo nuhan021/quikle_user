@@ -17,7 +17,7 @@ class ProfileController extends GetxController {
   final isEditing = false.obs;
   final isSaving = false.obs;
 
-  final userService = UserService.instance;
+  final UserService userService = Get.find<UserService>();
 
   @override
   @override
@@ -83,6 +83,10 @@ class ProfileController extends GetxController {
         snackPosition: SnackPosition.TOP,
       );
     }
+  }
+
+  Future<void> logout() async {
+    await userService.logoutUser();
   }
 
   @override
