@@ -14,7 +14,6 @@ class AuthService {
   }
 
   UserModel? get currentUser => _userService.currentUser;
-  String get currentToken => _userService.token;
   bool get isLoggedIn => _userService.isLoggedIn;
 
   final NetworkCaller _networkCaller = NetworkCaller();
@@ -144,7 +143,7 @@ class AuthService {
   }
 
   Future<void> logout() async {
-    await _userService.clearUser();
+    await UserService.instance.logoutUser();
   }
 
   Future<ResponseData> resendOtp(String phone) async {

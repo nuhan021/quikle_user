@@ -61,7 +61,7 @@ class AddressCard extends StatelessWidget {
                             address.name,
                             style: getTextStyle(
                               font: CustomFonts.obviously,
-                              fontSize: 18.sp,
+                              fontSize: 14.sp,
                               fontWeight: FontWeight.w500,
                               color: AppColors.ebonyBlack,
                             ),
@@ -72,7 +72,7 @@ class AddressCard extends StatelessWidget {
                             address.phoneNumber,
                             style: getTextStyle(
                               font: CustomFonts.inter,
-                              fontSize: 14.sp,
+                              fontSize: 12.sp,
                               fontWeight: FontWeight.w400,
                               color: AppColors.textSecondary,
                             ),
@@ -110,7 +110,7 @@ class AddressCard extends StatelessWidget {
                               'Default',
                               style: getTextStyle(
                                 font: CustomFonts.inter,
-                                fontSize: 14.sp,
+                                fontSize: 12.sp,
                                 fontWeight: FontWeight.w400,
                                 color: AppColors.freeColor,
                               ),
@@ -138,8 +138,8 @@ class AddressCard extends StatelessWidget {
 
   Widget _buildAddressTypeIcon() {
     return SizedBox(
-      width: 66.w,
-      height: 66.w,
+      width: 60.w,
+      height: 60.w,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -152,7 +152,7 @@ class AddressCard extends StatelessWidget {
             textAlign: TextAlign.center,
             style: getTextStyle(
               font: CustomFonts.inter,
-              fontSize: 14.sp,
+              fontSize: 12.sp,
               fontWeight: FontWeight.w500,
               color: AppColors.ebonyBlack,
             ),
