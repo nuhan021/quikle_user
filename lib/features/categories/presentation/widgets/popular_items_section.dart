@@ -148,7 +148,19 @@ class PopularItemsSection extends StatelessWidget {
                             ],
                           ),
                           child: Center(
-                            child: Image.asset(sub.iconPath, fit: BoxFit.cover),
+                            child: sub.iconPath.startsWith('http')
+                                ? Image.network(
+                                    sub.iconPath,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (_, __, ___) =>
+                                        const Icon(Icons.shopping_bag),
+                                  )
+                                : Image.asset(
+                                    sub.iconPath,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (_, __, ___) =>
+                                        const Icon(Icons.shopping_bag),
+                                  ),
                           ),
                         ),
                         SizedBox(height: 4.h),
