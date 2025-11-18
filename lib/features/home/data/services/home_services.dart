@@ -70,47 +70,77 @@ class HomeService {
   }
 
   Future<List<ProductSectionModel>> fetchProductSections() async {
+    // Fetch only 6 products for each category on home page for faster loading
+    final foodProducts = await _productService.getProductsByCategory(
+      '1',
+      limit: 6,
+    );
+    final groceryProducts = await _productService.getProductsByCategory(
+      '2',
+      limit: 6,
+    );
+    final medicineProducts = await _productService.getProductsByCategory(
+      '3',
+      limit: 6,
+    );
+    final cleaningProducts = await _productService.getProductsByCategory(
+      '4',
+      limit: 6,
+    );
+    final petProducts = await _productService.getProductsByCategory(
+      '5',
+      limit: 6,
+    );
+    final pharmacyProducts = await _productService.getProductsByCategory(
+      '6',
+      limit: 6,
+    );
+    final customProducts = await _productService.getProductsByCategory(
+      '7',
+      limit: 6,
+    );
+
     return [
       ProductSectionModel(
         id: 'section_1',
         viewAllText: 'View all',
-        products: _productService.getProductsByCategory('1').take(6).toList(),
+        products: foodProducts,
         categoryId: '1',
       ),
       ProductSectionModel(
         id: 'section_2',
         viewAllText: 'View all',
-        products: _productService.getProductsByCategory('2').take(6).toList(),
+        products: groceryProducts,
         categoryId: '2',
       ),
       ProductSectionModel(
         id: 'section_3',
         viewAllText: 'View all',
-        products: _productService.getProductsByCategory('3').take(6).toList(),
+        products: medicineProducts,
         categoryId: '3',
       ),
       ProductSectionModel(
         id: 'section_4',
         viewAllText: 'View all',
-        products: _productService.getProductsByCategory('4').take(6).toList(),
+        products: cleaningProducts,
         categoryId: '4',
       ),
       ProductSectionModel(
         id: 'section_5',
         viewAllText: 'View all',
-        products: _productService.getProductsByCategory('5').take(6).toList(),
+        products: petProducts,
         categoryId: '5',
       ),
       ProductSectionModel(
         id: 'section_6',
         viewAllText: 'View all',
-        products: _productService.getProductsByCategory('6').take(6).toList(),
+        products: pharmacyProducts,
         categoryId: '6',
       ),
       ProductSectionModel(
         id: 'section_7',
         viewAllText: 'View all',
-        products: _productService.getProductsByCategory('7').take(6).toList(),
+        products: customProducts,
         categoryId: '7',
       ),
     ];
