@@ -17,7 +17,7 @@ class ApiConstants {
       "$baseUrl/items/subcategories/?category_id={category_id}";
   //Get sub sub category for grocery
   static const String getSubSubcategoriesBySubcategory =
-      "$baseUrl/items/subcategories/?parent_subcategory_id={parent_subcategory_id}";
+      "$baseUrl/items/sub-subcategories/?subcategory_id={subcategory_id}";
 
   //Profile api's
   static const String getUserProfile = "$baseUrl/customer/profile/";

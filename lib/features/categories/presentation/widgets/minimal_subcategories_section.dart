@@ -69,6 +69,7 @@ class MinimalSubcategoriesSection extends StatelessWidget {
                         children: [
                           Container(
                             height: 38.h,
+                            width: 38.h,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(12.r),
                               border: isSelected
@@ -85,9 +86,12 @@ class MinimalSubcategoriesSection extends StatelessWidget {
                                 ),
                               ],
                             ),
-                            child: Image.asset(
-                              categoryIconPath,
-                              fit: BoxFit.cover,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12.r),
+                              child: Image.asset(
+                                categoryIconPath,
+                                fit: BoxFit.cover,
+                              ),
                             ),
                           ),
                           SizedBox(height: 4.h),
@@ -122,6 +126,7 @@ class MinimalSubcategoriesSection extends StatelessWidget {
                       children: [
                         Container(
                           height: 38.h,
+                          width: 38.h,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(12.r),
                             border: isSelected
@@ -138,15 +143,14 @@ class MinimalSubcategoriesSection extends StatelessWidget {
                               ),
                             ],
                           ),
-                          child: Center(
-                            child: Image.asset(
-                              subcategory.iconPath,
-                              fit: BoxFit.cover,
-                            ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12.r),
+                            child: _buildImage(subcategory.iconPath),
                           ),
                         ),
                         SizedBox(height: 4.h),
                         SizedBox(
+                          width: 50.w,
                           child: Text(
                             subcategory.title,
                             textAlign: TextAlign.center,
@@ -172,5 +176,60 @@ class MinimalSubcategoriesSection extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Widget _buildImage(String imagePath) {
+    // Check if it's a network URL
+    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+      return Image.network(
+        imagePath,
+        fit: BoxFit.cover,
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return Container(
+            color: Colors.grey[200],
+            child: Center(
+              child: SizedBox(
+                width: 20.w,
+                height: 20.h,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    AppColors.beakYellow,
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+        errorBuilder: (context, error, stackTrace) {
+          // Fallback to a placeholder icon
+          return Container(
+            color: Colors.grey[200],
+            child: Icon(
+              Icons.shopping_bag,
+              size: 20.sp,
+              color: AppColors.beakYellow,
+            ),
+          );
+        },
+      );
+    } else {
+      // Use asset image for local paths
+      return Image.asset(
+        imagePath,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return Container(
+            color: Colors.grey[200],
+            child: Icon(
+              Icons.shopping_bag,
+              size: 20.sp,
+              color: AppColors.beakYellow,
+            ),
+          );
+        },
+      );
+    }
   }
 }
