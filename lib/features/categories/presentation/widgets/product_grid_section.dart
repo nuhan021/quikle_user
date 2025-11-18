@@ -40,7 +40,7 @@ class ProductGridSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (products.isEmpty) return const SizedBox.shrink();
-    final bool isMedicalCategory = categoryName.toLowerCase() == 'medicines';
+    final bool isMedicalCategory = categoryName.toLowerCase() == 'medicine';
     final displayProducts = products.take(maxItems).toList();
 
     return Column(

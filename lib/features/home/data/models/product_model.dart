@@ -38,6 +38,53 @@ class ProductModel {
     this.prescriptionId,
     this.vendorResponseId,
   });
+
+  /// Factory constructor to create ProductModel from API response
+  factory ProductModel.fromJson(Map<String, dynamic> json) {
+    return ProductModel(
+      id: json['id'].toString(),
+      title: json['title'] as String,
+      description: json['description'] as String,
+      price: '\$${json['sell_price']}',
+      imagePath: json['image'] as String,
+      categoryId: json['category_id'].toString(),
+      subcategoryId: json['subcategory_id']?.toString(),
+      shopId: json['vendor_id'].toString(),
+      rating: (json['ratings'] as num?)?.toDouble() ?? 4.5,
+      weight: json['weight']?.toString(),
+      isFavorite: false,
+      reviewsCount: json['total_sale'] as int? ?? 0,
+      isOTC: json['is_otc'] as bool? ?? false,
+      productType: json['product_type'] as String?,
+      isPrescriptionMedicine:
+          json['is_prescription_medicine'] as bool? ?? false,
+    );
+  }
+
+  /// Convert ProductModel to JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'description': description,
+      'price': price,
+      'imagePath': imagePath,
+      'categoryId': categoryId,
+      'subcategoryId': subcategoryId,
+      'shopId': shopId,
+      'isFavorite': isFavorite,
+      'rating': rating,
+      'reviewsCount': reviewsCount,
+      'weight': weight,
+      'isOTC': isOTC,
+      'hasPrescriptionUploaded': hasPrescriptionUploaded,
+      'productType': productType,
+      'isPrescriptionMedicine': isPrescriptionMedicine,
+      'prescriptionId': prescriptionId,
+      'vendorResponseId': vendorResponseId,
+    };
+  }
+
   ProductModel copyWith({
     String? id,
     String? title,
@@ -125,7 +172,7 @@ class ProductModel {
   }
 
   // Medicine related getters
-  bool get isMedicine => categoryId == '3';
+  bool get isMedicine => categoryId == '6';
 
   bool get canAddToCart {
     if (!isMedicine) return true;

@@ -199,7 +199,7 @@ class CategoryService {
   Future<List<ProductModel>> fetchProductsBySubcategory(
     String subcategoryId,
   ) async {
-    return _productService.getProductsBySubcategory(subcategoryId);
+    return await _productService.getProductsBySubcategory(subcategoryId);
   }
 
   Future<List<SubcategoryModel>> fetchPopularSubcategories(
@@ -209,23 +209,37 @@ class CategoryService {
     return fetchSubcategories(categoryId);
   }
 
-  Future<List<ProductModel>> fetchFeaturedProducts(String categoryId) async {
-    return _productService.getFeaturedProducts(categoryId);
+  Future<List<ProductModel>> fetchFeaturedProducts(
+    String categoryId, {
+    int limit = 9,
+  }) async {
+    return await _productService.getFeaturedProducts(categoryId, limit: limit);
   }
 
-  Future<List<ProductModel>> fetchRecommendedProducts(String categoryId) async {
-    return _productService.getRecommendedProducts(categoryId);
+  Future<List<ProductModel>> fetchRecommendedProducts(
+    String categoryId, {
+    int limit = 9,
+  }) async {
+    return await _productService.getRecommendedProducts(
+      categoryId,
+      limit: limit,
+    );
   }
 
   Future<List<ProductModel>> fetchProductsByMainCategory(
-    String mainCategoryId,
-  ) async {
+    String mainCategoryId, {
+    int limit = 9,
+  }) async {
     return _productService.getProductsByMainCategory(mainCategoryId);
   }
 
   Future<List<ProductModel>> fetchAllProductsByCategory(
-    String categoryId,
-  ) async {
-    return _productService.getProductsByCategory(categoryId);
+    String categoryId, {
+    int limit = 9,
+  }) async {
+    return await _productService.getProductsByCategory(
+      categoryId,
+      limit: limit,
+    );
   }
 }

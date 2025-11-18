@@ -46,10 +46,38 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
       duration: const Duration(milliseconds: 500),
       value: 1.0,
     );
+
+    // Add scroll listener for pagination
+    _scroll.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    final controller = Get.find<UnifiedCategoryController>();
+
+    final scrollPercent =
+        _scroll.position.pixels / _scroll.position.maxScrollExtent;
+    print(
+      '📜 Scroll position: ${_scroll.position.pixels.toStringAsFixed(0)} / ${_scroll.position.maxScrollExtent.toStringAsFixed(0)} (${(scrollPercent * 100).toStringAsFixed(1)}%)',
+    );
+    print(
+      '📊 showingAllProducts: ${controller.showingAllProducts.value}, isLoadingMore: ${controller.isLoadingMore.value}, hasMore: ${controller.hasMore.value}',
+    );
+
+    // Trigger load more when 80% scrolled and showing all products
+    if (_scroll.position.pixels >= _scroll.position.maxScrollExtent * 0.8) {
+      print('🎯 Reached 80% threshold');
+      if (controller.showingAllProducts.value) {
+        print('✅ Calling loadMoreProducts()');
+        controller.loadMoreProducts();
+      } else {
+        print('⚠️ NOT showing all products, skipping load');
+      }
+    }
   }
 
   @override
   void dispose() {
+    _scroll.removeListener(_onScroll);
     _scroll.dispose();
     _navController.dispose();
     super.dispose();
@@ -501,6 +529,34 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
               );
             },
           ),
+          // Loading indicator for pagination
+          Obx(() {
+            if (controller.isLoadingMore.value) {
+              return Padding(
+                padding: EdgeInsets.symmetric(vertical: 16.h),
+                child: const Center(child: CircularProgressIndicator()),
+              );
+            }
+            // Show "No more products" message if there are no more items
+            if (!controller.hasMore.value &&
+                controller.displayProducts.isNotEmpty) {
+              return Padding(
+                padding: EdgeInsets.symmetric(vertical: 16.h),
+                child: Center(
+                  child: Text(
+                    'No more products',
+                    style: TextStyle(
+                      color: AppColors.featherGrey,
+                      fontSize: 14.sp,
+                    ),
+                  ),
+                ),
+              );
+            }
+            return const SizedBox.shrink();
+          }),
+          // Add extra space to ensure content is scrollable even with few items
+          SizedBox(height: 100.h),
         ],
       ),
     );
