@@ -40,74 +40,57 @@ class HomeService {
   }
 
   Future<List<ProductSectionModel>> fetchProductSections() async {
-    // Fetch only 6 products for each category on home page for faster loading
-    final foodProducts = await _productService.getProductsByCategory(
-      '1',
-      limit: 6,
-    );
-    final groceryProducts = await _productService.getProductsByCategory(
-      '2',
-      limit: 6,
-    );
-    final medicineProducts = await _productService.getProductsByCategory(
-      '3',
-      limit: 6,
-    );
-    final cleaningProducts = await _productService.getProductsByCategory(
-      '4',
-      limit: 6,
-    );
-    final petProducts = await _productService.getProductsByCategory(
-      '5',
-      limit: 6,
-    );
-    final pharmacyProducts = await _productService.getProductsByCategory(
-      '6',
-      limit: 6,
-    );
+    final List<Future<List<ProductModel>>> productFutures = [
+      _productService.getProductsByCategory('1', limit: 6),
+      _productService.getProductsByCategory('2', limit: 6),
+      _productService.getProductsByCategory('3', limit: 6),
+      _productService.getProductsByCategory('4', limit: 6),
+      _productService.getProductsByCategory('5', limit: 6),
+      _productService.getProductsByCategory('6', limit: 6),
+    ];
 
+    final List<List<ProductModel>> results = await Future.wait(productFutures);
     return [
       ProductSectionModel(
         id: 'section_1',
         viewAllText: 'View all',
-        products: foodProducts,
+        products: results[0],
         categoryId: '1',
       ),
       ProductSectionModel(
         id: 'section_2',
         viewAllText: 'View all',
-        products: groceryProducts,
+        products: results[1],
         categoryId: '2',
       ),
       ProductSectionModel(
         id: 'section_3',
         viewAllText: 'View all',
-        products: medicineProducts,
+        products: results[2],
         categoryId: '3',
       ),
       ProductSectionModel(
         id: 'section_4',
         viewAllText: 'View all',
-        products: cleaningProducts,
+        products: results[3],
         categoryId: '4',
       ),
       ProductSectionModel(
         id: 'section_5',
         viewAllText: 'View all',
-        products: petProducts,
+        products: results[4],
         categoryId: '5',
       ),
       ProductSectionModel(
         id: 'section_6',
         viewAllText: 'View all',
-        products: pharmacyProducts,
+        products: results[5],
         categoryId: '6',
       ),
     ];
   }
 
   Future<List<ProductModel>> fetchAllProducts() async {
-    // Return empty list - all products should come from specific category APIs
     return [];
   }
 }

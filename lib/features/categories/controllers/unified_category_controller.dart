@@ -21,6 +21,7 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
   final CartController _cartController = Get.find<CartController>();
 
   final isLoading = false.obs;
+  final isLoadingProducts = false.obs;
   final isLoadingMore = false.obs;
   final hasMore = true.obs;
   final currentOffset = 0.obs;
@@ -284,15 +285,12 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
 
   void onSubcategoryTap(SubcategoryModel? subcategory) async {
     try {
-      isLoading.value = true;
-
       // Handle "All" option
       if (subcategory == null) {
         selectedSubcategory.value = null;
         showingAllProducts.value = false;
         displayProducts.value = allProducts.take(9).toList();
         productsTitle.value = 'All Items';
-        isLoading.value = false;
         return;
       }
 
@@ -310,8 +308,34 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
           selectedSubcategory.value = subcategory;
           showingAllProducts.value = false;
           applyFilter(subcategory.id);
+          return;
         }
-      } else if (isFoodCategory) {
+      }
+
+      // For all other categories, check if we already have products for this subcategory
+      final existingProducts = allProducts
+          .where((p) => p.subcategoryId == subcategory.id)
+          .toList();
+
+      if (existingProducts.isNotEmpty) {
+        // We already have products for this subcategory, just filter them
+        print(
+          '✅ Filtering existing products for subcategory: ${subcategory.id}',
+        );
+        selectedSubcategory.value = subcategory;
+        showingAllProducts.value = false;
+        currentOffset.value = 0;
+        hasMore.value = existingProducts.length > 9;
+        displayProducts.value = existingProducts.take(9).toList();
+        productsTitle.value = '${subcategory.title} Items';
+        return;
+      }
+
+      // If we don't have products yet, fetch from API
+      print('🌐 Fetching products from API for subcategory: ${subcategory.id}');
+      isLoadingProducts.value = true;
+
+      if (isFoodCategory) {
         // For food category, fetch only 9 products for the subcategory
         selectedSubcategory.value = subcategory;
         showingAllProducts.value = false;
@@ -323,7 +347,12 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
           limit: 9,
           categoryId: currentCategory.id, // Pass category ID
         );
-        allProducts.value = products;
+        // Add to allProducts if not already there
+        for (var product in products) {
+          if (!allProducts.any((p) => p.id == product.id)) {
+            allProducts.add(product);
+          }
+        }
         displayProducts.value = products;
         productsTitle.value = '${subcategory.title} Items';
       } else if (isMedicineCategory) {
@@ -338,7 +367,12 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
           limit: 9,
           categoryId: currentCategory.id, // Pass category ID
         );
-        allProducts.value = products;
+        // Add to allProducts if not already there
+        for (var product in products) {
+          if (!allProducts.any((p) => p.id == product.id)) {
+            allProducts.add(product);
+          }
+        }
         displayProducts.value = products;
         productsTitle.value = '${subcategory.title} Items';
       } else if (currentCategory.id == '2' ||
@@ -356,7 +390,12 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
           limit: 9,
           categoryId: currentCategory.id, // Pass category ID
         );
-        allProducts.value = products;
+        // Add to allProducts if not already there
+        for (var product in products) {
+          if (!allProducts.any((p) => p.id == product.id)) {
+            allProducts.add(product);
+          }
+        }
         displayProducts.value = products;
         productsTitle.value = '${subcategory.title} Items';
       } else {
@@ -376,7 +415,7 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
     } catch (e) {
       print('Error loading subcategory: $e');
     } finally {
-      isLoading.value = false;
+      isLoadingProducts.value = false;
     }
   }
 
@@ -859,7 +898,7 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
         categoryId: currentCategory.id,
         subcategoryId: selectedSubcategory.value?.id,
         offset: nextOffset,
-        limit: 20, // Load 20 more products at a time
+        limit: 20,
       );
 
       final newProducts = result['products'] as List<ProductModel>;

@@ -16,22 +16,31 @@ class ProductDataService {
     return _instance!;
   }
 
+  /// Ensures the limit is always a multiple of 3 for grid display
+  int _ensureMultipleOfThree(int limit) {
+    if (limit % 3 == 0) return limit;
+    return ((limit / 3).ceil()) * 3;
+  }
+
   /// Fetch food products from API
   /// [categoryId] - The category ID (1 for food)
   /// [subcategoryId] - Optional subcategory ID filter
   /// [offset] - Pagination offset (default: 0)
-  /// [limit] - Number of items to fetch (default: 20)
+  /// [limit] - Number of items to fetch (default: 21 - multiple of 3)
   Future<List<ProductModel>> fetchFoodProducts({
     required String categoryId,
     String? subcategoryId,
     int offset = 0,
-    int limit = 20,
+    int limit = 21,
   }) async {
     try {
+      // Ensure limit is always a multiple of 3 for grid display
+      final adjustedLimit = _ensureMultipleOfThree(limit);
+
       final queryParams = <String, dynamic>{
         'category': categoryId,
         'offset': offset.toString(),
-        'limit': limit.toString(),
+        'limit': adjustedLimit.toString(),
       };
 
       if (subcategoryId != null) {
@@ -79,18 +88,21 @@ class ProductDataService {
   /// [categoryId] - The category ID (should be '6' for medicine)
   /// [subcategoryId] - Optional subcategory ID filter
   /// [offset] - Pagination offset (default: 0)
-  /// [limit] - Number of items to fetch (default: 20)
+  /// [limit] - Number of items to fetch (default: 21 - multiple of 3)
   Future<List<ProductModel>> fetchMedicineProducts({
     required String categoryId,
     String? subcategoryId,
     int offset = 0,
-    int limit = 20,
+    int limit = 21,
   }) async {
     try {
+      // Ensure limit is always a multiple of 3 for grid display
+      final adjustedLimit = _ensureMultipleOfThree(limit);
+
       final queryParams = <String, dynamic>{
         'category': categoryId,
         'offset': offset.toString(),
-        'limit': limit.toString(),
+        'limit': adjustedLimit.toString(),
       };
 
       if (subcategoryId != null) {
@@ -140,19 +152,22 @@ class ProductDataService {
   /// [categoryId] - The category ID (2 for groceries)
   /// [subcategoryId] - Optional subcategory ID filter
   /// [offset] - Pagination offset (default: 0)
-  /// [limit] - Number of items to fetch (default: 20)
+  /// [limit] - Number of items to fetch (default: 21 - multiple of 3)
   Future<List<ProductModel>> fetchGroceriesProducts({
     required String categoryId,
     String? subcategoryId,
     String? subSubcategoryId,
     int offset = 0,
-    int limit = 20,
+    int limit = 21,
   }) async {
     try {
+      // Ensure limit is always a multiple of 3 for grid display
+      final adjustedLimit = _ensureMultipleOfThree(limit);
+
       final queryParams = <String, dynamic>{
         'category': categoryId,
         'offset': offset.toString(),
-        'limit': limit.toString(),
+        'limit': adjustedLimit.toString(),
       };
 
       if (subcategoryId != null) {
@@ -208,10 +223,12 @@ class ProductDataService {
     String? subcategoryId,
     String? subSubcategoryId,
     required int offset,
-    int limit = 20,
+    int limit = 21,
   }) async {
+    // Ensure limit is always a multiple of 3 for grid display
+    final adjustedLimit = _ensureMultipleOfThree(limit);
     print(
-      '🔍 fetchMoreProducts - CategoryID: $categoryId, SubcategoryID: $subcategoryId, SubSubcategoryID: $subSubcategoryId, Offset: $offset, Limit: $limit',
+      '🔍 fetchMoreProducts - CategoryID: $categoryId, SubcategoryID: $subcategoryId, SubSubcategoryID: $subSubcategoryId, Offset: $offset, Limit: $limit (adjusted: $adjustedLimit)',
     );
 
     if (categoryId == '1') {
@@ -222,11 +239,11 @@ class ProductDataService {
           categoryId: categoryId,
           subcategoryId: subcategoryId,
           offset: offset,
-          limit: limit,
+          limit: adjustedLimit,
         );
 
         // Check if there are more products by trying to fetch one more
-        final hasMore = products.length == limit;
+        final hasMore = products.length == adjustedLimit;
 
         print('✅ Food: Got ${products.length} products, hasMore: $hasMore');
 
@@ -251,10 +268,10 @@ class ProductDataService {
           categoryId: categoryId,
           subcategoryId: subcategoryId,
           offset: offset,
-          limit: limit,
+          limit: adjustedLimit,
         );
 
-        final hasMore = products.length == limit;
+        final hasMore = products.length == adjustedLimit;
 
         print('✅ Medicine: Got ${products.length} products, hasMore: $hasMore');
 
@@ -285,10 +302,10 @@ class ProductDataService {
             subcategoryId: subcategoryId,
             subSubcategoryId: subSubcategoryId,
             offset: offset,
-            limit: limit,
+            limit: adjustedLimit,
           );
 
-          final hasMore = products.length == limit;
+          final hasMore = products.length == adjustedLimit;
 
           print(
             '✅ Groceries: Got ${products.length} products, hasMore: $hasMore',
@@ -327,9 +344,13 @@ class ProductDataService {
     String categoryId, {
     int limit = 30,
   }) async {
-    // For food category (categoryId = '1'), fetch from API
+    final adjustedLimit = _ensureMultipleOfThree(limit);
+
     if (categoryId == '1') {
-      return await fetchFoodProducts(categoryId: categoryId, limit: limit);
+      return await fetchFoodProducts(
+        categoryId: categoryId,
+        limit: adjustedLimit,
+      );
     }
 
     // For groceries and related categories (2: groceries, 3: cleaning, 4: personal care, 5: pet supplies)
@@ -337,11 +358,17 @@ class ProductDataService {
         categoryId == '3' ||
         categoryId == '4' ||
         categoryId == '5') {
-      return await fetchGroceriesProducts(categoryId: categoryId, limit: limit);
+      return await fetchGroceriesProducts(
+        categoryId: categoryId,
+        limit: adjustedLimit,
+      );
     }
     // For medicine category (categoryId = '6'), fetch from API
     if (categoryId == '6') {
-      return await fetchMedicineProducts(categoryId: categoryId, limit: limit);
+      return await fetchMedicineProducts(
+        categoryId: categoryId,
+        limit: adjustedLimit,
+      );
     }
 
     // For other categories not yet implemented, return empty list
@@ -355,8 +382,11 @@ class ProductDataService {
     String? categoryId,
     String? subSubcategoryId,
   }) async {
+    // Ensure limit is always a multiple of 3 for grid display
+    final adjustedLimit = _ensureMultipleOfThree(limit);
+
     print(
-      '🔍 getProductsBySubcategory - SubcategoryID: $subcategoryId, CategoryID: $categoryId, SubSubcategoryID: $subSubcategoryId, Limit: $limit',
+      '🔍 getProductsBySubcategory - SubcategoryID: $subcategoryId, CategoryID: $categoryId, SubSubcategoryID: $subSubcategoryId, Limit: $limit (adjusted: $adjustedLimit)',
     );
 
     // If categoryId is provided, use it to determine which API to call
@@ -367,7 +397,7 @@ class ProductDataService {
         return await fetchFoodProducts(
           categoryId: categoryId,
           subcategoryId: subcategoryId,
-          limit: limit,
+          limit: adjustedLimit,
         );
       } else if (categoryId == '6') {
         // Medicine category
@@ -375,7 +405,7 @@ class ProductDataService {
         return await fetchMedicineProducts(
           categoryId: categoryId,
           subcategoryId: subcategoryId,
-          limit: limit,
+          limit: adjustedLimit,
         );
       } else if (categoryId == '2' ||
           categoryId == '3' ||
@@ -389,7 +419,7 @@ class ProductDataService {
           categoryId: categoryId,
           subcategoryId: subcategoryId,
           subSubcategoryId: subSubcategoryId,
-          limit: limit,
+          limit: adjustedLimit,
         );
       }
     }
@@ -400,7 +430,7 @@ class ProductDataService {
       return await fetchFoodProducts(
         categoryId: '1',
         subcategoryId: subcategoryId,
-        limit: limit,
+        limit: adjustedLimit,
       );
     }
 
@@ -409,7 +439,7 @@ class ProductDataService {
       return await fetchMedicineProducts(
         categoryId: '6',
         subcategoryId: subcategoryId,
-        limit: limit,
+        limit: adjustedLimit,
       );
     }
 
@@ -428,7 +458,7 @@ class ProductDataService {
       return await fetchGroceriesProducts(
         categoryId: '2',
         subcategoryId: subcategoryId,
-        limit: limit,
+        limit: adjustedLimit,
       );
     }
 
