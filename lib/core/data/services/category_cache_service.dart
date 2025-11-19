@@ -10,6 +10,7 @@ class CategoryCacheService {
   static CategoryCacheService? _instance;
   static const String _cachePrefix = 'category_cache_';
   static const String _subcategoryListPrefix = 'subcategory_list_';
+  static const String _homeProductSectionsKey = 'home_product_sections';
   static const String _cacheTimestampPrefix = 'cache_timestamp_';
 
   CategoryCacheService._internal();
@@ -289,6 +290,85 @@ class CategoryCacheService {
     } catch (e) {
       AppLoggerHelper.error('Error getting cache stats', e);
       return {};
+    }
+  }
+
+  /// Cache home product sections (6 products per category)
+  Future<void> cacheHomeProductSections(
+    List<ProductSectionModel> sections,
+  ) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+
+      // Convert sections to JSON
+      final sectionsJson = sections.map((s) => s.toJson()).toList();
+      final jsonString = jsonEncode(sectionsJson);
+
+      // Save to cache
+      await prefs.setString(_homeProductSectionsKey, jsonString);
+
+      // Save timestamp
+      await prefs.setString(
+        _getTimestampKey(_homeProductSectionsKey),
+        DateTime.now().toIso8601String(),
+      );
+
+      AppLoggerHelper.debug(
+        '💾 Cached ${sections.length} home product sections',
+      );
+    } catch (e) {
+      AppLoggerHelper.error('Error caching home product sections', e);
+    }
+  }
+
+  /// Get cached home product sections
+  Future<List<ProductSectionModel>?> getCachedHomeProductSections() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+
+      // Check if cache exists
+      if (!await _isCacheValid(_homeProductSectionsKey)) {
+        AppLoggerHelper.debug('❌ No home product sections cache found');
+        return null;
+      }
+
+      final jsonString = prefs.getString(_homeProductSectionsKey);
+      if (jsonString == null) {
+        AppLoggerHelper.debug('❌ No home product sections data found');
+        return null;
+      }
+
+      // Parse JSON
+      final List sectionsJson = jsonDecode(jsonString) as List;
+      final sections = sectionsJson
+          .map(
+            (json) =>
+                ProductSectionModel.fromJson(json as Map<String, dynamic>),
+          )
+          .toList();
+
+      AppLoggerHelper.debug(
+        '✅ Retrieved ${sections.length} cached home product sections',
+      );
+
+      return sections;
+    } catch (e) {
+      AppLoggerHelper.error('Error retrieving cached home product sections', e);
+      return null;
+    }
+  }
+
+  /// Clear home product sections cache
+  Future<void> clearHomeProductSectionsCache() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+
+      await prefs.remove(_homeProductSectionsKey);
+      await prefs.remove(_getTimestampKey(_homeProductSectionsKey));
+
+      AppLoggerHelper.debug('🗑️ Cleared home product sections cache');
+    } catch (e) {
+      AppLoggerHelper.error('Error clearing home product sections cache', e);
     }
   }
 }
