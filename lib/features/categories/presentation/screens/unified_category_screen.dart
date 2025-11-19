@@ -10,6 +10,7 @@ import 'package:quikle_user/core/common/widgets/custom_navbar.dart';
 import 'package:quikle_user/core/common/widgets/floating_cart_button.dart';
 import 'package:quikle_user/core/common/widgets/voice_search_overlay.dart';
 import 'package:quikle_user/core/common/widgets/product_card_shimmer.dart';
+import 'package:quikle_user/features/categories/presentation/widgets/category_screen_shimmer.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 import 'package:quikle_user/core/utils/navigation/navbar_navigation_helper.dart';
@@ -193,36 +194,47 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
                               ),
                             ),
                             popularSection: hasPopular
-                                ? Padding(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 16.w,
-                                    ),
-                                    child: PopularItemsSection(
-                                      subcategories:
-                                          controller.isGroceryCategory
-                                          ? controller.allCategories
-                                          : controller.availableSubcategories,
-                                      onSubcategoryTap:
-                                          controller.onSubcategoryTap,
-                                      title: controller.isGroceryCategory
-                                          ? 'Categories'
-                                          : controller
-                                                .sectionTitle
-                                                .value
-                                                .isEmpty
-                                          ? 'Popular Items'
-                                          : controller.sectionTitle.value,
-                                      selectedSubcategory:
-                                          controller.isGroceryCategory
-                                          ? controller
-                                                .selectedMainCategory
-                                                .value
-                                          : controller
-                                                .selectedSubcategory
-                                                .value,
-                                      category: controller.currentCategory,
-                                    ),
-                                  )
+                                ? (controller.isLoading.value
+                                      ? Padding(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: 16.w,
+                                          ),
+                                          child: const PopularItemsShimmer(
+                                            itemCount: 5,
+                                          ),
+                                        )
+                                      : Padding(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: 16.w,
+                                          ),
+                                          child: PopularItemsSection(
+                                            subcategories:
+                                                controller.isGroceryCategory
+                                                ? controller.allCategories
+                                                : controller
+                                                      .availableSubcategories,
+                                            onSubcategoryTap:
+                                                controller.onSubcategoryTap,
+                                            title: controller.isGroceryCategory
+                                                ? 'Categories'
+                                                : controller
+                                                      .sectionTitle
+                                                      .value
+                                                      .isEmpty
+                                                ? 'Popular Items'
+                                                : controller.sectionTitle.value,
+                                            selectedSubcategory:
+                                                controller.isGroceryCategory
+                                                ? controller
+                                                      .selectedMainCategory
+                                                      .value
+                                                : controller
+                                                      .selectedSubcategory
+                                                      .value,
+                                            category:
+                                                controller.currentCategory,
+                                          ),
+                                        ))
                                 : const SizedBox.shrink(),
 
                             totalHeight: totalHeaderHeight,
@@ -239,7 +251,48 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
                         // 🔸 Offer Banner + Top Restaurants + Content
                         Obx(() {
                           if (controller.isLoading.value) {
-                            return const ProductGridShimmer(itemCount: 9);
+                            return SliverList(
+                              delegate: SliverChildListDelegate([
+                                // Show prescription shimmer for medicine category
+                                if (controller.isMedicineCategory) ...[
+                                  const PrescriptionUploadShimmer(),
+                                  SizedBox(height: 8.h),
+                                ],
+                                // Show restaurant shimmer for food category
+                                if (controller.isFoodCategory) ...[
+                                  const TopRestaurantsShimmer(itemCount: 6),
+                                  SizedBox(height: 16.h),
+                                ],
+                                // Product grid shimmer
+                                Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 16.w,
+                                    vertical: 12.h,
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      const ProductGridHeaderShimmer(),
+                                      SizedBox(height: 12.h),
+                                      GridView.builder(
+                                        shrinkWrap: true,
+                                        physics:
+                                            const NeverScrollableScrollPhysics(),
+                                        gridDelegate:
+                                            SliverGridDelegateWithFixedCrossAxisCount(
+                                              crossAxisCount: 3,
+                                              crossAxisSpacing: 8.w,
+                                              mainAxisSpacing: 8.h,
+                                              childAspectRatio: 0.70,
+                                            ),
+                                        itemCount: 9,
+                                        itemBuilder: (context, index) =>
+                                            const ProductCardShimmer(),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ]),
+                            );
                           }
 
                           final showTopRestaurants =
@@ -532,7 +585,20 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
             if (controller.isLoadingMore.value) {
               return Padding(
                 padding: EdgeInsets.symmetric(vertical: 16.h),
-                child: const Center(child: CircularProgressIndicator()),
+                child: GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    crossAxisSpacing: 8.w,
+                    mainAxisSpacing: 8.h,
+                    childAspectRatio: controller.isMedicineCategory
+                        ? 0.65
+                        : 0.70,
+                  ),
+                  itemCount: 3, // Show 3 shimmer cards while loading more
+                  itemBuilder: (context, index) => const ProductCardShimmer(),
+                ),
               );
             }
             // Show "No more products" message if there are no more items
