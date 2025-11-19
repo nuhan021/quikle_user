@@ -321,6 +321,7 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
         final products = await _productDataService.getProductsBySubcategory(
           subcategory.id,
           limit: 9,
+          categoryId: currentCategory.id, // Pass category ID
         );
         allProducts.value = products;
         displayProducts.value = products;
@@ -335,6 +336,7 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
         final products = await _productDataService.getProductsBySubcategory(
           subcategory.id,
           limit: 9,
+          categoryId: currentCategory.id, // Pass category ID
         );
         allProducts.value = products;
         displayProducts.value = products;
@@ -352,6 +354,7 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
         final products = await _productDataService.getProductsBySubcategory(
           subcategory.id,
           limit: 9,
+          categoryId: currentCategory.id, // Pass category ID
         );
         allProducts.value = products;
         displayProducts.value = products;

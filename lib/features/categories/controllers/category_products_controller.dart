@@ -10,9 +10,11 @@ import 'package:quikle_user/features/cart/controllers/cart_controller.dart';
 import 'package:quikle_user/features/profile/controllers/favorites_controller.dart';
 import 'package:quikle_user/routes/app_routes.dart';
 import 'package:quikle_user/core/mixins/voice_search_mixin.dart';
+import 'package:quikle_user/core/data/services/product_data_service.dart';
 
 class CategoryProductsController extends GetxController with VoiceSearchMixin {
   final CategoryService _categoryService = CategoryService();
+  final ProductDataService _productDataService = ProductDataService();
   final CartController _cartController = Get.find<CartController>();
 
   final isLoading = false.obs;
@@ -24,6 +26,11 @@ class CategoryProductsController extends GetxController with VoiceSearchMixin {
 
   final selectedSubcategory = Rxn<SubcategoryModel>();
   final searchQuery = ''.obs;
+
+  // Pagination state
+  final isLoadingMore = false.obs;
+  final hasMore = true.obs;
+  final currentOffset = 0.obs;
 
   final currentPlaceholder = "Search products...".obs;
   Timer? _placeholderTimer;
@@ -171,11 +178,28 @@ class CategoryProductsController extends GetxController with VoiceSearchMixin {
       );
       subcategories.value = subCategories;
 
-      final products = await _categoryService.fetchProductsByMainCategory(
-        currentMainCategory.id,
-      );
-      allProducts.value = products;
-      displayProducts.value = products;
+      // For groceries category (2), fetch from API with pagination
+      if (currentCategory.id == '2') {
+        print('🛒 Loading groceries subcategory data from API');
+        final products = await _productDataService.getProductsBySubcategory(
+          currentMainCategory.id, // subcategory ID
+          categoryId: currentCategory.id,
+          limit: 10, // Initial load: 10 items
+        );
+        allProducts.value = products;
+        displayProducts.value = products;
+        currentOffset.value = products.length;
+        hasMore.value =
+            products.length >= 10; // If we got 10, there might be more
+        print('✅ Loaded ${products.length} products initially');
+      } else {
+        // For other categories, use the old method
+        final products = await _categoryService.fetchProductsByMainCategory(
+          currentMainCategory.id,
+        );
+        allProducts.value = products;
+        displayProducts.value = products;
+      }
     } catch (e) {
       print('Error loading category data: $e');
     } finally {
@@ -183,28 +207,166 @@ class CategoryProductsController extends GetxController with VoiceSearchMixin {
     }
   }
 
-  void onSubcategoryTap(SubcategoryModel? subcategory) {
+  void onSubcategoryTap(SubcategoryModel? subcategory) async {
     if (subcategory == null) {
-      // "All" option selected - show all products
+      // "All" option selected - show all products from subcategory
       selectedSubcategory.value = null;
-      displayProducts.value = allProducts;
+
+      if (currentCategory.id == '2') {
+        // For groceries, reload all products for the main subcategory with pagination
+        try {
+          isLoading.value = true;
+          currentOffset.value = 0;
+          hasMore.value = true;
+
+          print(
+            '🛒 Reloading all products for subcategory: ${currentMainCategory.id}',
+          );
+
+          final products = await _productDataService.getProductsBySubcategory(
+            currentMainCategory.id,
+            categoryId: currentCategory.id,
+            limit: 10, // Load 10 initially
+          );
+
+          displayProducts.value = products;
+          currentOffset.value = products.length;
+          hasMore.value = products.length >= 10;
+
+          print('✅ Loaded ${products.length} products for "All"');
+        } catch (e) {
+          print('❌ Error loading all products: $e');
+        } finally {
+          isLoading.value = false;
+        }
+      } else {
+        displayProducts.value = allProducts;
+      }
       return;
     }
 
     if (selectedSubcategory.value?.id == subcategory.id) {
       selectedSubcategory.value = null;
-      displayProducts.value = allProducts;
+
+      if (currentCategory.id == '2') {
+        // Reload all products
+        try {
+          isLoading.value = true;
+          currentOffset.value = 0;
+          hasMore.value = true;
+
+          final products = await _productDataService.getProductsBySubcategory(
+            currentMainCategory.id,
+            categoryId: currentCategory.id,
+            limit: 10,
+          );
+
+          displayProducts.value = products;
+          currentOffset.value = products.length;
+          hasMore.value = products.length >= 10;
+        } catch (e) {
+          print('❌ Error: $e');
+        } finally {
+          isLoading.value = false;
+        }
+      } else {
+        displayProducts.value = allProducts;
+      }
       return;
     }
 
     selectedSubcategory.value = subcategory;
-    _filterProductsBySubcategory(subcategory.id);
+
+    // For groceries category (2), fetch from API with sub_subcategory parameter
+    if (currentCategory.id == '2') {
+      try {
+        isLoading.value = true;
+        currentOffset.value = 0;
+        hasMore.value = true;
+
+        print(
+          '🛒 Fetching products for sub_subcategory: ${subcategory.id} under subcategory: ${currentMainCategory.id}',
+        );
+
+        final products = await _productDataService.getProductsBySubcategory(
+          currentMainCategory.id, // This is the subcategory ID
+          categoryId: currentCategory.id,
+          subSubcategoryId: subcategory.id, // This is the sub_subcategory ID
+          limit: 10, // Load 10 initially
+        );
+
+        displayProducts.value = products;
+        currentOffset.value = products.length;
+        hasMore.value =
+            products.length >= 10; // If we got 10, there might be more
+
+        print('✅ Loaded ${products.length} products for sub_subcategory');
+      } catch (e) {
+        print('❌ Error loading sub_subcategory products: $e');
+        // Fallback to filter from allProducts
+        _filterProductsBySubcategory(subcategory.id);
+      } finally {
+        isLoading.value = false;
+      }
+    } else {
+      // For other categories, filter from existing products
+      _filterProductsBySubcategory(subcategory.id);
+    }
   }
 
   void _filterProductsBySubcategory(String subcategoryId) {
     displayProducts.value = allProducts
         .where((product) => product.subcategoryId == subcategoryId)
         .toList();
+  }
+
+  Future<void> loadMoreProducts() async {
+    // Only load more for groceries category
+    if (currentCategory.id != '2') {
+      return;
+    }
+
+    if (isLoadingMore.value || !hasMore.value) {
+      print(
+        '⏭️ Skipping loadMore - isLoadingMore: ${isLoadingMore.value}, hasMore: ${hasMore.value}',
+      );
+      return;
+    }
+
+    try {
+      isLoadingMore.value = true;
+      final offset = displayProducts.length;
+      print('📥 Loading more products - Offset: $offset');
+
+      final result = await _productDataService.fetchMoreProducts(
+        categoryId: currentCategory.id,
+        subcategoryId: currentMainCategory.id, // Always the subcategory
+        subSubcategoryId: selectedSubcategory
+            .value
+            ?.id, // null if "All", ID if sub_subcategory selected
+        offset: offset,
+        limit: 15, // Load 15 more items on scroll
+      );
+
+      final newProducts = result['products'] as List<ProductModel>;
+      hasMore.value = result['hasMore'] as bool;
+
+      if (newProducts.isNotEmpty) {
+        displayProducts.addAll(newProducts);
+        currentOffset.value = displayProducts.length;
+        print(
+          '✅ Loaded ${newProducts.length} more products. Total: ${displayProducts.length}',
+        );
+      } else {
+        print('⚠️ No more products to load');
+        hasMore.value = false;
+      }
+    } catch (e) {
+      print('❌ Error loading more products: $e');
+      hasMore.value = false;
+    } finally {
+      isLoadingMore.value = false;
+    }
   }
 
   void onSearchChanged(String query) {
