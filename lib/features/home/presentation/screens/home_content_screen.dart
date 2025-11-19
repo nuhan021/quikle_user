@@ -107,7 +107,9 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                                     ),
                                     Obx(() {
                                       if (controller.isLoading) {
-                                        return const CategoryShimmer(itemCount: 6);
+                                        return const CategoryShimmer(
+                                          itemCount: 6,
+                                        );
                                       }
                                       return CategoriesSection(
                                         categories: controller.categories,
