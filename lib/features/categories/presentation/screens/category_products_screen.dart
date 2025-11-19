@@ -17,6 +17,7 @@ import 'package:quikle_user/features/categories/presentation/widgets/search_and_
 import 'package:quikle_user/features/categories/presentation/widgets/category_product_item.dart';
 import 'package:quikle_user/features/categories/presentation/widgets/minimal_subcategories_section.dart';
 import 'package:quikle_user/features/categories/presentation/widgets/minimal_subcategories_shimmer.dart';
+import 'package:quikle_user/features/categories/presentation/widgets/load_more_products_shimmer.dart';
 import 'package:quikle_user/features/orders/presentation/widgets/live_order_indicator.dart';
 
 class CategoryProductsScreen extends StatefulWidget {
@@ -272,22 +273,8 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
                           ),
                         // Loading more indicator
                         if (controller.isLoadingMore.value)
-                          SliverToBoxAdapter(
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(vertical: 16.h),
-                              child: Center(
-                                child: SizedBox(
-                                  width: 24.w,
-                                  height: 24.h,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                      AppColors.beakYellow,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
+                          const SliverToBoxAdapter(
+                            child: LoadMoreProductsShimmer(itemCount: 3),
                           ),
                         // Bottom padding for scrollability
                         SliverToBoxAdapter(child: SizedBox(height: 100.h)),
