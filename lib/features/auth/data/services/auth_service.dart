@@ -146,16 +146,19 @@ class AuthService {
     await UserService.instance.logoutUser();
   }
 
-  Future<ResponseData> resendOtp(String phone) async {
+  Future<ResponseData> resendOtp(
+    String phone, {
+    String? name,
+    bool isLogin = true,
+  }) async {
     try {
-      await Future<void>.delayed(const Duration(milliseconds: 500));
+      // Determine the purpose based on whether it's login or signup
+      final purpose = isLogin ? 'login' : 'signup';
 
-      return ResponseData(
-        isSuccess: true,
-        statusCode: 200,
-        errorMessage: '',
-        responseData: {'success': true, 'message': 'OTP resent successfully'},
-      );
+      // Call the sendOtp method with the appropriate parameters
+      final response = await sendOtp(phone, name: name, purpose: purpose);
+
+      return response;
     } catch (e) {
       return ResponseData(
         isSuccess: false,

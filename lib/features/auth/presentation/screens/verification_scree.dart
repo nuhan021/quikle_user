@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:quikle_user/core/common/styles/global_text_style.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
@@ -111,35 +112,40 @@ class VerificationScreen extends StatelessWidget {
                   padding: EdgeInsets.symmetric(horizontal: 20.w),
                   child: Column(
                     children: [
-                      SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          children: List.generate(
-                            6,
-                            (index) => Obx(() {
-                              final isFilled =
-                                  controller.otpDigits[index].isNotEmpty;
-                              final color = isFilled
-                                  ? const Color(0xFFFFC200)
-                                  : const Color(0xFF7C7C7C);
-                              return Padding(
-                                padding: EdgeInsets.only(
-                                  right: index == 5 ? 0 : 12.w,
-                                ),
-                                child: Container(
-                                  alignment: Alignment.center,
-                                  width: 48.67.w,
-                                  height: 52.h,
-                                  decoration: BoxDecoration(
-                                    border: Border.all(color: color),
-                                    borderRadius: BorderRadius.circular(8.r),
-                                  ),
-                                  child: _OtpCell(index: index, color: color),
-                                ),
-                              );
-                            }),
-                          ),
+                      PinCodeTextField(
+                        appContext: context,
+                        length: 6,
+                        controller: controller.otpController,
+                        keyboardType: TextInputType.number,
+                        animationType: AnimationType.slide,
+                        autoDisposeControllers: false,
+                        animationDuration: const Duration(milliseconds: 300),
+                        enableActiveFill: true,
+                        textStyle: TextStyle(
+                          color: AppColors.eggshellWhite,
+                          fontSize: 18.sp,
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w600,
                         ),
+                        cursorColor: const Color(0xFFF8F8F8),
+                        pinTheme: PinTheme(
+                          shape: PinCodeFieldShape.box,
+                          borderRadius: BorderRadius.circular(8.r),
+                          fieldHeight: 52.h,
+                          fieldWidth: 48.67.w,
+                          activeFillColor: AppColors.ebonyBlack,
+                          inactiveFillColor: AppColors.ebonyBlack,
+                          selectedFillColor: AppColors.ebonyBlack,
+                          activeColor: const Color(0xFFFFC200),
+                          inactiveColor: const Color(0xFF7C7C7C),
+                          selectedColor: const Color(0xFFFFC200),
+                        ),
+                        onChanged: (value) {
+                          controller.onOtpChanged(value);
+                        },
+                        onCompleted: (value) {
+                          controller.onTapVerify();
+                        },
                       ),
                       SizedBox(height: 16.h),
                       GestureDetector(
@@ -174,13 +180,19 @@ class VerificationScreen extends StatelessWidget {
                       Obx(() {
                         final canResend = controller.canResend;
                         final seconds = controller.secondsLeft.value;
+                        final isResending = controller.isResending.value;
+
                         return GestureDetector(
-                          onTap: canResend ? controller.onTapResend : null,
+                          onTap: canResend && !isResending
+                              ? controller.onTapResend
+                              : null,
                           child: Text.rich(
                             TextSpan(
                               children: [
                                 TextSpan(
-                                  text: 'Resend code in ',
+                                  text: isResending
+                                      ? 'Resending...'
+                                      : 'Resend code in ',
                                   style: getTextStyle(
                                     font: CustomFonts.inter,
                                     color: AppColors.featherGrey,
@@ -188,17 +200,18 @@ class VerificationScreen extends StatelessWidget {
                                     fontWeight: FontWeight.w400,
                                   ),
                                 ),
-                                TextSpan(
-                                  text: canResend
-                                      ? 'now'
-                                      : '${seconds.toString().padLeft(2, '0')}s',
-                                  style: TextStyle(
-                                    color: const Color(0xFFFFC200),
-                                    fontSize: 14.sp,
-                                    fontFamily: 'Inter',
-                                    fontWeight: FontWeight.w400,
+                                if (!isResending)
+                                  TextSpan(
+                                    text: canResend
+                                        ? 'now'
+                                        : '${seconds.toString().padLeft(2, '0')}s',
+                                    style: TextStyle(
+                                      color: const Color(0xFFFFC200),
+                                      fontSize: 14.sp,
+                                      fontFamily: 'Inter',
+                                      fontWeight: FontWeight.w400,
+                                    ),
                                   ),
-                                ),
                               ],
                             ),
                           ),
@@ -212,41 +225,6 @@ class VerificationScreen extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-}
-
-class _OtpCell extends StatelessWidget {
-  const _OtpCell({required this.index, required this.color});
-
-  final int index;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    final controller = Get.find<VerificationController>();
-    return TextField(
-      controller: controller.digits[index],
-      focusNode: controller.focuses[index],
-      textAlign: TextAlign.center,
-      keyboardType: TextInputType.number,
-      maxLength: 1,
-      style: TextStyle(
-        color: AppColors.eggshellWhite,
-        fontSize: 18.sp,
-        fontFamily: 'Inter',
-        fontWeight: FontWeight.w600,
-      ),
-      cursorColor: const Color(0xFFF8F8F8),
-      decoration: const InputDecoration(
-        counterText: '',
-        border: InputBorder.none,
-        enabledBorder: InputBorder.none,
-        focusedBorder: InputBorder.none,
-        isCollapsed: true,
-      ),
-      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-      onChanged: (value) => controller.onDigitChanged(index, value),
     );
   }
 }
