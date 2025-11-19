@@ -11,6 +11,9 @@ class VerificationController extends GetxController {
   final RxList<String> otpDigits = List.generate(6, (_) => '').obs;
   final LoginController loginController = Get.find<LoginController>();
 
+  // OTP Controller for pin_code_fields package
+  final TextEditingController otpController = TextEditingController();
+
   // Read arguments dynamically so the controller works correctly when reused
   String get phone => (Get.arguments is Map && Get.arguments['phone'] != null)
       ? Get.arguments['phone'].toString()
@@ -31,6 +34,7 @@ class VerificationController extends GetxController {
   final List<FocusNode> focuses = List.generate(6, (_) => FocusNode());
 
   final isVerifying = false.obs;
+  final isResending = false.obs;
   final errorMessage = ''.obs;
 
   final RxInt secondsLeft = 30.obs;
@@ -61,6 +65,19 @@ class VerificationController extends GetxController {
 
   bool get canResend => secondsLeft.value == 0;
 
+  void onOtpChanged(String value) {
+    for (int i = 0; i < value.length && i < 6; i++) {
+      otpDigits[i] = value[i];
+    }
+    for (int i = value.length; i < 6; i++) {
+      otpDigits[i] = '';
+    }
+
+    if (value.isNotEmpty && errorMessage.value.isNotEmpty) {
+      errorMessage.value = '';
+    }
+  }
+
   void onDigitChanged(int index, String value) {
     otpDigits[index] = value;
     if (value.length == 1 && index < 5) {
@@ -74,7 +91,7 @@ class VerificationController extends GetxController {
   }
 
   Future<void> onTapVerify() async {
-    final code = digits.map((e) => e.text).join();
+    final code = otpController.text.trim();
 
     if (_validateOtp(code)) {
       isVerifying.value = true;
@@ -141,10 +158,16 @@ class VerificationController extends GetxController {
   }
 
   Future<void> onTapResend() async {
-    if (!canResend) return;
+    if (!canResend || isResending.value) return;
+
+    isResending.value = true;
 
     try {
-      final response = await _auth.resendOtp(phone);
+      final response = await _auth.resendOtp(
+        phone,
+        name: name,
+        isLogin: isLogin,
+      );
 
       if (response.isSuccess) {
         if (response.responseData != null &&
@@ -175,12 +198,15 @@ class VerificationController extends GetxController {
         backgroundColor: Colors.red.withValues(alpha: 0.1),
         colorText: Colors.red,
       );
+    } finally {
+      isResending.value = false;
     }
   }
 
   /// Clear OTP inputs held in the controller (text fields and our observable list).
   /// Call this when leaving the verification flow so stale OTP isn't shown later.
   void clearOtp() {
+    otpController.clear();
     for (int i = 0; i < digits.length; i++) {
       try {
         digits[i].text = '';
@@ -199,6 +225,7 @@ class VerificationController extends GetxController {
   @override
   void onClose() {
     _timer?.cancel();
+    otpController.dispose();
     for (final c in digits) c.dispose();
     for (final f in focuses) f.dispose();
     super.onClose();
