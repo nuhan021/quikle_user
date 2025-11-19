@@ -353,7 +353,6 @@ class ProductDataService {
       );
     }
 
-    // For groceries and related categories (2: groceries, 3: cleaning, 4: personal care, 5: pet supplies)
     if (categoryId == '2' ||
         categoryId == '3' ||
         categoryId == '4' ||
@@ -363,7 +362,7 @@ class ProductDataService {
         limit: adjustedLimit,
       );
     }
-    // For medicine category (categoryId = '6'), fetch from API
+
     if (categoryId == '6') {
       return await fetchMedicineProducts(
         categoryId: categoryId,
