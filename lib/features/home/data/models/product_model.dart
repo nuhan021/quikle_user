@@ -39,25 +39,54 @@ class ProductModel {
     this.vendorResponseId,
   });
 
-  /// Factory constructor to create ProductModel from API response
+  /// Factory constructor to create ProductModel from API response or cached data
   factory ProductModel.fromJson(Map<String, dynamic> json) {
+    // Check if this is cached data (has 'imagePath') or API data (has 'image')
+    final bool isCachedData = json.containsKey('imagePath');
+
     return ProductModel(
       id: json['id'].toString(),
-      title: json['title'] as String,
-      description: json['description'] as String,
-      price: '\$${json['sell_price']}',
-      imagePath: json['image'] as String,
-      categoryId: json['category_id'].toString(),
-      subcategoryId: json['subcategory_id']?.toString(),
-      shopId: json['vendor_id'].toString(),
-      rating: (json['ratings'] as num?)?.toDouble() ?? 4.5,
+      title: (json['title'] as String?) ?? '',
+      description: (json['description'] as String?) ?? '',
+      // Handle both cached format and API format for price
+      price: isCachedData
+          ? (json['price'] as String?) ?? '\$0'
+          : '\$${json['sell_price'] ?? 0}',
+      // Handle both cached format (imagePath) and API format (image)
+      imagePath: isCachedData
+          ? (json['imagePath'] as String?) ?? ''
+          : (json['image'] as String?) ?? '',
+      // Handle both cached format and API format for categoryId
+      categoryId: isCachedData
+          ? (json['categoryId'] as String?) ?? ''
+          : json['category_id']?.toString() ?? '',
+      subcategoryId:
+          json['subcategoryId']?.toString() ??
+          json['subcategory_id']?.toString(),
+      // Handle both cached format and API format for shopId
+      shopId: isCachedData
+          ? (json['shopId'] as String?) ?? ''
+          : json['vendor_id']?.toString() ?? '',
+      rating: isCachedData
+          ? (json['rating'] as num?)?.toDouble() ?? 4.5
+          : (json['ratings'] as num?)?.toDouble() ?? 4.5,
       weight: json['weight']?.toString(),
-      isFavorite: false,
-      reviewsCount: json['total_sale'] as int? ?? 0,
-      isOTC: json['is_otc'] as bool? ?? false,
-      productType: json['product_type'] as String?,
-      isPrescriptionMedicine:
-          json['is_prescription_medicine'] as bool? ?? false,
+      isFavorite: json['isFavorite'] as bool? ?? false,
+      reviewsCount: isCachedData
+          ? (json['reviewsCount'] as int?) ?? 0
+          : (json['total_sale'] as int?) ?? 0,
+      isOTC: isCachedData
+          ? (json['isOTC'] as bool?) ?? false
+          : (json['is_otc'] as bool?) ?? false,
+      productType:
+          json['productType'] as String? ?? json['product_type'] as String?,
+      isPrescriptionMedicine: isCachedData
+          ? (json['isPrescriptionMedicine'] as bool?) ?? false
+          : (json['is_prescription_medicine'] as bool?) ?? false,
+      hasPrescriptionUploaded:
+          json['hasPrescriptionUploaded'] as bool? ?? false,
+      prescriptionId: json['prescriptionId'] as String?,
+      vendorResponseId: json['vendorResponseId'] as String?,
     );
   }
 
