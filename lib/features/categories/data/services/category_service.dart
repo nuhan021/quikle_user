@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'package:quikle_user/core/models/response_data.dart';
 import 'package:quikle_user/core/services/network_caller.dart';
+import 'package:quikle_user/core/services/storage_service.dart';
 import 'package:quikle_user/core/utils/constants/api_constants.dart';
 import 'package:quikle_user/core/utils/constants/image_path.dart';
 import 'package:quikle_user/core/utils/logging/logger.dart';
 import 'package:quikle_user/features/categories/data/models/subcategory_model.dart';
+import 'package:quikle_user/features/categories/data/models/sub_subcategory_model.dart';
 import 'package:quikle_user/features/home/data/models/product_model.dart';
 import 'package:quikle_user/core/data/services/product_data_service.dart';
 
@@ -15,6 +17,10 @@ class CategoryService {
   Future<List<SubcategoryModel>> _fetchSubcategoriesFromApi(
     String categoryId,
   ) async {
+    AppLoggerHelper.debug('User token is: ${StorageService.token}');
+    AppLoggerHelper.debug(
+      'User Refresh token is: ${StorageService.refreshToken}',
+    );
     try {
       final url = ApiConstants.getSubcategoriesByCategory.replaceAll(
         '{category_id}',
@@ -35,6 +41,39 @@ class CategoryService {
       return [];
     } catch (e) {
       AppLoggerHelper.error('❌ Error fetching subcategories', e);
+      return [];
+    }
+  }
+
+  Future<List<SubSubcategoryModel>> fetchSubSubcategoriesBySubcategory(
+    String subcategoryId,
+  ) async {
+    try {
+      final url = ApiConstants.getSubSubcategoriesBySubcategory.replaceAll(
+        '{subcategory_id}',
+        subcategoryId,
+      );
+
+      AppLoggerHelper.debug('Fetching sub-subcategories from: $url');
+
+      final ResponseData response = await _networkCaller.getRequest(url);
+
+      if (response.isSuccess && response.responseData != null) {
+        final responseMap = response.responseData as Map<String, dynamic>;
+        final List data = responseMap['data'] as List;
+
+        AppLoggerHelper.debug('Found ${data.length} sub-subcategories');
+
+        final subSubcategories = data
+            .map((json) => SubSubcategoryModel.fromJson(json))
+            .toList();
+        return subSubcategories;
+      }
+
+      AppLoggerHelper.warning('No sub-subcategories found or API call failed');
+      return [];
+    } catch (e) {
+      AppLoggerHelper.error('❌ Error fetching sub-subcategories', e);
       return [];
     }
   }
@@ -90,246 +129,77 @@ class CategoryService {
   }
 
   Future<List<SubcategoryModel>> fetchProduceSubcategories() async {
-    return [
-      const SubcategoryModel(
-        id: 'produce_vegetables',
-        title: 'Vegetables',
-        description: 'Fresh vegetables',
-        iconPath: ImagePath.groceryIcon,
-        categoryId: '2',
-        parentSubcategoryId: 'grocery_produce',
-      ),
-      const SubcategoryModel(
-        id: 'produce_fruits',
-        title: 'Fruits',
-        description: 'Fresh fruits',
-        iconPath: ImagePath.groceryIcon,
-        categoryId: '2',
-        parentSubcategoryId: 'grocery_produce',
-      ),
-      const SubcategoryModel(
-        id: 'produce_herbs',
-        title: 'Herbs',
-        description: 'Fresh herbs and spices',
-        iconPath: ImagePath.groceryIcon,
-        categoryId: '2',
-        parentSubcategoryId: 'grocery_produce',
-      ),
-      const SubcategoryModel(
-        id: 'produce_packaged',
-        title: 'Packaged',
-        description: 'Pre-packaged produce items',
-        iconPath: ImagePath.groceryIcon,
-        categoryId: '2',
-        parentSubcategoryId: 'grocery_produce',
-      ),
-    ];
+    // This method is now generic - it gets the subcategory ID from the calling context
+    // For backward compatibility, we return empty list
+    // The proper way is to call fetchSubSubcategoriesBySubcategory with the actual subcategory ID
+    return [];
+  }
+
+  Future<List<SubcategoryModel>> fetchCookingSubcategories() async {
+    // Same as above - deprecated, returns empty
+    return [];
+  }
+
+  Future<List<SubcategoryModel>> fetchMeatsSubcategories() async {
+    // Same as above - deprecated, returns empty
+    return [];
+  }
+
+  Future<List<SubcategoryModel>> fetchOilsSubcategories() async {
+    // Same as above - deprecated, returns empty
+    return [];
+  }
+
+  Future<List<SubcategoryModel>> fetchDairySubcategories() async {
+    // Same as above - deprecated, returns empty
+    return [];
+  }
+
+  Future<List<SubcategoryModel>> fetchGrainsSubcategories() async {
+    // Same as above - deprecated, returns empty
+    return [];
+  }
+
+  // New method to fetch sub-subcategories and convert to SubcategoryModel for UI compatibility
+  Future<List<SubcategoryModel>> fetchSubSubcategoriesAsSubcategories(
+    String subcategoryId,
+  ) async {
+    final subSubcategories = await fetchSubSubcategoriesBySubcategory(
+      subcategoryId,
+    );
+
+    return subSubcategories
+        .map(
+          (subSub) => SubcategoryModel(
+            id: subSub.id,
+            title: subSub.name,
+            description: subSub.description ?? '',
+            iconPath: subSub.avatar,
+            categoryId: subSub.subcategory.category.id,
+            parentSubcategoryId: subSub.subcategory.id,
+          ),
+        )
+        .toList();
   }
 
   Future<List<SubcategoryModel>> fetchSubcategories(
     String categoryId, {
     String? parentSubcategoryId,
   }) async {
-    // For subcategories with parent (nested categories), use API with parent filter
+    // For subcategories with parent (nested categories like grocery sub-subcategories)
     if (parentSubcategoryId != null) {
-      // TODO: Implement API endpoint for nested subcategories if available
-      // For now, return empty or implement nested logic
-      return [];
+      // Fetch sub-subcategories and convert them to SubcategoryModel
+      return fetchSubSubcategoriesAsSubcategories(parentSubcategoryId);
     }
 
-    // For all categories, fetch from API
+    // For all categories, fetch subcategories from API
     return _fetchSubcategoriesFromApi(categoryId);
-  }
-
-  Future<List<SubcategoryModel>> fetchCookingSubcategories() async {
-    return [
-      const SubcategoryModel(
-        id: 'cooking_spices',
-        title: 'Spices',
-        description: 'Herbs and spices',
-        iconPath: ImagePath.groceryIcon,
-        categoryId: '2',
-        parentSubcategoryId: 'grocery_cooking',
-      ),
-      const SubcategoryModel(
-        id: 'cooking_condiments',
-        title: 'Condiments',
-        description: 'Sauces and condiments',
-        iconPath: ImagePath.groceryIcon,
-        categoryId: '2',
-        parentSubcategoryId: 'grocery_cooking',
-      ),
-      const SubcategoryModel(
-        id: 'cooking_baking',
-        title: 'Baking',
-        description: 'Baking ingredients',
-        iconPath: ImagePath.groceryIcon,
-        categoryId: '2',
-        parentSubcategoryId: 'grocery_cooking',
-      ),
-      const SubcategoryModel(
-        id: 'cooking_canned',
-        title: 'Canned Foods',
-        description: 'Canned and preserved foods',
-        iconPath: ImagePath.groceryIcon,
-        categoryId: '2',
-        parentSubcategoryId: 'grocery_cooking',
-      ),
-    ];
-  }
-
-  Future<List<SubcategoryModel>> fetchMeatsSubcategories() async {
-    return [
-      const SubcategoryModel(
-        id: 'meats_chicken',
-        title: 'Chicken',
-        description: 'Fresh chicken and poultry',
-        iconPath: ImagePath.groceryIcon,
-        categoryId: '2',
-        parentSubcategoryId: 'grocery_meats',
-      ),
-      const SubcategoryModel(
-        id: 'meats_beef',
-        title: 'Beef',
-        description: 'Fresh beef cuts',
-        iconPath: ImagePath.groceryIcon,
-        categoryId: '2',
-        parentSubcategoryId: 'grocery_meats',
-      ),
-      const SubcategoryModel(
-        id: 'meats_fish',
-        title: 'Fish & Seafood',
-        description: 'Fresh fish and seafood',
-        iconPath: ImagePath.groceryIcon,
-        categoryId: '2',
-        parentSubcategoryId: 'grocery_meats',
-      ),
-      const SubcategoryModel(
-        id: 'meats_processed',
-        title: 'Processed Meats',
-        description: 'Sausages, bacon, and deli meats',
-        iconPath: ImagePath.groceryIcon,
-        categoryId: '2',
-        parentSubcategoryId: 'grocery_meats',
-      ),
-    ];
-  }
-
-  Future<List<SubcategoryModel>> fetchOilsSubcategories() async {
-    return [
-      const SubcategoryModel(
-        id: 'oils_cooking',
-        title: 'Cooking Oils',
-        description: 'Cooking and frying oils',
-        iconPath: ImagePath.groceryIcon,
-        categoryId: '2',
-        parentSubcategoryId: 'grocery_oils',
-      ),
-      const SubcategoryModel(
-        id: 'oils_olive',
-        title: 'Olive Oil',
-        description: 'Extra virgin and regular olive oil',
-        iconPath: ImagePath.groceryIcon,
-        categoryId: '2',
-        parentSubcategoryId: 'grocery_oils',
-      ),
-      const SubcategoryModel(
-        id: 'oils_specialty',
-        title: 'Specialty Oils',
-        description: 'Coconut, sesame, and other specialty oils',
-        iconPath: ImagePath.groceryIcon,
-        categoryId: '2',
-        parentSubcategoryId: 'grocery_oils',
-      ),
-      const SubcategoryModel(
-        id: 'oils_vinegar',
-        title: 'Vinegar',
-        description: 'Cooking vinegars and dressings',
-        iconPath: ImagePath.groceryIcon,
-        categoryId: '2',
-        parentSubcategoryId: 'grocery_oils',
-      ),
-    ];
-  }
-
-  Future<List<SubcategoryModel>> fetchDairySubcategories() async {
-    return [
-      const SubcategoryModel(
-        id: 'dairy_milk',
-        title: 'Milk',
-        description: 'Fresh milk and alternatives',
-        iconPath: ImagePath.groceryIcon,
-        categoryId: '2',
-        parentSubcategoryId: 'grocery_dairy',
-      ),
-      const SubcategoryModel(
-        id: 'dairy_cheese',
-        title: 'Cheese',
-        description: 'Various types of cheese',
-        iconPath: ImagePath.groceryIcon,
-        categoryId: '2',
-        parentSubcategoryId: 'grocery_dairy',
-      ),
-      const SubcategoryModel(
-        id: 'dairy_yogurt',
-        title: 'Yogurt',
-        description: 'Greek yogurt, regular yogurt',
-        iconPath: ImagePath.groceryIcon,
-        categoryId: '2',
-        parentSubcategoryId: 'grocery_dairy',
-      ),
-      const SubcategoryModel(
-        id: 'dairy_eggs',
-        title: 'Eggs',
-        description: 'Fresh eggs and egg products',
-        iconPath: ImagePath.groceryIcon,
-        categoryId: '2',
-        parentSubcategoryId: 'grocery_dairy',
-      ),
-    ];
-  }
-
-  Future<List<SubcategoryModel>> fetchGrainsSubcategories() async {
-    return [
-      const SubcategoryModel(
-        id: 'grains_rice',
-        title: 'Rice',
-        description: 'Basmati, jasmine, and other rice varieties',
-        iconPath: ImagePath.groceryIcon,
-        categoryId: '2',
-        parentSubcategoryId: 'grocery_grains',
-      ),
-      const SubcategoryModel(
-        id: 'grains_flour',
-        title: 'Flour',
-        description: 'Wheat, almond, and specialty flours',
-        iconPath: ImagePath.groceryIcon,
-        categoryId: '2',
-        parentSubcategoryId: 'grocery_grains',
-      ),
-      const SubcategoryModel(
-        id: 'grains_cereal',
-        title: 'Cereals',
-        description: 'Breakfast cereals and oats',
-        iconPath: ImagePath.groceryIcon,
-        categoryId: '2',
-        parentSubcategoryId: 'grocery_grains',
-      ),
-      const SubcategoryModel(
-        id: 'grains_pasta',
-        title: 'Pasta',
-        description: 'Dried pasta and noodles',
-        iconPath: ImagePath.groceryIcon,
-        categoryId: '2',
-        parentSubcategoryId: 'grocery_grains',
-      ),
-    ];
   }
 
   Future<List<ProductModel>> fetchProductsBySubcategory(
     String subcategoryId,
   ) async {
-    return _productService.getProductsBySubcategory(subcategoryId);
+    return await _productService.getProductsBySubcategory(subcategoryId);
   }
 
   Future<List<SubcategoryModel>> fetchPopularSubcategories(
@@ -339,23 +209,37 @@ class CategoryService {
     return fetchSubcategories(categoryId);
   }
 
-  Future<List<ProductModel>> fetchFeaturedProducts(String categoryId) async {
-    return _productService.getFeaturedProducts(categoryId);
+  Future<List<ProductModel>> fetchFeaturedProducts(
+    String categoryId, {
+    int limit = 9,
+  }) async {
+    return await _productService.getFeaturedProducts(categoryId, limit: limit);
   }
 
-  Future<List<ProductModel>> fetchRecommendedProducts(String categoryId) async {
-    return _productService.getRecommendedProducts(categoryId);
+  Future<List<ProductModel>> fetchRecommendedProducts(
+    String categoryId, {
+    int limit = 9,
+  }) async {
+    return await _productService.getRecommendedProducts(
+      categoryId,
+      limit: limit,
+    );
   }
 
   Future<List<ProductModel>> fetchProductsByMainCategory(
-    String mainCategoryId,
-  ) async {
+    String mainCategoryId, {
+    int limit = 9,
+  }) async {
     return _productService.getProductsByMainCategory(mainCategoryId);
   }
 
   Future<List<ProductModel>> fetchAllProductsByCategory(
-    String categoryId,
-  ) async {
-    return _productService.getProductsByCategory(categoryId);
+    String categoryId, {
+    int limit = 9,
+  }) async {
+    return await _productService.getProductsByCategory(
+      categoryId,
+      limit: limit,
+    );
   }
 }

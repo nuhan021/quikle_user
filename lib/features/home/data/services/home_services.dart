@@ -5,12 +5,13 @@ import 'package:quikle_user/core/utils/constants/api_constants.dart';
 import 'package:quikle_user/core/utils/constants/image_path.dart';
 import 'package:quikle_user/features/home/data/models/category_model.dart';
 import 'package:quikle_user/features/home/data/models/product_model.dart';
-import 'package:quikle_user/features/home/data/models/shop_model.dart';
 import 'package:quikle_user/core/data/services/product_data_service.dart';
+import 'package:quikle_user/core/data/services/category_cache_service.dart';
 
 class HomeService {
   final ProductDataService _productService = ProductDataService();
   final NetworkCaller _networkCaller = NetworkCaller();
+  final CategoryCacheService _cacheService = CategoryCacheService();
 
   Future<List<CategoryModel>> fetchCategories() async {
     final ResponseData response = await _networkCaller.getRequest(
@@ -40,83 +41,84 @@ class HomeService {
     }
   }
 
-  Future<List<ShopModel>> fetchShops() async {
-    return [
-      const ShopModel(
-        id: 'shop_1',
-        name: 'Tandoori Tarang',
-        image: ImagePath.profileIcon,
-        deliveryTime: '30-35 min',
-        rating: 4.8,
-        address: '123 Food Street, City',
-      ),
-      const ShopModel(
-        id: 'shop_2',
-        name: 'Fresh Market',
-        image: ImagePath.profileIcon,
-        deliveryTime: '25-30 min',
-        rating: 4.6,
-        address: '456 Market Lane, City',
-      ),
-      const ShopModel(
-        id: 'shop_3',
-        name: 'Health Plus Pharmacy',
-        image: ImagePath.profileIcon,
-        deliveryTime: '15-20 min',
-        rating: 4.9,
-        address: '789 Health Ave, City',
-      ),
-    ];
+  Future<List<ProductSectionModel>> fetchProductSections() async {
+    // Try to load from cache first
+    final cachedSections = await _cacheService.getCachedHomeProductSections();
+
+    if (cachedSections != null && cachedSections.isNotEmpty) {
+      print('📦 Loaded ${cachedSections.length} product sections from cache');
+
+      // Return cached data immediately, then fetch fresh data in background
+      _fetchAndCacheProductSections();
+
+      return cachedSections;
+    }
+
+    // No cache available, fetch from API
+    print('🌐 Fetching product sections from API');
+    return await _fetchAndCacheProductSections();
   }
 
-  Future<List<ProductSectionModel>> fetchProductSections() async {
-    return [
+  /// Internal method to fetch and cache product sections
+  Future<List<ProductSectionModel>> _fetchAndCacheProductSections() async {
+    final List<Future<List<ProductModel>>> productFutures = [
+      _productService.getProductsByCategory('1', limit: 6),
+      _productService.getProductsByCategory('2', limit: 6),
+      _productService.getProductsByCategory('3', limit: 6),
+      _productService.getProductsByCategory('4', limit: 6),
+      _productService.getProductsByCategory('5', limit: 6),
+      _productService.getProductsByCategory('6', limit: 6),
+    ];
+
+    final List<List<ProductModel>> results = await Future.wait(productFutures);
+
+    final sections = [
       ProductSectionModel(
         id: 'section_1',
         viewAllText: 'View all',
-        products: _productService.getProductsByCategory('1').take(6).toList(),
+        products: results[0],
         categoryId: '1',
       ),
       ProductSectionModel(
         id: 'section_2',
         viewAllText: 'View all',
-        products: _productService.getProductsByCategory('2').take(6).toList(),
+        products: results[1],
         categoryId: '2',
       ),
       ProductSectionModel(
         id: 'section_3',
         viewAllText: 'View all',
-        products: _productService.getProductsByCategory('3').take(6).toList(),
+        products: results[2],
         categoryId: '3',
       ),
       ProductSectionModel(
         id: 'section_4',
         viewAllText: 'View all',
-        products: _productService.getProductsByCategory('4').take(6).toList(),
+        products: results[3],
         categoryId: '4',
       ),
       ProductSectionModel(
         id: 'section_5',
         viewAllText: 'View all',
-        products: _productService.getProductsByCategory('5').take(6).toList(),
+        products: results[4],
         categoryId: '5',
       ),
       ProductSectionModel(
         id: 'section_6',
         viewAllText: 'View all',
-        products: _productService.getProductsByCategory('6').take(6).toList(),
+        products: results[5],
         categoryId: '6',
       ),
-      ProductSectionModel(
-        id: 'section_7',
-        viewAllText: 'View all',
-        products: _productService.getProductsByCategory('7').take(6).toList(),
-        categoryId: '7',
-      ),
     ];
+
+    // Cache the sections
+    await _cacheService.cacheHomeProductSections(sections);
+    print('💾 Cached ${sections.length} product sections');
+
+    return sections;
   }
 
   Future<List<ProductModel>> fetchAllProducts() async {
-    return _productService.allProducts;
+    return [];
   }
 }

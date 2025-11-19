@@ -6,6 +6,8 @@ import 'package:quikle_user/features/home/data/models/product_model.dart';
 import 'package:quikle_user/features/home/data/models/shop_model.dart';
 import 'package:quikle_user/features/categories/data/models/subcategory_model.dart';
 import 'package:quikle_user/features/categories/data/services/category_service.dart';
+import 'package:quikle_user/core/data/services/product_data_service.dart';
+import 'package:quikle_user/core/data/services/category_cache_service.dart';
 import 'package:quikle_user/features/restaurants/data/models/restaurant_model.dart';
 import 'package:quikle_user/features/restaurants/data/services/restaurant_service.dart';
 import 'package:quikle_user/features/cart/controllers/cart_controller.dart';
@@ -15,10 +17,16 @@ import 'package:quikle_user/core/mixins/voice_search_mixin.dart';
 
 class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
   final CategoryService _categoryService = CategoryService();
+  final ProductDataService _productDataService = ProductDataService();
   final RestaurantService _restaurantService = RestaurantService();
+  final CategoryCacheService _cacheService = CategoryCacheService();
   final CartController _cartController = Get.find<CartController>();
 
   final isLoading = false.obs;
+  final isLoadingProducts = false.obs;
+  final isLoadingMore = false.obs;
+  final hasMore = true.obs;
+  final currentOffset = 0.obs;
   final categoryTitle = ''.obs;
   final productsTitle = 'All Products'.obs;
   final sectionTitle = ''.obs;
@@ -53,7 +61,7 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
   late CategoryModel currentCategory;
   bool get isGroceryCategory => currentCategory.id == '2';
   bool get isFoodCategory => currentCategory.id == '1';
-  bool get isMedicineCategory => currentCategory.id == '3';
+  bool get isMedicineCategory => currentCategory.id == '6';
 
   bool get shouldShowCombinedSection => selectedSubcategory.value != null;
 
@@ -213,71 +221,251 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
   }
 
   Future<void> _loadGroceryMainCategories() async {
-    // Use the same API method as other categories
-    final mainCategories = await _categoryService.fetchSubcategories(
-      currentCategory.id,
+    // Try to get cached data in parallel
+    final results = await Future.wait([
+      _cacheService.getCachedSubcategories(categoryId: currentCategory.id),
+      _cacheService.getCachedProducts(categoryId: currentCategory.id),
+    ]);
+
+    final cachedSubcategories = results[0] as List<SubcategoryModel>?;
+    final cachedProducts = results[1] as List<ProductModel>?;
+
+    // If we have both cached data, use it immediately
+    if (cachedSubcategories != null && cachedProducts != null) {
+      print('✅ Using cached data for category: ${currentCategory.id}');
+      allCategories.value = cachedSubcategories;
+      availableSubcategories.value = cachedSubcategories;
+      sectionTitle.value = 'Select Category';
+
+      allProducts.value = cachedProducts;
+      displayProducts.value = cachedProducts;
+      productsTitle.value = 'All ${currentCategory.title}';
+
+      selectedMainCategory.value = null;
+      filterSubcategories.clear();
+      currentOffset.value = 0;
+      hasMore.value = true;
+
+      // Fetch fresh data in background to update cache
+      _refreshGroceryDataInBackground();
+      return;
+    }
+
+    // If no cache, fetch from API in parallel
+    print(
+      '🌐 No cache found, fetching from API for category: ${currentCategory.id}',
     );
 
+    // Fetch BOTH subcategories and products concurrently using Future.wait
+    final apiResults = await Future.wait([
+      _categoryService.fetchSubcategories(currentCategory.id),
+      _categoryService.fetchAllProductsByCategory(currentCategory.id, limit: 9),
+    ]);
+
+    final mainCategories = apiResults[0] as List<SubcategoryModel>;
+    final products = apiResults[1] as List<ProductModel>;
+
+    // Update all data at once
     allCategories.value = mainCategories;
     availableSubcategories.value = mainCategories;
     sectionTitle.value = 'Select Category';
+    selectedMainCategory.value = null;
+    filterSubcategories.clear();
+    currentOffset.value = 0;
+    hasMore.value = true;
 
-    final products = await _categoryService.fetchAllProductsByCategory(
-      currentCategory.id,
-    );
     allProducts.value = products;
     displayProducts.value = products;
     productsTitle.value = 'All ${currentCategory.title}';
 
-    selectedMainCategory.value = null;
-    filterSubcategories.clear();
+    // Cache both in parallel
+    await Future.wait([
+      _cacheService.cacheSubcategories(
+        categoryId: currentCategory.id,
+        subcategories: mainCategories,
+      ),
+      _cacheService.cacheProducts(
+        categoryId: currentCategory.id,
+        products: products,
+      ),
+    ]);
+  }
+
+  /// Refresh grocery data in background (after showing cached data)
+  Future<void> _refreshGroceryDataInBackground() async {
+    try {
+      // Fetch both subcategories and products in parallel
+      final results = await Future.wait([
+        _categoryService.fetchSubcategories(currentCategory.id),
+        _categoryService.fetchAllProductsByCategory(
+          currentCategory.id,
+          limit: 9,
+        ),
+      ]);
+
+      final mainCategories = results[0] as List<SubcategoryModel>;
+      final products = results[1] as List<ProductModel>;
+
+      // Update cache with fresh data in parallel
+      await Future.wait([
+        _cacheService.cacheSubcategories(
+          categoryId: currentCategory.id,
+          subcategories: mainCategories,
+        ),
+        _cacheService.cacheProducts(
+          categoryId: currentCategory.id,
+          products: products,
+        ),
+      ]);
+
+      // Only update UI if data has changed
+      if (mainCategories.length != allCategories.length ||
+          products.length != allProducts.length) {
+        allCategories.value = mainCategories;
+        availableSubcategories.value = mainCategories;
+        allProducts.value = products;
+        displayProducts.value = products;
+      }
+    } catch (e) {
+      print('Error refreshing grocery data in background: $e');
+    }
   }
 
   Future<void> _loadCategorySubcategories() async {
-    final subcategories = await _categoryService.fetchSubcategories(
-      currentCategory.id,
+    // Try to get cached data in parallel
+    final results = await Future.wait([
+      _cacheService.getCachedSubcategories(categoryId: currentCategory.id),
+      _cacheService.getCachedProducts(categoryId: currentCategory.id),
+    ]);
+
+    final cachedSubcategories = results[0] as List<SubcategoryModel>?;
+    final cachedProducts = results[1] as List<ProductModel>?;
+
+    // If we have both cached data, use it immediately
+    if (cachedSubcategories != null && cachedProducts != null) {
+      print('✅ Using cached data for category: ${currentCategory.id}');
+      allCategories.value = cachedSubcategories;
+      availableSubcategories.value = cachedSubcategories;
+      sectionTitle.value = 'Popular Items';
+
+      allProducts.value = cachedProducts;
+      displayProducts.value = cachedProducts;
+      productsTitle.value = 'All ${currentCategory.title}';
+
+      selectedSubcategory.value = null;
+      currentOffset.value = 0;
+      hasMore.value = true;
+
+      // Fetch fresh data in background to update cache
+      _refreshCategoryDataInBackground();
+      return;
+    }
+
+    // If no cache, fetch from API
+    print(
+      '🌐 No cache found, fetching from API for category: ${currentCategory.id}',
     );
+
+    // Fetch BOTH subcategories and products concurrently using Future.wait
+    final apiResults = await Future.wait([
+      _categoryService.fetchSubcategories(currentCategory.id),
+      _categoryService.fetchAllProductsByCategory(currentCategory.id, limit: 9),
+    ]);
+
+    final subcategories = apiResults[0] as List<SubcategoryModel>;
+    final products = apiResults[1] as List<ProductModel>;
+
+    // Update all data at once
     allCategories.value = subcategories;
     availableSubcategories.value = subcategories;
     sectionTitle.value = 'Popular Items';
+    selectedSubcategory.value = null;
+    currentOffset.value = 0;
+    hasMore.value = true;
 
-    final products = await _categoryService.fetchAllProductsByCategory(
-      currentCategory.id,
-    );
     allProducts.value = products;
-
     displayProducts.value = products;
     productsTitle.value = 'All ${currentCategory.title}';
 
-    selectedSubcategory.value = null;
+    // Cache both in parallel
+    await Future.wait([
+      _cacheService.cacheSubcategories(
+        categoryId: currentCategory.id,
+        subcategories: subcategories,
+      ),
+      _cacheService.cacheProducts(
+        categoryId: currentCategory.id,
+        products: products,
+      ),
+    ]);
 
-    if (!isGroceryCategory) {
-      await _loadRecommendedProducts();
-    }
+    // TODO: Recommended products will come from API later
+    // if (!isGroceryCategory) {
+    //   await _loadRecommendedProducts();
+    // }
   }
 
-  Future<void> _loadRecommendedProducts() async {
+  /// Refresh category data in background (after showing cached data)
+  Future<void> _refreshCategoryDataInBackground() async {
     try {
-      final products = await _categoryService.fetchRecommendedProducts(
-        currentCategory.id,
-      );
-      recommendedProducts.value = products;
+      // Fetch both subcategories and products in parallel
+      final results = await Future.wait([
+        _categoryService.fetchSubcategories(currentCategory.id),
+        _categoryService.fetchAllProductsByCategory(
+          currentCategory.id,
+          limit: 9,
+        ),
+      ]);
+
+      final subcategories = results[0] as List<SubcategoryModel>;
+      final products = results[1] as List<ProductModel>;
+
+      // Update cache with fresh data in parallel
+      await Future.wait([
+        _cacheService.cacheSubcategories(
+          categoryId: currentCategory.id,
+          subcategories: subcategories,
+        ),
+        _cacheService.cacheProducts(
+          categoryId: currentCategory.id,
+          products: products,
+        ),
+      ]);
+
+      // Only update UI if data has changed
+      if (subcategories.length != allCategories.length ||
+          products.length != allProducts.length) {
+        allCategories.value = subcategories;
+        availableSubcategories.value = subcategories;
+        allProducts.value = products;
+        displayProducts.value = products;
+      }
     } catch (e) {
-      print('Error loading recommended products: $e');
+      print('Error refreshing category data in background: $e');
     }
   }
+
+  // TODO: Re-enable when recommended products API is ready
+  // Future<void> _loadRecommendedProducts() async {
+  //   try {
+  //     final products = await _categoryService.fetchRecommendedProducts(
+  //       currentCategory.id,
+  //       limit: 8, // Only load 8 recommended products
+  //     );
+  //     recommendedProducts.value = products;
+  //   } catch (e) {
+  //     print('Error loading recommended products: $e');
+  //   }
+  // }
 
   void onSubcategoryTap(SubcategoryModel? subcategory) async {
     try {
-      isLoading.value = true;
-
       // Handle "All" option
       if (subcategory == null) {
         selectedSubcategory.value = null;
         showingAllProducts.value = false;
-        displayProducts.value = allProducts;
+        displayProducts.value = allProducts.take(9).toList();
         productsTitle.value = 'All Items';
-        isLoading.value = false;
         return;
       }
 
@@ -295,19 +483,144 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
           selectedSubcategory.value = subcategory;
           showingAllProducts.value = false;
           applyFilter(subcategory.id);
+          return;
         }
-      } else if (isFoodCategory) {
+      }
+
+      // Check if we already have products for this subcategory
+      final existingProducts = allProducts
+          .where((p) => p.subcategoryId == subcategory.id)
+          .toList();
+
+      if (existingProducts.isNotEmpty) {
+        // We already have products for this subcategory, just filter them
+        print(
+          '✅ Filtering existing products for subcategory: ${subcategory.id}',
+        );
         selectedSubcategory.value = subcategory;
         showingAllProducts.value = false;
-        final filteredProducts = allProducts
-            .where(
-              (product) =>
-                  product.subcategoryId != null &&
-                  product.subcategoryId == subcategory.id,
-            )
-            .toList();
-        displayProducts.value = filteredProducts;
+        currentOffset.value = 0;
+        hasMore.value = existingProducts.length > 9;
+        displayProducts.value = existingProducts.take(9).toList();
         productsTitle.value = '${subcategory.title} Items';
+        return;
+      }
+
+      // Try to get cached products for this subcategory
+      final cachedProducts = await _cacheService.getCachedProducts(
+        categoryId: currentCategory.id,
+        subcategoryId: subcategory.id,
+      );
+
+      if (cachedProducts != null) {
+        print('✅ Using cached products for subcategory: ${subcategory.id}');
+        selectedSubcategory.value = subcategory;
+        showingAllProducts.value = false;
+        currentOffset.value = 0;
+        hasMore.value = true;
+
+        // Add to allProducts if not already there
+        for (var product in cachedProducts) {
+          if (!allProducts.any((p) => p.id == product.id)) {
+            allProducts.add(product);
+          }
+        }
+        displayProducts.value = cachedProducts;
+        productsTitle.value = '${subcategory.title} Items';
+
+        // Fetch fresh data in background
+        _refreshSubcategoryDataInBackground(subcategory);
+        return;
+      }
+
+      // If we don't have cached products, fetch from API
+      print('🌐 Fetching products from API for subcategory: ${subcategory.id}');
+      isLoadingProducts.value = true;
+
+      if (isFoodCategory) {
+        // For food category, fetch only 9 products for the subcategory
+        selectedSubcategory.value = subcategory;
+        showingAllProducts.value = false;
+        currentOffset.value = 0;
+        hasMore.value = true;
+
+        final products = await _productDataService.getProductsBySubcategory(
+          subcategory.id,
+          limit: 9,
+          categoryId: currentCategory.id, // Pass category ID
+        );
+        // Add to allProducts if not already there
+        for (var product in products) {
+          if (!allProducts.any((p) => p.id == product.id)) {
+            allProducts.add(product);
+          }
+        }
+        displayProducts.value = products;
+        productsTitle.value = '${subcategory.title} Items';
+
+        // Cache the fetched products
+        await _cacheService.cacheProducts(
+          categoryId: currentCategory.id,
+          subcategoryId: subcategory.id,
+          products: products,
+        );
+      } else if (isMedicineCategory) {
+        // For medicine category, fetch only 9 products for the subcategory
+        selectedSubcategory.value = subcategory;
+        showingAllProducts.value = false;
+        currentOffset.value = 0;
+        hasMore.value = true;
+
+        final products = await _productDataService.getProductsBySubcategory(
+          subcategory.id,
+          limit: 9,
+          categoryId: currentCategory.id, // Pass category ID
+        );
+        // Add to allProducts if not already there
+        for (var product in products) {
+          if (!allProducts.any((p) => p.id == product.id)) {
+            allProducts.add(product);
+          }
+        }
+        displayProducts.value = products;
+        productsTitle.value = '${subcategory.title} Items';
+
+        // Cache the fetched products
+        await _cacheService.cacheProducts(
+          categoryId: currentCategory.id,
+          subcategoryId: subcategory.id,
+          products: products,
+        );
+      } else if (currentCategory.id == '2' ||
+          currentCategory.id == '3' ||
+          currentCategory.id == '4' ||
+          currentCategory.id == '5') {
+        // For groceries/cleaning/personal/pet categories, fetch from API
+        selectedSubcategory.value = subcategory;
+        showingAllProducts.value = false;
+        currentOffset.value = 0;
+        hasMore.value = true;
+
+        final products = await _productDataService.getProductsBySubcategory(
+          subcategory.id,
+          limit: 9,
+          categoryId: currentCategory.id, // Pass category ID
+        );
+        // Add to allProducts if not already there
+        for (var product in products) {
+          if (!allProducts.any((p) => p.id == product.id)) {
+            allProducts.add(product);
+          }
+        }
+        displayProducts.value = products;
+        productsTitle.value = '${subcategory.title} Items';
+
+        // Cache the fetched products
+        await _cacheService.cacheProducts(
+          categoryId: currentCategory.id,
+          subcategoryId: subcategory.id,
+          products: products,
+        );
       } else {
         selectedSubcategory.value = subcategory;
         showingAllProducts.value = false;
@@ -317,6 +630,7 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
                   product.subcategoryId != null &&
                   product.subcategoryId == subcategory.id,
             )
+            .take(9)
             .toList();
         displayProducts.value = filteredProducts;
         productsTitle.value = '${subcategory.title} Items ';
@@ -324,7 +638,41 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
     } catch (e) {
       print('Error loading subcategory: $e');
     } finally {
-      isLoading.value = false;
+      isLoadingProducts.value = false;
+    }
+  }
+
+  /// Refresh subcategory data in background (after showing cached data)
+  Future<void> _refreshSubcategoryDataInBackground(
+    SubcategoryModel subcategory,
+  ) async {
+    try {
+      final products = await _productDataService.getProductsBySubcategory(
+        subcategory.id,
+        limit: 9,
+        categoryId: currentCategory.id,
+      );
+
+      // Update cache with fresh data
+      await _cacheService.cacheProducts(
+        categoryId: currentCategory.id,
+        subcategoryId: subcategory.id,
+        products: products,
+      );
+
+      // Only update UI if we're still on the same subcategory and data has changed
+      if (selectedSubcategory.value?.id == subcategory.id &&
+          products.length != displayProducts.length) {
+        // Add to allProducts if not already there
+        for (var product in products) {
+          if (!allProducts.any((p) => p.id == product.id)) {
+            allProducts.add(product);
+          }
+        }
+        displayProducts.value = products;
+      }
+    } catch (e) {
+      print('Error refreshing subcategory data in background: $e');
     }
   }
 
@@ -332,7 +680,7 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
     selectedFilter.value = subcategoryId;
 
     if (subcategoryId == null) {
-      displayProducts.value = allProducts;
+      displayProducts.value = allProducts.take(9).toList();
       productsTitle.value = selectedMainCategory.value != null
           ? 'All ${selectedMainCategory.value!.title}'
           : 'All Products';
@@ -343,6 +691,7 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
                 product.subcategoryId != null &&
                 product.subcategoryId == subcategoryId,
           )
+          .take(9)
           .toList();
       displayProducts.value = filteredProducts;
 
@@ -440,9 +789,38 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
     }
   }
 
-  void showAllProducts() {
+  Future<void> showAllProducts() async {
+    print(
+      '🎬 showAllProducts called - current state: ${showingAllProducts.value}',
+    );
     showingAllProducts.value = !showingAllProducts.value;
+
     if (showingAllProducts.value) {
+      print('📖 Showing ALL products mode');
+      // Load more products when showing all
+      currentOffset.value = 0;
+      hasMore.value = true;
+
+      // For API-driven categories (food, medicine, groceries, cleaning, personal, pet)
+      // we already have the initial products loaded, just set the flag to enable pagination
+      if (isFoodCategory ||
+          isMedicineCategory ||
+          currentCategory.id == '2' ||
+          currentCategory.id == '3' ||
+          currentCategory.id == '4' ||
+          currentCategory.id == '5') {
+        print('✅ API-driven category - pagination enabled');
+        // Keep current displayProducts, pagination will add more on scroll
+        if (selectedSubcategory.value != null) {
+          productsTitle.value =
+              '${selectedSubcategory.value!.title} - All Items';
+        } else {
+          productsTitle.value = '${currentCategory.title} - All Items';
+        }
+        return;
+      }
+
+      // For static categories, show all loaded products
       if (isGroceryCategory) {
         if (selectedSubcategory.value != null) {
           final filteredProducts = allProducts
@@ -481,6 +859,8 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
         }
       }
     } else {
+      print('📕 Hiding ALL products mode - back to 9 items');
+      // Reset to initial 9 products
       if (isGroceryCategory) {
         if (selectedSubcategory.value != null) {
           final filteredProducts = allProducts
@@ -489,14 +869,15 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
                     product.subcategoryId != null &&
                     product.subcategoryId == selectedSubcategory.value!.id,
               )
+              .take(9)
               .toList();
           displayProducts.value = filteredProducts;
           productsTitle.value = '${selectedSubcategory.value!.title} Items';
         } else if (selectedMainCategory.value != null) {
-          displayProducts.value = allProducts;
+          displayProducts.value = allProducts.take(9).toList();
           productsTitle.value = 'All ${selectedMainCategory.value!.title}';
         } else {
-          displayProducts.value = allProducts;
+          displayProducts.value = allProducts.take(9).toList();
           productsTitle.value = 'All ${currentCategory.title}';
         }
       } else {
@@ -507,11 +888,12 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
                     product.subcategoryId != null &&
                     product.subcategoryId == selectedSubcategory.value!.id,
               )
+              .take(9)
               .toList();
           displayProducts.value = filteredProducts;
           productsTitle.value = '${selectedSubcategory.value!.title} Items';
         } else {
-          displayProducts.value = allProducts;
+          displayProducts.value = allProducts.take(9).toList();
           productsTitle.value = 'All ${currentCategory.title}';
         }
       }
@@ -522,11 +904,22 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
     selectedSubcategory.value = null;
     showingAllProducts.value = false;
 
+    // Reset pagination state for API-driven categories
+    if (isFoodCategory ||
+        isMedicineCategory ||
+        currentCategory.id == '2' ||
+        currentCategory.id == '3' ||
+        currentCategory.id == '4' ||
+        currentCategory.id == '5') {
+      currentOffset.value = 0;
+      hasMore.value = true;
+    }
+
     if (isGroceryCategory && selectedMainCategory.value != null) {
-      displayProducts.value = allProducts;
+      displayProducts.value = allProducts.take(9).toList();
       productsTitle.value = 'All ${selectedMainCategory.value!.title}';
     } else {
-      displayProducts.value = allProducts;
+      displayProducts.value = allProducts.take(9).toList();
       productsTitle.value = 'All ${currentCategory.title}';
     }
   }
@@ -536,7 +929,19 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
     selectedSubcategory.value = null;
     showingAllProducts.value = false;
     filterSubcategories.clear();
-    displayProducts.value = allProducts;
+
+    // Reset pagination state for API-driven categories
+    if (isFoodCategory ||
+        isMedicineCategory ||
+        currentCategory.id == '2' ||
+        currentCategory.id == '3' ||
+        currentCategory.id == '4' ||
+        currentCategory.id == '5') {
+      currentOffset.value = 0;
+      hasMore.value = true;
+    }
+
+    displayProducts.value = allProducts.take(9).toList();
     productsTitle.value = 'All ${currentCategory.title}';
   }
 
@@ -676,17 +1081,37 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
     priceRange.value = [0.0, 100.0];
     showOnlyInStock.value = false;
 
-    if (selectedSubcategory.value != null) {
-      final filteredProducts = allProducts
-          .where(
-            (product) =>
-                product.subcategoryId != null &&
-                product.subcategoryId == selectedSubcategory.value!.id,
-          )
-          .toList();
-      displayProducts.value = filteredProducts;
+    // For API-driven categories, refetch with proper pagination reset
+    if (isFoodCategory ||
+        isMedicineCategory ||
+        currentCategory.id == '2' ||
+        currentCategory.id == '3' ||
+        currentCategory.id == '4' ||
+        currentCategory.id == '5') {
+      currentOffset.value = 0;
+      hasMore.value = true;
+
+      if (selectedSubcategory.value != null) {
+        // Keep the first 9 items of the current subcategory
+        displayProducts.value = allProducts.take(9).toList();
+      } else {
+        displayProducts.value = allProducts.take(9).toList();
+      }
     } else {
-      displayProducts.value = allProducts;
+      // For static categories, filter from allProducts
+      if (selectedSubcategory.value != null) {
+        final filteredProducts = allProducts
+            .where(
+              (product) =>
+                  product.subcategoryId != null &&
+                  product.subcategoryId == selectedSubcategory.value!.id,
+            )
+            .take(9)
+            .toList();
+        displayProducts.value = filteredProducts;
+      } else {
+        displayProducts.value = allProducts.take(9).toList();
+      }
     }
   }
 
@@ -703,5 +1128,83 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
 
   Future<void> onVoiceSearchPressed() async {
     await startVoiceSearch(navigateToSearch: true);
+  }
+
+  /// Force refresh data and update cache
+  Future<void> refreshData() async {
+    try {
+      isLoading.value = true;
+
+      // Clear cache for current category
+      await _cacheService.clearCache(
+        categoryId: currentCategory.id,
+        subcategoryId: selectedSubcategory.value?.id,
+      );
+
+      // Reload data
+      if (isGroceryCategory) {
+        await _loadGroceryMainCategories();
+      } else if (isFoodCategory) {
+        await _loadFoodCategoryData();
+      } else {
+        await _loadCategorySubcategories();
+      }
+    } catch (e) {
+      print('Error refreshing data: $e');
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  /// Load more products with pagination (for infinite scroll)
+  Future<void> loadMoreProducts() async {
+    print(
+      '🔄 loadMoreProducts called - isLoadingMore: ${isLoadingMore.value}, hasMore: ${hasMore.value}',
+    );
+
+    if (isLoadingMore.value || !hasMore.value) {
+      print(
+        '❌ Skipping loadMoreProducts - isLoadingMore: ${isLoadingMore.value}, hasMore: ${hasMore.value}',
+      );
+      return;
+    }
+
+    try {
+      isLoadingMore.value = true;
+
+      final nextOffset = displayProducts.length;
+      print(
+        '📊 Fetching more products - Category: ${currentCategory.id}, Subcategory: ${selectedSubcategory.value?.id}, Offset: $nextOffset, Limit: 20',
+      );
+
+      final result = await _productDataService.fetchMoreProducts(
+        categoryId: currentCategory.id,
+        subcategoryId: selectedSubcategory.value?.id,
+        offset: nextOffset,
+        limit: 20,
+      );
+
+      final newProducts = result['products'] as List<ProductModel>;
+      hasMore.value = result['hasMore'] as bool;
+
+      print(
+        '✅ Received ${newProducts.length} products, hasMore: ${hasMore.value}',
+      );
+
+      if (newProducts.isNotEmpty) {
+        allProducts.addAll(newProducts);
+        displayProducts.addAll(newProducts);
+        print('📦 Total products now: ${displayProducts.length}');
+      } else {
+        print('⚠️ No new products received');
+      }
+    } catch (e) {
+      print('❌ Error loading more products: $e');
+    } finally {
+      isLoadingMore.value = false;
+      print(
+        '🏁 loadMoreProducts completed - isLoadingMore: ${isLoadingMore.value}',
+      );
+    }
   }
 }

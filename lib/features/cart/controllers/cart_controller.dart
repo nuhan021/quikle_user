@@ -20,6 +20,11 @@ class CartController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    _initializeCart();
+  }
+
+  Future<void> _initializeCart() async {
+    await _cartService.initialize();
     _updateCartData();
   }
 

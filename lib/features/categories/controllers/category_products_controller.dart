@@ -10,12 +10,17 @@ import 'package:quikle_user/features/cart/controllers/cart_controller.dart';
 import 'package:quikle_user/features/profile/controllers/favorites_controller.dart';
 import 'package:quikle_user/routes/app_routes.dart';
 import 'package:quikle_user/core/mixins/voice_search_mixin.dart';
+import 'package:quikle_user/core/data/services/product_data_service.dart';
+import 'package:quikle_user/core/data/services/category_cache_service.dart';
 
 class CategoryProductsController extends GetxController with VoiceSearchMixin {
   final CategoryService _categoryService = CategoryService();
+  final ProductDataService _productDataService = ProductDataService();
+  final CategoryCacheService _cacheService = CategoryCacheService();
   final CartController _cartController = Get.find<CartController>();
 
   final isLoading = false.obs;
+  final isLoadingSubcategories = false.obs;
   final categoryTitle = ''.obs;
   final subcategories = <SubcategoryModel>[].obs;
   final allProducts = <ProductModel>[].obs;
@@ -24,6 +29,11 @@ class CategoryProductsController extends GetxController with VoiceSearchMixin {
 
   final selectedSubcategory = Rxn<SubcategoryModel>();
   final searchQuery = ''.obs;
+
+  // Pagination state
+  final isLoadingMore = false.obs;
+  final hasMore = true.obs;
+  final currentOffset = 0.obs;
 
   final currentPlaceholder = "Search products...".obs;
   Timer? _placeholderTimer;
@@ -163,48 +173,288 @@ class CategoryProductsController extends GetxController with VoiceSearchMixin {
   Future<void> _loadCategoryData() async {
     try {
       isLoading.value = true;
+      isLoadingSubcategories.value = true;
       await _loadShopData();
 
+      // Try to load subcategories from cache first
+      final cachedSubcategories = await _cacheService.getCachedSubcategories(
+        categoryId: currentCategory.id,
+        parentSubcategoryId: currentMainCategory.id,
+      );
+
+      if (cachedSubcategories != null && cachedSubcategories.isNotEmpty) {
+        print(
+          '📦 Loaded ${cachedSubcategories.length} subcategories from cache',
+        );
+        subcategories.value = cachedSubcategories;
+        isLoadingSubcategories.value = false;
+      }
+
+      // Try to load products from cache first (initial 9 items)
+      final cachedProducts = await _cacheService.getCachedProducts(
+        categoryId: currentCategory.id,
+        subcategoryId: currentMainCategory.id,
+      );
+
+      if (cachedProducts != null && cachedProducts.isNotEmpty) {
+        print('📦 Loaded ${cachedProducts.length} products from cache');
+        allProducts.value = cachedProducts;
+        displayProducts.value = cachedProducts;
+        isLoading.value = false;
+      }
+
+      // Fetch fresh data from API
       final subCategories = await _categoryService.fetchSubcategories(
         currentCategory.id,
         parentSubcategoryId: currentMainCategory.id,
       );
-      subcategories.value = subCategories;
 
-      final products = await _categoryService.fetchProductsByMainCategory(
-        currentMainCategory.id,
+      // Cache the subcategories
+      await _cacheService.cacheSubcategories(
+        categoryId: currentCategory.id,
+        parentSubcategoryId: currentMainCategory.id,
+        subcategories: subCategories,
       );
-      allProducts.value = products;
-      displayProducts.value = products;
+      subcategories.value = subCategories;
+      isLoadingSubcategories.value = false;
+
+      // For groceries category (2), fetch from API with pagination
+      if (currentCategory.id == '2') {
+        print('🛒 Loading groceries subcategory data from API');
+        final products = await _productDataService.getProductsBySubcategory(
+          currentMainCategory.id, // subcategory ID
+          categoryId: currentCategory.id,
+          limit: 12, // Initial load: 12 items
+        );
+
+        // Cache only the first 9 products
+        if (products.length >= 9) {
+          await _cacheService.cacheProducts(
+            categoryId: currentCategory.id,
+            subcategoryId: currentMainCategory.id,
+            products: products.take(9).toList(),
+          );
+          print('💾 Cached first 9 products');
+        }
+
+        allProducts.value = products;
+        displayProducts.value = products;
+        currentOffset.value = products.length;
+        hasMore.value =
+            products.length >= 12; // If we got 12, there might be more
+        print('✅ Loaded ${products.length} products initially');
+      } else {
+        // For other categories, use the old method
+        final products = await _categoryService.fetchProductsByMainCategory(
+          currentMainCategory.id,
+        );
+
+        // Cache only the first 9 products
+        if (products.length >= 9) {
+          await _cacheService.cacheProducts(
+            categoryId: currentCategory.id,
+            subcategoryId: currentMainCategory.id,
+            products: products.take(9).toList(),
+          );
+          print('💾 Cached first 9 products');
+        }
+
+        allProducts.value = products;
+        displayProducts.value = products;
+      }
     } catch (e) {
       print('Error loading category data: $e');
     } finally {
       isLoading.value = false;
+      isLoadingSubcategories.value = false;
     }
   }
 
-  void onSubcategoryTap(SubcategoryModel? subcategory) {
+  void onSubcategoryTap(SubcategoryModel? subcategory) async {
     if (subcategory == null) {
-      // "All" option selected - show all products
+      // "All" option selected - show all products from subcategory
       selectedSubcategory.value = null;
-      displayProducts.value = allProducts;
+
+      if (currentCategory.id == '2') {
+        // For groceries, reload all products for the main subcategory with pagination
+        try {
+          isLoading.value = true;
+          currentOffset.value = 0;
+          hasMore.value = true;
+
+          print(
+            '🛒 Reloading all products for subcategory: ${currentMainCategory.id}',
+          );
+
+          final products = await _productDataService.getProductsBySubcategory(
+            currentMainCategory.id,
+            categoryId: currentCategory.id,
+            limit: 12, // Load 12 initially
+          );
+
+          displayProducts.value = products;
+          currentOffset.value = products.length;
+          hasMore.value = products.length >= 12;
+
+          print('✅ Loaded ${products.length} products for "All"');
+        } catch (e) {
+          print('❌ Error loading all products: $e');
+        } finally {
+          isLoading.value = false;
+        }
+      } else {
+        displayProducts.value = allProducts;
+      }
       return;
     }
 
     if (selectedSubcategory.value?.id == subcategory.id) {
       selectedSubcategory.value = null;
-      displayProducts.value = allProducts;
+
+      if (currentCategory.id == '2') {
+        // Reload all products
+        try {
+          isLoading.value = true;
+          currentOffset.value = 0;
+          hasMore.value = true;
+
+          final products = await _productDataService.getProductsBySubcategory(
+            currentMainCategory.id,
+            categoryId: currentCategory.id,
+            limit: 12,
+          );
+
+          displayProducts.value = products;
+          currentOffset.value = products.length;
+          hasMore.value = products.length >= 10;
+        } catch (e) {
+          print('❌ Error: $e');
+        } finally {
+          isLoading.value = false;
+        }
+      } else {
+        displayProducts.value = allProducts;
+      }
       return;
     }
 
     selectedSubcategory.value = subcategory;
-    _filterProductsBySubcategory(subcategory.id);
+
+    // For groceries category (2), fetch from API with sub_subcategory parameter
+    if (currentCategory.id == '2') {
+      try {
+        isLoading.value = true;
+        currentOffset.value = 0;
+        hasMore.value = true;
+
+        print(
+          '🛒 Fetching products for sub_subcategory: ${subcategory.id} under subcategory: ${currentMainCategory.id}',
+        );
+
+        // Try to load from cache first
+        final cachedProducts = await _cacheService.getCachedProducts(
+          categoryId: currentCategory.id,
+          subcategoryId: currentMainCategory.id,
+          subSubcategoryId: subcategory.id,
+        );
+
+        if (cachedProducts != null && cachedProducts.isNotEmpty) {
+          print(
+            '📦 Loaded ${cachedProducts.length} sub-subcategory products from cache',
+          );
+          displayProducts.value = cachedProducts;
+          isLoading.value = false;
+        }
+
+        // Fetch fresh data from API
+        final products = await _productDataService.getProductsBySubcategory(
+          currentMainCategory.id, // This is the subcategory ID
+          categoryId: currentCategory.id,
+          subSubcategoryId: subcategory.id, // This is the sub_subcategory ID
+          limit: 12, // Load 12 initially
+        );
+
+        // Cache only the first 9 products
+        if (products.length >= 9) {
+          await _cacheService.cacheProducts(
+            categoryId: currentCategory.id,
+            subcategoryId: currentMainCategory.id,
+            subSubcategoryId: subcategory.id,
+            products: products.take(9).toList(),
+          );
+          print('💾 Cached first 9 sub-subcategory products');
+        }
+
+        displayProducts.value = products;
+        currentOffset.value = products.length;
+        hasMore.value =
+            products.length >= 12; // If we got 10, there might be more
+
+        print('✅ Loaded ${products.length} products for sub_subcategory');
+      } catch (e) {
+        print('❌ Error loading sub_subcategory products: $e');
+        // Fallback to filter from allProducts
+        _filterProductsBySubcategory(subcategory.id);
+      } finally {
+        isLoading.value = false;
+      }
+    } else {
+      // For other categories, filter from existing products
+      _filterProductsBySubcategory(subcategory.id);
+    }
   }
 
   void _filterProductsBySubcategory(String subcategoryId) {
     displayProducts.value = allProducts
         .where((product) => product.subcategoryId == subcategoryId)
         .toList();
+  }
+
+  Future<void> loadMoreProducts() async {
+    // Only load more for groceries category
+    if (currentCategory.id != '2') {
+      return;
+    }
+
+    if (isLoadingMore.value || !hasMore.value) {
+      print(
+        '⏭️ Skipping loadMore - isLoadingMore: ${isLoadingMore.value}, hasMore: ${hasMore.value}',
+      );
+      return;
+    }
+
+    try {
+      isLoadingMore.value = true;
+      final offset = displayProducts.length;
+      print('📥 Loading more products - Offset: $offset');
+
+      final result = await _productDataService.fetchMoreProducts(
+        categoryId: currentCategory.id,
+        subcategoryId: currentMainCategory.id,
+        subSubcategoryId: selectedSubcategory.value?.id,
+        offset: offset,
+        limit: 15,
+      );
+
+      final newProducts = result['products'] as List<ProductModel>;
+      hasMore.value = result['hasMore'] as bool;
+
+      if (newProducts.isNotEmpty) {
+        displayProducts.addAll(newProducts);
+        currentOffset.value = displayProducts.length;
+        print(
+          '✅ Loaded ${newProducts.length} more products. Total: ${displayProducts.length}',
+        );
+      } else {
+        print('⚠️ No more products to load');
+        hasMore.value = false;
+      }
+    } catch (e) {
+      print('❌ Error loading more products: $e');
+      hasMore.value = false;
+    } finally {
+      isLoadingMore.value = false;
+    }
   }
 
   void onSearchChanged(String query) {
