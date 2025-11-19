@@ -16,6 +16,7 @@ import 'package:quikle_user/core/common/widgets/common_app_bar.dart';
 import 'package:quikle_user/features/categories/presentation/widgets/search_and_filters_section.dart';
 import 'package:quikle_user/features/categories/presentation/widgets/category_product_item.dart';
 import 'package:quikle_user/features/categories/presentation/widgets/minimal_subcategories_section.dart';
+import 'package:quikle_user/features/categories/presentation/widgets/minimal_subcategories_shimmer.dart';
 import 'package:quikle_user/features/orders/presentation/widgets/live_order_indicator.dart';
 
 class CategoryProductsScreen extends StatefulWidget {
@@ -175,23 +176,32 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
                                 ),
                               ),
                             ),
-                            subcategoriesSection: hasSubcategories
+                            subcategoriesSection:
+                                hasSubcategories ||
+                                    controller.isLoadingSubcategories.value
                                 ? SizedBox(
                                     height: subcategoriesHeight,
                                     child: Padding(
                                       padding: EdgeInsets.symmetric(
                                         horizontal: 16.w,
                                       ),
-                                      child: MinimalSubcategoriesSection(
-                                        categoryIconPath:
-                                            controller.currentCategory.iconPath,
-                                        subcategories: controller.subcategories,
-                                        selectedSubcategory: controller
-                                            .selectedSubcategory
-                                            .value,
-                                        onSubcategoryTap:
-                                            controller.onSubcategoryTap,
-                                      ),
+                                      child:
+                                          controller
+                                              .isLoadingSubcategories
+                                              .value
+                                          ? const MinimalSubcategoriesShimmer()
+                                          : MinimalSubcategoriesSection(
+                                              categoryIconPath: controller
+                                                  .currentCategory
+                                                  .iconPath,
+                                              subcategories:
+                                                  controller.subcategories,
+                                              selectedSubcategory: controller
+                                                  .selectedSubcategory
+                                                  .value,
+                                              onSubcategoryTap:
+                                                  controller.onSubcategoryTap,
+                                            ),
                                     ),
                                   )
                                 : const SizedBox.shrink(),

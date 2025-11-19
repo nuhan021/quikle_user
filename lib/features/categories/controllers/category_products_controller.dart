@@ -11,13 +11,16 @@ import 'package:quikle_user/features/profile/controllers/favorites_controller.da
 import 'package:quikle_user/routes/app_routes.dart';
 import 'package:quikle_user/core/mixins/voice_search_mixin.dart';
 import 'package:quikle_user/core/data/services/product_data_service.dart';
+import 'package:quikle_user/core/data/services/category_cache_service.dart';
 
 class CategoryProductsController extends GetxController with VoiceSearchMixin {
   final CategoryService _categoryService = CategoryService();
   final ProductDataService _productDataService = ProductDataService();
+  final CategoryCacheService _cacheService = CategoryCacheService();
   final CartController _cartController = Get.find<CartController>();
 
   final isLoading = false.obs;
+  final isLoadingSubcategories = false.obs;
   final categoryTitle = ''.obs;
   final subcategories = <SubcategoryModel>[].obs;
   final allProducts = <ProductModel>[].obs;
@@ -170,13 +173,50 @@ class CategoryProductsController extends GetxController with VoiceSearchMixin {
   Future<void> _loadCategoryData() async {
     try {
       isLoading.value = true;
+      isLoadingSubcategories.value = true;
       await _loadShopData();
 
+      // Try to load subcategories from cache first
+      final cachedSubcategories = await _cacheService.getCachedSubcategories(
+        categoryId: currentCategory.id,
+        parentSubcategoryId: currentMainCategory.id,
+      );
+
+      if (cachedSubcategories != null && cachedSubcategories.isNotEmpty) {
+        print(
+          '📦 Loaded ${cachedSubcategories.length} subcategories from cache',
+        );
+        subcategories.value = cachedSubcategories;
+        isLoadingSubcategories.value = false;
+      }
+
+      // Try to load products from cache first (initial 9 items)
+      final cachedProducts = await _cacheService.getCachedProducts(
+        categoryId: currentCategory.id,
+        subcategoryId: currentMainCategory.id,
+      );
+
+      if (cachedProducts != null && cachedProducts.isNotEmpty) {
+        print('📦 Loaded ${cachedProducts.length} products from cache');
+        allProducts.value = cachedProducts;
+        displayProducts.value = cachedProducts;
+        isLoading.value = false;
+      }
+
+      // Fetch fresh data from API
       final subCategories = await _categoryService.fetchSubcategories(
         currentCategory.id,
         parentSubcategoryId: currentMainCategory.id,
       );
+
+      // Cache the subcategories
+      await _cacheService.cacheSubcategories(
+        categoryId: currentCategory.id,
+        parentSubcategoryId: currentMainCategory.id,
+        subcategories: subCategories,
+      );
       subcategories.value = subCategories;
+      isLoadingSubcategories.value = false;
 
       // For groceries category (2), fetch from API with pagination
       if (currentCategory.id == '2') {
@@ -186,6 +226,17 @@ class CategoryProductsController extends GetxController with VoiceSearchMixin {
           categoryId: currentCategory.id,
           limit: 12, // Initial load: 12 items
         );
+
+        // Cache only the first 9 products
+        if (products.length >= 9) {
+          await _cacheService.cacheProducts(
+            categoryId: currentCategory.id,
+            subcategoryId: currentMainCategory.id,
+            products: products.take(9).toList(),
+          );
+          print('💾 Cached first 9 products');
+        }
+
         allProducts.value = products;
         displayProducts.value = products;
         currentOffset.value = products.length;
@@ -197,6 +248,17 @@ class CategoryProductsController extends GetxController with VoiceSearchMixin {
         final products = await _categoryService.fetchProductsByMainCategory(
           currentMainCategory.id,
         );
+
+        // Cache only the first 9 products
+        if (products.length >= 9) {
+          await _cacheService.cacheProducts(
+            categoryId: currentCategory.id,
+            subcategoryId: currentMainCategory.id,
+            products: products.take(9).toList(),
+          );
+          print('💾 Cached first 9 products');
+        }
+
         allProducts.value = products;
         displayProducts.value = products;
       }
@@ -204,6 +266,7 @@ class CategoryProductsController extends GetxController with VoiceSearchMixin {
       print('Error loading category data: $e');
     } finally {
       isLoading.value = false;
+      isLoadingSubcategories.value = false;
     }
   }
 
@@ -288,12 +351,39 @@ class CategoryProductsController extends GetxController with VoiceSearchMixin {
           '🛒 Fetching products for sub_subcategory: ${subcategory.id} under subcategory: ${currentMainCategory.id}',
         );
 
+        // Try to load from cache first
+        final cachedProducts = await _cacheService.getCachedProducts(
+          categoryId: currentCategory.id,
+          subcategoryId: currentMainCategory.id,
+          subSubcategoryId: subcategory.id,
+        );
+
+        if (cachedProducts != null && cachedProducts.isNotEmpty) {
+          print(
+            '📦 Loaded ${cachedProducts.length} sub-subcategory products from cache',
+          );
+          displayProducts.value = cachedProducts;
+          isLoading.value = false;
+        }
+
+        // Fetch fresh data from API
         final products = await _productDataService.getProductsBySubcategory(
           currentMainCategory.id, // This is the subcategory ID
           categoryId: currentCategory.id,
           subSubcategoryId: subcategory.id, // This is the sub_subcategory ID
-          limit: 12, // Load 10 initially
+          limit: 12, // Load 12 initially
         );
+
+        // Cache only the first 9 products
+        if (products.length >= 9) {
+          await _cacheService.cacheProducts(
+            categoryId: currentCategory.id,
+            subcategoryId: currentMainCategory.id,
+            subSubcategoryId: subcategory.id,
+            products: products.take(9).toList(),
+          );
+          print('💾 Cached first 9 sub-subcategory products');
+        }
 
         displayProducts.value = products;
         currentOffset.value = products.length;
