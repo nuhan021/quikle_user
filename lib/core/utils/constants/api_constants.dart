@@ -21,7 +21,7 @@ class ApiConstants {
 
   //For product api's
   static const String getFoodProducts = "$baseUrl/items/food/";
-  static const String getMedicineProducts = "$baseUrl/items/medicine/";
+  static const String getMedicineProducts = "$baseUrl/items/medicine/is_otc/";
   // Groceries endpoint
   static const String getGroceriesProducts = "$baseUrl/items/groceries/";
 
