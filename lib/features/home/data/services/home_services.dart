@@ -5,7 +5,6 @@ import 'package:quikle_user/core/utils/constants/api_constants.dart';
 import 'package:quikle_user/core/utils/constants/image_path.dart';
 import 'package:quikle_user/features/home/data/models/category_model.dart';
 import 'package:quikle_user/features/home/data/models/product_model.dart';
-import 'package:quikle_user/features/home/data/models/shop_model.dart';
 import 'package:quikle_user/core/data/services/product_data_service.dart';
 
 class HomeService {
@@ -40,35 +39,6 @@ class HomeService {
     }
   }
 
-  Future<List<ShopModel>> fetchShops() async {
-    return [
-      const ShopModel(
-        id: 'shop_1',
-        name: 'Tandoori Tarang',
-        image: ImagePath.profileIcon,
-        deliveryTime: '30-35 min',
-        rating: 4.8,
-        address: '123 Food Street, City',
-      ),
-      const ShopModel(
-        id: 'shop_2',
-        name: 'Fresh Market',
-        image: ImagePath.profileIcon,
-        deliveryTime: '25-30 min',
-        rating: 4.6,
-        address: '456 Market Lane, City',
-      ),
-      const ShopModel(
-        id: 'shop_3',
-        name: 'Health Plus Pharmacy',
-        image: ImagePath.profileIcon,
-        deliveryTime: '15-20 min',
-        rating: 4.9,
-        address: '789 Health Ave, City',
-      ),
-    ];
-  }
-
   Future<List<ProductSectionModel>> fetchProductSections() async {
     // Fetch only 6 products for each category on home page for faster loading
     final foodProducts = await _productService.getProductsByCategory(
@@ -93,10 +63,6 @@ class HomeService {
     );
     final pharmacyProducts = await _productService.getProductsByCategory(
       '6',
-      limit: 6,
-    );
-    final customProducts = await _productService.getProductsByCategory(
-      '7',
       limit: 6,
     );
 
@@ -136,12 +102,6 @@ class HomeService {
         viewAllText: 'View all',
         products: pharmacyProducts,
         categoryId: '6',
-      ),
-      ProductSectionModel(
-        id: 'section_7',
-        viewAllText: 'View all',
-        products: customProducts,
-        categoryId: '7',
       ),
     ];
   }
