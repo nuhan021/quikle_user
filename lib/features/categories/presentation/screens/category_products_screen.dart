@@ -41,13 +41,26 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
       duration: const Duration(milliseconds: 500),
       value: 1.0,
     );
+
+    // Add scroll listener for pagination
+    _scroll.addListener(_onScroll);
   }
 
   @override
   void dispose() {
+    _scroll.removeListener(_onScroll);
     _scroll.dispose();
     _navController.dispose();
     super.dispose();
+  }
+
+  void _onScroll() {
+    final controller = Get.find<CategoryProductsController>();
+
+    if (_scroll.position.pixels >= _scroll.position.maxScrollExtent * 0.8) {
+      // User scrolled 80% of the content
+      controller.loadMoreProducts();
+    }
   }
 
   void _measureNavBarHeight() {
@@ -249,6 +262,27 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
                               }, childCount: controller.displayProducts.length),
                             ),
                           ),
+                        // Loading more indicator
+                        if (controller.isLoadingMore.value)
+                          SliverToBoxAdapter(
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(vertical: 16.h),
+                              child: Center(
+                                child: SizedBox(
+                                  width: 24.w,
+                                  height: 24.h,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      AppColors.beakYellow,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        // Bottom padding for scrollability
+                        SliverToBoxAdapter(child: SizedBox(height: 100.h)),
                       ],
                     );
                   }),

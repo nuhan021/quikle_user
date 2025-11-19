@@ -99,6 +99,7 @@ class ProductDataService {
   }) async {
     try {
       final queryParams = <String, dynamic>{
+        'category': '6', // Medicine category ID
         'offset': offset.toString(),
         'limit': limit.toString(),
       };
@@ -165,6 +166,7 @@ class ProductDataService {
   Future<List<ProductModel>> fetchGroceriesProducts({
     required String categoryId,
     String? subcategoryId,
+    String? subSubcategoryId,
     int offset = 0,
     int limit = 20,
   }) async {
@@ -176,8 +178,11 @@ class ProductDataService {
       };
 
       if (subcategoryId != null) {
-        // backend may expect a subcategory or sub_subcategory param; try using 'subcategory'
         queryParams['subcategory'] = subcategoryId;
+      }
+
+      if (subSubcategoryId != null) {
+        queryParams['sub_subcategory'] = subSubcategoryId;
       }
 
       AppLoggerHelper.debug(
@@ -234,11 +239,12 @@ class ProductDataService {
   Future<Map<String, dynamic>> fetchMoreProducts({
     required String categoryId,
     String? subcategoryId,
+    String? subSubcategoryId,
     required int offset,
     int limit = 20,
   }) async {
     print(
-      '🔍 fetchMoreProducts - CategoryID: $categoryId, SubcategoryID: $subcategoryId, Offset: $offset, Limit: $limit',
+      '🔍 fetchMoreProducts - CategoryID: $categoryId, SubcategoryID: $subcategoryId, SubSubcategoryID: $subSubcategoryId, Offset: $offset, Limit: $limit',
     );
 
     if (categoryId == '1') {
@@ -309,6 +315,7 @@ class ProductDataService {
           final products = await fetchGroceriesProducts(
             categoryId: categoryId,
             subcategoryId: subcategoryId,
+            subSubcategoryId: subSubcategoryId,
             offset: offset,
             limit: limit,
           );
@@ -2068,8 +2075,48 @@ class ProductDataService {
   Future<List<ProductModel>> getProductsBySubcategory(
     String subcategoryId, {
     int limit = 100,
+    String? categoryId,
+    String? subSubcategoryId,
   }) async {
-    // Extract category ID if this is a food subcategory
+    print(
+      '🔍 getProductsBySubcategory - SubcategoryID: $subcategoryId, CategoryID: $categoryId, SubSubcategoryID: $subSubcategoryId, Limit: $limit',
+    );
+
+    // If categoryId is provided, use it to determine which API to call
+    if (categoryId != null) {
+      if (categoryId == '1') {
+        // Food category
+        print('🍔 Fetching food products for subcategory: $subcategoryId');
+        return await fetchFoodProducts(
+          categoryId: '1',
+          subcategoryId: subcategoryId,
+          limit: limit,
+        );
+      } else if (categoryId == '6') {
+        // Medicine category
+        print('💊 Fetching medicine products for subcategory: $subcategoryId');
+        return await fetchMedicineProducts(
+          subcategoryId: subcategoryId,
+          limit: limit,
+        );
+      } else if (categoryId == '2' ||
+          categoryId == '3' ||
+          categoryId == '4' ||
+          categoryId == '5') {
+        // Groceries/cleaning/personal/pet categories
+        print(
+          '🛒 Fetching groceries products for subcategory: $subcategoryId, subSubcategory: $subSubcategoryId',
+        );
+        return await fetchGroceriesProducts(
+          categoryId: categoryId,
+          subcategoryId: subcategoryId,
+          subSubcategoryId: subSubcategoryId,
+          limit: limit,
+        );
+      }
+    }
+
+    // Fallback: Check for string prefixes (for backward compatibility with static data)
     // Food subcategories start with 'food_'
     if (subcategoryId.startsWith('food_')) {
       return await fetchFoodProducts(
@@ -2107,6 +2154,7 @@ class ProductDataService {
     }
 
     // For other categories, use static data
+    print('📦 Using static data for subcategory: $subcategoryId');
     return allProducts
         .where((product) => product.subcategoryId == subcategoryId)
         .take(limit)
