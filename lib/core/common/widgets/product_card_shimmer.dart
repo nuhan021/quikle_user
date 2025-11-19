@@ -146,10 +146,7 @@ class ProductHorizontalShimmer extends StatelessWidget {
 class ProductSectionShimmer extends StatelessWidget {
   final bool isMedicine;
 
-  const ProductSectionShimmer({
-    super.key,
-    this.isMedicine = false,
-  });
+  const ProductSectionShimmer({super.key, this.isMedicine = false});
 
   @override
   Widget build(BuildContext context) {

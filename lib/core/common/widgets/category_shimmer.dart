@@ -23,9 +23,7 @@ class CategoryShimmer extends StatelessWidget {
           itemCount: itemCount,
           itemBuilder: (context, index) {
             return Container(
-              margin: EdgeInsets.only(
-                right: index < itemCount - 1 ? 24.w : 0,
-              ),
+              margin: EdgeInsets.only(right: index < itemCount - 1 ? 24.w : 0),
               child: const _CategoryItemShimmer(),
             );
           },
