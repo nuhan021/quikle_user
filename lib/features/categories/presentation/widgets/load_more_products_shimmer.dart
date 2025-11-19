@@ -6,10 +6,7 @@ import 'package:shimmer/shimmer.dart';
 class LoadMoreProductsShimmer extends StatelessWidget {
   final int itemCount;
 
-  const LoadMoreProductsShimmer({
-    super.key,
-    this.itemCount = 3,
-  });
+  const LoadMoreProductsShimmer({super.key, this.itemCount = 3});
 
   @override
   Widget build(BuildContext context) {
