@@ -45,4 +45,20 @@ class CartItemModel {
 
   @override
   int get hashCode => product.id.hashCode;
+
+  Map<String, dynamic> toJson() {
+    return {
+      'product': product.toJson(),
+      'quantity': quantity,
+      'isUrgent': isUrgent,
+    };
+  }
+
+  factory CartItemModel.fromJson(Map<String, dynamic> json) {
+    return CartItemModel(
+      product: ProductModel.fromJson(json['product'] as Map<String, dynamic>),
+      quantity: json['quantity'] as int,
+      isUrgent: json['isUrgent'] as bool? ?? false,
+    );
+  }
 }

@@ -6,10 +6,12 @@ import 'package:quikle_user/core/utils/constants/image_path.dart';
 import 'package:quikle_user/features/home/data/models/category_model.dart';
 import 'package:quikle_user/features/home/data/models/product_model.dart';
 import 'package:quikle_user/core/data/services/product_data_service.dart';
+import 'package:quikle_user/core/data/services/category_cache_service.dart';
 
 class HomeService {
   final ProductDataService _productService = ProductDataService();
   final NetworkCaller _networkCaller = NetworkCaller();
+  final CategoryCacheService _cacheService = CategoryCacheService();
 
   Future<List<CategoryModel>> fetchCategories() async {
     final ResponseData response = await _networkCaller.getRequest(
@@ -40,6 +42,25 @@ class HomeService {
   }
 
   Future<List<ProductSectionModel>> fetchProductSections() async {
+    // Try to load from cache first
+    final cachedSections = await _cacheService.getCachedHomeProductSections();
+
+    if (cachedSections != null && cachedSections.isNotEmpty) {
+      print('📦 Loaded ${cachedSections.length} product sections from cache');
+
+      // Return cached data immediately, then fetch fresh data in background
+      _fetchAndCacheProductSections();
+
+      return cachedSections;
+    }
+
+    // No cache available, fetch from API
+    print('🌐 Fetching product sections from API');
+    return await _fetchAndCacheProductSections();
+  }
+
+  /// Internal method to fetch and cache product sections
+  Future<List<ProductSectionModel>> _fetchAndCacheProductSections() async {
     final List<Future<List<ProductModel>>> productFutures = [
       _productService.getProductsByCategory('1', limit: 6),
       _productService.getProductsByCategory('2', limit: 6),
@@ -50,7 +71,8 @@ class HomeService {
     ];
 
     final List<List<ProductModel>> results = await Future.wait(productFutures);
-    return [
+
+    final sections = [
       ProductSectionModel(
         id: 'section_1',
         viewAllText: 'View all',
@@ -88,6 +110,12 @@ class HomeService {
         categoryId: '6',
       ),
     ];
+
+    // Cache the sections
+    await _cacheService.cacheHomeProductSections(sections);
+    print('💾 Cached ${sections.length} product sections');
+
+    return sections;
   }
 
   Future<List<ProductModel>> fetchAllProducts() async {

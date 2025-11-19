@@ -234,4 +234,24 @@ class ProductSectionModel {
     required this.products,
     required this.categoryId,
   });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'viewAllText': viewAllText,
+      'products': products.map((p) => p.toJson()).toList(),
+      'categoryId': categoryId,
+    };
+  }
+
+  factory ProductSectionModel.fromJson(Map<String, dynamic> json) {
+    return ProductSectionModel(
+      id: json['id'] as String,
+      viewAllText: json['viewAllText'] as String,
+      products: (json['products'] as List)
+          .map((p) => ProductModel.fromJson(p as Map<String, dynamic>))
+          .toList(),
+      categoryId: json['categoryId'] as String,
+    );
+  }
 }
