@@ -97,7 +97,7 @@ class CartItemsSection extends StatelessWidget {
                                     cartItem.product.title,
                                     style: getTextStyle(
                                       font: CustomFonts.inter,
-                                      fontSize: 16.sp,
+                                      fontSize: 14.sp,
                                       fontWeight: FontWeight.w500,
                                       color: AppColors.ebonyBlack,
                                     ),
@@ -154,20 +154,22 @@ class CartItemsSection extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                Container(
-                                  child: Text(
-                                    '${cartItem.product.price} x ${cartItem.quantity} = ${cartItem.totalPrice.toStringAsFixed(2)}',
-                                    style: getTextStyle(
-                                      font: CustomFonts.inter,
-                                      fontSize: 14.sp,
-                                      fontWeight: FontWeight.w700,
-                                      color: AppColors.ebonyBlack,
+                                Expanded(
+                                  child: Container(
+                                    child: Text(
+                                      '${cartItem.product.price} x ${cartItem.quantity} = ${cartItem.totalPrice.toStringAsFixed(2)}',
+                                      style: getTextStyle(
+                                        font: CustomFonts.inter,
+                                        fontSize: 12.sp,
+                                        fontWeight: FontWeight.w700,
+                                        color: AppColors.ebonyBlack,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
-                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
 
-                                // Quantity controls
                                 _buildQuantityControls(
                                   cartItem.quantity,
                                   () =>

@@ -8,7 +8,6 @@ import 'package:quikle_user/core/common/widgets/custom_navbar.dart';
 import 'package:quikle_user/core/common/widgets/floating_cart_button.dart';
 import 'package:quikle_user/core/common/widgets/unified_product_card.dart';
 import 'package:quikle_user/core/common/widgets/cart_animation_overlay.dart';
-import 'package:quikle_user/core/data/services/product_data_service.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 import 'package:quikle_user/core/common/widgets/common_app_bar.dart';
@@ -35,7 +34,6 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen>
   final GlobalKey _navKey = GlobalKey();
   double _navBarHeight = 0.0;
 
-  final ProductDataService _productService = ProductDataService();
   List<ProductModel> _restaurantProducts = [];
   List<ProductModel> _filteredProducts = [];
   bool _isLoading = true;
@@ -96,9 +94,8 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen>
 
   void _loadProducts() {
     setState(() => _isLoading = true);
-    _restaurantProducts = _productService.allProducts
-        .where((p) => p.shopId == restaurant.id)
-        .toList();
+    // Static data removed - restaurant products should come from API
+    _restaurantProducts = [];
     _filterProducts(_selectedCategory);
     setState(() => _isLoading = false);
   }
@@ -179,8 +176,9 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen>
     final keyboardInset = MediaQuery.of(context).viewInsets.bottom;
     final isKeyboardOpen = keyboardInset > 0;
     const double cartMargin = 16.0;
-    final double bottomPadding =
-        isKeyboardOpen ? keyboardInset : _navBarHeight + cartMargin;
+    final double bottomPadding = isKeyboardOpen
+        ? keyboardInset
+        : _navBarHeight + cartMargin;
 
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
@@ -252,9 +250,10 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen>
                                               border: InputBorder.none,
                                               enabledBorder: InputBorder.none,
                                               focusedBorder: InputBorder.none,
-                                              contentPadding: EdgeInsets.symmetric(
-                                                horizontal: 16.w,
-                                              ),
+                                              contentPadding:
+                                                  EdgeInsets.symmetric(
+                                                    horizontal: 16.w,
+                                                  ),
                                             ),
                                           ),
                                         ),
@@ -274,7 +273,9 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen>
                                   height: 30.h,
                                   child: ListView.builder(
                                     scrollDirection: Axis.horizontal,
-                                    padding: EdgeInsets.symmetric(horizontal: 16.w),
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 16.w,
+                                    ),
                                     itemCount: _categories.length,
                                     itemBuilder: (_, idx) {
                                       final cat = _categories[idx];
@@ -291,10 +292,14 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen>
                                             color: sel
                                                 ? AppColors.beakYellow
                                                 : Colors.white,
-                                            borderRadius: BorderRadius.circular(4.r),
+                                            borderRadius: BorderRadius.circular(
+                                              4.r,
+                                            ),
                                             boxShadow: [
                                               BoxShadow(
-                                                color: Colors.grey.withValues(alpha: .1),
+                                                color: Colors.grey.withValues(
+                                                  alpha: .1,
+                                                ),
                                                 blurRadius: 8,
                                                 offset: const Offset(0, 2),
                                               ),
@@ -340,26 +345,24 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen>
                           bottom: bottomPadding,
                         ),
                         sliver: SliverGrid(
-                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 3,
-                            crossAxisSpacing: 8.w,
-                            mainAxisSpacing: 8.h,
-                            childAspectRatio: 0.70,
-                          ),
-                          delegate: SliverChildBuilderDelegate(
-                            (context, idx) {
-                              final prod = _filteredProducts[idx];
-                              return UnifiedProductCard(
-                                product: prod,
-                                onTap: () => _onProductTap(prod),
-                                onAddToCart: () => _onAddToCart(prod),
-                                onFavoriteToggle: () => _onFavoriteToggle(prod),
-                                variant: ProductCardVariant.category,
-                                isGroceryCategory: false,
-                              );
-                            },
-                            childCount: _filteredProducts.length,
-                          ),
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 3,
+                                crossAxisSpacing: 8.w,
+                                mainAxisSpacing: 8.h,
+                                childAspectRatio: 0.70,
+                              ),
+                          delegate: SliverChildBuilderDelegate((context, idx) {
+                            final prod = _filteredProducts[idx];
+                            return UnifiedProductCard(
+                              product: prod,
+                              onTap: () => _onProductTap(prod),
+                              onAddToCart: () => _onAddToCart(prod),
+                              onFavoriteToggle: () => _onFavoriteToggle(prod),
+                              variant: ProductCardVariant.category,
+                              isGroceryCategory: false,
+                            );
+                          }, childCount: _filteredProducts.length),
                         ),
                       ),
                   ],
@@ -421,23 +424,23 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen>
   }
 
   Widget _emptyState() => Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.restaurant_menu, size: 64.sp, color: Colors.grey),
-            SizedBox(height: 16.h),
-            Text(
-              'No items found',
-              style: getTextStyle(
-                font: CustomFonts.obviously,
-                fontSize: 16.sp,
-                fontWeight: FontWeight.w500,
-                color: Colors.grey,
-              ),
-            ),
-          ],
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(Icons.restaurant_menu, size: 64.sp, color: Colors.grey),
+        SizedBox(height: 16.h),
+        Text(
+          'No items found',
+          style: getTextStyle(
+            font: CustomFonts.obviously,
+            fontSize: 16.sp,
+            fontWeight: FontWeight.w500,
+            color: Colors.grey,
+          ),
         ),
-      );
+      ],
+    ),
+  );
 
   double get _headerExtent => (48.h + 24.h) + 30.h + 4.h;
 }

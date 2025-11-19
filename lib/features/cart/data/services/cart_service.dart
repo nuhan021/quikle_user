@@ -1,7 +1,10 @@
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/cart_item_model.dart';
 import '../../../home/data/models/product_model.dart';
 
 class CartService {
+  static const String _cartCacheKey = 'cart_items_cache';
   final List<CartItemModel> _cartItems = [];
 
   List<CartItemModel> get cartItems => List.unmodifiable(_cartItems);
@@ -11,7 +14,49 @@ class CartService {
   double get totalAmount =>
       _cartItems.fold(0.0, (sum, item) => sum + item.totalPrice);
 
-  void addToCart(ProductModel product, {bool isUrgent = false}) {
+  /// Initialize cart service and load cached cart items
+  Future<void> initialize() async {
+    await _loadCartFromCache();
+  }
+
+  /// Load cart items from cache
+  Future<void> _loadCartFromCache() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final cartJson = prefs.getString(_cartCacheKey);
+
+      if (cartJson != null) {
+        final List<dynamic> cartList = jsonDecode(cartJson) as List;
+        _cartItems.clear();
+        _cartItems.addAll(
+          cartList
+              .map(
+                (item) => CartItemModel.fromJson(item as Map<String, dynamic>),
+              )
+              .toList(),
+        );
+        print('📦 Loaded ${_cartItems.length} items from cart cache');
+      }
+    } catch (e) {
+      print('Error loading cart from cache: $e');
+    }
+  }
+
+  /// Save cart items to cache
+  Future<void> _saveCartToCache() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final cartJson = jsonEncode(
+        _cartItems.map((item) => item.toJson()).toList(),
+      );
+      await prefs.setString(_cartCacheKey, cartJson);
+      print('💾 Saved ${_cartItems.length} items to cart cache');
+    } catch (e) {
+      print('Error saving cart to cache: $e');
+    }
+  }
+
+  void addToCart(ProductModel product, {bool isUrgent = false}) async {
     final existingItemIndex = _cartItems.indexWhere(
       (item) =>
           item.product.title == product.title &&
@@ -30,17 +75,21 @@ class CartService {
         CartItemModel(product: product, quantity: 1, isUrgent: isUrgent),
       );
     }
+
+    await _saveCartToCache();
   }
 
-  void removeFromCart(CartItemModel cartItem) {
+  void removeFromCart(CartItemModel cartItem) async {
     _cartItems.removeWhere(
       (item) =>
           item.product.title == cartItem.product.title &&
           item.product.categoryId == cartItem.product.categoryId,
     );
+
+    await _saveCartToCache();
   }
 
-  void updateQuantity(CartItemModel cartItem, int newQuantity) {
+  void updateQuantity(CartItemModel cartItem, int newQuantity) async {
     if (newQuantity <= 0) {
       removeFromCart(cartItem);
       return;
@@ -55,10 +104,13 @@ class CartService {
     if (itemIndex != -1) {
       _cartItems[itemIndex] = cartItem.copyWith(quantity: newQuantity);
     }
+
+    await _saveCartToCache();
   }
 
-  void clearCart() {
+  void clearCart() async {
     _cartItems.clear();
+    await _saveCartToCache();
   }
 
   // Get the quantity of a specific product in the cart
@@ -95,7 +147,7 @@ class CartService {
   }
 
   // Toggle urgent status for a specific product
-  void toggleProductUrgentStatus(ProductModel product) {
+  void toggleProductUrgentStatus(ProductModel product) async {
     final itemIndex = _cartItems.indexWhere(
       (item) =>
           item.product.title == product.title &&
@@ -107,6 +159,8 @@ class CartService {
       _cartItems[itemIndex] = existingItem.copyWith(
         isUrgent: !existingItem.isUrgent,
       );
+
+      await _saveCartToCache();
     }
   }
 

@@ -7,7 +7,7 @@ import '../models/response_data.dart';
 import '../utils/logging/logger.dart';
 
 class NetworkCaller {
-  final int timeoutDuration = 10;
+  final int timeoutDuration = 30; // Increased to 30 seconds for cold starts
 
   Future<ResponseData> getRequest(
     String url, {

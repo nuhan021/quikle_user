@@ -6,7 +6,7 @@ class RestaurantService {
     const RestaurantModel(
       id: 'restaurant_1',
       name: 'Tandoori Tarang',
-      image: '', 
+      image: '',
       deliveryTime: '30-35 min',
       rating: 4.8,
       address: '123 Food Street, City',
@@ -38,7 +38,7 @@ class RestaurantService {
     const RestaurantModel(
       id: 'restaurant_2',
       name: 'Biryani Paradise',
-      image: '', 
+      image: '',
       deliveryTime: '25-30 min',
       rating: 4.9,
       address: '456 Spice Avenue, City',
@@ -70,7 +70,7 @@ class RestaurantService {
     const RestaurantModel(
       id: 'restaurant_3',
       name: 'Pizza Palace',
-      image: '', 
+      image: '',
       deliveryTime: '20-25 min',
       rating: 4.7,
       address: '789 Italian Street, City',
@@ -102,7 +102,7 @@ class RestaurantService {
     const RestaurantModel(
       id: 'restaurant_4',
       name: 'Burger Junction',
-      image: '', 
+      image: '',
       deliveryTime: '15-20 min',
       rating: 4.6,
       address: '321 Fast Food Lane, City',
@@ -134,7 +134,7 @@ class RestaurantService {
     const RestaurantModel(
       id: 'restaurant_5',
       name: 'Chinese Garden',
-      image: '', 
+      image: '',
       deliveryTime: '35-40 min',
       rating: 4.5,
       address: '654 Asian Plaza, City',
@@ -194,7 +194,7 @@ class RestaurantService {
     const RestaurantModel(
       id: 'restaurant_8',
       name: 'Royal Biryani',
-      image: '', 
+      image: '',
       deliveryTime: '40-45 min',
       rating: 4.7,
       address: '258 Royal Court, City',
@@ -310,7 +310,7 @@ class RestaurantService {
     const RestaurantModel(
       id: 'restaurant_15',
       name: 'Hyderabadi Biryani',
-      image: '', 
+      image: '',
       deliveryTime: '45-50 min',
       rating: 4.8,
       address: '468 Hyderabad Street, City',

@@ -9,6 +9,8 @@ import 'package:quikle_user/core/common/widgets/cart_animation_overlay.dart';
 import 'package:quikle_user/core/common/widgets/custom_navbar.dart';
 import 'package:quikle_user/core/common/widgets/floating_cart_button.dart';
 import 'package:quikle_user/core/common/widgets/voice_search_overlay.dart';
+import 'package:quikle_user/core/common/widgets/product_card_shimmer.dart';
+import 'package:quikle_user/features/categories/presentation/widgets/category_screen_shimmer.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 import 'package:quikle_user/core/utils/navigation/navbar_navigation_helper.dart';
@@ -46,10 +48,38 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
       duration: const Duration(milliseconds: 500),
       value: 1.0,
     );
+
+    // Add scroll listener for pagination
+    _scroll.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    final controller = Get.find<UnifiedCategoryController>();
+
+    final scrollPercent =
+        _scroll.position.pixels / _scroll.position.maxScrollExtent;
+    print(
+      '📜 Scroll position: ${_scroll.position.pixels.toStringAsFixed(0)} / ${_scroll.position.maxScrollExtent.toStringAsFixed(0)} (${(scrollPercent * 100).toStringAsFixed(1)}%)',
+    );
+    print(
+      '📊 showingAllProducts: ${controller.showingAllProducts.value}, isLoadingMore: ${controller.isLoadingMore.value}, hasMore: ${controller.hasMore.value}',
+    );
+
+    // Trigger load more when 80% scrolled and showing all products
+    if (_scroll.position.pixels >= _scroll.position.maxScrollExtent * 0.8) {
+      print('🎯 Reached 80% threshold');
+      if (controller.showingAllProducts.value) {
+        print('✅ Calling loadMoreProducts()');
+        controller.loadMoreProducts();
+      } else {
+        print('⚠️ NOT showing all products, skipping load');
+      }
+    }
   }
 
   @override
   void dispose() {
+    _scroll.removeListener(_onScroll);
     _scroll.dispose();
     _navController.dispose();
     super.dispose();
@@ -164,36 +194,47 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
                               ),
                             ),
                             popularSection: hasPopular
-                                ? Padding(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 16.w,
-                                    ),
-                                    child: PopularItemsSection(
-                                      subcategories:
-                                          controller.isGroceryCategory
-                                          ? controller.allCategories
-                                          : controller.availableSubcategories,
-                                      onSubcategoryTap:
-                                          controller.onSubcategoryTap,
-                                      title: controller.isGroceryCategory
-                                          ? 'Categories'
-                                          : controller
-                                                .sectionTitle
-                                                .value
-                                                .isEmpty
-                                          ? 'Popular Items'
-                                          : controller.sectionTitle.value,
-                                      selectedSubcategory:
-                                          controller.isGroceryCategory
-                                          ? controller
-                                                .selectedMainCategory
-                                                .value
-                                          : controller
-                                                .selectedSubcategory
-                                                .value,
-                                      category: controller.currentCategory,
-                                    ),
-                                  )
+                                ? (controller.isLoading.value
+                                      ? Padding(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: 16.w,
+                                          ),
+                                          child: const PopularItemsShimmer(
+                                            itemCount: 5,
+                                          ),
+                                        )
+                                      : Padding(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: 16.w,
+                                          ),
+                                          child: PopularItemsSection(
+                                            subcategories:
+                                                controller.isGroceryCategory
+                                                ? controller.allCategories
+                                                : controller
+                                                      .availableSubcategories,
+                                            onSubcategoryTap:
+                                                controller.onSubcategoryTap,
+                                            title: controller.isGroceryCategory
+                                                ? 'Categories'
+                                                : controller
+                                                      .sectionTitle
+                                                      .value
+                                                      .isEmpty
+                                                ? 'Popular Items'
+                                                : controller.sectionTitle.value,
+                                            selectedSubcategory:
+                                                controller.isGroceryCategory
+                                                ? controller
+                                                      .selectedMainCategory
+                                                      .value
+                                                : controller
+                                                      .selectedSubcategory
+                                                      .value,
+                                            category:
+                                                controller.currentCategory,
+                                          ),
+                                        ))
                                 : const SizedBox.shrink(),
 
                             totalHeight: totalHeaderHeight,
@@ -209,10 +250,49 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
 
                         // 🔸 Offer Banner + Top Restaurants + Content
                         Obx(() {
+                          // Show full page loading only on initial load
                           if (controller.isLoading.value) {
-                            return const SliverFillRemaining(
-                              hasScrollBody: false,
-                              child: Center(child: CircularProgressIndicator()),
+                            return SliverList(
+                              delegate: SliverChildListDelegate([
+                                // Show prescription shimmer for medicine category
+                                if (controller.isMedicineCategory) ...[
+                                  const PrescriptionUploadShimmer(),
+                                  SizedBox(height: 8.h),
+                                ],
+                                // Show restaurant shimmer for food category
+                                if (controller.isFoodCategory) ...[
+                                  const TopRestaurantsShimmer(itemCount: 6),
+                                  SizedBox(height: 16.h),
+                                ],
+                                // Product grid shimmer
+                                Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 16.w,
+                                    vertical: 12.h,
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      const ProductGridHeaderShimmer(),
+                                      SizedBox(height: 12.h),
+                                      GridView.builder(
+                                        shrinkWrap: true,
+                                        physics:
+                                            const NeverScrollableScrollPhysics(),
+                                        gridDelegate:
+                                            SliverGridDelegateWithFixedCrossAxisCount(
+                                              crossAxisCount: 3,
+                                              crossAxisSpacing: 8.w,
+                                              mainAxisSpacing: 8.h,
+                                              childAspectRatio: 0.70,
+                                            ),
+                                        itemCount: 9,
+                                        itemBuilder: (context, index) =>
+                                            const ProductCardShimmer(),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ]),
                             );
                           }
 
@@ -243,17 +323,46 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
                                 const PrescriptionUploadSection(),
                                 SizedBox(height: 8.h),
                               ],
-                              // Main content (products)
-                              Padding(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 16.w,
-                                  vertical: 12.h,
+                              // Main content (products) - show shimmer only when loading products
+                              if (controller.isLoadingProducts.value)
+                                Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 16.w,
+                                    vertical: 12.h,
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      const ProductGridHeaderShimmer(),
+                                      SizedBox(height: 12.h),
+                                      GridView.builder(
+                                        shrinkWrap: true,
+                                        physics:
+                                            const NeverScrollableScrollPhysics(),
+                                        gridDelegate:
+                                            SliverGridDelegateWithFixedCrossAxisCount(
+                                              crossAxisCount: 3,
+                                              crossAxisSpacing: 8.w,
+                                              mainAxisSpacing: 8.h,
+                                              childAspectRatio: 0.70,
+                                            ),
+                                        itemCount: 9,
+                                        itemBuilder: (context, index) =>
+                                            const ProductCardShimmer(),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              else
+                                Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 16.w,
+                                    vertical: 12.h,
+                                  ),
+                                  child: _buildContent(
+                                    controller,
+                                    showTopRestaurants && !showRestaurantsAtTop,
+                                  ),
                                 ),
-                                child: _buildContent(
-                                  controller,
-                                  showTopRestaurants && !showRestaurantsAtTop,
-                                ),
-                              ),
                             ]),
                           );
                         }),
@@ -501,6 +610,47 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
               );
             },
           ),
+          // Loading indicator for pagination
+          Obx(() {
+            if (controller.isLoadingMore.value) {
+              return Padding(
+                padding: EdgeInsets.symmetric(vertical: 16.h),
+                child: GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    crossAxisSpacing: 8.w,
+                    mainAxisSpacing: 8.h,
+                    childAspectRatio: controller.isMedicineCategory
+                        ? 0.65
+                        : 0.70,
+                  ),
+                  itemCount: 3, // Show 3 shimmer cards while loading more
+                  itemBuilder: (context, index) => const ProductCardShimmer(),
+                ),
+              );
+            }
+            // Show "No more products" message if there are no more items
+            if (!controller.hasMore.value &&
+                controller.displayProducts.isNotEmpty) {
+              return Padding(
+                padding: EdgeInsets.symmetric(vertical: 16.h),
+                child: Center(
+                  child: Text(
+                    'No more products',
+                    style: TextStyle(
+                      color: AppColors.featherGrey,
+                      fontSize: 14.sp,
+                    ),
+                  ),
+                ),
+              );
+            }
+            return const SizedBox.shrink();
+          }),
+          // Add extra space to ensure content is scrollable even with few items
+          SizedBox(height: 100.h),
         ],
       ),
     );

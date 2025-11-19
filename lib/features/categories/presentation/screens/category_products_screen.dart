@@ -8,6 +8,7 @@ import 'package:quikle_user/core/common/widgets/cart_animation_overlay.dart';
 import 'package:quikle_user/core/common/widgets/custom_navbar.dart';
 import 'package:quikle_user/core/common/widgets/floating_cart_button.dart';
 import 'package:quikle_user/core/common/widgets/voice_search_overlay.dart';
+import 'package:quikle_user/core/common/widgets/product_card_shimmer.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/navigation/navbar_navigation_helper.dart';
 import 'package:quikle_user/features/categories/controllers/category_products_controller.dart';
@@ -15,6 +16,8 @@ import 'package:quikle_user/core/common/widgets/common_app_bar.dart';
 import 'package:quikle_user/features/categories/presentation/widgets/search_and_filters_section.dart';
 import 'package:quikle_user/features/categories/presentation/widgets/category_product_item.dart';
 import 'package:quikle_user/features/categories/presentation/widgets/minimal_subcategories_section.dart';
+import 'package:quikle_user/features/categories/presentation/widgets/minimal_subcategories_shimmer.dart';
+import 'package:quikle_user/features/categories/presentation/widgets/load_more_products_shimmer.dart';
 import 'package:quikle_user/features/orders/presentation/widgets/live_order_indicator.dart';
 
 class CategoryProductsScreen extends StatefulWidget {
@@ -41,13 +44,26 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
       duration: const Duration(milliseconds: 500),
       value: 1.0,
     );
+
+    // Add scroll listener for pagination
+    _scroll.addListener(_onScroll);
   }
 
   @override
   void dispose() {
+    _scroll.removeListener(_onScroll);
     _scroll.dispose();
     _navController.dispose();
     super.dispose();
+  }
+
+  void _onScroll() {
+    final controller = Get.find<CategoryProductsController>();
+
+    if (_scroll.position.pixels >= _scroll.position.maxScrollExtent * 0.8) {
+      // User scrolled 80% of the content
+      controller.loadMoreProducts();
+    }
   }
 
   void _measureNavBarHeight() {
@@ -161,23 +177,32 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
                                 ),
                               ),
                             ),
-                            subcategoriesSection: hasSubcategories
+                            subcategoriesSection:
+                                hasSubcategories ||
+                                    controller.isLoadingSubcategories.value
                                 ? SizedBox(
                                     height: subcategoriesHeight,
                                     child: Padding(
                                       padding: EdgeInsets.symmetric(
                                         horizontal: 16.w,
                                       ),
-                                      child: MinimalSubcategoriesSection(
-                                        categoryIconPath:
-                                            controller.currentCategory.iconPath,
-                                        subcategories: controller.subcategories,
-                                        selectedSubcategory: controller
-                                            .selectedSubcategory
-                                            .value,
-                                        onSubcategoryTap:
-                                            controller.onSubcategoryTap,
-                                      ),
+                                      child:
+                                          controller
+                                              .isLoadingSubcategories
+                                              .value
+                                          ? const MinimalSubcategoriesShimmer()
+                                          : MinimalSubcategoriesSection(
+                                              categoryIconPath: controller
+                                                  .currentCategory
+                                                  .iconPath,
+                                              subcategories:
+                                                  controller.subcategories,
+                                              selectedSubcategory: controller
+                                                  .selectedSubcategory
+                                                  .value,
+                                              onSubcategoryTap:
+                                                  controller.onSubcategoryTap,
+                                            ),
                                     ),
                                   )
                                 : const SizedBox.shrink(),
@@ -190,10 +215,7 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
                           ),
                         ),
                         if (controller.isLoading.value)
-                          const SliverFillRemaining(
-                            hasScrollBody: false,
-                            child: Center(child: CircularProgressIndicator()),
-                          )
+                          const ProductGridShimmer(itemCount: 9)
                         else if (controller.displayProducts.isEmpty)
                           SliverFillRemaining(
                             hasScrollBody: false,
@@ -249,6 +271,13 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
                               }, childCount: controller.displayProducts.length),
                             ),
                           ),
+                        // Loading more indicator
+                        if (controller.isLoadingMore.value)
+                          const SliverToBoxAdapter(
+                            child: LoadMoreProductsShimmer(itemCount: 3),
+                          ),
+                        // Bottom padding for scrollability
+                        SliverToBoxAdapter(child: SizedBox(height: 100.h)),
                       ],
                     );
                   }),
