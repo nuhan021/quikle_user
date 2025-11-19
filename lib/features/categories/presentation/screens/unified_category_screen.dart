@@ -9,6 +9,7 @@ import 'package:quikle_user/core/common/widgets/cart_animation_overlay.dart';
 import 'package:quikle_user/core/common/widgets/custom_navbar.dart';
 import 'package:quikle_user/core/common/widgets/floating_cart_button.dart';
 import 'package:quikle_user/core/common/widgets/voice_search_overlay.dart';
+import 'package:quikle_user/core/common/widgets/product_card_shimmer.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 import 'package:quikle_user/core/utils/navigation/navbar_navigation_helper.dart';
@@ -238,10 +239,7 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
                         // 🔸 Offer Banner + Top Restaurants + Content
                         Obx(() {
                           if (controller.isLoading.value) {
-                            return const SliverFillRemaining(
-                              hasScrollBody: false,
-                              child: Center(child: CircularProgressIndicator()),
-                            );
+                            return const ProductGridShimmer(itemCount: 9);
                           }
 
                           final showTopRestaurants =

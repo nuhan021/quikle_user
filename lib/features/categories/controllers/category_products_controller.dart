@@ -184,13 +184,13 @@ class CategoryProductsController extends GetxController with VoiceSearchMixin {
         final products = await _productDataService.getProductsBySubcategory(
           currentMainCategory.id, // subcategory ID
           categoryId: currentCategory.id,
-          limit: 10, // Initial load: 10 items
+          limit: 12, // Initial load: 12 items
         );
         allProducts.value = products;
         displayProducts.value = products;
         currentOffset.value = products.length;
         hasMore.value =
-            products.length >= 10; // If we got 10, there might be more
+            products.length >= 12; // If we got 12, there might be more
         print('✅ Loaded ${products.length} products initially');
       } else {
         // For other categories, use the old method
@@ -226,12 +226,12 @@ class CategoryProductsController extends GetxController with VoiceSearchMixin {
           final products = await _productDataService.getProductsBySubcategory(
             currentMainCategory.id,
             categoryId: currentCategory.id,
-            limit: 10, // Load 10 initially
+            limit: 12, // Load 12 initially
           );
 
           displayProducts.value = products;
           currentOffset.value = products.length;
-          hasMore.value = products.length >= 10;
+          hasMore.value = products.length >= 12;
 
           print('✅ Loaded ${products.length} products for "All"');
         } catch (e) {
@@ -258,7 +258,7 @@ class CategoryProductsController extends GetxController with VoiceSearchMixin {
           final products = await _productDataService.getProductsBySubcategory(
             currentMainCategory.id,
             categoryId: currentCategory.id,
-            limit: 10,
+            limit: 12,
           );
 
           displayProducts.value = products;
@@ -292,13 +292,13 @@ class CategoryProductsController extends GetxController with VoiceSearchMixin {
           currentMainCategory.id, // This is the subcategory ID
           categoryId: currentCategory.id,
           subSubcategoryId: subcategory.id, // This is the sub_subcategory ID
-          limit: 10, // Load 10 initially
+          limit: 12, // Load 10 initially
         );
 
         displayProducts.value = products;
         currentOffset.value = products.length;
         hasMore.value =
-            products.length >= 10; // If we got 10, there might be more
+            products.length >= 12; // If we got 10, there might be more
 
         print('✅ Loaded ${products.length} products for sub_subcategory');
       } catch (e) {

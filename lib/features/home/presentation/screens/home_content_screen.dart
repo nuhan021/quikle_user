@@ -5,6 +5,8 @@ import 'package:get/get.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/common/widgets/voice_search_overlay.dart';
 import 'package:quikle_user/features/prescription/controllers/prescription_controller.dart';
+import 'package:quikle_user/core/common/widgets/product_card_shimmer.dart';
+import 'package:quikle_user/core/common/widgets/category_shimmer.dart';
 import '../../controllers/home_controller.dart';
 import '../widgets/app_bar/home_app_bar.dart';
 import '../widgets/banners/offer_banner.dart';
@@ -103,16 +105,19 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                                       onVoiceTap:
                                           controller.onVoiceSearchPressed,
                                     ),
-                                    Obx(
-                                      () => CategoriesSection(
+                                    Obx(() {
+                                      if (controller.isLoading) {
+                                        return const CategoryShimmer(itemCount: 6);
+                                      }
+                                      return CategoriesSection(
                                         categories: controller.categories,
                                         onCategoryTap:
                                             controller.onCategoryPressed,
                                         selectedCategoryId:
                                             controller.selectedCategoryId,
                                         showTitle: true,
-                                      ),
-                                    ),
+                                      );
+                                    }),
                                     if (hasIndicator)
                                       const PrescriptionStatusIndicator(),
                                   ],
@@ -126,9 +131,22 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                   }),
                   Obx(() {
                     if (controller.isLoading) {
-                      return const SliverFillRemaining(
-                        hasScrollBody: false,
-                        child: Center(child: CircularProgressIndicator()),
+                      return SliverPadding(
+                        padding: EdgeInsets.only(top: 12.h, bottom: 24.h),
+                        sliver: SliverList(
+                          delegate: SliverChildListDelegate([
+                            Center(child: OfferBanner()),
+                            12.verticalSpace,
+                            // Show shimmer for 6 product sections
+                            const ProductSectionShimmer(isMedicine: false),
+                            const ProductSectionShimmer(isMedicine: true),
+                            const ProductSectionShimmer(isMedicine: false),
+                            const ProductSectionShimmer(isMedicine: false),
+                            const ProductSectionShimmer(isMedicine: false),
+                            const ProductSectionShimmer(isMedicine: false),
+                            SizedBox(height: 50.h),
+                          ]),
+                        ),
                       );
                     }
 
