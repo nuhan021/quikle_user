@@ -250,6 +250,7 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
 
                         // 🔸 Offer Banner + Top Restaurants + Content
                         Obx(() {
+                          // Show full page loading only on initial load
                           if (controller.isLoading.value) {
                             return SliverList(
                               delegate: SliverChildListDelegate([
@@ -322,17 +323,46 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
                                 const PrescriptionUploadSection(),
                                 SizedBox(height: 8.h),
                               ],
-                              // Main content (products)
-                              Padding(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 16.w,
-                                  vertical: 12.h,
+                              // Main content (products) - show shimmer only when loading products
+                              if (controller.isLoadingProducts.value)
+                                Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 16.w,
+                                    vertical: 12.h,
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      const ProductGridHeaderShimmer(),
+                                      SizedBox(height: 12.h),
+                                      GridView.builder(
+                                        shrinkWrap: true,
+                                        physics:
+                                            const NeverScrollableScrollPhysics(),
+                                        gridDelegate:
+                                            SliverGridDelegateWithFixedCrossAxisCount(
+                                              crossAxisCount: 3,
+                                              crossAxisSpacing: 8.w,
+                                              mainAxisSpacing: 8.h,
+                                              childAspectRatio: 0.70,
+                                            ),
+                                        itemCount: 9,
+                                        itemBuilder: (context, index) =>
+                                            const ProductCardShimmer(),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              else
+                                Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 16.w,
+                                    vertical: 12.h,
+                                  ),
+                                  child: _buildContent(
+                                    controller,
+                                    showTopRestaurants && !showRestaurantsAtTop,
+                                  ),
                                 ),
-                                child: _buildContent(
-                                  controller,
-                                  showTopRestaurants && !showRestaurantsAtTop,
-                                ),
-                              ),
                             ]),
                           );
                         }),

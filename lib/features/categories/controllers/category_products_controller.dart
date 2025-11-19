@@ -340,12 +340,10 @@ class CategoryProductsController extends GetxController with VoiceSearchMixin {
 
       final result = await _productDataService.fetchMoreProducts(
         categoryId: currentCategory.id,
-        subcategoryId: currentMainCategory.id, // Always the subcategory
-        subSubcategoryId: selectedSubcategory
-            .value
-            ?.id, // null if "All", ID if sub_subcategory selected
+        subcategoryId: currentMainCategory.id,
+        subSubcategoryId: selectedSubcategory.value?.id,
         offset: offset,
-        limit: 15, // Load 15 more items on scroll
+        limit: 15,
       );
 
       final newProducts = result['products'] as List<ProductModel>;
