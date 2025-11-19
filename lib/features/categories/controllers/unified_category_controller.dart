@@ -221,15 +221,14 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
   }
 
   Future<void> _loadGroceryMainCategories() async {
-    // Try to get cached subcategories first
-    final cachedSubcategories = await _cacheService.getCachedSubcategories(
-      categoryId: currentCategory.id,
-    );
+    // Try to get cached data in parallel
+    final results = await Future.wait([
+      _cacheService.getCachedSubcategories(categoryId: currentCategory.id),
+      _cacheService.getCachedProducts(categoryId: currentCategory.id),
+    ]);
 
-    // Try to get cached products first
-    final cachedProducts = await _cacheService.getCachedProducts(
-      categoryId: currentCategory.id,
-    );
+    final cachedSubcategories = results[0] as List<SubcategoryModel>?;
+    final cachedProducts = results[1] as List<ProductModel>?;
 
     // If we have both cached data, use it immediately
     if (cachedSubcategories != null && cachedProducts != null) {
@@ -252,63 +251,72 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
       return;
     }
 
-    // If no cache, fetch from API
+    // If no cache, fetch from API in parallel
     print(
       '🌐 No cache found, fetching from API for category: ${currentCategory.id}',
     );
-    final mainCategories = await _categoryService.fetchSubcategories(
-      currentCategory.id,
-    );
 
+    // Fetch BOTH subcategories and products concurrently using Future.wait
+    final apiResults = await Future.wait([
+      _categoryService.fetchSubcategories(currentCategory.id),
+      _categoryService.fetchAllProductsByCategory(currentCategory.id, limit: 9),
+    ]);
+
+    final mainCategories = apiResults[0] as List<SubcategoryModel>;
+    final products = apiResults[1] as List<ProductModel>;
+
+    // Update all data at once
     allCategories.value = mainCategories;
     availableSubcategories.value = mainCategories;
     sectionTitle.value = 'Select Category';
-
-    // Initially load only 9 products
+    selectedMainCategory.value = null;
+    filterSubcategories.clear();
     currentOffset.value = 0;
     hasMore.value = true;
-    final products = await _categoryService.fetchAllProductsByCategory(
-      currentCategory.id,
-      limit: 9,
-    );
+
     allProducts.value = products;
     displayProducts.value = products;
     productsTitle.value = 'All ${currentCategory.title}';
 
-    selectedMainCategory.value = null;
-    filterSubcategories.clear();
-
-    // Cache the fetched data
-    await _cacheService.cacheSubcategories(
-      categoryId: currentCategory.id,
-      subcategories: mainCategories,
-    );
-    await _cacheService.cacheProducts(
-      categoryId: currentCategory.id,
-      products: products,
-    );
+    // Cache both in parallel
+    await Future.wait([
+      _cacheService.cacheSubcategories(
+        categoryId: currentCategory.id,
+        subcategories: mainCategories,
+      ),
+      _cacheService.cacheProducts(
+        categoryId: currentCategory.id,
+        products: products,
+      ),
+    ]);
   }
 
   /// Refresh grocery data in background (after showing cached data)
   Future<void> _refreshGroceryDataInBackground() async {
     try {
-      final mainCategories = await _categoryService.fetchSubcategories(
-        currentCategory.id,
-      );
-      final products = await _categoryService.fetchAllProductsByCategory(
-        currentCategory.id,
-        limit: 9,
-      );
+      // Fetch both subcategories and products in parallel
+      final results = await Future.wait([
+        _categoryService.fetchSubcategories(currentCategory.id),
+        _categoryService.fetchAllProductsByCategory(
+          currentCategory.id,
+          limit: 9,
+        ),
+      ]);
 
-      // Update cache with fresh data
-      await _cacheService.cacheSubcategories(
-        categoryId: currentCategory.id,
-        subcategories: mainCategories,
-      );
-      await _cacheService.cacheProducts(
-        categoryId: currentCategory.id,
-        products: products,
-      );
+      final mainCategories = results[0] as List<SubcategoryModel>;
+      final products = results[1] as List<ProductModel>;
+
+      // Update cache with fresh data in parallel
+      await Future.wait([
+        _cacheService.cacheSubcategories(
+          categoryId: currentCategory.id,
+          subcategories: mainCategories,
+        ),
+        _cacheService.cacheProducts(
+          categoryId: currentCategory.id,
+          products: products,
+        ),
+      ]);
 
       // Only update UI if data has changed
       if (mainCategories.length != allCategories.length ||
@@ -324,15 +332,14 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
   }
 
   Future<void> _loadCategorySubcategories() async {
-    // Try to get cached subcategories first
-    final cachedSubcategories = await _cacheService.getCachedSubcategories(
-      categoryId: currentCategory.id,
-    );
+    // Try to get cached data in parallel
+    final results = await Future.wait([
+      _cacheService.getCachedSubcategories(categoryId: currentCategory.id),
+      _cacheService.getCachedProducts(categoryId: currentCategory.id),
+    ]);
 
-    // Try to get cached products first
-    final cachedProducts = await _cacheService.getCachedProducts(
-      categoryId: currentCategory.id,
-    );
+    final cachedSubcategories = results[0] as List<SubcategoryModel>?;
+    final cachedProducts = results[1] as List<ProductModel>?;
 
     // If we have both cached data, use it immediately
     if (cachedSubcategories != null && cachedProducts != null) {
@@ -358,35 +365,39 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
     print(
       '🌐 No cache found, fetching from API for category: ${currentCategory.id}',
     );
-    final subcategories = await _categoryService.fetchSubcategories(
-      currentCategory.id,
-    );
+
+    // Fetch BOTH subcategories and products concurrently using Future.wait
+    final apiResults = await Future.wait([
+      _categoryService.fetchSubcategories(currentCategory.id),
+      _categoryService.fetchAllProductsByCategory(currentCategory.id, limit: 9),
+    ]);
+
+    final subcategories = apiResults[0] as List<SubcategoryModel>;
+    final products = apiResults[1] as List<ProductModel>;
+
+    // Update all data at once
     allCategories.value = subcategories;
     availableSubcategories.value = subcategories;
     sectionTitle.value = 'Popular Items';
-
-    // Initially load only 9 products for category page
+    selectedSubcategory.value = null;
     currentOffset.value = 0;
     hasMore.value = true;
-    final products = await _categoryService.fetchAllProductsByCategory(
-      currentCategory.id,
-      limit: 9,
-    );
+
     allProducts.value = products;
     displayProducts.value = products;
     productsTitle.value = 'All ${currentCategory.title}';
 
-    selectedSubcategory.value = null;
-
-    // Cache the fetched data
-    await _cacheService.cacheSubcategories(
-      categoryId: currentCategory.id,
-      subcategories: subcategories,
-    );
-    await _cacheService.cacheProducts(
-      categoryId: currentCategory.id,
-      products: products,
-    );
+    // Cache both in parallel
+    await Future.wait([
+      _cacheService.cacheSubcategories(
+        categoryId: currentCategory.id,
+        subcategories: subcategories,
+      ),
+      _cacheService.cacheProducts(
+        categoryId: currentCategory.id,
+        products: products,
+      ),
+    ]);
 
     // TODO: Recommended products will come from API later
     // if (!isGroceryCategory) {
@@ -397,23 +408,29 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
   /// Refresh category data in background (after showing cached data)
   Future<void> _refreshCategoryDataInBackground() async {
     try {
-      final subcategories = await _categoryService.fetchSubcategories(
-        currentCategory.id,
-      );
-      final products = await _categoryService.fetchAllProductsByCategory(
-        currentCategory.id,
-        limit: 9,
-      );
+      // Fetch both subcategories and products in parallel
+      final results = await Future.wait([
+        _categoryService.fetchSubcategories(currentCategory.id),
+        _categoryService.fetchAllProductsByCategory(
+          currentCategory.id,
+          limit: 9,
+        ),
+      ]);
 
-      // Update cache with fresh data
-      await _cacheService.cacheSubcategories(
-        categoryId: currentCategory.id,
-        subcategories: subcategories,
-      );
-      await _cacheService.cacheProducts(
-        categoryId: currentCategory.id,
-        products: products,
-      );
+      final subcategories = results[0] as List<SubcategoryModel>;
+      final products = results[1] as List<ProductModel>;
+
+      // Update cache with fresh data in parallel
+      await Future.wait([
+        _cacheService.cacheSubcategories(
+          categoryId: currentCategory.id,
+          subcategories: subcategories,
+        ),
+        _cacheService.cacheProducts(
+          categoryId: currentCategory.id,
+          products: products,
+        ),
+      ]);
 
       // Only update UI if data has changed
       if (subcategories.length != allCategories.length ||
