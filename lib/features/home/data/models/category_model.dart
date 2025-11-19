@@ -16,7 +16,8 @@ class CategoryModel {
       id: json['id'].toString(),
       title: json['name'] as String,
       type: json['type'] ?? 'All',
-      iconPath: json['avatar'] as String,
+      //iconPath: json['avatar'] as String,
+      iconPath: 'assets/images/logo.png',
     );
   }
 }

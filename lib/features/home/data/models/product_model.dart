@@ -49,9 +49,10 @@ class ProductModel {
       price: isCachedData
           ? (json['price'] as String?) ?? '\$0'
           : '\$${json['sell_price'] ?? 0}',
-      imagePath: isCachedData
-          ? (json['imagePath'] as String?) ?? ''
-          : (json['image'] as String?) ?? '',
+      // imagePath: isCachedData
+      //     ? (json['imagePath'] as String?) ?? ''
+      //     : (json['image'] as String?) ?? '',
+      imagePath: 'assets/images/logo.png',
       categoryId: isCachedData
           ? (json['categoryId'] as String?) ?? ''
           : json['category_id']?.toString() ?? '',
