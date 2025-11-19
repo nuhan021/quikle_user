@@ -20,7 +20,14 @@ class CategoryCacheService {
   }
 
   /// Generate cache key for category products
-  String _getCacheKey(String categoryId, String? subcategoryId) {
+  String _getCacheKey(
+    String categoryId,
+    String? subcategoryId, [
+    String? subSubcategoryId,
+  ]) {
+    if (subSubcategoryId != null && subcategoryId != null) {
+      return '${_cachePrefix}${categoryId}_${subcategoryId}_$subSubcategoryId';
+    }
     if (subcategoryId != null) {
       return '${_cachePrefix}${categoryId}_$subcategoryId';
     }
@@ -28,7 +35,13 @@ class CategoryCacheService {
   }
 
   /// Generate cache key for subcategory list
-  String _getSubcategoryListKey(String categoryId) {
+  String _getSubcategoryListKey(
+    String categoryId, [
+    String? parentSubcategoryId,
+  ]) {
+    if (parentSubcategoryId != null) {
+      return '${_subcategoryListPrefix}${categoryId}_$parentSubcategoryId';
+    }
     return '$_subcategoryListPrefix$categoryId';
   }
 
@@ -52,15 +65,20 @@ class CategoryCacheService {
     }
   }
 
-  /// Cache initial products for a category/subcategory
+  /// Cache initial products for a category/subcategory/sub-subcategory
   Future<void> cacheProducts({
     required String categoryId,
     String? subcategoryId,
+    String? subSubcategoryId,
     required List<ProductModel> products,
   }) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final cacheKey = _getCacheKey(categoryId, subcategoryId);
+      final cacheKey = _getCacheKey(
+        categoryId,
+        subcategoryId,
+        subSubcategoryId,
+      );
 
       // Convert products to JSON
       final productsJson = products.map((p) => p.toJson()).toList();
@@ -76,21 +94,26 @@ class CategoryCacheService {
       );
 
       AppLoggerHelper.debug(
-        '💾 Cached ${products.length} products for category: $categoryId${subcategoryId != null ? ', subcategory: $subcategoryId' : ''}',
+        '💾 Cached ${products.length} products for category: $categoryId${subcategoryId != null ? ', subcategory: $subcategoryId' : ''}${subSubcategoryId != null ? ', sub-subcategory: $subSubcategoryId' : ''}',
       );
     } catch (e) {
       AppLoggerHelper.error('Error caching products', e);
     }
   }
 
-  /// Get cached products for a category/subcategory
+  /// Get cached products for a category/subcategory/sub-subcategory
   Future<List<ProductModel>?> getCachedProducts({
     required String categoryId,
     String? subcategoryId,
+    String? subSubcategoryId,
   }) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final cacheKey = _getCacheKey(categoryId, subcategoryId);
+      final cacheKey = _getCacheKey(
+        categoryId,
+        subcategoryId,
+        subSubcategoryId,
+      );
 
       // Check if cache exists
       if (!await _isCacheValid(cacheKey)) {
@@ -111,7 +134,7 @@ class CategoryCacheService {
           .toList();
 
       AppLoggerHelper.debug(
-        '✅ Retrieved ${products.length} cached products for category: $categoryId${subcategoryId != null ? ', subcategory: $subcategoryId' : ''}',
+        '✅ Retrieved ${products.length} cached products for category: $categoryId${subcategoryId != null ? ', subcategory: $subcategoryId' : ''}${subSubcategoryId != null ? ', sub-subcategory: $subSubcategoryId' : ''}',
       );
 
       return products;
@@ -124,11 +147,12 @@ class CategoryCacheService {
   /// Cache subcategory list for a category
   Future<void> cacheSubcategories({
     required String categoryId,
+    String? parentSubcategoryId,
     required List<SubcategoryModel> subcategories,
   }) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final cacheKey = _getSubcategoryListKey(categoryId);
+      final cacheKey = _getSubcategoryListKey(categoryId, parentSubcategoryId);
 
       // Convert subcategories to JSON
       final subcategoriesJson = subcategories.map((s) => s.toJson()).toList();
@@ -144,7 +168,7 @@ class CategoryCacheService {
       );
 
       AppLoggerHelper.debug(
-        '💾 Cached ${subcategories.length} subcategories for category: $categoryId',
+        '💾 Cached ${subcategories.length} subcategories for category: $categoryId${parentSubcategoryId != null ? ', parent: $parentSubcategoryId' : ''}',
       );
     } catch (e) {
       AppLoggerHelper.error('Error caching subcategories', e);
@@ -154,10 +178,11 @@ class CategoryCacheService {
   /// Get cached subcategories for a category
   Future<List<SubcategoryModel>?> getCachedSubcategories({
     required String categoryId,
+    String? parentSubcategoryId,
   }) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final cacheKey = _getSubcategoryListKey(categoryId);
+      final cacheKey = _getSubcategoryListKey(categoryId, parentSubcategoryId);
 
       // Check if cache exists
       if (!await _isCacheValid(cacheKey)) {
@@ -182,7 +207,7 @@ class CategoryCacheService {
           .toList();
 
       AppLoggerHelper.debug(
-        '✅ Retrieved ${subcategories.length} cached subcategories for category: $categoryId',
+        '✅ Retrieved ${subcategories.length} cached subcategories for category: $categoryId${parentSubcategoryId != null ? ', parent: $parentSubcategoryId' : ''}',
       );
 
       return subcategories;
