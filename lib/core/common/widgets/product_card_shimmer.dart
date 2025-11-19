@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shimmer/shimmer.dart';
 
-/// Shimmer loading effect for product cards
-/// Matches the exact dimensions of UnifiedProductCard
 class ProductCardShimmer extends StatelessWidget {
   final double? width;
   final double? height;
@@ -12,87 +10,165 @@ class ProductCardShimmer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Shimmer.fromColors(
-      baseColor: Colors.grey[300]!,
-      highlightColor: Colors.grey[100]!,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Product image placeholder
-          Container(
-            width: width ?? double.infinity,
-            height: height ?? 100.h,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12.r),
-            ),
-          ),
-          SizedBox(height: 6.h),
-
-          // Product title placeholder
-          Container(
-            width: (width ?? 100.w) * 0.8,
-            height: 12.h,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(4.r),
-            ),
-          ),
-          SizedBox(height: 4.h),
-
-          // Rating and info placeholder
-          Row(
-            children: [
-              Container(
-                width: 40.w,
-                height: 10.h,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(4.r),
-                ),
-              ),
-              SizedBox(width: 8.w),
-              Container(
-                width: 30.w,
-                height: 10.h,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(4.r),
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 6.h),
-
-          // Price and cart button placeholder
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                width: 50.w,
-                height: 14.h,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(4.r),
-                ),
-              ),
-              Container(
-                width: 22.w,
-                height: 22.w,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(6.r),
-                ),
-              ),
-            ],
+    return Container(
+      decoration: ShapeDecoration(
+        color: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
+        shadows: [
+          BoxShadow(
+            color: const Color(0x14000000),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+            spreadRadius: 0,
           ),
         ],
+      ),
+      child: Shimmer.fromColors(
+        baseColor: Colors.grey[300]!,
+        highlightColor: Colors.grey[100]!,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Image section with exact card structure
+            Flexible(
+              flex: 3,
+              fit: FlexFit.loose,
+              child: Stack(
+                children: [
+                  Container(
+                    width: double.infinity,
+                    height: double.infinity,
+                    decoration: ShapeDecoration(
+                      color: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(8.r),
+                        ),
+                      ),
+                    ),
+                  ),
+                  // Favorite icon placeholder
+                  Positioned(
+                    top: 4.h,
+                    right: 4.w,
+                    child: Container(
+                      width: 18.sp,
+                      height: 18.sp,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[400],
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Product info section
+            Flexible(
+              flex: 3,
+              fit: FlexFit.loose,
+              child: Padding(
+                padding: EdgeInsets.all(6.w),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Product title placeholder
+                    Container(
+                      width: double.infinity,
+                      height: 12.h,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(4.r),
+                      ),
+                    ),
+                    SizedBox(height: 6.h),
+
+                    // Rating and delivery time placeholder
+                    Row(
+                      children: [
+                        // Star icon
+                        Container(
+                          width: 10.sp,
+                          height: 10.sp,
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        SizedBox(width: 2.w),
+                        // Rating text
+                        Container(
+                          width: 20.w,
+                          height: 9.h,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(2.r),
+                          ),
+                        ),
+                        SizedBox(width: 4.w),
+                        // Clock icon
+                        Container(
+                          width: 9.sp,
+                          height: 9.sp,
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        SizedBox(width: 2.w),
+                        // Delivery time text
+                        Container(
+                          width: 30.w,
+                          height: 8.h,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(2.r),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 4.h),
+
+                    // Price and cart button placeholder
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        // Price
+                        Container(
+                          width: 50.w,
+                          height: 12.h,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(4.r),
+                          ),
+                        ),
+                        SizedBox(width: 4.w),
+                        // Cart button
+                        Container(
+                          width: 22.w,
+                          height: 22.w,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(4.r),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
-/// Grid shimmer for category screens (3 columns)
 class ProductGridShimmer extends StatelessWidget {
   final int itemCount;
 
@@ -118,7 +194,6 @@ class ProductGridShimmer extends StatelessWidget {
   }
 }
 
-/// Horizontal shimmer for home screen sections
 class ProductHorizontalShimmer extends StatelessWidget {
   final int itemCount;
 
@@ -141,8 +216,6 @@ class ProductHorizontalShimmer extends StatelessWidget {
   }
 }
 
-/// Product section shimmer for home screen
-/// Matches the ProductSection widget with header and 3-column grid
 class ProductSectionShimmer extends StatelessWidget {
   final bool isMedicine;
 
