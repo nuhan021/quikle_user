@@ -8,6 +8,7 @@ import 'package:quikle_user/core/common/widgets/cart_animation_overlay.dart';
 import 'package:quikle_user/core/common/widgets/custom_navbar.dart';
 import 'package:quikle_user/core/common/widgets/floating_cart_button.dart';
 import 'package:quikle_user/core/common/widgets/voice_search_overlay.dart';
+import 'package:quikle_user/core/common/widgets/product_card_shimmer.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/navigation/navbar_navigation_helper.dart';
 import 'package:quikle_user/features/categories/controllers/category_products_controller.dart';
@@ -203,10 +204,7 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
                           ),
                         ),
                         if (controller.isLoading.value)
-                          const SliverFillRemaining(
-                            hasScrollBody: false,
-                            child: Center(child: CircularProgressIndicator()),
-                          )
+                          const ProductGridShimmer(itemCount: 9)
                         else if (controller.displayProducts.isEmpty)
                           SliverFillRemaining(
                             hasScrollBody: false,

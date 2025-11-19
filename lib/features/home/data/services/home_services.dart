@@ -147,6 +147,7 @@ class HomeService {
   }
 
   Future<List<ProductModel>> fetchAllProducts() async {
-    return _productService.allProducts;
+    // Return empty list - all products should come from specific category APIs
+    return [];
   }
 }
