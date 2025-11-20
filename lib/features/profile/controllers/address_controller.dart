@@ -20,7 +20,7 @@ class AddressController extends GetxController {
     _isLoading.value = true;
 
     try {
-      final addresses = await _addressService.fetchAddresses('user123');
+      final addresses = await _addressService.fetchAddresses();
       _addresses.assignAll(addresses);
     } catch (e) {
       print('Error loading addresses: $e');

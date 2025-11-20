@@ -3,6 +3,8 @@ class ProductModel {
   final String title;
   final String description;
   final String price;
+  final String? beforeDiscountPrice;
+  final String? discountPercentage;
   final String imagePath;
   final String categoryId;
   final String? subcategoryId;
@@ -23,6 +25,8 @@ class ProductModel {
     required this.title,
     required this.description,
     required this.price,
+    this.beforeDiscountPrice,
+    this.discountPercentage,
     required this.imagePath,
     required this.categoryId,
     this.subcategoryId,
@@ -49,6 +53,12 @@ class ProductModel {
       price: isCachedData
           ? (json['price'] as String?) ?? '\$0'
           : '\$${json['sell_price'] ?? 0}',
+      beforeDiscountPrice: isCachedData
+          ? (json['beforeDiscountPrice'] as String?) ?? ''
+          : (json['price'] != null ? '\$${json['price']}' : null),
+      discountPercentage: isCachedData
+          ? (json['discount'] as String?) ?? ''
+          : (json['discount'] != null ? json['discount'].toString() : null),
       // imagePath: isCachedData
       //     ? (json['imagePath'] as String?) ?? ''
       //     : (json['image'] as String?) ?? '',
@@ -93,6 +103,8 @@ class ProductModel {
       'title': title,
       'description': description,
       'price': price,
+      'beforeDiscountPrice': beforeDiscountPrice,
+      'discount': discountPercentage,
       'imagePath': imagePath,
       'categoryId': categoryId,
       'subcategoryId': subcategoryId,

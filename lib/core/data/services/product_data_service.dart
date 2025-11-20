@@ -69,10 +69,12 @@ class ProductDataService {
           'Fetched ${data.length} food products. Total: ${responseMap['total']}',
         );
 
+        AppLoggerHelper.warning("Food data: $data");
+
         final products = data
             .map((json) => ProductModel.fromJson(json as Map<String, dynamic>))
             .toList();
-
+        print("Food products: ${products[0].discountPercentage}");
         return products;
       }
 

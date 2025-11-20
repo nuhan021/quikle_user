@@ -198,9 +198,9 @@ import 'package:quikle_user/core/utils/constants/enums/address_type_enums.dart';
 class AddressService extends GetxService {
   final NetworkCaller _networkCaller = NetworkCaller();
 
-  Future<List<ShippingAddressModel>> fetchAddresses(String userId) async {
+  Future<List<ShippingAddressModel>> fetchAddresses() async {
     try {
-      AppLoggerHelper.debug('Fetching addresses for user: $userId');
+      AppLoggerHelper.debug('Fetching addresses');
 
       final token = StorageService.token;
       final refreshToken = StorageService.refreshToken;
@@ -212,6 +212,9 @@ class AddressService extends GetxService {
           'refresh-token': '$refreshToken',
         },
       );
+
+      AppLoggerHelper.debug('Address data is: ${response.statusCode}');
+      AppLoggerHelper.debug('Address data is: ${response.responseData}');
 
       if (response.isSuccess && response.responseData != null) {
         final List data = response.responseData as List;
