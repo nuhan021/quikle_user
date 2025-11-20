@@ -24,10 +24,11 @@ class ProductInfoWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool hasDiscount = price != originalPrice;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        
         Text(
           title,
           style: getTextStyle(
@@ -39,7 +40,6 @@ class ProductInfoWidget extends StatelessWidget {
         ),
         SizedBox(height: 8.h),
 
-        
         Row(
           children: [
             Icon(Icons.star, color: Colors.orange, size: 16.sp),
@@ -64,7 +64,6 @@ class ProductInfoWidget extends StatelessWidget {
         ),
         SizedBox(height: 16.h),
 
-        
         Row(
           children: [
             Text(
@@ -76,33 +75,35 @@ class ProductInfoWidget extends StatelessWidget {
                 color: AppColors.ebonyBlack,
               ),
             ),
-            SizedBox(width: 8.w),
-            Text(
-              originalPrice,
-              style:
-                  getTextStyle(
-                    font: CustomFonts.inter,
+            if (hasDiscount) ...[
+              SizedBox(width: 8.w),
+              Text(
+                originalPrice,
+                style:
+                    getTextStyle(
+                      font: CustomFonts.inter,
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.featherGrey,
+                    ).copyWith(
+                      decoration: TextDecoration.lineThrough,
+                      decorationColor: AppColors.featherGrey,
+                      decorationThickness: 1.5,
+                    ),
+              ),
+              SizedBox(width: 8.w),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+                child: Text(
+                  discount,
+                  style: TextStyle(
                     fontSize: 14.sp,
                     fontWeight: FontWeight.w500,
-                    color: AppColors.featherGrey,
-                  ).copyWith(
-                    decoration: TextDecoration.lineThrough,
-                    decorationColor: AppColors.featherGrey,
-                    decorationThickness: 1.5,
+                    color: AppColors.beakYellow,
                   ),
-            ),
-            SizedBox(width: 8.w),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
-              child: Text(
-                discount,
-                style: TextStyle(
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.beakYellow,
                 ),
               ),
-            ),
+            ],
           ],
         ),
       ],
