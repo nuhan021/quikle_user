@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:quikle_user/features/profile/data/services/address_service.dart';
-import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/features/profile/data/models/shipping_address_model.dart';
 import 'package:quikle_user/features/profile/controllers/address_controller.dart';
 import 'package:quikle_user/core/utils/constants/enums/address_type_enums.dart';
@@ -156,7 +155,36 @@ class AddAddressController extends GetxController {
   }
 */
   Future<void> addAddress() async {
-    //if (!_validateForm()) return;
+    // Basic validation
+    if (nameController.text.trim().isEmpty) {
+      nameError.value = 'Full name is required';
+      return;
+    }
+
+    if (phoneController.text.trim().isEmpty) {
+      phoneError.value = 'Phone number is required';
+      return;
+    }
+
+    if (addressController.text.trim().isEmpty) {
+      addressError.value = 'Address is required';
+      return;
+    }
+
+    if (selectedState.value == null || selectedState.value!.isEmpty) {
+      Get.snackbar('Validation Error', 'Please select a state');
+      return;
+    }
+
+    if (selectedCity.value == null || selectedCity.value!.isEmpty) {
+      Get.snackbar('Validation Error', 'Please select a city');
+      return;
+    }
+
+    if (zipCodeController.text.trim().isEmpty) {
+      zipCodeError.value = 'Zip code is required';
+      return;
+    }
 
     try {
       isLoading.value = true;
@@ -168,6 +196,7 @@ class AddAddressController extends GetxController {
         address: addressController.text.trim(),
         city: selectedCity.value!,
         state: selectedState.value!,
+        country: selectedCountry.value ?? 'India',
         zipCode: zipCodeController.text.trim(),
         phoneNumber: phoneController.text.trim(),
         type: selectedAddressType.value!,
@@ -175,26 +204,14 @@ class AddAddressController extends GetxController {
         createdAt: DateTime.now(),
       );
 
-      final addedAddress = await _addressService.addAddress(newAddress);
+      // The AddressController will handle the API call and refresh
+      await _addressController.addAddress(newAddress);
 
-      await _addressController.addAddress(addedAddress);
-
+      // Clear form only if successful (AddressController will show success message)
       clearForm();
-      Get.back();
-      Get.snackbar(
-        'Success',
-        'Address added successfully',
-        backgroundColor: AppColors.freeColor,
-        colorText: Colors.white,
-        duration: const Duration(seconds: 2),
-      );
     } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Failed to add address: ${e.toString()}',
-        backgroundColor: AppColors.error,
-        colorText: Colors.white,
-      );
+      // Error is already handled in AddressController
+      // Just re-enable the button
     } finally {
       isLoading.value = false;
     }

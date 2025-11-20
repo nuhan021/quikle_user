@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:quikle_user/core/common/styles/global_text_style.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
@@ -30,11 +31,7 @@ class AddressBookScreen extends StatelessWidget {
             Expanded(
               child: Obx(() {
                 if (controller.isLoading) {
-                  return Center(
-                    child: CircularProgressIndicator(
-                      color: AppColors.beakYellow,
-                    ),
-                  );
+                  return _buildShimmerList();
                 }
 
                 if (controller.addresses.isEmpty) {
@@ -312,6 +309,115 @@ class AddressBookScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  /// ✨ Shimmer skeleton list that mimics address cards
+  Widget _buildShimmerList() {
+    return ListView.builder(
+      itemCount: 3,
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+      itemBuilder: (context, index) {
+        return Shimmer.fromColors(
+          baseColor: Colors.grey.shade300,
+          highlightColor: Colors.grey.shade100,
+          child: Container(
+            margin: EdgeInsets.only(bottom: 12.h),
+            padding: EdgeInsets.all(12.w),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8.r),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Left icon placeholder
+                Container(
+                  width: 60.w,
+                  height: 60.w,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                ),
+                SizedBox(width: 8.w),
+
+                // Middle content shimmer lines
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Name
+                      Container(
+                        height: 14.h,
+                        width: 120.w,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(4.r),
+                        ),
+                      ),
+                      SizedBox(height: 4.h),
+                      // Phone
+                      Container(
+                        height: 12.h,
+                        width: 100.w,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(4.r),
+                        ),
+                      ),
+                      SizedBox(height: 4.h),
+                      // Address line 1
+                      Container(
+                        height: 12.h,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(4.r),
+                        ),
+                      ),
+                      SizedBox(height: 4.h),
+                      // Address line 2
+                      Container(
+                        height: 12.h,
+                        width: 180.w,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(4.r),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Right side - default badge placeholder
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Container(
+                      width: 60.w,
+                      height: 24.h,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(4.r),
+                      ),
+                    ),
+                    SizedBox(height: 32.h),
+                    Container(
+                      width: 20.w,
+                      height: 20.h,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(4.r),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

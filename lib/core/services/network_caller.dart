@@ -7,7 +7,7 @@ import '../models/response_data.dart';
 import '../utils/logging/logger.dart';
 
 class NetworkCaller {
-  final int timeoutDuration = 30; // Increased to 30 seconds for cold starts
+  final int timeoutDuration = 30;
 
   Future<ResponseData> getRequest(
     String url, {
@@ -77,6 +77,30 @@ class NetworkCaller {
 
     try {
       final response = await put(
+        Uri.parse(url),
+        headers: requestHeaders,
+        body: jsonEncode(body ?? {}),
+      ).timeout(Duration(seconds: timeoutDuration));
+      return _handleResponse(response);
+    } catch (e) {
+      return _handleError(e);
+    }
+  }
+
+  Future<ResponseData> patchRequest(
+    String url, {
+    Map<String, dynamic>? body,
+    String? token,
+    Map<String, String>? headers,
+  }) async {
+    Map<String, String> requestHeaders = {
+      'Content-Type': 'application/json',
+      if (token != null) 'Authorization': token,
+      if (headers != null) ...headers,
+    };
+
+    try {
+      final response = await patch(
         Uri.parse(url),
         headers: requestHeaders,
         body: jsonEncode(body ?? {}),
@@ -197,22 +221,24 @@ class NetworkCaller {
   }
 
   String _extractErrorMessages(dynamic errorSources) {
-    if (errorSources is List)
+    if (errorSources is List) {
       return errorSources
           .map((e) => e['message'] ?? 'Unknown error')
           .join(', ');
+    }
     return 'Validation error';
   }
 
   ResponseData _handleError(dynamic error) {
     AppLoggerHelper.error('Request error', error);
-    if (error is TimeoutException)
+    if (error is TimeoutException) {
       return ResponseData(
         isSuccess: false,
         statusCode: 408,
         responseData: '',
         errorMessage: 'Request timeout',
       );
+    }
     return ResponseData(
       isSuccess: false,
       statusCode: 500,

@@ -34,16 +34,35 @@ class AddressController extends GetxController {
     _isLoading.value = true;
 
     try {
-      await Future.delayed(const Duration(milliseconds: 300));
-      if (address.isDefault) {
-        _setAllAddressesNonDefault();
-      }
+      // Call the API to add the address
+      await _addressService.addAddress(address);
 
-      _addresses.add(address);
+      // Refresh the address list from the server to get the latest data
+      await loadAddresses();
+
       Get.back();
-      Get.snackbar('Success', 'Address added successfully');
+      Get.snackbar(
+        'Success',
+        'Address added successfully',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.green[600],
+        colorText: Colors.white,
+        duration: const Duration(seconds: 2),
+        margin: const EdgeInsets.all(12),
+        borderRadius: 8,
+        icon: const Icon(Icons.check_circle, color: Colors.white),
+      );
     } catch (e) {
-      Get.snackbar('Error', 'Failed to add address');
+      Get.snackbar(
+        'Error',
+        'Failed to add address: ${e.toString()}',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red[600],
+        colorText: Colors.white,
+        margin: const EdgeInsets.all(12),
+        borderRadius: 8,
+        icon: const Icon(Icons.error, color: Colors.white),
+      );
     } finally {
       _isLoading.value = false;
     }
@@ -79,6 +98,7 @@ class AddressController extends GetxController {
       await Future.delayed(const Duration(milliseconds: 300));
 
       _addresses.removeWhere((addr) => addr.id == addressId);
+      await _addressService.deleteAddress(addressId);
       Get.snackbar('Success', 'Address deleted successfully');
     } catch (e) {
       Get.snackbar('Error', 'Failed to delete address');
@@ -89,28 +109,29 @@ class AddressController extends GetxController {
 
   Future<void> setAsDefault(String addressId) async {
     try {
-      _setAllAddressesNonDefault();
-      final index = _addresses.indexWhere((addr) => addr.id == addressId);
-      if (index != -1) {
-        _addresses[index] = _addresses[index].copyWith(isDefault: true);
+      _isLoading.value = true;
 
-        update();
-        Get.snackbar(
-          'Success',
-          'Default address updated',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.green[600],
-          colorText: Colors.white,
-          duration: const Duration(seconds: 2),
-          margin: const EdgeInsets.all(12),
-          borderRadius: 8,
-          icon: const Icon(Icons.check_circle, color: Colors.white),
-        );
-      }
+      // Call the API to set the address as default
+      await _addressService.setDefaultAddress(addressId);
+
+      // Refresh the address list from the server to get updated data
+      await loadAddresses();
+
+      Get.snackbar(
+        'Success',
+        'Default address updated',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.green[600],
+        colorText: Colors.white,
+        duration: const Duration(seconds: 2),
+        margin: const EdgeInsets.all(12),
+        borderRadius: 8,
+        icon: const Icon(Icons.check_circle, color: Colors.white),
+      );
     } catch (e) {
       Get.snackbar(
         'Error',
-        'Failed to update default address',
+        'Failed to update default address: ${e.toString()}',
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red[600],
         colorText: Colors.white,
@@ -118,6 +139,8 @@ class AddressController extends GetxController {
         borderRadius: 8,
         icon: const Icon(Icons.error, color: Colors.white),
       );
+    } finally {
+      _isLoading.value = false;
     }
   }
 
