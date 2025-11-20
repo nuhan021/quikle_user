@@ -190,6 +190,7 @@ class CartScreen extends StatelessWidget {
             address: '123 Main Street',
             city: 'Default City',
             state: 'Default State',
+            country: 'India',
             zipCode: '12345',
             phoneNumber: '+1234567890',
             type: AddressType.home,

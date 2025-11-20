@@ -27,4 +27,13 @@ class ApiConstants {
 
   //Profile api's
   static const String getUserProfile = "$baseUrl/customer/profile/";
+
+  //Shipping address api's
+  static const String shippingAddresses = "$baseUrl/customer/shipping-address/";
+  static const String getShippingAddresses =
+      "$baseUrl/customer/shipping-address/";
+  static const String makeDefault =
+      "$baseUrl/customer/shipping-address/{address_id}/set-default";
+  static const String deleteAddress =
+      "$baseUrl/customer/shipping-address/{address_id}";
 }
