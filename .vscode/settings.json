@@ -1,17 +1,18 @@
 {
-    "cSpell.words": [
-        "biryani",
-        "Getx",
-        "meds",
-        "Quickle",
-        "quikle"
-    ],
-    "dart.debugExternalPackageLibraries": false,
-    "dart.debugSdkLibraries": false,
-    "dart.vmServiceLogFile": null,
-    "dart.evaluateGettersInDebugViews": true,
-    "dart.evaluateToStringInDebugViews": true,
-    "dart.flutterHotReloadOnSave": "manual",
-    "dart.hotReloadOnSave": "manual",
-    "java.configuration.updateBuildConfiguration": "interactive"
+  "cSpell.words": [
+    "biryani",
+    "Getx",
+    "meds",
+    "Quickle",
+    "quikle"
+  ],
+  "dart.debugExternalPackageLibraries": false,
+  "dart.debugSdkLibraries": false,
+  "dart.vmServiceLogFile": null,
+  "dart.evaluateGettersInDebugViews": true,
+  "dart.evaluateToStringInDebugViews": true,
+  "dart.flutterHotReloadOnSave": "manual",
+  "dart.hotReloadOnSave": "manual",
+  "java.configuration.updateBuildConfiguration": "interactive",
+  "dart.flutterSdkPath": ".fvm/versions/stable"
 }
