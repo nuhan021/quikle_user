@@ -155,7 +155,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen>
                                               title: controller.product!.title,
                                               rating:
                                                   controller.product!.rating,
-                                              reviewCount: 500,
+                                              reviewCount: controller
+                                                  .product!
+                                                  .reviewsCount,
                                               price: controller.product!.price,
                                               originalPrice:
                                                   controller

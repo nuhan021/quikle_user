@@ -20,47 +20,46 @@ class StoreInfoWidget extends StatelessWidget {
       ),
       child: Row(
         children: [
-          CircleAvatar(radius: 20.r, backgroundImage: AssetImage(shop.image)),
+          // Shop Logo
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8.r),
+            child: shop.image.startsWith('http')
+                ? Image.network(
+                    shop.image,
+                    width: 48.w,
+                    height: 48.h,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Image.asset(
+                        'assets/images/shopImage.png',
+                        width: 48.w,
+                        height: 48.h,
+                        fit: BoxFit.cover,
+                      );
+                    },
+                  )
+                : Image.asset(
+                    shop.image,
+                    width: 48.w,
+                    height: 48.h,
+                    fit: BoxFit.cover,
+                  ),
+          ),
           SizedBox(width: 12.w),
+          // Shop Name
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  shop.name,
-                  style: getTextStyle(
-                    font: CustomFonts.inter,
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.ebonyBlack,
-                  ),
-                ),
-                SizedBox(height: 2.h),
-                Text(
-                  shop.deliveryTime,
-                  style: getTextStyle(
-                    font: CustomFonts.inter,
-                    color: AppColors.featherGrey,
-                  ),
-                ),
-              ],
+            child: Text(
+              shop.name,
+              style: getTextStyle(
+                font: CustomFonts.inter,
+                fontSize: 16.sp,
+                fontWeight: FontWeight.w600,
+                color: AppColors.ebonyBlack,
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
         ],
       ),
     );
