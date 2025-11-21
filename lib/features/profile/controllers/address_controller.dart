@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:quikle_user/core/services/storage_service.dart';
 import 'package:quikle_user/features/profile/data/models/shipping_address_model.dart';
 import 'package:quikle_user/features/profile/data/services/address_service.dart';
 
@@ -13,10 +14,19 @@ class AddressController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    loadAddresses();
+    // Only load addresses if token exists (user is logged in)
+    if (StorageService.hasToken()) {
+      loadAddresses();
+    }
   }
 
   Future<void> loadAddresses() async {
+    // Don't attempt to load if no token
+    if (!StorageService.hasToken()) {
+      _addresses.clear();
+      return;
+    }
+
     _isLoading.value = true;
 
     try {
