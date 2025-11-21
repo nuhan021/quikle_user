@@ -53,7 +53,7 @@ class ProductInfoWidget extends StatelessWidget {
             ),
             SizedBox(width: 4.w),
             Text(
-              '• $reviewCount+ reviews',
+              '• $reviewCount reviews',
               style: getTextStyle(
                 font: CustomFonts.inter,
                 fontWeight: FontWeight.w300,

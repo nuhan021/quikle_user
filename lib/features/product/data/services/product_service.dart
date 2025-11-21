@@ -5,7 +5,6 @@ import '../models/review_model.dart';
 import '../models/question_model.dart';
 
 class ProductService {
-  
   List<ReviewModel> getProductReviews(ProductModel product) {
     return [
       ReviewModel(
@@ -44,7 +43,6 @@ class ProductService {
     ];
   }
 
-  
   List<QuestionModel> getProductQuestions(ProductModel product) {
     return [
       QuestionModel(
@@ -61,41 +59,17 @@ class ProductService {
     ];
   }
 
-  
   ShopModel getShopInfo(ProductModel product) {
-    
-    final shops = {
-      'shop_1': ShopModel(
-        id: 'shop_1',
-        name: 'Tandoori Tarang',
-        deliveryTime: '30-35 min',
-        image: ImagePath.shopImage,
-        rating: 4.8,
-        address: '123 Food Street, City',
-        isOpen: true,
-      ),
-      'shop_2': ShopModel(
-        id: 'shop_2',
-        name: 'Fresh Market',
-        deliveryTime: '25-30 min',
-        image: ImagePath.shopImage,
-        rating: 4.6,
-        address: '456 Market Lane, City',
-        isOpen: true,
-      ),
-      'shop_3': ShopModel(
-        id: 'shop_3',
-        name: 'Health Plus Pharmacy',
-        deliveryTime: '15-20 min',
-        image: ImagePath.shopImage,
-        rating: 4.9,
-        address: '789 Health Ave, City',
-        isOpen: true,
-      ),
-    };
-
-    
-    return shops[product.shopId] ?? shops['shop_1']!;
+    // Use actual shop data from the product API response
+    return ShopModel(
+      id: product.shopId,
+      name: product.shopName ?? 'Shop',
+      image: product.shopLogo ?? 'assets/images/shopImage.png',
+      deliveryTime: '30-35 min', // Default delivery time
+      rating: 4.8, // Default rating
+      address: '', // Address not available from product API
+      isOpen: true,
+    );
   }
 
   String getProductDescription(ProductModel product) {

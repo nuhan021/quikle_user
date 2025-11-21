@@ -9,6 +9,8 @@ class ProductModel {
   final String categoryId;
   final String? subcategoryId;
   final String shopId;
+  final String? shopName;
+  final String? shopLogo;
   final bool isFavorite;
   final double rating;
   final int reviewsCount;
@@ -31,6 +33,8 @@ class ProductModel {
     required this.categoryId,
     this.subcategoryId,
     required this.shopId,
+    this.shopName,
+    this.shopLogo,
     this.isFavorite = false,
     this.rating = 4.5,
     this.reviewsCount = 25,
@@ -73,14 +77,20 @@ class ProductModel {
       shopId: isCachedData
           ? (json['shopId'] as String?) ?? ''
           : json['vendor_id']?.toString() ?? '',
+      shopName: isCachedData
+          ? (json['shopName'] as String?) ?? ''
+          : (json['shop_name'] as String?) ?? '',
+      shopLogo: isCachedData
+          ? (json['shopLogo'] as String?) ?? ''
+          : (json['shop_image'] as String?) ?? 'assets/images/shopImage.png',
       rating: isCachedData
-          ? (json['rating'] as num?)?.toDouble() ?? 4.5
-          : (json['ratings'] as num?)?.toDouble() ?? 4.5,
+          ? (json['rating'] as num?)?.toDouble() ?? 5
+          : (json['ratings'] as num?)?.toDouble() ?? 5,
       weight: json['weight']?.toString(),
       isFavorite: json['isFavorite'] as bool? ?? false,
       reviewsCount: isCachedData
           ? (json['reviewsCount'] as int?) ?? 0
-          : (json['total_sale'] as int?) ?? 0,
+          : (json['total_reviews'] as int?) ?? 0,
       isOTC: isCachedData
           ? (json['isOTC'] as bool?) ?? false
           : (json['isOTC'] as bool?) ?? false,
@@ -109,6 +119,8 @@ class ProductModel {
       'categoryId': categoryId,
       'subcategoryId': subcategoryId,
       'shopId': shopId,
+      'shopName': shopName,
+      'shopLogo': shopLogo,
       'isFavorite': isFavorite,
       'rating': rating,
       'reviewsCount': reviewsCount,
@@ -131,6 +143,8 @@ class ProductModel {
     String? categoryId,
     String? subcategoryId,
     String? shopId,
+    String? shopName,
+    String? shopLogo,
     bool? isFavorite,
     double? rating,
     int? reviewsCount,
@@ -151,6 +165,8 @@ class ProductModel {
       categoryId: categoryId ?? this.categoryId,
       subcategoryId: subcategoryId ?? this.subcategoryId,
       shopId: shopId ?? this.shopId,
+      shopName: shopName ?? this.shopName,
+      shopLogo: shopLogo ?? this.shopLogo,
       isFavorite: isFavorite ?? this.isFavorite,
       rating: rating ?? this.rating,
       reviewsCount: reviewsCount ?? this.reviewsCount,
@@ -177,6 +193,8 @@ class ProductModel {
         other.categoryId == categoryId &&
         other.subcategoryId == subcategoryId &&
         other.shopId == shopId &&
+        other.shopName == shopName &&
+        other.shopLogo == shopLogo &&
         other.isFavorite == isFavorite &&
         other.rating == rating &&
         other.weight == weight &&
@@ -197,6 +215,8 @@ class ProductModel {
         categoryId.hashCode ^
         subcategoryId.hashCode ^
         shopId.hashCode ^
+        shopName.hashCode ^
+        shopLogo.hashCode ^
         isFavorite.hashCode ^
         rating.hashCode ^
         weight.hashCode ^
