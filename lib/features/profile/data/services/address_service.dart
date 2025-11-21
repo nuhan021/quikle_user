@@ -338,10 +338,88 @@ class AddressService extends GetxService {
     ShippingAddressModel address,
   ) async {
     try {
-      await Future.delayed(const Duration(milliseconds: 600));
-      final updatedAddress = address.copyWith(updatedAt: DateTime.now());
-      return updatedAddress;
+      AppLoggerHelper.debug('Updating address: ${address.id}');
+
+      final token = StorageService.token;
+      final refreshToken = StorageService.refreshToken;
+
+      // Convert address type to backend format
+      String addressTypeValue;
+      switch (address.type) {
+        case AddressType.home:
+          addressTypeValue = 'HOME';
+          break;
+        case AddressType.office:
+          addressTypeValue = 'OFFICE';
+          break;
+        case AddressType.other:
+          addressTypeValue = 'OTHERS';
+          break;
+      }
+
+      // Prepare request body
+      final Map<String, dynamic> body = {
+        'full_name': address.name,
+        'address_line1': address.address,
+        'city': address.city,
+        'state': address.state,
+        'country': address.country,
+        'postal_code': address.zipCode,
+        'phone_number': address.phoneNumber,
+        'email': address.email ?? '',
+        'addressType': addressTypeValue,
+        'make_default': address.isDefault,
+      };
+
+      // Add optional fields only if they have values
+      if (address.landmark != null && address.landmark!.isNotEmpty) {
+        body['address_line2'] = address.landmark;
+      }
+
+      if (address.email != null && address.email!.isNotEmpty) {
+        body['email'] = address.email;
+      }
+
+      final url = ApiConstants.deleteAddress.replaceAll(
+        '{address_id}',
+        address.id,
+      );
+
+      AppLoggerHelper.debug('PUT $url');
+      AppLoggerHelper.debug('Request body for updating address: $body');
+
+      final ResponseData response = await _networkCaller.putRequest(
+        url,
+        body: body,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'refresh-token': '$refreshToken',
+        },
+      );
+
+      AppLoggerHelper.debug(
+        'Update address response status: ${response.statusCode}',
+      );
+      AppLoggerHelper.debug(
+        'Update address response data: ${response.responseData}',
+      );
+
+      if (response.isSuccess && response.responseData != null) {
+        AppLoggerHelper.debug('Address updated successfully');
+
+        // Parse the response to get the updated address
+        final addressData = response.responseData as Map<String, dynamic>;
+        final updatedAddress = ShippingAddressModel.fromJson(addressData);
+
+        return updatedAddress;
+      }
+
+      AppLoggerHelper.warning(
+        'Failed to update address: ${response.errorMessage}',
+      );
+      throw Exception('Failed to update address');
     } catch (e) {
+      AppLoggerHelper.error('❌ Error updating address', e);
       throw Exception('Failed to update address: $e');
     }
   }

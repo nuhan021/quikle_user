@@ -190,16 +190,22 @@ class AddressBookScreen extends StatelessWidget {
                 _buildBottomSheetOption(
                   icon: Iconsax.tick_circle,
                   title: 'Set as Default',
-                  onTap: () {
-                    Get.back();
+                  onTap: () async {
+                    Navigator.of(
+                      Get.context!,
+                    ).pop(); // Close bottom sheet using Navigator
+                    await Future.delayed(const Duration(milliseconds: 100));
                     controller.setAsDefault(address.id);
                   },
                 ),
               _buildBottomSheetOption(
                 icon: Iconsax.edit_2,
                 title: 'Edit Address',
-                onTap: () {
-                  Get.back();
+                onTap: () async {
+                  Navigator.of(
+                    Get.context!,
+                  ).pop(); // Close bottom sheet using Navigator
+                  await Future.delayed(const Duration(milliseconds: 100));
                   _navigateToEditAddress(address);
                 },
               ),
@@ -207,8 +213,11 @@ class AddressBookScreen extends StatelessWidget {
                 icon: Iconsax.trash,
                 title: 'Delete Address',
                 color: AppColors.error,
-                onTap: () {
-                  Get.back();
+                onTap: () async {
+                  Navigator.of(
+                    Get.context!,
+                  ).pop(); // Close bottom sheet using Navigator
+                  await Future.delayed(const Duration(milliseconds: 100));
                   _showDeleteConfirmation(address, controller);
                 },
               ),
@@ -246,12 +255,8 @@ class AddressBookScreen extends StatelessWidget {
   }
 
   void _navigateToEditAddress(address) {
-    Get.snackbar(
-      'Coming Soon',
-      'Edit address functionality will be implemented next',
-      backgroundColor: AppColors.beakYellow,
-      colorText: AppColors.ebonyBlack,
-    );
+    // Bottom sheet is already closed by the caller
+    AddAddressScreen.show(Get.context!, addressToEdit: address);
   }
 
   void _showDeleteConfirmation(address, AddressController controller) {
@@ -293,8 +298,13 @@ class AddressBookScreen extends StatelessWidget {
             ),
           ),
           TextButton(
-            onPressed: () {
-              Get.back();
+            onPressed: () async {
+              Navigator.of(
+                Get.context!,
+              ).pop(); // Close the confirmation dialog using Navigator
+              await Future.delayed(
+                const Duration(milliseconds: 100),
+              ); // Small delay
               controller.deleteAddress(address.id);
             },
             child: Text(
