@@ -154,8 +154,10 @@ class ShippingAddressModel {
       type: addressType,
       isDefault: json['is_default'] as bool? ?? false,
       isSelected: false,
-      createdAt: DateTime.now(),
-      updatedAt: null,
+      createdAt: DateTime.parse(json['created_at'] as String),
+      updatedAt: json['updated_at'] != null
+          ? DateTime.parse(json['updated_at'] as String)
+          : null,
     );
   }
 }

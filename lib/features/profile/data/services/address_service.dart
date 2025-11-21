@@ -205,33 +205,44 @@ class AddressService extends GetxService {
       final token = StorageService.token;
       final refreshToken = StorageService.refreshToken;
 
+      AppLoggerHelper.debug('Using token: $token');
+      AppLoggerHelper.debug('Using refresh token: $refreshToken');
+
       final ResponseData response = await _networkCaller.getRequest(
         ApiConstants.getShippingAddresses,
         headers: {
           'Authorization': 'Bearer $token',
-          'refresh-token': '$refreshToken',
+          'refresh-token': refreshToken ?? '',
         },
       );
 
-      AppLoggerHelper.debug('Address data is: ${response.statusCode}');
-      AppLoggerHelper.debug('Address data is: ${response.responseData}');
+      AppLoggerHelper.debug('Address status: ${response.statusCode}');
+      AppLoggerHelper.debug('Raw response: ${response.responseData}');
 
       if (response.isSuccess && response.responseData != null) {
-        final List data = response.responseData as List;
+        final data = response.responseData;
 
-        AppLoggerHelper.debug('Fetched ${data.length} addresses');
+        // Validate new structure
+        if (data is Map<String, dynamic> && data['addresses'] is List) {
+          final List addrList = data['addresses'];
 
-        final addresses = data
-            .map(
-              (json) =>
-                  ShippingAddressModel.fromJson(json as Map<String, dynamic>),
-            )
-            .toList();
+          AppLoggerHelper.debug('Fetched ${addrList.length} addresses');
 
-        return addresses;
+          final addresses = addrList
+              .map(
+                (json) =>
+                    ShippingAddressModel.fromJson(json as Map<String, dynamic>),
+              )
+              .toList();
+
+          return addresses;
+        } else {
+          AppLoggerHelper.warning('Unexpected response format');
+          return [];
+        }
       }
 
-      AppLoggerHelper.warning('No addresses found or API call failed');
+      AppLoggerHelper.warning('API call failed or no data');
       return [];
     } catch (e) {
       AppLoggerHelper.error('❌ Error fetching addresses', e);
@@ -253,7 +264,7 @@ class AddressService extends GetxService {
           addressTypeValue = 'HOME';
           break;
         case AddressType.office:
-          addressTypeValue = 'Office';
+          addressTypeValue = 'OFFICE';
           break;
         case AddressType.other:
           addressTypeValue = 'OTHERS';
@@ -269,6 +280,7 @@ class AddressService extends GetxService {
         'country': address.country,
         'postal_code': address.zipCode,
         'phone_number': address.phoneNumber,
+        'email': address.email ?? '',
         'addressType': addressTypeValue,
         'make_default': address.isDefault,
       };
@@ -282,6 +294,10 @@ class AddressService extends GetxService {
         body['email'] = address.email;
       }
 
+      AppLoggerHelper.debug('Using token: $token');
+      AppLoggerHelper.debug('Using refresh token: $refreshToken');
+      AppLoggerHelper.debug('Request body for adding address: $body');
+
       final ResponseData response = await _networkCaller.postRequest(
         ApiConstants.shippingAddresses,
         body: body,
@@ -289,6 +305,13 @@ class AddressService extends GetxService {
           'Authorization': 'Bearer $token',
           'refresh-token': '$refreshToken',
         },
+      );
+
+      AppLoggerHelper.debug(
+        'Add address response status: ${response.statusCode}',
+      );
+      AppLoggerHelper.debug(
+        'Add address response data: ${response.responseData}',
       );
 
       if (response.isSuccess && response.responseData != null) {
@@ -340,7 +363,9 @@ class AddressService extends GetxService {
         },
       );
 
-      if (response.isSuccess) {
+      if (response.statusCode == 204) {
+        AppLoggerHelper.debug('Address deleted successfully');
+
         return true;
       }
 
@@ -364,7 +389,7 @@ class AddressService extends GetxService {
 
       AppLoggerHelper.debug('PUT $url');
 
-      final ResponseData response = await _networkCaller.patchRequest(
+      final ResponseData response = await _networkCaller.postRequest(
         url,
         headers: {
           'Authorization': 'Bearer $token',
