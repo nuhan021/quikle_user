@@ -40,7 +40,12 @@ class AddressController extends GetxController {
       // Refresh the address list from the server to get the latest data
       await loadAddresses();
 
+      // Close the bottom sheet first
       Get.back();
+
+      // Add a small delay before showing snackbar to avoid initialization error
+      await Future.delayed(const Duration(milliseconds: 100));
+
       Get.snackbar(
         'Success',
         'Address added successfully',
@@ -72,20 +77,40 @@ class AddressController extends GetxController {
     _isLoading.value = true;
 
     try {
-      await Future.delayed(const Duration(milliseconds: 300));
-      final index = _addresses.indexWhere(
-        (addr) => addr.id == updatedAddress.id,
-      );
-      if (index != -1) {
-        if (updatedAddress.isDefault) {
-          _setAllAddressesNonDefault();
-        }
+      // Call the API to update the address
+      await _addressService.updateAddress(updatedAddress);
 
-        _addresses[index] = updatedAddress;
-        Get.snackbar('Success', 'Address updated successfully');
-      }
+      // Refresh the address list from the server to get the latest data
+      await loadAddresses();
+
+      // Close the bottom sheet first
+      Get.back();
+
+      // Add a small delay before showing snackbar to avoid initialization error
+      await Future.delayed(const Duration(milliseconds: 100));
+
+      Get.snackbar(
+        'Success',
+        'Address updated successfully',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.green[600],
+        colorText: Colors.white,
+        duration: const Duration(seconds: 2),
+        margin: const EdgeInsets.all(12),
+        borderRadius: 8,
+        icon: const Icon(Icons.check_circle, color: Colors.white),
+      );
     } catch (e) {
-      Get.snackbar('Error', 'Failed to update address');
+      Get.snackbar(
+        'Error',
+        'Failed to update address: ${e.toString()}',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red[600],
+        colorText: Colors.white,
+        margin: const EdgeInsets.all(12),
+        borderRadius: 8,
+        icon: const Icon(Icons.error, color: Colors.white),
+      );
     } finally {
       _isLoading.value = false;
     }
@@ -141,14 +166,6 @@ class AddressController extends GetxController {
       );
     } finally {
       _isLoading.value = false;
-    }
-  }
-
-  void _setAllAddressesNonDefault() {
-    for (int i = 0; i < _addresses.length; i++) {
-      if (_addresses[i].isDefault) {
-        _addresses[i] = _addresses[i].copyWith(isDefault: false);
-      }
     }
   }
 
