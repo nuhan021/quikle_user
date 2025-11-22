@@ -70,8 +70,18 @@ class FreshchatService extends GetxController {
       });
 
       // Listen for unread message count updates
-      _unreadCountSubscription = Freshchat.onMessageCountUpdate.listen((count) {
-        unreadMessageCount.value = count;
+      _unreadCountSubscription = Freshchat.onMessageCountUpdate.listen((
+        event,
+      ) async {
+        try {
+          // Event is a boolean, we need to fetch the actual count
+          final countResult = await Freshchat.getUnreadCountAsync;
+          if (countResult['count'] != null) {
+            unreadMessageCount.value = countResult['count'] as int;
+          }
+        } catch (e) {
+          print('Error retrieving unread count: $e');
+        }
       });
     } catch (e) {
       print('Error setting up Freshchat event listeners: $e');
