@@ -400,6 +400,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  freshchat_sdk:
+    dependency: "direct main"
+    description:
+      name: freshchat_sdk
+      sha256: d7a2934fb1d6db64c058c1c69b8370a1dcc8554ef650c6b074399f0b4314af44
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.10.26"
   geoclue:
     dependency: transitive
     description:
