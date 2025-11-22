@@ -19,6 +19,9 @@ class FreshchatService extends GetxController {
   // Observable for unread message count
   final RxInt unreadMessageCount = 0.obs;
 
+  // Observable for restore ID
+  final RxString restoreId = ''.obs;
+
   // Stream subscriptions for event listeners
   StreamSubscription? _restoreIdSubscription;
   StreamSubscription? _unreadCountSubscription;
@@ -27,8 +30,7 @@ class FreshchatService extends GetxController {
   // TODO: Replace these with your actual Freshchat credentials
   static const String _appId = '7c54e627-275f-4e5c-92af-e3427bf5bf4c';
   static const String _appKey = '8577ea2e-9b72-4348-9c6a-a157ec00c9cd';
-  static const String _domain =
-      'msdk.in.freshchat.com'; // or your custom domain
+  static const String _domain = 'msdk.in.freshchat.com';
 
   @override
   void onInit() {
@@ -39,18 +41,8 @@ class FreshchatService extends GetxController {
   /// Initialize Freshchat SDK with configuration
   Future<void> _initializeFreshchat() async {
     try {
-      // Initialize SDK
       Freshchat.init(_appId, _appKey, _domain);
-
-      // Set up event listeners for real-time updates
       _setupEventListeners();
-
-      // If user is logged in, identify them
-      if (StorageService.hasToken()) {
-        await identifyUser();
-      }
-
-      print('Freshchat initialized with event listeners');
     } catch (e) {
       print('Freshchat initialization error: $e');
     }
@@ -61,20 +53,26 @@ class FreshchatService extends GetxController {
     try {
       // Listen for restore ID events
       _restoreIdSubscription = Freshchat.onRestoreIdGenerated.listen((
-        restoreId,
-      ) {
-        print('Freshchat restore ID generated: $restoreId');
-        // You can save this for restoring user session later if needed
+        event,
+      ) async {
+        try {
+          FreshchatUser user = await Freshchat.getUser;
+          final generatedRestoreId = user.getRestoreId();
+
+          if (generatedRestoreId != null && generatedRestoreId.isNotEmpty) {
+            print('🔑 Freshchat Restore ID: $generatedRestoreId');
+            restoreId.value = generatedRestoreId;
+            await StorageService.saveFreshchatRestoreId(generatedRestoreId);
+          }
+        } catch (e) {
+          print('Error retrieving restore ID: $e');
+        }
       });
 
       // Listen for unread message count updates
-      // This will trigger whenever a new message arrives
       _unreadCountSubscription = Freshchat.onMessageCountUpdate.listen((count) {
-        print('Freshchat unread count updated: $count');
         unreadMessageCount.value = count;
       });
-
-      print('Freshchat event listeners initialized');
     } catch (e) {
       print('Error setting up Freshchat event listeners: $e');
     }
@@ -93,48 +91,62 @@ class FreshchatService extends GetxController {
     try {
       final userId = externalId ?? StorageService.userId?.toString() ?? '';
 
-      if (userId.isEmpty) {
-        print('Freshchat: Cannot identify user - userId is empty');
-        return;
-      }
+      if (userId.isEmpty) return;
 
-      // Create Freshchat user with external ID
-      var user = FreshchatUser(userId, userId);
+      final savedRestoreId = StorageService.freshchatRestoreId;
+      var user = FreshchatUser(userId, savedRestoreId);
 
-      // Set user - this identifies the user with Freshchat
-      Freshchat.setUser(user);
-
-      print('Freshchat user identified with ID: $userId');
-
-      // Now set user properties using the correct property names
-      // Freshchat uses specific property names that map to the user profile
-      Map<String, String> userProperties = {};
-
+      // Set user properties
       if (firstName != null && firstName.isNotEmpty) {
-        userProperties['first_name'] = firstName;
+        user.setFirstName(firstName);
       }
       if (lastName != null && lastName.isNotEmpty) {
-        userProperties['last_name'] = lastName;
+        user.setLastName(lastName);
       }
       if (email != null && email.isNotEmpty) {
-        userProperties['email'] = email;
+        user.setEmail(email);
       }
       if (phoneNumber != null && phoneNumber.isNotEmpty) {
-        userProperties['phone'] = phoneNumber;
+        String countryCode = '++91';
+        String phone = phoneNumber;
+
+        if (phoneNumber.startsWith('+')) {
+          final digitsOnly = phoneNumber
+              .substring(1)
+              .replaceAll(RegExp(r'\D'), '');
+
+          if (digitsOnly.length > 4) {
+            for (int codeLength in [1, 2, 3, 4]) {
+              final possibleCode = '+' + digitsOnly.substring(0, codeLength);
+              final possiblePhone = digitsOnly.substring(codeLength);
+
+              if (possiblePhone.length >= 7 && possiblePhone.length <= 15) {
+                countryCode = possibleCode;
+                phone = possiblePhone;
+                break;
+              }
+            }
+          } else {
+            phone = digitsOnly;
+          }
+        } else {
+          phone = phoneNumber.replaceAll(RegExp(r'\D'), '');
+        }
+
+        if (phone.isNotEmpty) {
+          user.setPhone(countryCode, phone);
+        }
       }
 
-      // Add custom properties if provided
-      if (customProperties != null) {
-        userProperties.addAll(customProperties);
-      }
+      // Identify user with external ID and restore ID
+      Freshchat.identifyUser(externalId: userId, restoreId: savedRestoreId);
 
-      // Set all user properties
-      if (userProperties.isNotEmpty) {
-        Freshchat.setUserProperties(userProperties);
-        print('Freshchat user properties set:');
-        print('  Name: $firstName $lastName');
-        print('  Email: $email');
-        print('  Phone: $phoneNumber');
+      // Set user properties
+      Freshchat.setUser(user);
+
+      // Set custom properties if provided
+      if (customProperties != null && customProperties.isNotEmpty) {
+        Freshchat.setUserProperties(customProperties);
       }
     } catch (e) {
       print('Error identifying Freshchat user: $e');
@@ -153,7 +165,6 @@ class FreshchatService extends GetxController {
   /// Open Freshchat conversation screen
   Future<void> openChat() async {
     try {
-      // Open conversation
       Freshchat.showConversations();
     } catch (e) {
       print('Error opening Freshchat: $e');
@@ -169,11 +180,22 @@ class FreshchatService extends GetxController {
     }
   }
 
+  /// Get current Freshchat user details
+  Future<FreshchatUser?> getCurrentUser() async {
+    try {
+      return await Freshchat.getUser;
+    } catch (e) {
+      print('Error getting current Freshchat user: $e');
+      return null;
+    }
+  }
+
   /// Reset Freshchat user data (call on logout)
   Future<void> resetUser() async {
     try {
       Freshchat.resetUser();
       unreadMessageCount.value = 0;
+      restoreId.value = '';
     } catch (e) {
       print('Error resetting Freshchat user: $e');
     }
