@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:quikle_user/core/utils/logging/logger.dart';
 import 'package:quikle_user/features/auth/data/services/auth_service.dart';
@@ -52,6 +53,38 @@ class LoginController extends GetxController {
         if (response.statusCode == 200 && response.isSuccess) {
           final userExists = !showNameField.value;
 
+          AppLoggerHelper.debug('Response Data: ${response.responseData}');
+
+          //////*********************************************************** */
+          ///
+          ///
+          ///
+          ///
+          final FlutterLocalNotificationsPlugin _localNotifications =
+              FlutterLocalNotificationsPlugin();
+          await _localNotifications.show(
+            1,
+            "You have a new OTP",
+            response.responseData['message'],
+            const NotificationDetails(
+              android: AndroidNotificationDetails(
+                'otp_channel',
+                'OTP Notifications',
+                channelDescription: 'Notifications for OTP codes',
+                importance: Importance.max,
+                priority: Priority.high,
+              ),
+              iOS: DarwinNotificationDetails(),
+            ),
+          );
+
+          //////*********************************************************** */
+          ///
+          ///
+          ///
+          ///
+          ///
+          ///
           Get.toNamed(
             AppRoute.getVerify(),
             arguments: {

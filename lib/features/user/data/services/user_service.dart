@@ -1,8 +1,10 @@
 import 'package:get/get.dart';
 import 'package:quikle_user/core/models/response_data.dart';
+import 'package:quikle_user/core/services/freshchat_service.dart';
 import 'package:quikle_user/core/services/network_caller.dart';
 import 'package:quikle_user/core/services/storage_service.dart';
 import 'package:quikle_user/core/utils/constants/api_constants.dart';
+import 'package:quikle_user/core/utils/logging/logger.dart';
 import 'package:quikle_user/routes/app_routes.dart';
 import '../models/user_model.dart';
 
@@ -46,6 +48,9 @@ class UserService extends GetxController {
         final user = UserModel.fromJson(response.responseData['data']);
         _currentUser.value = user;
         _isLoggedIn.value = true;
+
+        // Identify user with Freshchat after profile is loaded
+        _identifyUserWithFreshchat(user);
       } else {
         _currentUser.value = null;
         _isLoggedIn.value = false;
@@ -61,6 +66,38 @@ class UserService extends GetxController {
   /// Refresh user data from server
   Future<void> refreshUser() async {
     await _loadUser();
+  }
+
+  /// Identify user with Freshchat support
+  Future<void> _identifyUserWithFreshchat(UserModel user) async {
+    try {
+      // Check if FreshchatService is available
+      if (!Get.isRegistered<FreshchatService>()) {
+        AppLoggerHelper.debug(
+          'FreshchatService not registered, skipping identification',
+        );
+        return;
+      }
+
+      final freshchatService = Get.find<FreshchatService>();
+
+      // Identify user with Freshchat
+      await freshchatService.identifyUser(
+        externalId: user.id,
+        firstName: user.name.split(' ').first,
+        lastName: user.name.split(' ').length > 1
+            ? user.name.split(' ').last
+            : '',
+        email: user.email,
+        phoneNumber: user.phone,
+      );
+
+      AppLoggerHelper.debug(
+        'User identified with Freshchat: ${user.name} (${user.id})',
+      );
+    } catch (e) {
+      AppLoggerHelper.debug('Error identifying user with Freshchat: $e');
+    }
   }
 
   Future<bool> updateProfile(UserModel updatedUser) async {
@@ -89,6 +126,17 @@ class UserService extends GetxController {
   }
 
   Future<void> logoutUser() async {
+    // Reset Freshchat user session before logout
+    try {
+      if (Get.isRegistered<FreshchatService>()) {
+        final freshchatService = Get.find<FreshchatService>();
+        await freshchatService.resetUser();
+        AppLoggerHelper.debug('Freshchat user session reset on logout');
+      }
+    } catch (e) {
+      AppLoggerHelper.debug('Error resetting Freshchat on logout: $e');
+    }
+
     await StorageService.logoutUser();
     _currentUser.value = null;
     _isLoggedIn.value = false;

@@ -66,6 +66,7 @@ dependencies:
   connectivity_plus: ^7.0.0
   app_settings: ^6.1.1
   pin_code_fields: ^8.0.1
+  freshchat_sdk: ^0.10.26
 
 dev_dependencies:
   flutter_test:
