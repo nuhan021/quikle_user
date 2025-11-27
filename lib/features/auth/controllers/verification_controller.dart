@@ -4,6 +4,8 @@ import 'package:get/get.dart';
 import 'package:quikle_user/core/models/response_data.dart';
 import 'package:quikle_user/features/auth/controllers/login_controller.dart';
 import 'package:quikle_user/features/auth/data/services/auth_service.dart';
+// ignore: unused_import
+import 'package:quikle_user/features/profile/controllers/address_controller.dart';
 
 import '../presentation/screens/splash_wrapper.dart';
 
@@ -110,19 +112,15 @@ class VerificationController extends GetxController {
         }
 
         if (response.isSuccess) {
-          // String message = 'Phone number verified successfully';
-          // if (response.responseData != null &&
-          //     response.responseData['message'] != null) {
-          //   message = response.responseData['message'].toString();
-          // }
+          // Reload addresses after successful login
+          try {
+            final addressController = Get.find<AddressController>();
+            await addressController.loadAddresses();
+          } catch (e) {
+            // AddressController might not be initialized yet, that's ok
+            print('Could not reload addresses immediately after login: $e');
+          }
 
-          // Get.snackbar(
-          //   'Success',
-          //   message,
-          //   snackPosition: SnackPosition.TOP,
-          //   backgroundColor: Colors.green.withValues(alpha: 0.1),
-          //   colorText: Colors.green,
-          // );
           loginController.clearInputs();
           loginController.clearPhone();
           clearOtp();

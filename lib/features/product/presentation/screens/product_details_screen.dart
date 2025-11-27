@@ -155,10 +155,17 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen>
                                               title: controller.product!.title,
                                               rating:
                                                   controller.product!.rating,
-                                              reviewCount: 500,
+                                              reviewCount: controller
+                                                  .product!
+                                                  .reviewsCount,
                                               price: controller.product!.price,
-                                              originalPrice: '\$3.99',
-                                              discount: '26% OFF',
+                                              originalPrice:
+                                                  controller
+                                                      .product!
+                                                      .beforeDiscountPrice ??
+                                                  '',
+                                              discount:
+                                                  '${controller.product!.discountPercentage}% OFF',
                                             ),
                                           SizedBox(height: 16.h),
                                           if (controller.shop != null)

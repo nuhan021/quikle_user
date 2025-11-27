@@ -7,18 +7,29 @@ import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 import 'package:quikle_user/core/utils/constants/enums/address_type_enums.dart';
 import 'package:quikle_user/features/profile/controllers/add_address_controller.dart';
+import 'package:quikle_user/features/profile/data/models/shipping_address_model.dart';
 
 class AddAddressScreen extends StatelessWidget {
-  const AddAddressScreen({super.key});
+  final ShippingAddressModel? addressToEdit;
 
-  static void show(BuildContext context) {
+  const AddAddressScreen({super.key, this.addressToEdit});
+
+  static void show(
+    BuildContext context, {
+    ShippingAddressModel? addressToEdit,
+  }) {
     final controller = Get.put(AddAddressController());
+
+    // Pre-fill form if editing
+    if (addressToEdit != null) {
+      controller.prefillAddress(addressToEdit);
+    }
 
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => const AddAddressScreen(),
+      builder: (context) => AddAddressScreen(addressToEdit: addressToEdit),
     ).whenComplete(() {
       // Reset whenever dismissed (close button OR swipe down)
       controller.clearForm();
@@ -76,7 +87,9 @@ class AddAddressScreen extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          'Add New Address',
+                          addressToEdit != null
+                              ? 'Edit Address'
+                              : 'Add New Address',
                           style: getTextStyle(
                             font: CustomFonts.inter,
                             fontSize: 20.sp,
@@ -258,7 +271,9 @@ class AddAddressScreen extends StatelessWidget {
                       child: ElevatedButton(
                         onPressed: controller.isLoading.value
                             ? null
-                            : controller.addAddress,
+                            : () => addressToEdit != null
+                                  ? controller.updateAddress(addressToEdit!.id)
+                                  : controller.addAddress(),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.textPrimary,
                           foregroundColor: Colors.white,
@@ -283,7 +298,9 @@ class AddAddressScreen extends StatelessWidget {
                                   ),
                                   SizedBox(width: 12.w),
                                   Text(
-                                    'Adding address...',
+                                    addressToEdit != null
+                                        ? 'Updating address...'
+                                        : 'Adding address...',
                                     style: getTextStyle(
                                       font: CustomFonts.inter,
                                       fontSize: 16.sp,
@@ -294,7 +311,9 @@ class AddAddressScreen extends StatelessWidget {
                                 ],
                               )
                             : Text(
-                                'Add New Address',
+                                addressToEdit != null
+                                    ? 'Update Address'
+                                    : 'Add New Address',
                                 style: getTextStyle(
                                   font: CustomFonts.inter,
                                   fontSize: 16.sp,

@@ -3,12 +3,21 @@ import 'package:get/get.dart';
 import 'package:quikle_user/app.dart';
 import 'package:quikle_user/core/services/network_controller.dart';
 import 'package:quikle_user/core/services/storage_service.dart';
+import 'package:quikle_user/core/services/freshchat_service.dart';
 import 'core/common/widgets/no_internet_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize services
   await StorageService.init();
+
+  // Initialize controllers
   final networkController = Get.put(NetworkController());
+
+  // Initialize Freshchat service for customer support
+  Get.put(FreshchatService());
+
   bool isOverlayShown = false;
 
   ever<bool>(networkController.hasConnection, (hasInternet) {
