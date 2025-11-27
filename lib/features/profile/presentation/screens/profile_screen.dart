@@ -202,13 +202,6 @@ class ProfileScreen extends StatelessWidget {
             TextButton(
               onPressed: () {
                 controller.logout();
-                Get.snackbar(
-                  'Signed Out',
-                  'You have been successfully signed out',
-                  backgroundColor: AppColors.success,
-                  colorText: Colors.white,
-                  snackPosition: SnackPosition.TOP,
-                );
               },
               child: Text(
                 'Sign Out',

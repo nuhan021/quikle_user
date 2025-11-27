@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:quikle_user/core/services/storage_service.dart';
 import 'package:quikle_user/features/profile/data/models/shipping_address_model.dart';
 import 'package:quikle_user/features/profile/data/services/address_service.dart';
 
@@ -13,14 +14,23 @@ class AddressController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    loadAddresses();
+    // Only load addresses if token exists (user is logged in)
+    if (StorageService.hasToken()) {
+      loadAddresses();
+    }
   }
 
   Future<void> loadAddresses() async {
+    // Don't attempt to load if no token
+    if (!StorageService.hasToken()) {
+      _addresses.clear();
+      return;
+    }
+
     _isLoading.value = true;
 
     try {
-      final addresses = await _addressService.fetchAddresses('user123');
+      final addresses = await _addressService.fetchAddresses();
       _addresses.assignAll(addresses);
     } catch (e) {
       print('Error loading addresses: $e');
@@ -34,16 +44,40 @@ class AddressController extends GetxController {
     _isLoading.value = true;
 
     try {
-      await Future.delayed(const Duration(milliseconds: 300));
-      if (address.isDefault) {
-        _setAllAddressesNonDefault();
-      }
+      // Call the API to add the address
+      await _addressService.addAddress(address);
 
-      _addresses.add(address);
+      // Refresh the address list from the server to get the latest data
+      await loadAddresses();
+
+      // Close the bottom sheet first
       Get.back();
-      Get.snackbar('Success', 'Address added successfully');
+
+      // Add a small delay before showing snackbar to avoid initialization error
+      await Future.delayed(const Duration(milliseconds: 100));
+
+      Get.snackbar(
+        'Success',
+        'Address added successfully',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.green[600],
+        colorText: Colors.white,
+        duration: const Duration(seconds: 2),
+        margin: const EdgeInsets.all(12),
+        borderRadius: 8,
+        icon: const Icon(Icons.check_circle, color: Colors.white),
+      );
     } catch (e) {
-      Get.snackbar('Error', 'Failed to add address');
+      Get.snackbar(
+        'Error',
+        'Failed to add address: ${e.toString()}',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red[600],
+        colorText: Colors.white,
+        margin: const EdgeInsets.all(12),
+        borderRadius: 8,
+        icon: const Icon(Icons.error, color: Colors.white),
+      );
     } finally {
       _isLoading.value = false;
     }
@@ -53,20 +87,40 @@ class AddressController extends GetxController {
     _isLoading.value = true;
 
     try {
-      await Future.delayed(const Duration(milliseconds: 300));
-      final index = _addresses.indexWhere(
-        (addr) => addr.id == updatedAddress.id,
-      );
-      if (index != -1) {
-        if (updatedAddress.isDefault) {
-          _setAllAddressesNonDefault();
-        }
+      // Call the API to update the address
+      await _addressService.updateAddress(updatedAddress);
 
-        _addresses[index] = updatedAddress;
-        Get.snackbar('Success', 'Address updated successfully');
-      }
+      // Refresh the address list from the server to get the latest data
+      await loadAddresses();
+
+      // Close the bottom sheet first
+      Get.back();
+
+      // Add a small delay before showing snackbar to avoid initialization error
+      await Future.delayed(const Duration(milliseconds: 100));
+
+      Get.snackbar(
+        'Success',
+        'Address updated successfully',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.green[600],
+        colorText: Colors.white,
+        duration: const Duration(seconds: 2),
+        margin: const EdgeInsets.all(12),
+        borderRadius: 8,
+        icon: const Icon(Icons.check_circle, color: Colors.white),
+      );
     } catch (e) {
-      Get.snackbar('Error', 'Failed to update address');
+      Get.snackbar(
+        'Error',
+        'Failed to update address: ${e.toString()}',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red[600],
+        colorText: Colors.white,
+        margin: const EdgeInsets.all(12),
+        borderRadius: 8,
+        icon: const Icon(Icons.error, color: Colors.white),
+      );
     } finally {
       _isLoading.value = false;
     }
@@ -79,6 +133,7 @@ class AddressController extends GetxController {
       await Future.delayed(const Duration(milliseconds: 300));
 
       _addresses.removeWhere((addr) => addr.id == addressId);
+      await _addressService.deleteAddress(addressId);
       Get.snackbar('Success', 'Address deleted successfully');
     } catch (e) {
       Get.snackbar('Error', 'Failed to delete address');
@@ -89,28 +144,29 @@ class AddressController extends GetxController {
 
   Future<void> setAsDefault(String addressId) async {
     try {
-      _setAllAddressesNonDefault();
-      final index = _addresses.indexWhere((addr) => addr.id == addressId);
-      if (index != -1) {
-        _addresses[index] = _addresses[index].copyWith(isDefault: true);
+      _isLoading.value = true;
 
-        update();
-        Get.snackbar(
-          'Success',
-          'Default address updated',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.green[600],
-          colorText: Colors.white,
-          duration: const Duration(seconds: 2),
-          margin: const EdgeInsets.all(12),
-          borderRadius: 8,
-          icon: const Icon(Icons.check_circle, color: Colors.white),
-        );
-      }
+      // Call the API to set the address as default
+      await _addressService.setDefaultAddress(addressId);
+
+      // Refresh the address list from the server to get updated data
+      await loadAddresses();
+
+      Get.snackbar(
+        'Success',
+        'Default address updated',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.green[600],
+        colorText: Colors.white,
+        duration: const Duration(seconds: 2),
+        margin: const EdgeInsets.all(12),
+        borderRadius: 8,
+        icon: const Icon(Icons.check_circle, color: Colors.white),
+      );
     } catch (e) {
       Get.snackbar(
         'Error',
-        'Failed to update default address',
+        'Failed to update default address: ${e.toString()}',
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red[600],
         colorText: Colors.white,
@@ -118,14 +174,8 @@ class AddressController extends GetxController {
         borderRadius: 8,
         icon: const Icon(Icons.error, color: Colors.white),
       );
-    }
-  }
-
-  void _setAllAddressesNonDefault() {
-    for (int i = 0; i < _addresses.length; i++) {
-      if (_addresses[i].isDefault) {
-        _addresses[i] = _addresses[i].copyWith(isDefault: false);
-      }
+    } finally {
+      _isLoading.value = false;
     }
   }
 

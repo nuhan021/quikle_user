@@ -5,6 +5,7 @@ class StorageService {
   static const String _tokenKey = 'token';
   static const String _refreshTokenKey = 'refreshToken';
   static const String _idKey = 'userId';
+  static const String _freshchatRestoreIdKey = 'freshchatRestoreId';
 
   // SharedPreferences instance
   static SharedPreferences? _preferences;
@@ -49,6 +50,17 @@ class StorageService {
   static int? get userId => _preferences?.getInt(_idKey);
 
   // =======================
+  // FRESHCHAT RESTORE ID
+  // =======================
+
+  static Future<void> saveFreshchatRestoreId(String restoreId) async {
+    await _preferences?.setString(_freshchatRestoreIdKey, restoreId);
+  }
+
+  static String? get freshchatRestoreId =>
+      _preferences?.getString(_freshchatRestoreIdKey);
+
+  // =======================
   // LOGOUT
   // =======================
 
@@ -56,5 +68,6 @@ class StorageService {
     await _preferences?.remove(_tokenKey);
     await _preferences?.remove(_refreshTokenKey);
     await _preferences?.remove(_idKey);
+    await _preferences?.remove(_freshchatRestoreIdKey);
   }
 }

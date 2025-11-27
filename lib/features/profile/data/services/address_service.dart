@@ -187,58 +187,149 @@
 //   }
 // }
 import 'package:get/get.dart';
+import 'package:quikle_user/core/models/response_data.dart';
+import 'package:quikle_user/core/services/network_caller.dart';
+import 'package:quikle_user/core/services/storage_service.dart';
+import 'package:quikle_user/core/utils/constants/api_constants.dart';
+import 'package:quikle_user/core/utils/logging/logger.dart';
 import 'package:quikle_user/features/profile/data/models/shipping_address_model.dart';
 import 'package:quikle_user/core/utils/constants/enums/address_type_enums.dart';
 
 class AddressService extends GetxService {
-  Future<List<ShippingAddressModel>> fetchAddresses(String userId) async {
-    try {
-      await Future.delayed(const Duration(milliseconds: 500));
-      final mockAddresses = [
-        ShippingAddressModel(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
-          userId: userId,
-          name: 'Amit Sharma',
-          address: '221B MG Road',
-          city: 'Bengaluru',
-          state: 'Karnataka',
-          zipCode: '560001',
-          phoneNumber: '+91 9876543210',
-          type: AddressType.home,
-          isDefault: true,
-          createdAt: DateTime.now().subtract(const Duration(days: 30)),
-        ),
-        ShippingAddressModel(
-          id: DateTime.now().millisecondsSinceEpoch.toString() + '1',
-          userId: userId,
-          name: 'Priya Verma',
-          address: '14 Connaught Place',
-          city: 'New Delhi',
-          state: 'Delhi',
-          zipCode: '110001',
-          phoneNumber: '+91 9123456789',
-          type: AddressType.office,
-          isDefault: false,
-          createdAt: DateTime.now().subtract(const Duration(days: 15)),
-        ),
-      ];
+  final NetworkCaller _networkCaller = NetworkCaller();
 
-      return mockAddresses;
+  Future<List<ShippingAddressModel>> fetchAddresses() async {
+    try {
+      AppLoggerHelper.debug('Fetching addresses');
+
+      final token = StorageService.token;
+      final refreshToken = StorageService.refreshToken;
+
+      AppLoggerHelper.debug('Using token: $token');
+      AppLoggerHelper.debug('Using refresh token: $refreshToken');
+
+      final ResponseData response = await _networkCaller.getRequest(
+        ApiConstants.getShippingAddresses,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'refresh-token': refreshToken ?? '',
+        },
+      );
+
+      AppLoggerHelper.debug('Address status: ${response.statusCode}');
+      AppLoggerHelper.debug('Raw response: ${response.responseData}');
+
+      if (response.isSuccess && response.responseData != null) {
+        final data = response.responseData;
+
+        // Validate new structure
+        if (data is Map<String, dynamic> && data['addresses'] is List) {
+          final List addrList = data['addresses'];
+
+          AppLoggerHelper.debug('Fetched ${addrList.length} addresses');
+
+          final addresses = addrList
+              .map(
+                (json) =>
+                    ShippingAddressModel.fromJson(json as Map<String, dynamic>),
+              )
+              .toList();
+
+          return addresses;
+        } else {
+          AppLoggerHelper.warning('Unexpected response format');
+          return [];
+        }
+      }
+
+      AppLoggerHelper.warning('API call failed or no data');
+      return [];
     } catch (e) {
+      AppLoggerHelper.error('❌ Error fetching addresses', e);
       throw Exception('Failed to fetch addresses: $e');
     }
   }
 
   Future<ShippingAddressModel> addAddress(ShippingAddressModel address) async {
     try {
-      await Future.delayed(const Duration(milliseconds: 800));
-      final newAddress = address.copyWith(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        createdAt: DateTime.now(),
+      AppLoggerHelper.debug('Adding new address for user: ${address.userId}');
+
+      final token = StorageService.token;
+      final refreshToken = StorageService.refreshToken;
+
+      // Convert address type to backend format
+      String addressTypeValue;
+      switch (address.type) {
+        case AddressType.home:
+          addressTypeValue = 'HOME';
+          break;
+        case AddressType.office:
+          addressTypeValue = 'OFFICE';
+          break;
+        case AddressType.other:
+          addressTypeValue = 'OTHERS';
+          break;
+      }
+
+      // Prepare request body
+      final Map<String, dynamic> body = {
+        'full_name': address.name,
+        'address_line1': address.address,
+        'city': address.city,
+        'state': address.state,
+        'country': address.country,
+        'postal_code': address.zipCode,
+        'phone_number': address.phoneNumber,
+        'email': address.email ?? '',
+        'addressType': addressTypeValue,
+        'make_default': address.isDefault,
+      };
+
+      // Add optional fields only if they have values
+      if (address.landmark != null && address.landmark!.isNotEmpty) {
+        body['address_line2'] = address.landmark;
+      }
+
+      if (address.email != null && address.email!.isNotEmpty) {
+        body['email'] = address.email;
+      }
+
+      AppLoggerHelper.debug('Using token: $token');
+      AppLoggerHelper.debug('Using refresh token: $refreshToken');
+      AppLoggerHelper.debug('Request body for adding address: $body');
+
+      final ResponseData response = await _networkCaller.postRequest(
+        ApiConstants.shippingAddresses,
+        body: body,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'refresh-token': '$refreshToken',
+        },
       );
 
-      return newAddress;
+      AppLoggerHelper.debug(
+        'Add address response status: ${response.statusCode}',
+      );
+      AppLoggerHelper.debug(
+        'Add address response data: ${response.responseData}',
+      );
+
+      if (response.isSuccess && response.responseData != null) {
+        AppLoggerHelper.debug('Address added successfully');
+
+        // Parse the response to get the newly created address
+        final addressData = response.responseData as Map<String, dynamic>;
+        final newAddress = ShippingAddressModel.fromJson(addressData);
+
+        return newAddress;
+      }
+
+      AppLoggerHelper.warning(
+        'Failed to add address: ${response.errorMessage}',
+      );
+      throw Exception('Failed to add address');
     } catch (e) {
+      AppLoggerHelper.error('❌ Error adding address', e);
       throw Exception('Failed to add address: $e');
     }
   }
@@ -247,28 +338,154 @@ class AddressService extends GetxService {
     ShippingAddressModel address,
   ) async {
     try {
-      await Future.delayed(const Duration(milliseconds: 600));
-      final updatedAddress = address.copyWith(updatedAt: DateTime.now());
-      return updatedAddress;
+      AppLoggerHelper.debug('Updating address: ${address.id}');
+
+      final token = StorageService.token;
+      final refreshToken = StorageService.refreshToken;
+
+      // Convert address type to backend format
+      String addressTypeValue;
+      switch (address.type) {
+        case AddressType.home:
+          addressTypeValue = 'HOME';
+          break;
+        case AddressType.office:
+          addressTypeValue = 'OFFICE';
+          break;
+        case AddressType.other:
+          addressTypeValue = 'OTHERS';
+          break;
+      }
+
+      // Prepare request body
+      final Map<String, dynamic> body = {
+        'full_name': address.name,
+        'address_line1': address.address,
+        'city': address.city,
+        'state': address.state,
+        'country': address.country,
+        'postal_code': address.zipCode,
+        'phone_number': address.phoneNumber,
+        'email': address.email ?? '',
+        'addressType': addressTypeValue,
+        'make_default': address.isDefault,
+      };
+
+      // Add optional fields only if they have values
+      if (address.landmark != null && address.landmark!.isNotEmpty) {
+        body['address_line2'] = address.landmark;
+      }
+
+      if (address.email != null && address.email!.isNotEmpty) {
+        body['email'] = address.email;
+      }
+
+      final url = ApiConstants.deleteAddress.replaceAll(
+        '{address_id}',
+        address.id,
+      );
+
+      AppLoggerHelper.debug('PUT $url');
+      AppLoggerHelper.debug('Request body for updating address: $body');
+
+      final ResponseData response = await _networkCaller.putRequest(
+        url,
+        body: body,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'refresh-token': '$refreshToken',
+        },
+      );
+
+      AppLoggerHelper.debug(
+        'Update address response status: ${response.statusCode}',
+      );
+      AppLoggerHelper.debug(
+        'Update address response data: ${response.responseData}',
+      );
+
+      if (response.isSuccess && response.responseData != null) {
+        AppLoggerHelper.debug('Address updated successfully');
+
+        // Parse the response to get the updated address
+        final addressData = response.responseData as Map<String, dynamic>;
+        final updatedAddress = ShippingAddressModel.fromJson(addressData);
+
+        return updatedAddress;
+      }
+
+      AppLoggerHelper.warning(
+        'Failed to update address: ${response.errorMessage}',
+      );
+      throw Exception('Failed to update address');
     } catch (e) {
+      AppLoggerHelper.error('❌ Error updating address', e);
       throw Exception('Failed to update address: $e');
     }
   }
 
   Future<bool> deleteAddress(String addressId) async {
     try {
-      await Future.delayed(const Duration(milliseconds: 400));
-      return true;
+      final token = StorageService.token;
+      final refreshToken = StorageService.refreshToken;
+      final url = ApiConstants.deleteAddress.replaceAll(
+        '{address_id}',
+        addressId,
+      );
+
+      final ResponseData response = await _networkCaller.deleteRequest(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'refresh-token': '$refreshToken',
+        },
+      );
+
+      if (response.statusCode == 204) {
+        AppLoggerHelper.debug('Address deleted successfully');
+
+        return true;
+      }
+
+      throw Exception('Failed to delete address');
     } catch (e) {
       throw Exception('Failed to delete address: $e');
     }
   }
 
-  Future<bool> setDefaultAddress(String addressId, String userId) async {
+  Future<bool> setDefaultAddress(String addressId) async {
     try {
-      await Future.delayed(const Duration(milliseconds: 300));
-      return true;
+      AppLoggerHelper.debug('Setting address as default: $addressId');
+
+      final token = StorageService.token;
+      final refreshToken = StorageService.refreshToken;
+
+      final url = ApiConstants.makeDefault.replaceAll(
+        '{address_id}',
+        addressId,
+      );
+
+      AppLoggerHelper.debug('PUT $url');
+
+      final ResponseData response = await _networkCaller.postRequest(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'refresh-token': '$refreshToken',
+        },
+      );
+
+      if (response.isSuccess) {
+        AppLoggerHelper.debug('Address set as default successfully');
+        return true;
+      }
+
+      AppLoggerHelper.warning(
+        'Failed to set default address: ${response.errorMessage}',
+      );
+      throw Exception('Failed to set default address');
     } catch (e) {
+      AppLoggerHelper.error('❌ Error setting default address', e);
       throw Exception('Failed to set default address: $e');
     }
   }

@@ -80,7 +80,10 @@ class AuthService {
       StorageService.saveToken(token);
       StorageService.saveRefreshToken(refreshToken);
 
-      verifyToken();
+      await verifyToken();
+
+      // Load user profile after login
+      await UserService.instance.refreshUser();
 
       return ResponseData(
         isSuccess: true,
@@ -125,6 +128,11 @@ class AuthService {
 
       StorageService.saveToken(token);
       StorageService.saveRefreshToken(refreshToken);
+
+      await verifyToken();
+
+      // Load user profile after signup
+      await UserService.instance.refreshUser();
 
       return ResponseData(
         isSuccess: true,
@@ -183,7 +191,7 @@ class AuthService {
       );
       if (response.statusCode == 200) {
         final userId = response.responseData?['id'];
-        StorageService.saveUserId(userId);
+        await StorageService.saveUserId(userId);
       }
     } catch (e) {}
   }

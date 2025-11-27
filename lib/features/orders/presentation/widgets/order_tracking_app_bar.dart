@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:quikle_user/core/common/widgets/common_app_bar.dart';
 
 class OrderTrackingAppBar extends StatelessWidget
@@ -13,7 +12,14 @@ class OrderTrackingAppBar extends StatelessWidget
   Widget build(BuildContext context) {
     return CommonAppBar(
       title: "Order Tracking",
-      onBackTap: onBackTap ?? () => Get.back(),
+      onBackTap:
+          onBackTap ??
+          () {
+            // Just use Navigator.pop - avoid GetX snackbar issues
+            if (Navigator.canPop(context)) {
+              Navigator.pop(context);
+            }
+          },
       showBackButton: true,
       showNotification: false,
       showProfile: false,

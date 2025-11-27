@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:quikle_user/core/common/widgets/customer_support_fab.dart';
 import 'package:quikle_user/features/orders/controllers/order_tracking_controller.dart';
 import 'package:quikle_user/features/orders/data/models/order_model.dart';
 import 'package:quikle_user/features/orders/presentation/widgets/order_tracking_app_bar.dart';
@@ -28,33 +29,39 @@ class OrderTrackingScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       body: SafeArea(
-        child: Column(
+        child: Stack(
           children: [
-            const OrderTrackingAppBar(),
-            Expanded(
-              child: RefreshIndicator(
-                onRefresh: controller.refreshTrackingData,
-                child: SingleChildScrollView(
-                  physics: const ClampingScrollPhysics(),
-                  child: Column(
-                    children: [
-                      SizedBox(height: 16.h),
-                      const OrderTrackingMapSection(),
-                      SizedBox(height: 12.h),
-                      OrderTrackingSummary(
-                        order: order,
-                        controller: controller,
+            Column(
+              children: [
+                const OrderTrackingAppBar(),
+                Expanded(
+                  child: RefreshIndicator(
+                    onRefresh: controller.refreshTrackingData,
+                    child: SingleChildScrollView(
+                      physics: const ClampingScrollPhysics(),
+                      child: Column(
+                        children: [
+                          SizedBox(height: 16.h),
+                          const OrderTrackingMapSection(),
+                          SizedBox(height: 12.h),
+                          OrderTrackingSummary(
+                            order: order,
+                            controller: controller,
+                          ),
+                          SizedBox(height: 12.h),
+                          TimeEstimationSection(controller: controller),
+                          SizedBox(height: 12.h),
+                          ProgressSection(controller: controller),
+                          SizedBox(height: 12.h),
+                        ],
                       ),
-                      SizedBox(height: 12.h),
-                      TimeEstimationSection(controller: controller),
-                      SizedBox(height: 12.h),
-                      ProgressSection(controller: controller),
-                      SizedBox(height: 12.h),
-                    ],
+                    ),
                   ),
                 ),
-              ),
+              ],
             ),
+            // Customer Support FAB
+            const CustomerSupportFAB(),
           ],
         ),
       ),

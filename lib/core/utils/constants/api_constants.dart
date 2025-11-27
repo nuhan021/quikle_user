@@ -27,4 +27,19 @@ class ApiConstants {
 
   //Profile api's
   static const String getUserProfile = "$baseUrl/customer/profile/";
+
+  //Shipping address api's
+  static const String shippingAddresses =
+      "$baseUrl/customer/shipping-addresses/";
+  static const String getShippingAddresses =
+      "$baseUrl/customer/shipping-addresses/";
+  static const String makeDefault =
+      "$baseUrl/customer/shipping-addresses/{address_id}/set-default";
+  static const String deleteAddress =
+      "$baseUrl/customer/shipping-addresses/{address_id}";
+
+  //Freshchat api's
+  static const String saveFreshchatRestoreId = "$baseUrl/user/freshchat/";
+  static const String getFreshchatRestoreId =
+      "$baseUrl/user/freshchat/restore_id";
 }

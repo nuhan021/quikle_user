@@ -229,7 +229,7 @@ class CartBottomSection extends StatelessWidget {
                             '\$ ${totalAmount.toStringAsFixed(2)}',
                             style: getTextStyle(
                               font: CustomFonts.inter,
-                              fontSize: 16.sp,
+                              fontSize: 14.sp,
                               fontWeight: FontWeight.w700,
                               color: Colors.white,
                             ),
@@ -251,7 +251,7 @@ class CartBottomSection extends StatelessWidget {
                           'Place order',
                           style: getTextStyle(
                             font: CustomFonts.inter,
-                            fontSize: 16.sp,
+                            fontSize: 14.sp,
                             fontWeight: FontWeight.w700,
                             color: AppColors.beakYellow,
                           ),
