@@ -138,13 +138,17 @@ class OrderInvoiceScreen extends StatelessWidget {
                   color: const Color(0xFF7C7C7C),
                 ),
               ),
-              Text(
-                DateFormat('MMMM d, yyyy at h:mm a').format(order.orderDate),
-                style: getTextStyle(
-                  font: CustomFonts.inter,
-                  fontSize: 12.sp,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.ebonyBlack,
+              Expanded(
+                child: Text(
+                  DateFormat('MMMM d, yyyy at h:mm a').format(order.orderDate),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: getTextStyle(
+                    font: CustomFonts.inter,
+                    fontSize: 11.sp,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.ebonyBlack,
+                  ),
                 ),
               ),
             ],
@@ -162,15 +166,19 @@ class OrderInvoiceScreen extends StatelessWidget {
                     color: const Color(0xFF7C7C7C),
                   ),
                 ),
-                Text(
-                  DateFormat(
-                    'MMM d, yyyy at h:mm a',
-                  ).format(order.estimatedDelivery!),
-                  style: getTextStyle(
-                    font: CustomFonts.inter,
-                    fontSize: 12.sp,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.beakYellow,
+                Expanded(
+                  child: Text(
+                    DateFormat(
+                      'MMM d, yyyy at h:mm a',
+                    ).format(order.estimatedDelivery!),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: getTextStyle(
+                      font: CustomFonts.inter,
+                      fontSize: 11.sp,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.beakYellow,
+                    ),
                   ),
                 ),
               ],

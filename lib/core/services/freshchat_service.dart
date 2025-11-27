@@ -2,7 +2,10 @@ import 'dart:async';
 import 'package:freshchat_sdk/freshchat_sdk.dart';
 import 'package:freshchat_sdk/freshchat_user.dart';
 import 'package:get/get.dart';
+import 'package:quikle_user/core/services/network_caller.dart';
 import 'package:quikle_user/core/services/storage_service.dart';
+import 'package:quikle_user/core/utils/constants/api_constants.dart';
+import 'package:quikle_user/core/utils/logging/logger.dart';
 
 /// Freshchat Service for Customer Support
 ///
@@ -15,6 +18,9 @@ import 'package:quikle_user/core/services/storage_service.dart';
 /// - User logout handling
 class FreshchatService extends GetxController {
   static FreshchatService get instance => Get.find<FreshchatService>();
+
+  // Network caller for API requests
+  final NetworkCaller _networkCaller = NetworkCaller();
 
   // Observable for unread message count
   final RxInt unreadMessageCount = 0.obs;
@@ -60,12 +66,30 @@ class FreshchatService extends GetxController {
           final generatedRestoreId = user.getRestoreId();
 
           if (generatedRestoreId != null && generatedRestoreId.isNotEmpty) {
-            print('🔑 Freshchat Restore ID: $generatedRestoreId');
+            print('✅ 🔑 Freshchat Restore ID Generated: $generatedRestoreId');
             restoreId.value = generatedRestoreId;
+
+            // Save to local storage
             await StorageService.saveFreshchatRestoreId(generatedRestoreId);
+
+            // Verify it was saved by reading it back
+            final savedRestoreId = StorageService.freshchatRestoreId;
+            print('✅ 💾 Restore ID saved to local storage successfully!');
+            print('🔍 Verification - Retrieved from storage: $savedRestoreId');
+            print(
+              '✅ Storage verification: ${savedRestoreId == generatedRestoreId ? "MATCH ✓" : "MISMATCH ✗"}',
+            );
+
+            // Save to database
+            await _saveRestoreIdToDatabase(generatedRestoreId);
+
+            AppLoggerHelper.debug(
+              'Freshchat Restore ID saved: $generatedRestoreId',
+            );
           }
         } catch (e) {
-          print('Error retrieving restore ID: $e');
+          print('❌ Error retrieving restore ID: $e');
+          AppLoggerHelper.error('Error retrieving restore ID', e);
         }
       });
 
@@ -80,11 +104,11 @@ class FreshchatService extends GetxController {
             unreadMessageCount.value = countResult['count'] as int;
           }
         } catch (e) {
-          print('Error retrieving unread count: $e');
+          print('❌ Error retrieving unread count: $e');
         }
       });
     } catch (e) {
-      print('Error setting up Freshchat event listeners: $e');
+      print('❌ Error setting up Freshchat event listeners: $e');
     }
   }
 
@@ -101,9 +125,18 @@ class FreshchatService extends GetxController {
     try {
       final userId = externalId ?? StorageService.userId?.toString() ?? '';
 
-      if (userId.isEmpty) return;
+      if (userId.isEmpty) {
+        print('⚠️ User ID is empty, skipping Freshchat identification');
+        return;
+      }
 
       final savedRestoreId = StorageService.freshchatRestoreId;
+      if (savedRestoreId != null && savedRestoreId.isNotEmpty) {
+        print('🔑 Restore ID found: $savedRestoreId');
+      } else {
+        print('🔑 No Restore ID found (First time user)');
+      }
+
       var user = FreshchatUser(userId, savedRestoreId);
 
       // Set user properties
@@ -158,8 +191,14 @@ class FreshchatService extends GetxController {
       if (customProperties != null && customProperties.isNotEmpty) {
         Freshchat.setUserProperties(customProperties);
       }
+
+      print('✅ Freshchat user identified successfully');
+
+      // Print current restore ID after identification
+      await _printCurrentRestoreId();
     } catch (e) {
-      print('Error identifying Freshchat user: $e');
+      print('❌ Error identifying Freshchat user: $e');
+      AppLoggerHelper.error('Error identifying Freshchat user', e);
     }
   }
 
@@ -173,11 +212,54 @@ class FreshchatService extends GetxController {
   }
 
   /// Open Freshchat conversation screen
+  /// This method will identify the user before opening chat if not already identified
   Future<void> openChat() async {
     try {
+      print('🚀 Opening Freshchat...');
+
+      // Get user ID from storage
+      final userId = StorageService.userId;
+
+      if (userId == null) {
+        print('⚠️ User ID not found in storage. Please login first.');
+        Freshchat.showConversations();
+        return;
+      }
+
+      print('📱 User ID from storage: $userId');
+
+      // Get saved restore ID from local storage
+      String? savedRestoreId = StorageService.freshchatRestoreId;
+
+      if (savedRestoreId != null && savedRestoreId.isNotEmpty) {
+        print('🔑 Found saved Restore ID in local storage: $savedRestoreId');
+        print('✅ Restoring previous Freshchat session from local storage');
+      } else {
+        print('🔑 No Restore ID in local storage');
+        print('📥 Checking database for restore ID...');
+
+        // Try to fetch from database
+        savedRestoreId = await _fetchRestoreIdFromDatabase();
+
+        if (savedRestoreId != null && savedRestoreId.isNotEmpty) {
+          print('✅ Restore ID found in database and synced to local storage');
+        } else {
+          print('ℹ️ No Restore ID found in database either');
+          print(
+            'ℹ️ This is a new Freshchat session - Restore ID will be generated after first message',
+          );
+        }
+      }
+
+      // Identify user with Freshchat
+      await identifyUser(externalId: userId.toString());
+
+      print('✅ User identified, opening Freshchat conversations');
       Freshchat.showConversations();
     } catch (e) {
-      print('Error opening Freshchat: $e');
+      print('❌ Error opening Freshchat: $e');
+      // Still try to open chat even if identification fails
+      Freshchat.showConversations();
     }
   }
 
@@ -195,19 +277,145 @@ class FreshchatService extends GetxController {
     try {
       return await Freshchat.getUser;
     } catch (e) {
-      print('Error getting current Freshchat user: $e');
+      print('❌ Error getting current Freshchat user: $e');
       return null;
+    }
+  }
+
+  /// Manually print current restore ID (for debugging)
+  Future<void> _printCurrentRestoreId() async {
+    try {
+      final user = await Freshchat.getUser;
+      final currentRestoreId = user.getRestoreId();
+
+      print('════════════════════════════════════════');
+      print('📋 FRESHCHAT RESTORE ID STATUS');
+      print('════════════════════════════════════════');
+      print('Current Restore ID: ${currentRestoreId ?? "Not yet generated"}');
+      print(
+        'Stored Restore ID: ${StorageService.freshchatRestoreId ?? "None"}',
+      );
+      print(
+        'Observable Value: ${restoreId.value.isEmpty ? "Empty" : restoreId.value}',
+      );
+      print('════════════════════════════════════════');
+    } catch (e) {
+      print('❌ Error fetching restore ID: $e');
+    }
+  }
+
+  /// Public method to check restore ID anytime
+  Future<String?> getRestoreId() async {
+    await _printCurrentRestoreId();
+    try {
+      final user = await Freshchat.getUser;
+      return user.getRestoreId();
+    } catch (e) {
+      print('❌ Error getting restore ID: $e');
+      return null;
+    }
+  }
+
+  /// Fetch restore ID from database
+  Future<String?> _fetchRestoreIdFromDatabase() async {
+    try {
+      final token = StorageService.token;
+      final refreshToken = StorageService.refreshToken;
+
+      if (token == null || refreshToken == null) {
+        print('⚠️ No auth tokens available, skipping database fetch');
+        return null;
+      }
+
+      print('📥 Fetching restore ID from database...');
+
+      final response = await _networkCaller.getRequest(
+        ApiConstants.getFreshchatRestoreId,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'refresh-token': refreshToken,
+        },
+      );
+
+      if (response.isSuccess && response.statusCode == 200) {
+        final fetchedRestoreId = response.responseData?['restore_id'];
+
+        if (fetchedRestoreId != null && fetchedRestoreId.isNotEmpty) {
+          print('✅ 💾 Restore ID fetched from database: $fetchedRestoreId');
+
+          // Save to local storage for future use
+          await StorageService.saveFreshchatRestoreId(fetchedRestoreId);
+          print('✅ Restore ID synced to local storage');
+
+          AppLoggerHelper.debug('Freshchat Restore ID fetched from database');
+          return fetchedRestoreId;
+        } else {
+          print('ℹ️ No restore ID found in database');
+          return null;
+        }
+      } else {
+        print(
+          '❌ Failed to fetch restore ID from database: ${response.statusCode} - ${response.errorMessage}',
+        );
+        return null;
+      }
+    } catch (e) {
+      print('❌ Error fetching restore ID from database: $e');
+      AppLoggerHelper.error('Error fetching restore ID from database', e);
+      return null;
+    }
+  }
+
+  /// Save restore ID to database
+  Future<void> _saveRestoreIdToDatabase(String restoreId) async {
+    try {
+      final token = StorageService.token;
+      final refreshToken = StorageService.refreshToken;
+
+      if (token == null || refreshToken == null) {
+        print('⚠️ No auth tokens available, skipping database save');
+        return;
+      }
+
+      print('📤 Saving restore ID to database...');
+
+      final response = await _networkCaller.multipartRequest(
+        ApiConstants.saveFreshchatRestoreId,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'refresh-token': refreshToken,
+        },
+        fields: {'restore_id': restoreId},
+      );
+
+      if (response.isSuccess && response.statusCode == 200) {
+        print('✅ 💾 Restore ID saved to database successfully!');
+        AppLoggerHelper.debug('Freshchat Restore ID saved to database');
+      } else {
+        print(
+          '❌ Failed to save restore ID to database: ${response.statusCode} - ${response.errorMessage}',
+        );
+        AppLoggerHelper.error(
+          'Failed to save restore ID to database',
+          response.errorMessage,
+        );
+      }
+    } catch (e) {
+      print('❌ Error saving restore ID to database: $e');
+      AppLoggerHelper.error('Error saving restore ID to database', e);
     }
   }
 
   /// Reset Freshchat user data (call on logout)
   Future<void> resetUser() async {
     try {
+      print('🔄 Resetting Freshchat user...');
       Freshchat.resetUser();
       unreadMessageCount.value = 0;
       restoreId.value = '';
+      print('✅ Freshchat user reset successfully');
     } catch (e) {
-      print('Error resetting Freshchat user: $e');
+      print('❌ Error resetting Freshchat user: $e');
     }
   }
 
