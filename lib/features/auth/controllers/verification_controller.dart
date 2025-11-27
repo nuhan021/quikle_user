@@ -112,20 +112,6 @@ class VerificationController extends GetxController {
         }
 
         if (response.isSuccess) {
-          // String message = 'Phone number verified successfully';
-          // if (response.responseData != null &&
-          //     response.responseData['message'] != null) {
-          //   message = response.responseData['message'].toString();
-          // }
-
-          // Get.snackbar(
-          //   'Success',
-          //   message,
-          //   snackPosition: SnackPosition.TOP,
-          //   backgroundColor: Colors.green.withValues(alpha: 0.1),
-          //   colorText: Colors.green,
-          // );
-
           // Reload addresses after successful login
           try {
             final addressController = Get.find<AddressController>();

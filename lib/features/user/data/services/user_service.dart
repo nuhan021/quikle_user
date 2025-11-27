@@ -32,11 +32,13 @@ class UserService extends GetxController {
     final refreshToken = StorageService.refreshToken;
 
     if (token == null || refreshToken == null) {
+      print('⚠️ No token found, skipping user profile load');
       _currentUser.value = null;
       return;
     }
 
     try {
+      print('📱 Loading user profile...');
       final ResponseData response = await _networkCaller.getRequest(
         ApiConstants.getUserProfile,
         headers: {
@@ -44,20 +46,27 @@ class UserService extends GetxController {
           'refresh-token': '$refreshToken',
         },
       );
+
+      print('📱 User profile response status: ${response.statusCode}');
+
       if (response.statusCode == 200) {
         final user = UserModel.fromJson(response.responseData['data']);
         _currentUser.value = user;
         _isLoggedIn.value = true;
+        print('✅ User profile loaded: ${user.name} (ID: ${user.id})');
 
         // Identify user with Freshchat after profile is loaded
         _identifyUserWithFreshchat(user);
       } else {
+        print(
+          '❌ Failed to load user profile: ${response.statusCode} - ${response.errorMessage}',
+        );
         _currentUser.value = null;
         _isLoggedIn.value = false;
       }
     } catch (e) {
       // Don't throw - just log and set user to null
-      print('Error loading user profile: $e');
+      print('❌ Error loading user profile: $e');
       _currentUser.value = null;
       _isLoggedIn.value = false;
     }
@@ -66,6 +75,34 @@ class UserService extends GetxController {
   /// Refresh user data from server
   Future<void> refreshUser() async {
     await _loadUser();
+  }
+
+  /// Identify current user with Freshchat (public method)
+  Future<void> identifyFreshchatUser() async {
+    try {
+      // Get user ID from storage
+      final userId = StorageService.userId;
+
+      if (userId == null) {
+        print('❌ Cannot identify Freshchat user: User ID is null in storage');
+        return;
+      }
+
+      // Check if FreshchatService is available
+      if (!Get.isRegistered<FreshchatService>()) {
+        print('❌ FreshchatService not registered, skipping identification');
+        return;
+      }
+
+      final freshchatService = Get.find<FreshchatService>();
+
+      // Identify user with just the user ID
+      await freshchatService.identifyUser(externalId: userId.toString());
+
+      print('✅ Freshchat user identified with ID: $userId');
+    } catch (e) {
+      print('❌ Error identifying Freshchat user: $e');
+    }
   }
 
   /// Identify user with Freshchat support
