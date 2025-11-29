@@ -45,292 +45,298 @@ class AddAddressScreen extends StatelessWidget {
       minChildSize: 0.5,
       maxChildSize: 0.8,
       builder: (context, scrollController) {
-        return Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.1),
-                blurRadius: 16.r,
-                offset: Offset(0, -4.h),
-              ),
-            ],
-          ),
-          child: SingleChildScrollView(
-            controller: scrollController,
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(
-                20.w,
-                20.h,
-                20.w,
-                MediaQuery.of(context).viewInsets.bottom + 20.h,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Center(
-                    child: Container(
-                      width: 40.w,
-                      height: 4.h,
-                      decoration: BoxDecoration(
-                        color: AppColors.textSecondary.withValues(alpha: 0.3),
-                        borderRadius: BorderRadius.circular(2.r),
+        return Material(
+          type: MaterialType.transparency,
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.1),
+                  blurRadius: 16.r,
+                  offset: Offset(0, -4.h),
+                ),
+              ],
+            ),
+            child: SingleChildScrollView(
+              controller: scrollController,
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(
+                  20.w,
+                  20.h,
+                  20.w,
+                  MediaQuery.of(context).viewInsets.bottom + 20.h,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 40.w,
+                        height: 4.h,
+                        decoration: BoxDecoration(
+                          color: AppColors.textSecondary.withValues(alpha: 0.3),
+                          borderRadius: BorderRadius.circular(2.r),
+                        ),
                       ),
                     ),
-                  ),
 
-                  SizedBox(height: 20.h),
+                    SizedBox(height: 20.h),
 
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          addressToEdit != null
-                              ? 'Edit Address'
-                              : 'Add New Address',
-                          style: getTextStyle(
-                            font: CustomFonts.inter,
-                            fontSize: 20.sp,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.textPrimary,
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            addressToEdit != null
+                                ? 'Edit Address'
+                                : 'Add New Address',
+                            style: getTextStyle(
+                              font: CustomFonts.inter,
+                              fontSize: 20.sp,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textPrimary,
+                            ),
                           ),
                         ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          controller.clearForm(); // clear all fields
-                          Navigator.of(context).pop();
-                        },
-                        child: Container(
-                          width: 32.w,
-                          height: 32.h,
-                          decoration: BoxDecoration(
-                            color: AppColors.homeGrey,
-                            borderRadius: BorderRadius.circular(16.r),
-                          ),
-                          child: Icon(
-                            Icons.close,
-                            size: 20.sp,
-                            color: AppColors.textSecondary,
+                        GestureDetector(
+                          onTap: () {
+                            controller.clearForm(); // clear all fields
+                            Navigator.of(context).pop();
+                          },
+                          child: Container(
+                            width: 32.w,
+                            height: 32.h,
+                            decoration: BoxDecoration(
+                              color: AppColors.homeGrey,
+                              borderRadius: BorderRadius.circular(16.r),
+                            ),
+                            child: Icon(
+                              Icons.close,
+                              size: 20.sp,
+                              color: AppColors.textSecondary,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 12.h),
+                      ],
+                    ),
+                    SizedBox(height: 12.h),
 
-                  Obx(
-                    () => Row(
-                      children: AddressType.values.map((type) {
-                        final isSelected =
-                            controller.selectedAddressType.value == type;
-                        return Expanded(
-                          child: GestureDetector(
-                            onTap: () => controller.setAddressType(type),
-                            child: Container(
-                              margin: EdgeInsets.only(
-                                right: type != AddressType.values.last
-                                    ? 8.w
-                                    : 0,
-                              ),
-                              padding: EdgeInsets.symmetric(vertical: 12.h),
-                              decoration: BoxDecoration(
-                                color: isSelected
-                                    ? AppColors.beakYellow
-                                    : AppColors.homeGrey,
-                                borderRadius: BorderRadius.circular(8.r),
-                                border: Border.all(
+                    Obx(
+                      () => Row(
+                        children: AddressType.values.map((type) {
+                          final isSelected =
+                              controller.selectedAddressType.value == type;
+                          return Expanded(
+                            child: GestureDetector(
+                              onTap: () => controller.setAddressType(type),
+                              child: Container(
+                                margin: EdgeInsets.only(
+                                  right: type != AddressType.values.last
+                                      ? 8.w
+                                      : 0,
+                                ),
+                                padding: EdgeInsets.symmetric(vertical: 12.h),
+                                decoration: BoxDecoration(
                                   color: isSelected
                                       ? AppColors.beakYellow
-                                      : AppColors.cardColor,
-                                  width: 1.w,
+                                      : AppColors.homeGrey,
+                                  borderRadius: BorderRadius.circular(8.r),
+                                  border: Border.all(
+                                    color: isSelected
+                                        ? AppColors.beakYellow
+                                        : AppColors.cardColor,
+                                    width: 1.w,
+                                  ),
                                 ),
-                              ),
-                              child: Text(
-                                type.typeDisplayName,
-                                textAlign: TextAlign.center,
-                                style: getTextStyle(
-                                  font: CustomFonts.inter,
-                                  fontSize: 14.sp,
-                                  fontWeight: FontWeight.w500,
-                                  color: isSelected
-                                      ? Colors.white
-                                      : AppColors.textSecondary,
+                                child: Text(
+                                  type.typeDisplayName,
+                                  textAlign: TextAlign.center,
+                                  style: getTextStyle(
+                                    font: CustomFonts.inter,
+                                    fontSize: 14.sp,
+                                    fontWeight: FontWeight.w500,
+                                    color: isSelected
+                                        ? Colors.white
+                                        : AppColors.textSecondary,
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        );
-                      }).toList(),
+                          );
+                        }).toList(),
+                      ),
                     ),
-                  ),
 
-                  SizedBox(height: 24.h),
+                    SizedBox(height: 24.h),
 
-                  _buildTextField(
-                    controller: controller.nameController,
-                    hintText: 'Full Name',
-                    errorText: controller.nameError,
-                  ),
-
-                  SizedBox(height: 16.h),
-
-                  _buildTextField(
-                    controller: controller.phoneController,
-                    hintText: 'Phone Number',
-                    keyboardType: TextInputType.phone,
-                    errorText: controller.phoneError,
-                  ),
-
-                  SizedBox(height: 16.h),
-
-                  _buildTextField(
-                    controller: controller.addressController,
-                    hintText: 'Full Address',
-                    errorText: controller.addressError,
-                  ),
-
-                  SizedBox(height: 16.h),
-
-                  Obx(
-                    () => _buildDropdown(
-                      value: controller.selectedCountry.value,
-                      hintText: 'Select Country',
-                      items: controller.countries,
-                      onChanged: controller.setCountry,
+                    _buildTextField(
+                      controller: controller.nameController,
+                      hintText: 'Full Name',
+                      errorText: controller.nameError,
                     ),
-                  ),
 
-                  SizedBox(height: 16.h),
+                    SizedBox(height: 16.h),
 
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Obx(
-                          () => _buildDropdown(
-                            value: controller.selectedState.value,
-                            hintText: 'Select State',
-                            items: controller.states,
-                            onChanged: controller.setState,
+                    _buildTextField(
+                      controller: controller.phoneController,
+                      hintText: 'Phone Number',
+                      keyboardType: TextInputType.phone,
+                      errorText: controller.phoneError,
+                    ),
+
+                    SizedBox(height: 16.h),
+
+                    _buildTextField(
+                      controller: controller.addressController,
+                      hintText: 'Full Address',
+                      errorText: controller.addressError,
+                    ),
+
+                    SizedBox(height: 16.h),
+
+                    Obx(
+                      () => _buildDropdown(
+                        value: controller.selectedCountry.value,
+                        hintText: 'Select Country',
+                        items: controller.countries,
+                        onChanged: controller.setCountry,
+                      ),
+                    ),
+
+                    SizedBox(height: 16.h),
+
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Obx(
+                            () => _buildDropdown(
+                              value: controller.selectedState.value,
+                              hintText: 'Select State',
+                              items: controller.states,
+                              onChanged: controller.setState,
+                            ),
                           ),
                         ),
-                      ),
-                      SizedBox(width: 8.w),
-                      Expanded(
-                        child: Obx(
-                          () => _buildDropdown(
-                            value: controller.selectedCity.value,
-                            hintText: 'Select City',
-                            items: controller.cities,
-                            onChanged: controller.setCity,
+                        SizedBox(width: 8.w),
+                        Expanded(
+                          child: Obx(
+                            () => _buildDropdown(
+                              value: controller.selectedCity.value,
+                              hintText: 'Select City',
+                              items: controller.cities,
+                              onChanged: controller.setCity,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
+                      ],
+                    ),
 
-                  SizedBox(height: 16.h),
+                    SizedBox(height: 16.h),
 
-                  _buildTextField(
-                    controller: controller.zipCodeController,
-                    hintText: 'Zip Code',
-                    keyboardType: TextInputType.number,
-                    errorText: controller.zipCodeError,
-                  ),
+                    _buildTextField(
+                      controller: controller.zipCodeController,
+                      hintText: 'Zip Code',
+                      keyboardType: TextInputType.number,
+                      errorText: controller.zipCodeError,
+                    ),
 
-                  SizedBox(height: 24.h),
-                  Row(
-                    children: [
-                      Text(
-                        'Make default',
-                        style: getTextStyle(
-                          font: CustomFonts.inter,
-                          fontSize: 14.sp,
-                          fontWeight: FontWeight.w500,
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
-                      SizedBox(width: 12.w),
-                      Obx(
-                        () => Switch(
-                          value: controller.isDefault.value,
-                          onChanged: (value) => controller.setDefault(value),
-                          activeThumbColor: AppColors.textPrimary,
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  SizedBox(height: 32.h),
-
-                  Obx(
-                    () => SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: controller.isLoading.value
-                            ? null
-                            : () => addressToEdit != null
-                                  ? controller.updateAddress(addressToEdit!.id)
-                                  : controller.addAddress(),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.textPrimary,
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8.r),
+                    SizedBox(height: 24.h),
+                    Row(
+                      children: [
+                        Text(
+                          'Make default',
+                          style: getTextStyle(
+                            font: CustomFonts.inter,
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.textPrimary,
                           ),
-                          elevation: 0,
                         ),
-                        child: controller.isLoading.value
-                            ? Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  SizedBox(
-                                    width: 20.w,
-                                    height: 20.h,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2.w,
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                        Colors.white,
+                        SizedBox(width: 12.w),
+                        Obx(
+                          () => Switch(
+                            value: controller.isDefault.value,
+                            onChanged: (value) => controller.setDefault(value),
+                            activeThumbColor: AppColors.textPrimary,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    SizedBox(height: 32.h),
+
+                    Obx(
+                      () => SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: controller.isLoading.value
+                              ? null
+                              : () => addressToEdit != null
+                                    ? controller.updateAddress(
+                                        addressToEdit!.id,
+                                      )
+                                    : controller.addAddress(),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.textPrimary,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.r),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: controller.isLoading.value
+                              ? Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    SizedBox(
+                                      width: 20.w,
+                                      height: 20.h,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2.w,
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                              Colors.white,
+                                            ),
                                       ),
                                     ),
-                                  ),
-                                  SizedBox(width: 12.w),
-                                  Text(
-                                    addressToEdit != null
-                                        ? 'Updating address...'
-                                        : 'Adding address...',
-                                    style: getTextStyle(
-                                      font: CustomFonts.inter,
-                                      fontSize: 16.sp,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.white,
+                                    SizedBox(width: 12.w),
+                                    Text(
+                                      addressToEdit != null
+                                          ? 'Updating address...'
+                                          : 'Adding address...',
+                                      style: getTextStyle(
+                                        font: CustomFonts.inter,
+                                        fontSize: 16.sp,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white,
+                                      ),
                                     ),
+                                  ],
+                                )
+                              : Text(
+                                  addressToEdit != null
+                                      ? 'Update Address'
+                                      : 'Add New Address',
+                                  style: getTextStyle(
+                                    font: CustomFonts.inter,
+                                    fontSize: 16.sp,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
                                   ),
-                                ],
-                              )
-                            : Text(
-                                addressToEdit != null
-                                    ? 'Update Address'
-                                    : 'Add New Address',
-                                style: getTextStyle(
-                                  font: CustomFonts.inter,
-                                  fontSize: 16.sp,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white,
                                 ),
-                              ),
+                        ),
                       ),
                     ),
-                  ),
 
-                  SizedBox(height: 20.h),
-                ],
-              ),
-            ),
-          ),
-        );
+                    SizedBox(height: 20.h),
+                  ],
+                ),
+              ), // Padding
+            ), // SingleChildScrollView
+          ), // Container
+        ); // Material widget closing
       },
     );
   }
