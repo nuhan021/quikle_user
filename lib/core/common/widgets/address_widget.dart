@@ -104,10 +104,13 @@ class AddressWidget extends StatelessWidget {
   }
 
   String _formatAddress(String address, String city) {
-    // var shortAddress = address.split(',').first;
-    // if (shortAddress.length > 20) {
-    //   shortAddress = '${shortAddress.substring(0, 20)}...';
-    // }
-    return '$address, $city';
+    final parts = address.split(',');
+
+    // Take the first two comma-separated parts
+    final usefulParts = parts.take(2).map((e) => e.trim()).toList();
+
+    final shortAddress = usefulParts.join(', ');
+
+    return '$shortAddress, $city';
   }
 }

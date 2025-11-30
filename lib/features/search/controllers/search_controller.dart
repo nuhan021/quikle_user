@@ -6,14 +6,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:quikle_user/features/home/data/models/product_model.dart';
-import 'package:quikle_user/features/home/data/services/home_services.dart';
+import 'package:quikle_user/features/search/data/services/search_service.dart';
 import 'package:quikle_user/features/cart/controllers/cart_controller.dart';
 import 'package:quikle_user/features/profile/controllers/favorites_controller.dart';
 import 'package:quikle_user/routes/app_routes.dart';
 import 'package:quikle_user/core/services/whatsapp_service.dart';
 
 class ProductSearchController extends GetxController {
-  final HomeService _homeService = HomeService();
+  final SearchService _searchService = SearchService();
   late final CartController _cartController;
 
   final TextEditingController searchController = TextEditingController();
@@ -34,6 +34,14 @@ class ProductSearchController extends GetxController {
   final _searchResults = <ProductModel>[].obs;
   final _recentSearches = <String>[].obs;
   final _isLoading = false.obs;
+  final _isLoadingMore = false.obs;
+  final _hasSearched = false.obs; // Track if user has performed a search
+
+  // Pagination
+  final _currentOffset = 0.obs;
+  final _totalResults = 0.obs;
+  final _hasMoreResults = true.obs;
+  static const int _pageSize = 20;
 
   final _isListening = false.obs;
   bool get isListening => _isListening.value;
@@ -44,7 +52,6 @@ class ProductSearchController extends GetxController {
   final RxDouble soundLevel = 0.0.obs;
 
   late Timer _placeholderTimer;
-  Timer? _debounceTimer;
 
   // NEW: lazy init guard
   bool _speechInitialized = false;
@@ -87,6 +94,9 @@ class ProductSearchController extends GetxController {
   List<ProductModel> get searchResults => _searchResults;
   List<String> get recentSearches => _recentSearches;
   bool get isLoading => _isLoading.value;
+  bool get isLoadingMore => _isLoadingMore.value;
+  bool get hasMoreResults => _hasMoreResults.value;
+  bool get hasSearched => _hasSearched.value; // Getter for search state
 
   @override
   void onInit() {
@@ -103,8 +113,17 @@ class ProductSearchController extends GetxController {
   void onClose() {
     searchController.dispose();
     _placeholderTimer.cancel();
-    _debounceTimer?.cancel();
     super.onClose();
+  }
+
+  // Clear search when screen is disposed (going back)
+  void clearSearch() {
+    searchController.clear();
+    _searchQuery.value = '';
+    _searchResults.clear();
+    _hasSearched.value = false;
+    _currentOffset.value = 0;
+    _hasMoreResults.value = true;
   }
 
   void _startPlaceholderRotation() {
@@ -209,10 +228,14 @@ class ProductSearchController extends GetxController {
           if (result.finalResult) {
             final words = result.recognizedWords;
             searchController.text = words;
-            onSearchChanged(words);
             _isListening.value = false;
             soundLevel.value = 0.0;
             _currentPlaceholder.value = "Search for 'biryani'";
+
+            // Trigger the search immediately when voice input is complete
+            if (words.isNotEmpty) {
+              performSearchNow(words);
+            }
 
             if (onVoiceSearchCompleted != null && words.isNotEmpty) {
               onVoiceSearchCompleted!(words);
@@ -251,32 +274,77 @@ class ProductSearchController extends GetxController {
 
   void onSearchChanged(String query) {
     _searchQuery.value = query;
-    if (query.isEmpty) {
+    // Don't auto-search on every keystroke, wait for user to hit enter
+  }
+
+  // New method to perform search immediately (called when user hits enter)
+  void performSearchNow(String query) {
+    if (query.isNotEmpty) {
+      // Reset pagination when starting new search
+      _currentOffset.value = 0;
       _searchResults.clear();
+      _hasMoreResults.value = true;
+      _hasSearched.value = true; // Mark that user has searched
+      _performSearch(query);
+    }
+  }
+
+  // Load more results (pagination)
+  Future<void> loadMoreResults() async {
+    if (_isLoadingMore.value ||
+        !_hasMoreResults.value ||
+        _searchQuery.value.isEmpty) {
       return;
     }
-    _debounceSearch(query);
-  }
 
-  void _debounceSearch(String query) {
-    _debounceTimer?.cancel();
-    _debounceTimer = Timer(const Duration(milliseconds: 500), () {
-      _performSearch(query);
-    });
-  }
-
-  Future<void> _performSearch(String query) async {
-    if (query.isEmpty) return;
-    _isLoading.value = true;
+    _isLoadingMore.value = true;
+    _currentOffset.value += _pageSize;
 
     try {
-      final allProducts = await _homeService.fetchAllProducts();
-      final filtered = allProducts.where((p) {
-        return p.title.toLowerCase().contains(query.toLowerCase()) ||
-            p.description.toLowerCase().contains(query.toLowerCase());
+      await _performSearch(_searchQuery.value, append: true);
+    } finally {
+      _isLoadingMore.value = false;
+    }
+  }
+
+  Future<void> _performSearch(String query, {bool append = false}) async {
+    if (query.isEmpty) return;
+
+    if (!append) {
+      _isLoading.value = true;
+    }
+
+    try {
+      final result = await _searchService.searchProducts(
+        query: query,
+        offset: _currentOffset.value,
+        limit: _pageSize,
+      );
+
+      List<ProductModel> products = result['products'] as List<ProductModel>;
+
+      // Filter to show only OTC medicines
+      products = products.where((product) {
+        // If it's a medicine (assuming category_id 2 is medicine based on API response),
+        // only show if isOTC is true
+        if (product.categoryId == 2) {
+          return product.isOTC == true;
+        }
+        // For non-medicine items, show all
+        return true;
       }).toList();
 
-      _searchResults.value = filtered;
+      if (append) {
+        _searchResults.addAll(products);
+      } else {
+        _searchResults.value = products;
+      }
+
+      _totalResults.value = result['total'] ?? 0;
+
+      // Check if there are more results
+      final currentTotal = _currentOffset.value + products.length;
+      _hasMoreResults.value = currentTotal < _totalResults.value;
 
       if (!_recentSearches.contains(query)) {
         _recentSearches.insert(0, query);
@@ -287,11 +355,12 @@ class ProductSearchController extends GetxController {
       }
     } catch (e) {
       debugPrint('Error performing search: $e');
-      Get.snackbar(
-        'Search Error',
-        'Unable to search products. Please try again.',
-        snackPosition: SnackPosition.BOTTOM,
-        duration: const Duration(seconds: 2),
+      ScaffoldMessenger.of(Get.context!).showSnackBar(
+        const SnackBar(
+          content: Text('Unable to search products. Please try again.'),
+          duration: Duration(seconds: 2),
+          backgroundColor: Colors.red,
+        ),
       );
     } finally {
       _isLoading.value = false;
@@ -300,7 +369,7 @@ class ProductSearchController extends GetxController {
 
   void selectSuggestion(String suggestion) {
     searchController.text = suggestion;
-    onSearchChanged(suggestion);
+    performSearchNow(suggestion);
   }
 
   void clearRecentSearches() {

@@ -524,24 +524,24 @@ class OrderInvoiceScreen extends StatelessWidget {
               ),
             ],
           ),
-          if (order.couponCode != null) ...[
-            SizedBox(height: 8.h),
-            Row(
-              children: [
-                Icon(Icons.local_offer, size: 20.sp, color: Colors.green),
-                SizedBox(width: 8.w),
-                Text(
-                  'Coupon Applied: ${order.couponCode}',
-                  style: getTextStyle(
-                    font: CustomFonts.inter,
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.green,
-                  ),
-                ),
-              ],
-            ),
-          ],
+          // if (order.couponCode != null) ...[
+          //   SizedBox(height: 8.h),
+          //   Row(
+          //     children: [
+          //       Icon(Icons.local_offer, size: 20.sp, color: Colors.green),
+          //       SizedBox(width: 8.w),
+          //       Text(
+          //         'Coupon Applied: ${order.couponCode}',
+          //         style: getTextStyle(
+          //           font: CustomFonts.inter,
+          //           fontSize: 14.sp,
+          //           fontWeight: FontWeight.w500,
+          //           color: Colors.green,
+          //         ),
+          //       ),
+          //     ],
+          //   ),
+          // ],
         ],
       ),
     );
