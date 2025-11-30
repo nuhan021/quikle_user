@@ -152,28 +152,40 @@ class AddressController extends GetxController {
       // Refresh the address list from the server to get updated data
       await loadAddresses();
 
-      Get.snackbar(
-        'Success',
-        'Default address updated',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.green[600],
-        colorText: Colors.white,
-        duration: const Duration(seconds: 2),
-        margin: const EdgeInsets.all(12),
-        borderRadius: 8,
-        icon: const Icon(Icons.check_circle, color: Colors.white),
-      );
+      // Wait for bottom sheet to fully close and overlay to be available
+      // Use a longer delay to ensure navigation is complete
+      await Future.delayed(const Duration(milliseconds: 600));
+
+      // // Check if we have a valid context before showing snackbar
+      // if (Get.isSnackbarOpen != true) {
+      //   Get.snackbar(
+      //     'Success',
+      //     'Default address updated',
+      //     snackPosition: SnackPosition.BOTTOM,
+      //     backgroundColor: Colors.green[600],
+      //     colorText: Colors.white,
+      //     duration: const Duration(seconds: 2),
+      //     margin: const EdgeInsets.all(12),
+      //     borderRadius: 8,
+      //     icon: const Icon(Icons.check_circle, color: Colors.white),
+      //   );
+      // }
     } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Failed to update default address: ${e.toString()}',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red[600],
-        colorText: Colors.white,
-        margin: const EdgeInsets.all(12),
-        borderRadius: 8,
-        icon: const Icon(Icons.error, color: Colors.white),
-      );
+      // Wait for bottom sheet to close before showing error
+      await Future.delayed(const Duration(milliseconds: 600));
+
+      if (Get.isSnackbarOpen != true) {
+        Get.snackbar(
+          'Error',
+          'Failed to update default address: ${e.toString()}',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red[600],
+          colorText: Colors.white,
+          margin: const EdgeInsets.all(12),
+          borderRadius: 8,
+          icon: const Icon(Icons.error, color: Colors.white),
+        );
+      }
     } finally {
       _isLoading.value = false;
     }

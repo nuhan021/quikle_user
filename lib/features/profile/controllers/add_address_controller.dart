@@ -13,6 +13,8 @@ class AddAddressController extends GetxController {
   final addressController = TextEditingController();
   final zipCodeController = TextEditingController();
   final phoneController = TextEditingController();
+  final stateTextController = TextEditingController();
+  final cityTextController = TextEditingController();
 
   final isLoading = false.obs;
   final isDefault = false.obs;
@@ -45,6 +47,8 @@ class AddAddressController extends GetxController {
     addressController.dispose();
     zipCodeController.dispose();
     phoneController.dispose();
+    stateTextController.dispose();
+    cityTextController.dispose();
     super.onClose();
   }
 
@@ -83,9 +87,11 @@ class AddAddressController extends GetxController {
   void setState(String? state) {
     if (state != null) {
       selectedState.value = state;
+      stateTextController.text = state;
 
       // Clear previous city selection and cities list
       selectedCity.value = null;
+      cityTextController.clear();
       cities.clear();
 
       // Load cities for the selected state
@@ -93,8 +99,21 @@ class AddAddressController extends GetxController {
     }
   }
 
+  void setStateManually(String? state) {
+    selectedState.value = state;
+    // No need to update stateTextController here as it's already being updated by user typing
+  }
+
   void setCity(String? city) {
     selectedCity.value = city;
+    if (city != null) {
+      cityTextController.text = city;
+    }
+  }
+
+  void setCityManually(String? city) {
+    selectedCity.value = city;
+    // No need to update cityTextController here as it's already being updated by user typing
   }
 
   void setAddressType(AddressType type) {
@@ -222,6 +241,8 @@ class AddAddressController extends GetxController {
     addressController.clear();
     zipCodeController.clear();
     phoneController.clear();
+    stateTextController.clear();
+    cityTextController.clear();
     selectedCountry.value = 'India';
     selectedState.value = null;
     selectedCity.value = null;
@@ -254,9 +275,11 @@ class AddAddressController extends GetxController {
     _loadStatesForCountry(address.country);
 
     selectedState.value = address.state;
+    stateTextController.text = address.state;
     cities.assignAll(_addressService.getCitiesForState(address.state));
 
     selectedCity.value = address.city;
+    cityTextController.text = address.city;
     selectedAddressType.value = address.type;
     isDefault.value = address.isDefault;
   }
