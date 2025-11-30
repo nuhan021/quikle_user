@@ -43,7 +43,8 @@ class LiveOrderController extends GetxController {
     try {
       _isLoading.value = true;
 
-      final orders = await _orderService.getUserOrders('user123');
+      // Fetch orders from API (userId is handled by auth token)
+      final orders = await _orderService.getUserOrders('');
 
       final liveOrder = _findLiveOrder(orders);
 
@@ -165,19 +166,7 @@ class LiveOrderController extends GetxController {
   }
 
   Future<void> addNewOrder(OrderModel order) async {
-    final isTrackable = [
-      OrderStatus.confirmed,
-      OrderStatus.processing,
-      OrderStatus.shipped,
-      OrderStatus.outForDelivery,
-    ].contains(order.status);
-
-    if (isTrackable) {
-      if (_currentLiveOrder.value == null ||
-          order.orderDate.isAfter(_currentLiveOrder.value!.orderDate)) {
-        _currentLiveOrder.value = order;
-        _updateProgress();
-      }
-    }
+    // Since orders are now fetched from API, just refresh to get the latest
+    await refreshLiveOrder();
   }
 }

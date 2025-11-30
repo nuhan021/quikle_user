@@ -55,17 +55,23 @@ class OrderTrackingSummary extends StatelessWidget {
 
   Widget _buildOrderHeader() {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          'Order ${order.orderId}',
-          style: getTextStyle(
-            font: CustomFonts.obviously,
-            fontSize: 14.sp,
-            fontWeight: FontWeight.w600,
-            color: AppColors.ebonyBlack,
+        Expanded(
+          child: Text(
+            '${order.orderId}',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis, // 👈 ORDER ID shrinks
+            style: getTextStyle(
+              font: CustomFonts.obviously,
+              fontSize: 14.sp,
+              fontWeight: FontWeight.w600,
+              color: AppColors.ebonyBlack,
+            ),
           ),
         ),
+        SizedBox(width: 12.w),
+
+        // STATUS — takes required space
         Container(
           padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
           decoration: BoxDecoration(
