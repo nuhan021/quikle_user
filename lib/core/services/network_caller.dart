@@ -52,10 +52,16 @@ class NetworkCaller {
     };
 
     try {
+      // Check if content type is form-urlencoded
+      final isFormUrlEncoded =
+          requestHeaders['Content-Type'] == 'application/x-www-form-urlencoded';
+
       final response = await post(
         Uri.parse(url),
         headers: requestHeaders,
-        body: jsonEncode(body ?? {}),
+        body: isFormUrlEncoded
+            ? body?.map((k, v) => MapEntry(k.toString(), v.toString()))
+            : jsonEncode(body ?? {}),
       ).timeout(Duration(seconds: timeoutDuration));
       return _handleResponse(response);
     } catch (e) {
@@ -173,14 +179,11 @@ class NetworkCaller {
     }
 
     if (response.statusCode >= 200 && response.statusCode < 300) {
-      bool success = true;
       return ResponseData(
-        isSuccess: success,
+        isSuccess: true,
         statusCode: response.statusCode,
         responseData: decoded,
-        errorMessage: success
-            ? ''
-            : decoded['message'] ?? 'Unknown error occurred',
+        errorMessage: '',
       );
     } else if (response.statusCode == 400) {
       return ResponseData(
