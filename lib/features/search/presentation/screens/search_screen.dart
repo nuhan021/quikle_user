@@ -19,141 +19,158 @@ class SearchScreen extends StatelessWidget {
       ProductSearchController(),
     );
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
+    return WillPopScope(
+      onWillPop: () async {
+        controller.clearSearch(); // Clear search when going back
+        return true;
+      },
+      child: Scaffold(
         backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: AppColors.ebonyBlack),
-          onPressed: () => Get.back(),
-        ),
-        title: Text(
-          'Search Products',
-          style: getTextStyle(
-            font: CustomFonts.obviously,
-            fontSize: 18.sp,
-            fontWeight: FontWeight.w600,
-            color: AppColors.ebonyBlack,
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back, color: AppColors.ebonyBlack),
+            onPressed: () {
+              controller.clearSearch(); // Clear search when back button pressed
+              Get.back();
+            },
           ),
-        ),
-        centerTitle: true,
-      ),
-      body: Stack(
-        children: [
-          SafeArea(
-            child: Column(
-              children: [
-                Container(
-                  padding: EdgeInsets.all(16.w),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          height: 48.h,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF8F9FA),
-                            borderRadius: BorderRadius.circular(8.r),
-                          ),
-                          child: Row(
-                            children: [
-                              SizedBox(width: 16.w),
-                              Icon(
-                                Icons.search,
-                                color: Colors.grey,
-                                size: 20.w,
-                              ),
-                              SizedBox(width: 12.w),
-                              Expanded(
-                                child: Obx(
-                                  () => TextField(
-                                    controller: controller.searchController,
-                                    onChanged: controller.onSearchChanged,
-                                    decoration: InputDecoration(
-                                      hintText:
-                                          controller.currentPlaceholder.value,
-                                      hintStyle: getTextStyle(
-                                        font: CustomFonts.inter,
-                                        color: Colors.grey,
-                                        fontSize: 16,
-                                      ),
-                                      border: InputBorder.none,
-                                      enabledBorder: InputBorder.none,
-                                      focusedBorder: InputBorder.none,
-                                    ),
-                                    style: getTextStyle(
-                                      font: CustomFonts.inter,
-                                      fontSize: 16,
-                                      color: AppColors.ebonyBlack,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              SizedBox(width: 8.w),
-                              Obx(
-                                () => GestureDetector(
-                                  onTap: controller.toggleVoiceRecognition,
-                                  child: Container(
-                                    padding: EdgeInsets.all(8.w),
-                                    decoration: BoxDecoration(
-                                      color: controller.isListening
-                                          ? AppColors.primary.withValues(
-                                              alpha: 0.1,
-                                            )
-                                          : Colors.transparent,
-                                      borderRadius: BorderRadius.circular(6.r),
-                                    ),
-                                    child: Image.asset(
-                                      ImagePath.voiceIcon,
-                                      height: 20.w,
-                                      width: 20.w,
-                                      color: controller.isListening
-                                          ? AppColors.primary
-                                          : Colors.grey,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              SizedBox(width: 12.w),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                Expanded(
-                  child: Obx(() {
-                    if (controller.isLoading) {
-                      return Center(
-                        child: CircularProgressIndicator(
-                          color: AppColors.primary,
-                        ),
-                      );
-                    }
-
-                    if (controller.searchQuery.isEmpty) {
-                      return _buildSuggestionsView(controller);
-                    } else {
-                      return _buildSearchResults(controller);
-                    }
-                  }),
-                ),
-              ],
+          title: Text(
+            'Search Products',
+            style: getTextStyle(
+              font: CustomFonts.obviously,
+              fontSize: 18.sp,
+              fontWeight: FontWeight.w600,
+              color: AppColors.ebonyBlack,
             ),
           ),
+          centerTitle: true,
+        ),
+        body: Stack(
+          children: [
+            SafeArea(
+              child: Column(
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(16.w),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            height: 48.h,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF8F9FA),
+                              borderRadius: BorderRadius.circular(8.r),
+                            ),
+                            child: Row(
+                              children: [
+                                SizedBox(width: 16.w),
+                                Icon(
+                                  Icons.search,
+                                  color: Colors.grey,
+                                  size: 20.w,
+                                ),
+                                SizedBox(width: 12.w),
+                                Expanded(
+                                  child: Obx(
+                                    () => TextField(
+                                      controller: controller.searchController,
+                                      onChanged: controller.onSearchChanged,
+                                      onSubmitted: (value) {
+                                        if (value.isNotEmpty) {
+                                          controller.performSearchNow(value);
+                                        }
+                                      },
+                                      textInputAction: TextInputAction.search,
+                                      decoration: InputDecoration(
+                                        hintText:
+                                            controller.currentPlaceholder.value,
+                                        hintStyle: getTextStyle(
+                                          font: CustomFonts.inter,
+                                          color: Colors.grey,
+                                          fontSize: 16,
+                                        ),
+                                        border: InputBorder.none,
+                                        enabledBorder: InputBorder.none,
+                                        focusedBorder: InputBorder.none,
+                                      ),
+                                      style: getTextStyle(
+                                        font: CustomFonts.inter,
+                                        fontSize: 16,
+                                        color: AppColors.ebonyBlack,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(width: 8.w),
+                                Obx(
+                                  () => GestureDetector(
+                                    onTap: controller.toggleVoiceRecognition,
+                                    child: Container(
+                                      padding: EdgeInsets.all(8.w),
+                                      decoration: BoxDecoration(
+                                        color: controller.isListening
+                                            ? AppColors.primary.withValues(
+                                                alpha: 0.1,
+                                              )
+                                            : Colors.transparent,
+                                        borderRadius: BorderRadius.circular(
+                                          6.r,
+                                        ),
+                                      ),
+                                      child: Image.asset(
+                                        ImagePath.voiceIcon,
+                                        height: 20.w,
+                                        width: 20.w,
+                                        color: controller.isListening
+                                            ? AppColors.primary
+                                            : Colors.grey,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(width: 12.w),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
 
-          Obx(() {
-            if (!controller.isListening) return const SizedBox.shrink();
-            return VoiceSearchOverlay(
-              soundLevel: controller.soundLevel.value,
-              onCancel: () async {
-                await controller.toggleVoiceRecognition();
-              },
-            );
-          }),
-        ],
+                  Expanded(
+                    child: Obx(() {
+                      if (controller.isLoading) {
+                        return Center(
+                          child: CircularProgressIndicator(
+                            color: AppColors.primary,
+                          ),
+                        );
+                      }
+
+                      if (controller.searchQuery.isEmpty) {
+                        return _buildSuggestionsView(controller);
+                      } else {
+                        return _buildSearchResults(controller);
+                      }
+                    }),
+                  ),
+                ],
+              ),
+            ),
+
+            Obx(() {
+              if (!controller.isListening) return const SizedBox.shrink();
+              return VoiceSearchOverlay(
+                soundLevel: controller.soundLevel.value,
+                onCancel: () async {
+                  await controller.toggleVoiceRecognition();
+                },
+              );
+            }),
+          ],
+        ),
       ),
     );
   }
@@ -259,11 +276,35 @@ class SearchScreen extends StatelessWidget {
 
   Widget _buildSearchResults(ProductSearchController controller) {
     return Obx(() {
-      if (controller.searchResults.isEmpty) {
+      // Show "can't find" message ONLY after search completes with no results
+      if (controller.searchResults.isEmpty &&
+          !controller.isLoading &&
+          controller.hasSearched) {
         return SingleChildScrollView(
           child: CustomOrderSuggestionWidget(
             searchQuery: controller.searchQuery,
             onRequestCustomOrder: () => controller.onRequestCustomOrder(),
+          ),
+        );
+      }
+
+      // Show empty state before search or when search is cleared
+      if (controller.searchResults.isEmpty && !controller.hasSearched) {
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.search, size: 80.w, color: Colors.grey[300]),
+              SizedBox(height: 16.h),
+              Text(
+                'Search for products',
+                style: getTextStyle(
+                  font: CustomFonts.inter,
+                  fontSize: 16.sp,
+                  color: Colors.grey,
+                ),
+              ),
+            ],
           ),
         );
       }
@@ -283,25 +324,51 @@ class SearchScreen extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: GridView.builder(
-              padding: EdgeInsets.symmetric(horizontal: 16.w),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                crossAxisSpacing: 8.w,
-                mainAxisSpacing: 8.h,
-                childAspectRatio: 0.60,
-              ),
-              itemCount: controller.searchResults.length,
-              itemBuilder: (context, index) {
-                final product = controller.searchResults[index];
-                return UnifiedProductCard(
-                  product: product,
-                  onTap: () => controller.onProductPressed(product),
-                  onAddToCart: () => controller.onAddToCartPressed(product),
-                  onFavoriteToggle: () => controller.onFavoriteToggle(product),
-                  variant: ProductCardVariant.category,
-                );
+            child: NotificationListener<ScrollNotification>(
+              onNotification: (ScrollNotification scrollInfo) {
+                // Load more when user scrolls to 80% of the list
+                if (scrollInfo.metrics.pixels >=
+                    scrollInfo.metrics.maxScrollExtent * 0.8) {
+                  controller.loadMoreResults();
+                }
+                return false;
               },
+              child: GridView.builder(
+                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  crossAxisSpacing: 8.w,
+                  mainAxisSpacing: 8.h,
+                  childAspectRatio: 0.60,
+                ),
+                itemCount:
+                    controller.searchResults.length +
+                    (controller.hasMoreResults ? 1 : 0),
+                itemBuilder: (context, index) {
+                  // Show loading indicator at the end if there are more results
+                  if (index >= controller.searchResults.length) {
+                    return Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(16.w),
+                        child: CircularProgressIndicator(
+                          color: AppColors.primary,
+                          strokeWidth: 2,
+                        ),
+                      ),
+                    );
+                  }
+
+                  final product = controller.searchResults[index];
+                  return UnifiedProductCard(
+                    product: product,
+                    onTap: () => controller.onProductPressed(product),
+                    onAddToCart: () => controller.onAddToCartPressed(product),
+                    onFavoriteToggle: () =>
+                        controller.onFavoriteToggle(product),
+                    variant: ProductCardVariant.category,
+                  );
+                },
+              ),
             ),
           ),
         ],
