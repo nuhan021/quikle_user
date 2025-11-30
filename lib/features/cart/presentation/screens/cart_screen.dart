@@ -1,11 +1,7 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
-import 'package:quikle_user/core/utils/constants/enums/order_enums.dart';
-import 'package:quikle_user/core/utils/constants/enums/address_type_enums.dart';
 import 'package:quikle_user/core/utils/constants/enums/delivery_enums.dart';
 import '../../controllers/cart_controller.dart';
 import '../../data/models/cart_item_model.dart';
@@ -22,7 +18,7 @@ import '../../../payout/controllers/payout_controller.dart';
 import '../../../profile/controllers/payment_method_controller.dart';
 import '../../../orders/controllers/orders_controller.dart';
 import '../../../orders/controllers/live_order_controller.dart';
-import '../../../orders/data/models/order_model.dart';
+import '../../../orders/data/services/order_api_service.dart';
 import '../../../payout/data/models/delivery_option_model.dart';
 import '../../../profile/data/models/shipping_address_model.dart';
 import '../../../payout/data/models/payment_method_model.dart' as payout;
@@ -43,8 +39,13 @@ class CartScreen extends StatelessWidget {
         onClearAll: () => _showClearCartDialog(cartController),
       ),
       body: Obx(() {
+        // Only auto-close if not currently placing an order
         if (!cartController.hasItems && !cartController.isPlacingOrder) {
-          Future.microtask(() => Get.back());
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (Get.currentRoute == '/cart') {
+              Get.back();
+            }
+          });
           return const SizedBox.shrink();
         }
 
@@ -125,22 +126,18 @@ class CartScreen extends StatelessWidget {
           paymentMethodController.selectedPaymentMethod;
 
       if (selectedPaymentMethod == null) {
-        Get.snackbar(
-          'Payment Method Required',
-          'Please select a payment method to continue.',
-          duration: const Duration(seconds: 2),
+        ScaffoldMessenger.of(Get.context!).showSnackBar(
+          const SnackBar(
+            content: Text('Please select a payment method to continue.'),
+            duration: Duration(seconds: 2),
+            backgroundColor: Colors.orange,
+          ),
         );
         return;
       }
 
       await _placeOrder(payoutController);
     }
-  }
-
-  String generateOrderId() {
-    final random = Random();
-    final random4Digits = 1000 + random.nextInt(9000);
-    return random4Digits.toString();
   }
 
   Future<void> _placeOrder(PayoutController payoutController) async {
@@ -151,10 +148,12 @@ class CartScreen extends StatelessWidget {
     if (selectedPaymentMethod == null) return;
 
     if (!cartController.hasItems || cartController.cartItems.isEmpty) {
-      Get.snackbar(
-        'Empty Cart',
-        'Please add items to cart before placing order.',
-        duration: const Duration(seconds: 2),
+      ScaffoldMessenger.of(Get.context!).showSnackBar(
+        const SnackBar(
+          content: Text('Please add items to cart before placing order.'),
+          duration: Duration(seconds: 2),
+          backgroundColor: Colors.orange,
+        ),
       );
       return;
     }
@@ -163,11 +162,6 @@ class CartScreen extends StatelessWidget {
 
     try {
       final orderItems = List<CartItemModel>.from(cartController.cartItems);
-
-      final subtotal = payoutController.subtotal;
-      final deliveryFee = payoutController.deliveryFee;
-      final discountAmount = payoutController.discountAmount;
-      final total = payoutController.totalAmount;
 
       final selectedDeliveryOption = payoutController.selectedDeliveryOption;
       final deliveryOption =
@@ -181,98 +175,112 @@ class CartScreen extends StatelessWidget {
           );
 
       final selectedShippingAddress = payoutController.selectedShippingAddress;
-      final shippingAddress =
-          selectedShippingAddress ??
-          ShippingAddressModel(
-            id: 'default_address',
-            userId: 'user123',
-            name: 'Default User',
-            address: '123 Main Street',
-            city: 'Default City',
-            state: 'Default State',
-            country: 'India',
-            zipCode: '12345',
-            phoneNumber: '+1234567890',
-            type: AddressType.home,
-            createdAt: DateTime.now(),
-            isSelected: true,
-          );
+
+      // DEBUG: Print address information
+      print('=== ADDRESS SELECTION DEBUG ===');
+      print(
+        'Total addresses in AddressController: ${payoutController.shippingAddresses.length}',
+      );
+      for (var i = 0; i < payoutController.shippingAddresses.length; i++) {
+        final addr = payoutController.shippingAddresses[i];
+        print(
+          'Address $i: ${addr.name} - isSelected: ${addr.isSelected}, isDefault: ${addr.isDefault}',
+        );
+      }
+      print('Selected shipping address: $selectedShippingAddress');
+      print('Selected address name: ${selectedShippingAddress?.name}');
+      print('==============================');
+
+      // Validate that user has selected an address
+      if (selectedShippingAddress == null) {
+        ScaffoldMessenger.of(Get.context!).showSnackBar(
+          SnackBar(
+            content: const Text(
+              'Please select a delivery address to continue.',
+            ),
+            duration: const Duration(seconds: 2),
+            backgroundColor: Colors.orange.shade600,
+          ),
+        );
+        return;
+      }
 
       // Override receiver if provided
-      ShippingAddressModel finalShippingAddress = shippingAddress;
+      ShippingAddressModel finalShippingAddress = selectedShippingAddress;
       if (payoutController.isDifferentReceiver &&
           payoutController.receiverName.isNotEmpty) {
-        finalShippingAddress = shippingAddress.copyWith(
+        finalShippingAddress = selectedShippingAddress.copyWith(
           name: payoutController.receiverName,
           phoneNumber: payoutController.receiverPhone.isNotEmpty
               ? payoutController.receiverPhone
-              : shippingAddress.phoneNumber,
+              : selectedShippingAddress.phoneNumber,
         );
       }
-
-      final orderId = generateOrderId();
-      final transactionId = 'TXN_${DateTime.now().millisecondsSinceEpoch}';
 
       final payoutPaymentMethod = payout.PaymentMethodModel(
         type: selectedPaymentMethod.type,
         isSelected: true,
       );
 
-      final order = OrderModel(
-        orderId: orderId,
-        userId: 'user123',
+      // Call the backend API to create the order
+      final orderApiService = OrderApiService();
+      final response = await orderApiService.createOrder(
         items: orderItems,
         shippingAddress: finalShippingAddress,
         deliveryOption: deliveryOption,
         paymentMethod: payoutPaymentMethod,
-        subtotal: subtotal,
-        deliveryFee: deliveryFee,
-        total: total,
-        discount: discountAmount > 0 ? discountAmount : null,
         couponCode: payoutController.appliedCoupon?['isValid'] == true
             ? payoutController.couponCode
             : null,
-        orderDate: DateTime.now(),
-        status: OrderStatus.pending,
-        transactionId: transactionId,
-        estimatedDelivery: DateTime.now().add(const Duration(minutes: 30)),
-        metadata: {
-          'deliveryPreference': payoutController.selectedDeliveryPreference,
-          'isUrgent': payoutController.isUrgentDelivery,
-        },
       );
 
-      OrdersController ordersController;
-      try {
-        ordersController = Get.find<OrdersController>();
-      } catch (e) {
-        ordersController = Get.put(OrdersController());
+      // If API call is successful, refresh orders and clear cart
+      if (response.isSuccess) {
+        // Refresh orders from API
+        OrdersController ordersController;
+        try {
+          ordersController = Get.find<OrdersController>();
+        } catch (e) {
+          ordersController = Get.put(OrdersController());
+        }
+        await ordersController.loadOrders();
+
+        // Refresh live order tracking to pick up the new order
+        try {
+          final liveOrderController = Get.find<LiveOrderController>();
+          await liveOrderController.refreshLiveOrder();
+        } catch (e) {
+          print('LiveOrderController not found or error: $e');
+        }
+
+        // Clear cart
+        cartController.clearCart();
+
+        if (Get.isDialogOpen ?? false) {
+          Get.back();
+        }
+
+        await _showSuccessDialog();
+        Get.offAllNamed('/home');
       }
-      await ordersController.addOrder(order);
-
-      try {
-        final liveOrderController = Get.find<LiveOrderController>();
-        await liveOrderController.addNewOrder(order);
-      } catch (e) {
-        print('LiveOrderController not found or error: $e');
-      }
-
-      cartController.clearCart();
-
-      if (Get.isDialogOpen ?? false) {
-        Get.back();
-      }
-
-      await _showSuccessDialog();
-      Get.offAllNamed('/home');
     } catch (e) {
       if (Get.isDialogOpen ?? false) {
         Get.back();
       }
-      Get.snackbar(
-        'Error',
-        'Failed to place order. Please try again.',
-        duration: const Duration(seconds: 3),
+
+      // Extract error message
+      String errorMessage = 'Failed to place order. Please try again.';
+      if (e.toString().contains('Exception:')) {
+        errorMessage = e.toString().replaceFirst('Exception:', '').trim();
+      }
+
+      // Show error using ScaffoldMessenger
+      ScaffoldMessenger.of(Get.context!).showSnackBar(
+        SnackBar(
+          content: Text(errorMessage),
+          duration: const Duration(seconds: 3),
+          backgroundColor: Colors.red.shade600,
+        ),
       );
     } finally {
       cartController.setPlacingOrder(false);

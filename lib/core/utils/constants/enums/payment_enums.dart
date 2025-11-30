@@ -10,4 +10,20 @@ enum PaymentMethodType {
   final String? iconPath;
 
   const PaymentMethodType(this.displayName, this.iconPath);
+
+  /// Convert to backend API format
+  String toApiValue() {
+    switch (this) {
+      case PaymentMethodType.razorpay:
+        return 'razorpay';
+      case PaymentMethodType.cashOnDelivery:
+        return 'cod';
+      // Map other payment methods to razorpay as default
+      case PaymentMethodType.paytm:
+      case PaymentMethodType.googlePay:
+      case PaymentMethodType.phonePe:
+      case PaymentMethodType.cashfree:
+        return 'razorpay';
+    }
+  }
 }

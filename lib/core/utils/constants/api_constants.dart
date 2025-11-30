@@ -47,4 +47,8 @@ class ApiConstants {
   //Review api's
   static const String submitReview = "$baseUrl/items/reviews/";
   static const String getReviews = "$baseUrl/items/reviews/?item_id={item_id}";
+
+  //Order api's
+  static const String createOrder = "$baseUrl/customer/orders/";
+  static const String getOrders = "$baseUrl/customer/orders/";
 }

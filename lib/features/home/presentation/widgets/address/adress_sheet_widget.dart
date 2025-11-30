@@ -152,7 +152,7 @@ class _AddressSelectionSheet extends StatelessWidget {
                         final isSelected = currentDefaultId == address.id;
                         return GestureDetector(
                           onTap: () {
-                            Get.back(result: address.id);
+                            Navigator.pop(context, address.id);
                           },
                           child: Container(
                             margin: const EdgeInsets.only(bottom: 12),
@@ -317,7 +317,7 @@ class _EmptyAddresses extends StatelessWidget {
           const SizedBox(height: 16),
           ElevatedButton(
             onPressed: () {
-              Get.back();
+              Navigator.pop(context);
               Get.toNamed(AppRoute.getAddAddress());
             },
             style: ElevatedButton.styleFrom(

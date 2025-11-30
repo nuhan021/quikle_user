@@ -87,18 +87,26 @@ class OrderInvoiceScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // ---------------- HEADER ROW ----------------
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Order ${order.orderId}',
-                style: getTextStyle(
-                  font: CustomFonts.obviously,
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.ebonyBlack,
+              // ORDER ID — should ellipse
+              Expanded(
+                child: Text(
+                  '${order.orderId}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: getTextStyle(
+                    font: CustomFonts.obviously,
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.ebonyBlack,
+                  ),
                 ),
               ),
+              SizedBox(width: 12.w),
+
+              // STATUS — must remain fully visible
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
                 decoration: BoxDecoration(
@@ -126,7 +134,10 @@ class OrderInvoiceScreen extends StatelessWidget {
               ),
             ],
           ),
+
           SizedBox(height: 12.h),
+
+          // ---------------- ORDER DATE ----------------
           Row(
             children: [
               Text(
@@ -153,6 +164,8 @@ class OrderInvoiceScreen extends StatelessWidget {
               ),
             ],
           ),
+
+          // ---------------- EST. DELIVERY ----------------
           if (order.estimatedDelivery != null) ...[
             SizedBox(height: 8.h),
             Row(
@@ -184,6 +197,8 @@ class OrderInvoiceScreen extends StatelessWidget {
               ],
             ),
           ],
+
+          // ---------------- TRANSACTION ID ----------------
           if (order.transactionId != null) ...[
             SizedBox(height: 8.h),
             Row(
@@ -200,6 +215,8 @@ class OrderInvoiceScreen extends StatelessWidget {
                 Expanded(
                   child: Text(
                     order.transactionId!,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: getTextStyle(
                       font: CustomFonts.inter,
                       fontSize: 12.sp,
@@ -268,14 +285,35 @@ class OrderInvoiceScreen extends StatelessWidget {
                     ),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(8.r),
-                      child: Image.asset(
+                      child: Image.network(
                         item.product.imagePath,
                         fit: BoxFit.cover,
+                        width: 60.w,
+                        height: 60.w,
                         errorBuilder: (context, error, stackTrace) {
-                          return Icon(
-                            Icons.shopping_bag_outlined,
-                            size: 24.sp,
-                            color: const Color(0xFF7C7C7C),
+                          return Container(
+                            color: const Color(0xFFF5F5F5),
+                            child: Icon(
+                              Icons.shopping_bag_outlined,
+                              size: 24.sp,
+                              color: const Color(0xFF7C7C7C),
+                            ),
+                          );
+                        },
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+
+                          return Center(
+                            child: SizedBox(
+                              width: 20.w,
+                              height: 20.w,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation(
+                                  AppColors.beakYellow,
+                                ),
+                              ),
+                            ),
                           );
                         },
                       ),
