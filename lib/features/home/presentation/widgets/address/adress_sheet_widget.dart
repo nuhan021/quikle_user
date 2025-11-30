@@ -35,11 +35,12 @@ class _AddressSelectionSheet extends StatelessWidget {
   }
 
   String _formatAddress(String address, String city) {
-    var shortAddress = address.split(',').first;
-    if (shortAddress.length > 20) {
-      shortAddress = '${shortAddress.substring(0, 20)}...';
-    }
-    return '$shortAddress, $city';
+    // var shortAddress = address.split(',').first;
+    // if (shortAddress.length > 20) {
+    //   shortAddress = '${shortAddress.substring(0, 20)}...';
+    // }
+    print('Formatted Address: $address, $city');
+    return '$address, $city';
   }
 
   @override
