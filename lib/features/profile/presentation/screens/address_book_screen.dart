@@ -12,7 +12,9 @@ import 'package:quikle_user/features/profile/presentation/widgets/address_card.d
 import 'package:quikle_user/features/profile/presentation/screens/add_address_screen.dart';
 
 class AddressBookScreen extends StatelessWidget {
-  const AddressBookScreen({super.key});
+  final bool selectionMode;
+
+  const AddressBookScreen({super.key, this.selectionMode = false});
 
   @override
   Widget build(BuildContext context) {
@@ -23,8 +25,8 @@ class AddressBookScreen extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            const UnifiedProfileAppBar(
-              title: 'Address Book',
+            UnifiedProfileAppBar(
+              title: selectionMode ? 'Select Address' : 'Address Book',
               showActionButton: false,
             ),
 
@@ -115,7 +117,16 @@ class AddressBookScreen extends StatelessWidget {
         final address = controller.addresses[index];
         return AddressCard(
           address: address,
-          onTap: () => _showAddressOptions(address, controller),
+          onTap: () {
+            if (selectionMode) {
+              // In selection mode, select the address and go back
+              controller.selectAddress(address);
+              Get.back();
+            } else {
+              // In normal mode, show options
+              _showAddressOptions(address, controller);
+            }
+          },
           onSetDefault: () => controller.setAsDefault(address.id),
           onEdit: () => _navigateToEditAddress(address),
           onDelete: () => _showDeleteConfirmation(address, controller),

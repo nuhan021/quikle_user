@@ -35,10 +35,13 @@ class _AddressSelectionSheet extends StatelessWidget {
   }
 
   String _formatAddress(String address, String city) {
-    var shortAddress = address.split(',').first;
-    if (shortAddress.length > 20) {
-      shortAddress = '${shortAddress.substring(0, 20)}...';
-    }
+    final parts = address.split(',');
+
+    // Take the first two comma-separated parts
+    final usefulParts = parts.take(2).map((e) => e.trim()).toList();
+
+    final shortAddress = usefulParts.join(', ');
+
     return '$shortAddress, $city';
   }
 
@@ -151,7 +154,7 @@ class _AddressSelectionSheet extends StatelessWidget {
                         final isSelected = currentDefaultId == address.id;
                         return GestureDetector(
                           onTap: () {
-                            Get.back(result: address.id);
+                            Navigator.pop(context, address.id);
                           },
                           child: Container(
                             margin: const EdgeInsets.only(bottom: 12),
@@ -316,7 +319,7 @@ class _EmptyAddresses extends StatelessWidget {
           const SizedBox(height: 16),
           ElevatedButton(
             onPressed: () {
-              Get.back();
+              Navigator.pop(context);
               Get.toNamed(AppRoute.getAddAddress());
             },
             style: ElevatedButton.styleFrom(

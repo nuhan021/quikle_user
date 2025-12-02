@@ -48,7 +48,7 @@ class BriefOrderCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Order ${order.orderId}',
+                        '${order.orderId}',
                         style: getTextStyle(
                           font: CustomFonts.obviously,
                           fontSize: 14.sp,

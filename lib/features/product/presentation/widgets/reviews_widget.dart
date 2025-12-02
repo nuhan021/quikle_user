@@ -42,25 +42,12 @@ class ReviewsWidget extends StatelessWidget {
                 color: AppColors.ebonyBlack,
               ),
             ),
-            GestureDetector(
-              onTap: onSeeAll,
-              child: Text(
-                'See All',
-                style: getTextStyle(
-                  font: CustomFonts.inter,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.ebonyBlack,
-                ),
-              ),
-            ),
           ],
         ),
         SizedBox(height: 16.h),
 
-        
         Row(
           children: [
-            
             Column(
               children: [
                 Text(
@@ -81,15 +68,14 @@ class ReviewsWidget extends StatelessWidget {
                   }),
                 ),
                 SizedBox(height: 4.h),
-                Text(
-                  '500+ reviews',
-                  style: TextStyle(fontSize: 12.sp, color: Colors.grey[600]),
-                ),
+                // Text(
+                //   '500+ reviews',
+                //   style: TextStyle(fontSize: 12.sp, color: Colors.grey[600]),
+                // ),
               ],
             ),
             SizedBox(width: 32.w),
 
-            
             Expanded(
               child: Column(
                 children: [
@@ -127,7 +113,6 @@ class ReviewsWidget extends StatelessWidget {
 
         SizedBox(height: 16.h),
 
-        
         Container(
           padding: EdgeInsets.all(12.w),
           decoration: BoxDecoration(
@@ -225,7 +210,6 @@ class ReviewsWidget extends StatelessWidget {
 
         SizedBox(height: 20.h),
 
-        
         Obx(
           () => reviews.isNotEmpty
               ? Column(
@@ -241,9 +225,9 @@ class ReviewsWidget extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 16.h),
-                    ...controller.reviews.map(
-                      (review) => _buildReviewCard(review),
-                    ),
+                    ...controller.reviews
+                        .where((review) => !review.isReply)
+                        .map((review) => _buildReviewCard(review)),
                   ],
                 )
               : const SizedBox.shrink(),
@@ -256,7 +240,7 @@ class ReviewsWidget extends StatelessWidget {
     return Container(
       margin: EdgeInsets.only(bottom: 12.h),
       decoration: BoxDecoration(
-        color: AppColors.textWhite, 
+        color: AppColors.textWhite,
         borderRadius: BorderRadius.circular(8.r),
         border: Border.all(color: Colors.white, width: 1),
       ),
@@ -306,7 +290,7 @@ class ReviewsWidget extends StatelessWidget {
                       Row(
                         children: List.generate(5, (index) {
                           return Icon(
-                            index < review.rating.floor()
+                            index < (review.rating?.floor() ?? 0)
                                 ? Icons.star
                                 : Icons.star_border,
                             color: Colors.orange,
@@ -328,7 +312,6 @@ class ReviewsWidget extends StatelessWidget {
                 font: CustomFonts.inter,
                 fontSize: 14.sp,
                 color: AppColors.ebonyBlack,
-                
               ),
             ),
 
@@ -337,7 +320,10 @@ class ReviewsWidget extends StatelessWidget {
             Align(
               alignment: Alignment.bottomRight,
               child: GestureDetector(
-                onTap: () {},
+                onTap: () {
+                  final controller = Get.find<ProductController>();
+                  controller.onReplyToReview(review);
+                },
                 child: Text(
                   'Reply',
                   style: getTextStyle(
@@ -345,6 +331,99 @@ class ReviewsWidget extends StatelessWidget {
                     color: AppColors.ebonyBlack,
                   ),
                 ),
+              ),
+            ),
+
+            // Display replies if any
+            if (review.replies.isNotEmpty) ...[
+              SizedBox(height: 12.h),
+              ...review.replies.map(
+                (reply) => Padding(
+                  padding: EdgeInsets.only(left: 16.w, top: 8.h),
+                  child: _buildReplyCard(reply),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildReplyCard(ReviewModel reply) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.grey.shade50,
+        borderRadius: BorderRadius.circular(8.r),
+        border: Border.all(color: Colors.grey.shade200, width: 1),
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(10.w),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CircleAvatar(
+                  radius: 14.r,
+                  backgroundImage: AssetImage(reply.userImage),
+                ),
+                SizedBox(width: 10.w),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              reply.userName,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: getTextStyle(
+                                font: CustomFonts.inter,
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.ebonyBlack,
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 8.w),
+                          Text(
+                            reply.timeAgo,
+                            style: getTextStyle(
+                              font: CustomFonts.inter,
+                              fontSize: 11.sp,
+                              color: AppColors.featherGrey,
+                            ),
+                          ),
+                        ],
+                      ),
+                      if (reply.rating != null && reply.rating! > 0)
+                        Row(
+                          children: List.generate(5, (index) {
+                            return Icon(
+                              index < (reply.rating?.floor() ?? 0)
+                                  ? Icons.star
+                                  : Icons.star_border,
+                              color: Colors.orange,
+                              size: 10.sp,
+                            );
+                          }),
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 8.h),
+            Text(
+              reply.comment,
+              style: getTextStyle(
+                font: CustomFonts.inter,
+                fontSize: 13.sp,
+                color: AppColors.ebonyBlack,
               ),
             ),
           ],

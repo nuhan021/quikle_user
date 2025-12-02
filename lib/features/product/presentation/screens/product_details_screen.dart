@@ -17,7 +17,6 @@ import '../widgets/product_info_widget.dart';
 import '../widgets/store_info_widget.dart';
 import '../widgets/description_widget.dart';
 import '../widgets/reviews_widget.dart';
-import '../widgets/questions_widget.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
   final ProductModel product;
@@ -198,14 +197,14 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen>
                                             onWriteReview:
                                                 controller.onWriteReview,
                                           ),
-                                          SizedBox(height: 24.h),
-                                          QuestionsWidget(
-                                            questions: controller.questions,
-                                            onAskQuestion:
-                                                controller.onAskQuestion,
-                                            onReply:
-                                                controller.onReplyToQuestion,
-                                          ),
+                                          // SizedBox(height: 24.h),
+                                          // QuestionsWidget(
+                                          //   questions: controller.questions,
+                                          //   onAskQuestion:
+                                          //       controller.onAskQuestion,
+                                          //   onReply:
+                                          //       controller.onReplyToQuestion,
+                                          // ),
                                           SizedBox(height: 24.h),
                                           YouMayLikeSection(
                                             onAddToCart: (p) => controller

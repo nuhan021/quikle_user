@@ -577,7 +577,7 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
                       'Back to Sections',
                       style: getTextStyle(
                         font: CustomFonts.inter,
-                        fontSize: 12.sp,
+                        fontSize: 8.sp,
                         fontWeight: FontWeight.w500,
                         color: Colors.black,
                       ),

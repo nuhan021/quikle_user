@@ -39,10 +39,13 @@ class CategoryDeliveryAppBar extends StatelessWidget
   }
 
   String _formatAddress(String address, String city) {
-    var shortAddress = address.split(',').first;
-    if (shortAddress.length > 20) {
-      shortAddress = '${shortAddress.substring(0, 20)}...';
-    }
+    final parts = address.split(',');
+
+    // Take the first two comma-separated parts
+    final usefulParts = parts.take(2).map((e) => e.trim()).toList();
+
+    final shortAddress = usefulParts.join(', ');
+
     return '$shortAddress, $city';
   }
 
@@ -59,7 +62,6 @@ class CategoryDeliveryAppBar extends StatelessWidget
       onBackTap: onBackTap,
       titleWidget: Row(
         children: [
-          
           Expanded(
             flex: 2,
             child: Padding(
@@ -88,7 +90,6 @@ class CategoryDeliveryAppBar extends StatelessWidget
             ),
           ),
 
-          
           Expanded(
             flex: 3,
             child: GetBuilder<AddressController>(
@@ -98,7 +99,6 @@ class CategoryDeliveryAppBar extends StatelessWidget
 
                 return GestureDetector(
                   onTap: () async {
-                    
                     if (addressController.addresses.isEmpty) {
                       Get.toNamed(AppRoute.getAddAddress());
                       return;
