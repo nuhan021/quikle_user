@@ -20,10 +20,9 @@ class OrdersController extends GetxController {
       isLoading.value = true;
       error.value = '';
 
-      const String userId = 'user123';
-
+      // Fetch orders from API (userId is handled by auth token)
       final List<OrderModel> fetchedOrders = await _orderService.getUserOrders(
-        userId,
+        '',
       );
       orders.value = fetchedOrders;
     } catch (e) {
@@ -45,18 +44,17 @@ class OrdersController extends GetxController {
     }
   }
 
-  
   Future<void> addOrder(OrderModel order) async {
     try {
       print(
         'OrdersController: Adding order ${order.orderId} with ${order.items.length} items',
       );
 
-      
+      // Add to service (for backwards compatibility)
       await _orderService.addOrder(order);
 
-      
-      orders.insert(0, order);
+      // Refresh orders from API to get the latest
+      await loadOrders();
 
       print(
         'OrdersController: Order added successfully. Total orders: ${orders.length}',

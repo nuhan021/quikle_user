@@ -21,6 +21,7 @@ class ProductModel {
   final bool isPrescriptionMedicine;
   final String? prescriptionId;
   final String? vendorResponseId;
+  final Map<String, dynamic>? ratingsSummary;
 
   const ProductModel({
     required this.id,
@@ -45,6 +46,7 @@ class ProductModel {
     this.isPrescriptionMedicine = false,
     this.prescriptionId,
     this.vendorResponseId,
+    this.ratingsSummary,
   });
 
   factory ProductModel.fromJson(Map<String, dynamic> json) {
@@ -103,6 +105,9 @@ class ProductModel {
           json['hasPrescriptionUploaded'] as bool? ?? false,
       prescriptionId: json['prescriptionId'] as String?,
       vendorResponseId: json['vendorResponseId'] as String?,
+      ratingsSummary: isCachedData
+          ? (json['ratingsSummary'] as Map<String, dynamic>?)
+          : (json['ratings_summery'] as Map<String, dynamic>?),
     );
   }
 
@@ -131,6 +136,7 @@ class ProductModel {
       'isPrescriptionMedicine': isPrescriptionMedicine,
       'prescriptionId': prescriptionId,
       'vendorResponseId': vendorResponseId,
+      'ratingsSummary': ratingsSummary,
     };
   }
 
@@ -139,6 +145,8 @@ class ProductModel {
     String? title,
     String? description,
     String? price,
+    String? beforeDiscountPrice,
+    String? discountPercentage,
     String? imagePath,
     String? categoryId,
     String? subcategoryId,
@@ -155,12 +163,15 @@ class ProductModel {
     bool? isPrescriptionMedicine,
     String? prescriptionId,
     String? vendorResponseId,
+    Map<String, dynamic>? ratingsSummary,
   }) {
     return ProductModel(
       id: id ?? this.id,
       title: title ?? this.title,
       description: description ?? this.description,
       price: price ?? this.price,
+      beforeDiscountPrice: beforeDiscountPrice ?? this.beforeDiscountPrice,
+      discountPercentage: discountPercentage ?? this.discountPercentage,
       imagePath: imagePath ?? this.imagePath,
       categoryId: categoryId ?? this.categoryId,
       subcategoryId: subcategoryId ?? this.subcategoryId,
@@ -179,6 +190,7 @@ class ProductModel {
           isPrescriptionMedicine ?? this.isPrescriptionMedicine,
       prescriptionId: prescriptionId ?? this.prescriptionId,
       vendorResponseId: vendorResponseId ?? this.vendorResponseId,
+      ratingsSummary: ratingsSummary ?? this.ratingsSummary,
     );
   }
 
@@ -203,7 +215,8 @@ class ProductModel {
         other.productType == productType &&
         other.isPrescriptionMedicine == isPrescriptionMedicine &&
         other.prescriptionId == prescriptionId &&
-        other.vendorResponseId == vendorResponseId;
+        other.vendorResponseId == vendorResponseId &&
+        other.ratingsSummary == ratingsSummary;
   }
 
   @override
@@ -225,7 +238,8 @@ class ProductModel {
         productType.hashCode ^
         isPrescriptionMedicine.hashCode ^
         prescriptionId.hashCode ^
-        vendorResponseId.hashCode;
+        vendorResponseId.hashCode ^
+        ratingsSummary.hashCode;
   }
 
   // Medicine related getters

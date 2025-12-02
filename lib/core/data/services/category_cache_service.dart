@@ -236,6 +236,35 @@ class CategoryCacheService {
     }
   }
 
+  /// Invalidate product cache for a specific product's category
+  /// This will clear all cache entries for the product's category to ensure fresh data
+  Future<void> invalidateProductCache(ProductModel product) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+
+      // Clear cache for the product's category
+      await clearCache(categoryId: product.categoryId);
+
+      // Also clear cache for subcategory if it exists
+      if (product.subcategoryId != null) {
+        await clearCache(
+          categoryId: product.categoryId,
+          subcategoryId: product.subcategoryId,
+        );
+      }
+
+      // Clear home product sections cache as well
+      await prefs.remove(_homeProductSectionsKey);
+      await prefs.remove(_getTimestampKey(_homeProductSectionsKey));
+
+      AppLoggerHelper.debug(
+        '🔄 Invalidated cache for product ${product.id} in category ${product.categoryId}',
+      );
+    } catch (e) {
+      AppLoggerHelper.error('Error invalidating product cache', e);
+    }
+  }
+
   /// Clear all category caches
   Future<void> clearAllCaches() async {
     try {

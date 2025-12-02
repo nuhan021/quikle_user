@@ -50,10 +50,12 @@ class AddressWidget extends StatelessWidget {
                     Text(
                       defaultAddress != null
                           ? '${_getAddressTypeLabel(defaultAddress.type)} - ${defaultAddress.name}'
-                          : ' ',
+                          : 'No Address',
                       style: getTextStyle(
                         font: CustomFonts.inter,
-                        color: AppColors.ebonyBlack,
+                        color: defaultAddress != null
+                            ? AppColors.ebonyBlack
+                            : AppColors.featherGrey,
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                       ),
@@ -73,7 +75,7 @@ class AddressWidget extends StatelessWidget {
                           defaultAddress.address,
                           defaultAddress.city,
                         )
-                      : ' ',
+                      : 'Tap to add delivery address',
                   style: getTextStyle(
                     font: CustomFonts.inter,
                     color: AppColors.featherGrey,
@@ -102,10 +104,13 @@ class AddressWidget extends StatelessWidget {
   }
 
   String _formatAddress(String address, String city) {
-    var shortAddress = address.split(',').first;
-    if (shortAddress.length > 20) {
-      shortAddress = '${shortAddress.substring(0, 20)}...';
-    }
+    final parts = address.split(',');
+
+    // Take the first two comma-separated parts
+    final usefulParts = parts.take(2).map((e) => e.trim()).toList();
+
+    final shortAddress = usefulParts.join(', ');
+
     return '$shortAddress, $city';
   }
 }

@@ -1,5 +1,6 @@
 class ApiConstants {
-  static const String baseUrl = "https://caditya619-backend.onrender.com";
+  static const String baseUrl =
+      "https://adorningly-unstampeded-zetta.ngrok-free.dev";
 
   //For auth api's
   static const String authApi = "$baseUrl/auth";
@@ -42,4 +43,15 @@ class ApiConstants {
   static const String saveFreshchatRestoreId = "$baseUrl/user/freshchat/";
   static const String getFreshchatRestoreId =
       "$baseUrl/user/freshchat/restore_id";
+
+  //Review api's
+  static const String submitReview = "$baseUrl/items/reviews/";
+  static const String getReviews = "$baseUrl/items/reviews/?item_id={item_id}";
+
+  //Order api's
+  static const String createOrder = "$baseUrl/customer/orders/";
+  static const String getOrders = "$baseUrl/customer/orders/";
+
+  //Search api's
+  static const String searchItems = "$baseUrl/items/items/";
 }

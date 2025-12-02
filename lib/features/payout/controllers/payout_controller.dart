@@ -5,6 +5,7 @@ import 'package:quikle_user/features/payout/presentation/widgets/order_success_d
 import '../data/models/delivery_option_model.dart';
 import '../data/models/payment_method_model.dart';
 import '../../profile/data/models/shipping_address_model.dart';
+import '../../profile/controllers/address_controller.dart';
 import '../data/services/payout_service.dart';
 import '../../cart/controllers/cart_controller.dart';
 import '../../user/controllers/user_controller.dart';
@@ -16,11 +17,19 @@ class PayoutController extends GetxController {
   final _cartController = Get.find<CartController>();
   final _userController = Get.find<UserController>();
 
+  // Get AddressController - create if not exists
+  AddressController get _addressController {
+    try {
+      return Get.find<AddressController>();
+    } catch (e) {
+      return Get.put(AddressController());
+    }
+  }
+
   final _deliveryOptions = <DeliveryOptionModel>[].obs;
   final _deliveryPreferenceController = TextEditingController();
   final _selectedDeliveryPreference = Rxn<String?>(null);
   final _paymentMethods = <PaymentMethodModel>[].obs;
-  final _shippingAddresses = <ShippingAddressModel>[].obs;
   final _isUrgentDelivery = false.obs;
   final _userToggledUrgent = false.obs; // Track if user manually toggled
   final _couponCode = ''.obs;
@@ -43,7 +52,10 @@ class PayoutController extends GetxController {
   }
 
   List<PaymentMethodModel> get paymentMethods => _paymentMethods;
-  List<ShippingAddressModel> get shippingAddresses => _shippingAddresses;
+
+  // Get shipping addresses from AddressController (real API data)
+  List<ShippingAddressModel> get shippingAddresses =>
+      _addressController.addresses;
   bool get isUrgentDelivery => _isUrgentDelivery.value;
   String get couponCode => _couponCode.value;
   Map<String, dynamic>? get appliedCoupon => _appliedCoupon.value;
@@ -65,8 +77,11 @@ class PayoutController extends GetxController {
   PaymentMethodModel? get selectedPaymentMethod =>
       _paymentMethods.firstWhereOrNull((method) => method.isSelected);
 
-  ShippingAddressModel? get selectedShippingAddress =>
-      _shippingAddresses.firstWhereOrNull((address) => address.isSelected);
+  // Get selected shipping address from AddressController
+  ShippingAddressModel? get selectedShippingAddress {
+    final addresses = _addressController.addresses;
+    return addresses.firstWhereOrNull((address) => address.isSelected);
+  }
 
   double get subtotal => _cartController.totalAmount;
   double get _couponBaseSubtotal => subtotal;
@@ -191,7 +206,9 @@ class PayoutController extends GetxController {
   void _loadInitialData() {
     _deliveryOptions.value = _payoutService.getDeliveryOptions();
     _paymentMethods.value = _payoutService.getPaymentMethods();
-    _shippingAddresses.value = _payoutService.getShippingAddresses();
+
+    // Load addresses from AddressController (which gets them from API)
+    // AddressController loads addresses in its onInit, so they should be available
   }
 
   void selectDeliveryOption(DeliveryOptionModel option) {
@@ -212,9 +229,8 @@ class PayoutController extends GetxController {
   }
 
   void selectShippingAddress(ShippingAddressModel address) {
-    _shippingAddresses.value = _shippingAddresses.map((item) {
-      return item.copyWith(isSelected: item.id == address.id);
-    }).toList();
+    // Update the address selection in AddressController
+    _addressController.selectAddress(address);
   }
 
   void toggleUrgentDelivery() {
@@ -323,8 +339,10 @@ class PayoutController extends GetxController {
       selectPaymentMethod(_paymentMethods.first);
     }
 
-    if (selectedShippingAddress == null && _shippingAddresses.isNotEmpty) {
-      selectShippingAddress(_shippingAddresses.first);
+    // Auto-select first address if none selected and addresses available
+    if (selectedShippingAddress == null &&
+        _addressController.addresses.isNotEmpty) {
+      selectShippingAddress(_addressController.addresses.first);
     }
 
     if (selectedDeliveryOption == null ||
