@@ -1,6 +1,5 @@
 class ApiConstants {
-  static const String baseUrl =
-      "https://adorningly-unstampeded-zetta.ngrok-free.dev";
+  static const String baseUrl = "https://quikle-u4dv.onrender.com";
 
   //For auth api's
   static const String authApi = "$baseUrl/auth";
