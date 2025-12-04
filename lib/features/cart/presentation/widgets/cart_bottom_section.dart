@@ -9,6 +9,7 @@ import 'package:quikle_user/core/utils/constants/enums/address_type_enums.dart';
 import '../../../profile/controllers/address_controller.dart';
 import '../../../profile/controllers/payment_method_controller.dart';
 import '../../../home/presentation/widgets/address/adress_sheet_widget.dart';
+import '../../../cart/controllers/cart_controller.dart';
 
 class CartBottomSection extends StatelessWidget {
   final VoidCallback onPlaceOrder;
@@ -61,6 +62,10 @@ class CartBottomSection extends StatelessWidget {
 
   static void clearSelectedAddress() {
     _selectedAddressIdForCart = null;
+  }
+
+  static String? getSelectedAddressId() {
+    return _selectedAddressIdForCart;
   }
 
   @override
@@ -209,57 +214,86 @@ class CartBottomSection extends StatelessWidget {
 
               // Expanded Place Order button with total (takes remaining space)
               Expanded(
-                child: GestureDetector(
-                  onTap: onPlaceOrder,
-                  child: Container(
-                    padding: EdgeInsets.symmetric(
-                      vertical: 12.h,
-                      horizontal: 12.w,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.black,
-                      borderRadius: BorderRadius.circular(8.r),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        // Total price (left)
-                        Flexible(
-                          child: Text(
-                            '\$ ${totalAmount.toStringAsFixed(2)}',
-                            style: getTextStyle(
-                              font: CustomFonts.inter,
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.white,
+                child: Obx(() {
+                  final cartController = Get.find<CartController>();
+                  final isPlacingOrder = cartController.isPlacingOrder;
+
+                  return GestureDetector(
+                    onTap: isPlacingOrder ? null : onPlaceOrder,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        vertical: 12.h,
+                        horizontal: 12.w,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isPlacingOrder ? Colors.grey : Colors.black,
+                        borderRadius: BorderRadius.circular(8.r),
+                      ),
+                      child: isPlacingOrder
+                          ? Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SizedBox(
+                                  width: 16.w,
+                                  height: 16.h,
+                                  child: const CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
+                                  ),
+                                ),
+                                SizedBox(width: 8.w),
+                                Text(
+                                  'Processing...',
+                                  style: getTextStyle(
+                                    font: CustomFonts.inter,
+                                    fontSize: 14.sp,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            )
+                          : Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                // Total price (left)
+                                Flexible(
+                                  child: Text(
+                                    '\$ ${totalAmount.toStringAsFixed(2)}',
+                                    style: getTextStyle(
+                                      font: CustomFonts.inter,
+                                      fontSize: 14.sp,
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.white,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+
+                                // Thin divider
+                                SizedBox(width: 8.w),
+                                Container(
+                                  width: 1.w,
+                                  height: 20.h,
+                                  color: Colors.white.withValues(alpha: .25),
+                                ),
+                                SizedBox(width: 8.w),
+
+                                // Place order (right)
+                                Text(
+                                  'Place order',
+                                  style: getTextStyle(
+                                    font: CustomFonts.inter,
+                                    fontSize: 14.sp,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.beakYellow,
+                                  ),
+                                ),
+                              ],
                             ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-
-                        // Thin divider
-                        SizedBox(width: 8.w),
-                        Container(
-                          width: 1.w,
-                          height: 20.h,
-                          color: Colors.white.withValues(alpha: .25),
-                        ),
-                        SizedBox(width: 8.w),
-
-                        // Place order (right)
-                        Text(
-                          'Place order',
-                          style: getTextStyle(
-                            font: CustomFonts.inter,
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.beakYellow,
-                          ),
-                        ),
-                      ],
                     ),
-                  ),
-                ),
+                  );
+                }),
               ),
             ],
           ),

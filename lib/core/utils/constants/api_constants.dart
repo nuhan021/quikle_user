@@ -51,6 +51,9 @@ class ApiConstants {
   static const String createOrder = "$baseUrl/customer/orders/";
   static const String getOrders = "$baseUrl/customer/orders/";
 
+  //Payment api's
+  static const String initiatePayment = "$baseUrl/payment/payment/initiate";
+
   //Search api's
   static const String searchItems = "$baseUrl/items/items/";
 }

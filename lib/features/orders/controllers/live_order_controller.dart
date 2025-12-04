@@ -21,7 +21,7 @@ class LiveOrderController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _startLiveOrderTracking();
+    // _startLiveOrderTracking();
   }
 
   @override
