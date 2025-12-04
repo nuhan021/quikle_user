@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/route_manager.dart';
 import 'package:quikle_user/core/common/styles/global_text_style.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
+import 'package:quikle_user/features/chatting/presentation/screens/chat_screen.dart';
 import 'package:quikle_user/features/orders/controllers/order_tracking_controller.dart';
 
 class DeliveryPersonCard extends StatelessWidget {
@@ -56,16 +58,39 @@ class DeliveryPersonCard extends StatelessWidget {
               ],
             ),
           ),
-          GestureDetector(
-            onTap: controller.contactDeliveryPerson,
-            child: Container(
-              padding: EdgeInsets.all(8.w),
-              decoration: BoxDecoration(
-                color: const Color(0xFF06BD4C),
-                borderRadius: BorderRadius.circular(6.r),
+          Row(
+            children: [
+              GestureDetector(
+                onTap: controller.contactDeliveryPerson,
+                child: Container(
+                  padding: EdgeInsets.all(8.w),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF06BD4C),
+                    borderRadius: BorderRadius.circular(6.r),
+                  ),
+                  child: Icon(Icons.phone, color: Colors.white, size: 16.sp),
+                ),
               ),
-              child: Icon(Icons.phone, color: Colors.white, size: 16.sp),
-            ),
+              SizedBox(width: 8.w), // spacing between icons
+              GestureDetector(
+                onTap: () {
+                  //Navigate to chat screen ChatScreen
+                  final riderId =
+                      controller.trackingData.value!['deliveryPerson']['id']
+                          ?.toString() ??
+                      '3';
+                  Get.to(() => ChatScreen(riderId: riderId));
+                },
+                child: Container(
+                  padding: EdgeInsets.all(8.w),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF06A0BD), // blue-ish chat color
+                    borderRadius: BorderRadius.circular(6.r),
+                  ),
+                  child: Icon(Icons.chat, color: Colors.white, size: 16.sp),
+                ),
+              ),
+            ],
           ),
         ],
       ),
