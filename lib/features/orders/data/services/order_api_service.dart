@@ -8,6 +8,7 @@ import 'package:quikle_user/features/orders/data/models/order_model.dart';
 import 'package:quikle_user/features/payout/data/models/delivery_option_model.dart';
 import 'package:quikle_user/features/payout/data/models/payment_method_model.dart';
 import 'package:quikle_user/features/profile/data/models/shipping_address_model.dart';
+import 'package:quikle_user/features/payment/data/models/order_creation_response.dart';
 
 /// Order API Service
 ///
@@ -84,7 +85,7 @@ class OrderApiService {
   }
 
   /// Create a new order
-  Future<ResponseData> createOrder({
+  Future<OrderCreationResponse> createOrder({
     required List<CartItemModel> items,
     required ShippingAddressModel shippingAddress,
     required DeliveryOptionModel deliveryOption,
@@ -156,10 +157,13 @@ class OrderApiService {
         },
       );
 
-      if (response.isSuccess) {
+      if (response.isSuccess && response.responseData != null) {
         AppLoggerHelper.debug('Order created successfully');
         AppLoggerHelper.debug('Order response: ${response.responseData}');
-        return response;
+
+        return OrderCreationResponse.fromJson(
+          response.responseData as Map<String, dynamic>,
+        );
       }
 
       // Extract error message from response

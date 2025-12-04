@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:quikle_user/features/orders/data/models/order_model.dart';
+import 'package:quikle_user/features/orders/data/services/order_api_service.dart';
+import 'package:quikle_user/features/payment/data/services/payment_api_service.dart';
+import 'package:quikle_user/features/payment/presentation/screens/payment_webview_screen.dart';
 import 'package:quikle_user/features/payout/presentation/widgets/order_success_dialog.dart';
 import '../data/models/delivery_option_model.dart';
 import '../data/models/payment_method_model.dart';
@@ -11,9 +14,12 @@ import '../../cart/controllers/cart_controller.dart';
 import '../../user/controllers/user_controller.dart';
 import '../../../core/utils/constants/enums/order_enums.dart';
 import '../../../core/utils/constants/enums/delivery_enums.dart';
+import '../../../core/utils/logging/logger.dart';
 
 class PayoutController extends GetxController {
   final PayoutService _payoutService = PayoutService();
+  final OrderApiService _orderApiService = OrderApiService();
+  final PaymentApiService _paymentApiService = PaymentApiService();
   final _cartController = Get.find<CartController>();
   final _userController = Get.find<UserController>();
 
@@ -355,70 +361,149 @@ class PayoutController extends GetxController {
     _isProcessingPayment.value = true;
 
     try {
-      final orderId = 'ORD_${DateTime.now().millisecondsSinceEpoch}';
-      final paymentResult = await _payoutService.processPayment(
-        amount: totalAmount,
+      // Determine final shipping address to attach to order.
+      // If user provided a different receiver, copy the selected address but
+      // replace name and phone number.
+      ShippingAddressModel finalShippingAddress = selectedShippingAddress!;
+      if (isDifferentReceiver && receiverName.isNotEmpty) {
+        finalShippingAddress = selectedShippingAddress!.copyWith(
+          name: receiverName,
+          phoneNumber: receiverPhone.isNotEmpty
+              ? receiverPhone
+              : selectedShippingAddress!.phoneNumber,
+        );
+      }
+
+      // Set loading state
+      _isProcessingPayment.value = true;
+
+      // Step 1: Create order with backend API
+      AppLoggerHelper.debug('Creating order with backend API...');
+      final orderCreationResponse = await _orderApiService.createOrder(
+        items: _cartController.cartItems,
+        shippingAddress: finalShippingAddress,
+        deliveryOption: selectedDeliveryOption!,
         paymentMethod: selectedPaymentMethod!,
-        orderId: orderId,
+        couponCode: appliedCoupon?['isValid'] == true
+            ? _couponController.text
+            : null,
       );
 
-      if (paymentResult['success'] == true) {
-        // Determine final shipping address to attach to order.
-        // If user provided a different receiver, copy the selected address but
-        // replace name and phone number.
-        ShippingAddressModel finalShippingAddress = selectedShippingAddress!;
-        if (isDifferentReceiver && receiverName.isNotEmpty) {
-          finalShippingAddress = selectedShippingAddress!.copyWith(
-            name: receiverName,
-            phoneNumber: receiverPhone.isNotEmpty
-                ? receiverPhone
-                : selectedShippingAddress!.phoneNumber,
-          );
+      if (!orderCreationResponse.success) {
+        throw Exception(orderCreationResponse.message);
+      }
+
+      final orderData = orderCreationResponse.data;
+      AppLoggerHelper.debug(
+        '✅ Order created: ${orderData.orderId}, requires_payment: ${orderData.requiresPayment}',
+      );
+
+      // Step 2: If payment is required, initiate Cashfree payment
+      if (orderData.requiresPayment) {
+        AppLoggerHelper.debug(
+          'Initiating Cashfree payment for order: ${orderData.orderId}',
+        );
+
+        final paymentResponse = await _paymentApiService.initiatePayment(
+          orderId: orderData.orderId,
+        );
+
+        if (!paymentResponse.success) {
+          throw Exception(paymentResponse.message);
         }
 
-        final order = OrderModel(
-          orderId: orderId,
-          userId: _userController.currentUserId ?? 'unknown_user',
-          items: _cartController.cartItems,
-          shippingAddress: finalShippingAddress,
-          deliveryOption: selectedDeliveryOption!,
-          paymentMethod: selectedPaymentMethod!,
-          subtotal: subtotal,
-          deliveryFee: deliveryFee,
-          total: totalAmount,
-          couponCode: appliedCoupon?['isValid'] == true
-              ? _couponController.text
-              : null,
-          discount: discountAmount > 0 ? discountAmount : null,
-          orderDate: DateTime.now(),
-          status: OrderStatus.pending,
-          transactionId: paymentResult['transactionId'],
-          metadata: {
-            'deliveryPreference': selectedDeliveryPreference,
-            'isUrgent': isUrgentDelivery,
-          },
+        AppLoggerHelper.debug(
+          '✅ Payment link received: ${paymentResponse.paymentLink}',
         );
 
-        _cartController.clearCart();
+        // Step 3: Open payment webview
+        _isProcessingPayment.value = false;
 
-        Get.dialog(
-          OrderSuccessDialog(
-            order: order,
-            transactionId: paymentResult['transactionId'],
-            onContinue: () {
-              Get.back();
-              Get.offAllNamed('/main');
+        await Get.to(
+          () => PaymentWebViewScreen(
+            paymentUrl: paymentResponse.paymentLink,
+            orderId: orderData.orderId,
+            onPaymentSuccess: () {
+              _handlePaymentSuccess(orderData, finalShippingAddress);
+            },
+            onPaymentFailed: () {
+              _handlePaymentFailure(orderData.orderId);
             },
           ),
-          barrierDismissible: false,
         );
       } else {
-        Get.snackbar('Payment Failed', paymentResult['message']);
+        // Payment not required (e.g., COD)
+        _handlePaymentSuccess(orderData, finalShippingAddress);
       }
     } catch (e) {
-      Get.snackbar('Error', 'Failed to place order. Please try again.');
-    } finally {
+      AppLoggerHelper.error('❌ Error placing order', e);
       _isProcessingPayment.value = false;
+
+      // Don't use Get.snackbar here as it may not have overlay context
+      // The error will be caught and displayed by CartScreen
+      rethrow;
     }
+  }
+
+  void _handlePaymentSuccess(
+    dynamic orderData,
+    ShippingAddressModel finalShippingAddress,
+  ) {
+    AppLoggerHelper.debug(
+      '✅ Payment successful for order: ${orderData.orderId}',
+    );
+
+    // Create local order model for display
+    final order = OrderModel(
+      orderId: orderData.orderId,
+      userId: _userController.currentUserId ?? 'unknown_user',
+      items: _cartController.cartItems,
+      shippingAddress: finalShippingAddress,
+      deliveryOption: selectedDeliveryOption!,
+      paymentMethod: selectedPaymentMethod!,
+      subtotal: subtotal,
+      deliveryFee: deliveryFee,
+      total: orderData.total,
+      couponCode: appliedCoupon?['isValid'] == true
+          ? _couponController.text
+          : null,
+      discount: discountAmount > 0 ? discountAmount : null,
+      orderDate: DateTime.now(),
+      status: OrderStatus.pending,
+      trackingNumber: orderData.trackingNumber,
+      metadata: {
+        'deliveryPreference': selectedDeliveryPreference,
+        'isUrgent': isUrgentDelivery,
+      },
+    );
+
+    // Clear cart
+    _cartController.clearCart();
+    _isProcessingPayment.value = false;
+
+    // Show success dialog
+    Get.dialog(
+      OrderSuccessDialog(
+        order: order,
+        transactionId: orderData.orderId,
+        onContinue: () {
+          Get.back();
+          Get.offAllNamed('/home');
+        },
+      ),
+      barrierDismissible: false,
+    );
+  }
+
+  void _handlePaymentFailure(String orderId) {
+    AppLoggerHelper.debug('❌ Payment failed for order: $orderId');
+    _isProcessingPayment.value = false;
+
+    Get.snackbar(
+      'Payment Failed',
+      'Your order was created but payment failed. Please try again.',
+      snackPosition: SnackPosition.BOTTOM,
+      duration: const Duration(seconds: 4),
+    );
   }
 }
