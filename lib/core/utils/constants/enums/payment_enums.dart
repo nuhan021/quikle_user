@@ -23,7 +23,7 @@ enum PaymentMethodType {
       case PaymentMethodType.googlePay:
       case PaymentMethodType.phonePe:
       case PaymentMethodType.cashfree:
-        return 'razorpay';
+        return 'cashfree';
     }
   }
 }

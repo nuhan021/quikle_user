@@ -159,115 +159,98 @@ class OrderModel {
   }
 
   factory OrderModel.fromJson(Map<String, dynamic> json) {
-    // Parse status
-    OrderStatus orderStatus = OrderStatus.pending;
-    if (json['status'] != null) {
-      try {
-        orderStatus = OrderStatus.values.firstWhere(
-          (e) =>
-              e.name.toLowerCase() == json['status'].toString().toLowerCase(),
-          orElse: () => OrderStatus.pending,
-        );
-      } catch (e) {
-        orderStatus = OrderStatus.pending;
-      }
+    double? toDouble(dynamic v) {
+      if (v == null) return null;
+      if (v is num) return v.toDouble();
+      if (v is String) return double.tryParse(v);
+      return null;
     }
 
-    // Parse items
-    final itemsList = json['items'] as List<dynamic>? ?? [];
-    final items = itemsList.map((item) {
-      final productData = item as Map<String, dynamic>;
+    // Parse order status
+    OrderStatus orderStatus = OrderStatus.pending;
+    if (json['status'] != null) {
+      final s = json['status'].toString().toLowerCase();
+      orderStatus = OrderStatus.values.firstWhere(
+        (e) => e.name.toLowerCase() == s,
+        orElse: () => OrderStatus.pending,
+      );
+    }
 
-      // Create a ProductModel from the item data
+    // Parse items -> convert API item structure into CartItemModel
+    final items = (json['items'] as List? ?? []).map((item) {
+      final map = item as Map<String, dynamic>;
+
       final product = ProductModel(
-        id: productData['productId']?.toString() ?? '',
-        title: productData['title'] as String? ?? '',
-        description: '',
-        price: productData['price']?.toString() ?? '\$0',
-        imagePath: productData['imagePath'] as String? ?? '',
-        categoryId: '',
-        shopId: '',
+        id: map['item_id']?.toString() ?? "",
+        title: map['title'] ?? "",
+        description: "",
+        price: map['price']?.toString() ?? "0",
+        imagePath: map['image_path'] ?? "",
+        categoryId: "",
+        shopId: "",
       );
 
-      return CartItemModel(
-        product: product,
-        quantity: productData['quantity'] as int? ?? 1,
-      );
+      return CartItemModel(product: product, quantity: map['quantity'] ?? 1);
     }).toList();
 
-    // Parse shipping address
-    final shippingAddressData =
-        json['shippingAddress'] as Map<String, dynamic>? ?? {};
+    // Parse shipping address (snake_case)
+    final sa = json['shipping_address'] as Map<String, dynamic>? ?? {};
     final shippingAddress = ShippingAddressModel(
-      id: shippingAddressData['id'] as String? ?? '',
-      userId: json['userId'] as String? ?? '',
-      name: shippingAddressData['fullName'] as String? ?? '',
-      address: shippingAddressData['addressLine1'] as String? ?? '',
-      landmark: shippingAddressData['addressLine2'] as String?,
-      city: shippingAddressData['city'] as String? ?? '',
-      state: shippingAddressData['state'] as String? ?? '',
-      country: shippingAddressData['country'] as String? ?? '',
-      zipCode: shippingAddressData['postalCode'] as String? ?? '',
-      phoneNumber: shippingAddressData['phoneNumber'] as String? ?? '',
+      id: sa['id'] ?? "",
+      userId: json['user_id']?.toString() ?? "",
+      name: sa['fullName'] ?? "",
+      address: sa['addressLine1'] ?? "",
+      landmark: sa['addressLine2'],
+      city: sa['city'] ?? "",
+      state: sa['state'] ?? "",
+      country: sa['country'] ?? "",
+      zipCode: sa['postalCode'] ?? "",
+      phoneNumber: sa['phoneNumber'] ?? "",
       type: AddressType.home,
-      isDefault: shippingAddressData['isDefault'] as bool? ?? false,
+      isDefault: sa['isDefault'] ?? false,
       createdAt: DateTime.now(),
     );
 
-    // Parse delivery option
-    final deliveryOptionData =
-        json['deliveryOption'] as Map<String, dynamic>? ?? {};
-    DeliveryType deliveryType = DeliveryType.combined;
-    final typeString = deliveryOptionData['type'] as String? ?? 'standard';
-    if (typeString == 'express') {
-      deliveryType = DeliveryType.split;
-    } else if (typeString == 'urgent') {
-      deliveryType = DeliveryType.urgent;
-    }
+    // Delivery option
+    final doMap = json['delivery_option'] as Map<String, dynamic>? ?? {};
+    DeliveryType dType = DeliveryType.combined;
+    if (doMap['type'] == "urgent") dType = DeliveryType.urgent;
+    if (doMap['type'] == "split") dType = DeliveryType.split;
+    if (doMap['type'] == "combined") dType = DeliveryType.combined;
 
     final deliveryOption = DeliveryOptionModel(
-      type: deliveryType,
-      title: deliveryOptionData['title'] as String? ?? '',
-      description: deliveryOptionData['description'] as String? ?? '',
-      price: (deliveryOptionData['price'] as num?)?.toDouble() ?? 0.0,
+      type: dType,
+      title: doMap['title'] ?? "",
+      description: doMap['description'] ?? "",
+      price: toDouble(doMap['price']) ?? 0.0,
       isSelected: true,
     );
 
-    // Parse payment method
-    final paymentMethodData =
-        json['paymentMethod'] as Map<String, dynamic>? ?? {};
-    PaymentMethodType paymentType = PaymentMethodType.razorpay;
-    final paymentTypeString =
-        paymentMethodData['type'] as String? ?? 'razorpay';
-    if (paymentTypeString == 'cod') {
-      paymentType = PaymentMethodType.cashOnDelivery;
-    }
+    // Payment method
+    final pm = json['payment_method'] as Map<String, dynamic>? ?? {};
+    PaymentMethodType pType = PaymentMethodType.cashfree;
+    if (pm['type'] == "cod") pType = PaymentMethodType.cashOnDelivery;
 
-    final paymentMethod = PaymentMethodModel(
-      type: paymentType,
-      isSelected: true,
-    );
+    final paymentMethod = PaymentMethodModel(type: pType, isSelected: true);
 
     return OrderModel(
-      orderId: json['orderId'] as String? ?? '',
-      userId: json['userId'] as String? ?? '',
+      orderId: json['id'] ?? "",
+      userId: json['user_id']?.toString() ?? "",
       items: items,
       shippingAddress: shippingAddress,
       deliveryOption: deliveryOption,
       paymentMethod: paymentMethod,
-      subtotal: (json['subtotal'] as num?)?.toDouble() ?? 0.0,
-      deliveryFee: (json['deliveryFee'] as num?)?.toDouble() ?? 0.0,
-      total: (json['total'] as num?)?.toDouble() ?? 0.0,
-      couponCode: json['couponCode'] as String?,
-      discount: (json['discount'] as num?)?.toDouble(),
-      orderDate: json['orderDate'] != null
-          ? DateTime.parse(json['orderDate'] as String)
-          : DateTime.now(),
+      subtotal: toDouble(json['subtotal']) ?? 0.0,
+      deliveryFee: toDouble(json['delivery_fee']) ?? 0.0,
+      total: toDouble(json['total']) ?? 0.0,
+      couponCode: json['coupon_code'] ?? "",
+      discount: toDouble(json['discount']) ?? 0.0,
+      orderDate: DateTime.tryParse(json['order_date'] ?? "") ?? DateTime.now(),
       status: orderStatus,
-      transactionId: json['transactionId'] as String?,
-      trackingNumber: json['trackingNumber'] as String?,
-      estimatedDelivery: json['estimatedDelivery'] != null
-          ? DateTime.parse(json['estimatedDelivery'] as String)
+      transactionId: json['transaction_id'],
+      trackingNumber: json['tracking_number'],
+      estimatedDelivery: json['estimated_delivery'] != null
+          ? DateTime.tryParse(json['estimated_delivery'])
           : null,
       metadata: json['metadata'] as Map<String, dynamic>?,
     );

@@ -67,24 +67,12 @@ class OrderApiService {
       );
 
       if (response.isSuccess && response.responseData != null) {
-        final responseMap = response.responseData as Map<String, dynamic>;
+        // API returns a LIST
+        final ordersList = response.responseData as List<dynamic>;
 
-        if (responseMap['success'] == true && responseMap['data'] != null) {
-          final data = responseMap['data'] as Map<String, dynamic>;
-          final ordersList = data['orders'] as List<dynamic>? ?? [];
-
-          // AppLoggerHelper.debug('Fetched ${ordersList.length} orders from API');
-
-          final orders = ordersList
-              .map((json) => OrderModel.fromJson(json as Map<String, dynamic>))
-              .toList();
-
-          // AppLoggerHelper.debug(
-          //   'Order date and time parsed successfully: ${orders.map((o) => o.orderDate).toList()}',
-          // );
-
-          return orders;
-        }
+        return ordersList
+            .map((json) => OrderModel.fromJson(json as Map<String, dynamic>))
+            .toList();
       }
 
       AppLoggerHelper.warning('No orders found or API call failed');
