@@ -1,11 +1,11 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'package:quikle_user/core/models/response_data.dart';
+import 'package:quikle_user/core/services/network_caller.dart';
 import 'package:quikle_user/core/services/storage_service.dart';
+import 'package:quikle_user/core/utils/constants/api_constants.dart';
 import 'package:quikle_user/core/utils/logging/logger.dart';
 
 class FavoritesService {
-  static const String baseUrl = 'https://quikle-u4dv.onrender.com';
-  static const String favoritesEndpoint = '/favourites/favorites/';
+  final NetworkCaller _networkCaller = NetworkCaller();
 
   Future<Map<String, dynamic>?> addToFavorites(int itemId) async {
     final token = StorageService.token;
@@ -19,26 +19,20 @@ class FavoritesService {
     }
 
     try {
-      final url = Uri.parse('$baseUrl$favoritesEndpoint');
-      final response = await http.post(
-        url,
+      final ResponseData response = await _networkCaller.postRequest(
+        ApiConstants.favorites,
+        body: {'item_id': itemId},
         headers: {
-          'accept': 'application/json',
-          'refresh-token': refreshToken,
           'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
+          'refresh-token': refreshToken,
         },
-        body: jsonEncode({'item_id': itemId}),
       );
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
+      if (response.isSuccess && response.responseData != null) {
         AppLoggerHelper.debug('Favorite added successfully');
-        final data = jsonDecode(response.body) as Map<String, dynamic>;
-        return data;
+        return response.responseData as Map<String, dynamic>;
       } else {
-        print(
-          'Failed to add favorite: ${response.statusCode} ${response.body}',
-        );
+        print('Failed to add favorite: ${response.errorMessage}');
         return null;
       }
     } catch (e) {
@@ -59,24 +53,20 @@ class FavoritesService {
     }
 
     try {
-      final url = Uri.parse('$baseUrl$favoritesEndpoint');
-      final response = await http.get(
-        url,
+      final ResponseData response = await _networkCaller.getRequest(
+        ApiConstants.favorites,
         headers: {
-          'accept': 'application/json',
-          'refresh-token': refreshToken,
           'Authorization': 'Bearer $token',
+          'refresh-token': refreshToken,
         },
       );
 
-      if (response.statusCode == 200) {
+      if (response.isSuccess && response.responseData != null) {
         AppLoggerHelper.debug('Favorites retrieved successfully');
-        final data = jsonDecode(response.body) as List;
+        final data = response.responseData as List;
         return data.map((e) => e as Map<String, dynamic>).toList();
       } else {
-        print(
-          'Failed to get favorites: ${response.statusCode} ${response.body}',
-        );
+        print('Failed to get favorites: ${response.errorMessage}');
         return [];
       }
     } catch (e) {
@@ -97,23 +87,19 @@ class FavoritesService {
     }
 
     try {
-      final url = Uri.parse('$baseUrl$favoritesEndpoint$itemId');
-      final response = await http.delete(
-        url,
+      final ResponseData response = await _networkCaller.deleteRequest(
+        '${ApiConstants.favorites}$itemId',
         headers: {
-          'accept': 'application/json',
-          'refresh-token': refreshToken,
           'Authorization': 'Bearer $token',
+          'refresh-token': refreshToken,
         },
       );
 
-      if (response.statusCode == 200 || response.statusCode == 204) {
+      if (response.isSuccess) {
         AppLoggerHelper.debug('Favorite removed successfully');
         return true;
       } else {
-        print(
-          'Failed to remove favorite: ${response.statusCode} ${response.body}',
-        );
+        print('Failed to remove favorite: ${response.errorMessage}');
         return false;
       }
     } catch (e) {
