@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:quikle_user/features/home/data/models/product_model.dart';
 import 'package:quikle_user/features/profile/services/favorites_service.dart';
+import 'package:quikle_user/core/data/services/product_data_service.dart';
 
 class FavoritesController extends GetxController {
   static final RxSet<String> _globalFavoriteIds = <String>{}.obs;
@@ -31,47 +32,41 @@ class FavoritesController extends GetxController {
     super.onInit();
     loadFavorites();
 
-    ever(_globalFavoriteIds, (Set<String> favoriteIds) {
+    ever(_globalFavoriteIds, (_) {
       refreshFavorites();
     });
   }
 
-  void loadFavorites() {
+  Future<void> loadFavorites() async {
     try {
       _isLoading.value = true;
 
-      if (_globalFavoriteIds.isEmpty) {
-        _initializeSampleFavorites();
-      }
+      final favorites = await FavoritesService().getFavorites();
+      final itemIds = favorites.map((f) => f['item_id'].toString()).toSet();
+      _globalFavoriteIds.assignAll(itemIds);
 
-      refreshFavorites();
+      await refreshFavorites();
     } catch (e) {
       print('Error loading favorites: $e');
-
       _favoriteProducts.clear();
     } finally {
       _isLoading.value = false;
     }
   }
 
-  void _initializeSampleFavorites() {
-    final sampleFavoriteIds = [
-      'produce_fruits_1',
-      'dairy_yogurt_1',
-      'produce_fruits_2',
-      'food_pizza_1',
-      'produce_fruits_6',
-      'dairy_milk_1',
-    ];
-
-    _globalFavoriteIds.addAll(sampleFavoriteIds);
-  }
-
-  void refreshFavorites() {
+  Future<void> refreshFavorites() async {
     try {
-      // Static data removed - favorites should be fetched from API
-      // For now, just clear the list
-      _favoriteProducts.clear();
+      final productService = ProductDataService();
+      final products = <ProductModel>[];
+
+      for (final id in _globalFavoriteIds) {
+        final product = await productService.getProductById(id);
+        if (product != null) {
+          products.add(product);
+        }
+      }
+
+      _favoriteProducts.assignAll(products);
     } catch (e) {
       print('Error refreshing favorites: $e');
       _favoriteProducts.clear();
@@ -81,10 +76,10 @@ class FavoritesController extends GetxController {
   Future<void> addToFavorites(ProductModel product) async {
     final itemId = int.tryParse(product.id);
     if (itemId != null) {
-      final success = await FavoritesService().addToFavorites(itemId);
-      if (success) {
+      final result = await FavoritesService().addToFavorites(itemId);
+      if (result != null) {
         addToGlobalFavorites(product.id);
-        refreshFavorites();
+        // refreshFavorites will be called by ever
       } else {
         // Handle failure, maybe show error
         print('Failed to add favorite');
@@ -94,9 +89,19 @@ class FavoritesController extends GetxController {
     }
   }
 
-  void removeFromFavorites(String productId) {
-    removeFromGlobalFavorites(productId);
-    refreshFavorites();
+  void removeFromFavorites(String productId) async {
+    final itemId = int.tryParse(productId);
+    if (itemId != null) {
+      final success = await FavoritesService().removeFromFavorites(itemId);
+      if (success) {
+        removeFromGlobalFavorites(productId);
+        // refreshFavorites will be called by ever
+      } else {
+        print('Failed to remove favorite');
+      }
+    } else {
+      print('Invalid product id: $productId');
+    }
   }
 
   void toggleFavorite(ProductModel product) async {
