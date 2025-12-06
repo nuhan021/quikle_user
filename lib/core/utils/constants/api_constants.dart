@@ -57,4 +57,7 @@ class ApiConstants {
   //Search api's
   static const String searchItems = "$baseUrl/items/items/";
   static const String getItemById = "$baseUrl/items/items/{id}/";
+
+  //Favorites api's
+  static const String favorites = "$baseUrl/favourites/favorites/";
 }
