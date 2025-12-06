@@ -502,4 +502,27 @@ class ProductDataService {
     categoryProducts.shuffle();
     return categoryProducts.take(limit).toList();
   }
+
+  Future<ProductModel?> getProductById(String id) async {
+    try {
+      final url = ApiConstants.getItemById.replaceFirst('{id}', id);
+      AppLoggerHelper.debug('Fetching product by id: $id, URL: $url');
+
+      final response = await _networkCaller.getRequest(url);
+
+      if (response.isSuccess && response.responseData != null) {
+        final data = response.responseData as Map<String, dynamic>;
+        AppLoggerHelper.debug('Fetched product data: $data');
+        return ProductModel.fromJson(data);
+      }
+
+      AppLoggerHelper.warning(
+        'Product not found or API call failed for id: $id',
+      );
+      return null;
+    } catch (e) {
+      AppLoggerHelper.error('Error fetching product by id: $id', e);
+      return null;
+    }
+  }
 }
