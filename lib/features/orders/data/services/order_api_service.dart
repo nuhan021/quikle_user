@@ -68,8 +68,9 @@ class OrderApiService {
       );
 
       if (response.isSuccess && response.responseData != null) {
-        // API returns a LIST
-        final ordersList = response.responseData as List<dynamic>;
+        // API returns a MAP with orders list
+        final data = response.responseData as Map<String, dynamic>;
+        final ordersList = data['orders'] as List<dynamic>;
 
         return ordersList
             .map((json) => OrderModel.fromJson(json as Map<String, dynamic>))
