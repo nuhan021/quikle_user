@@ -151,6 +151,27 @@ class CartScreen extends StatelessWidget {
       return;
     }
 
+    // Sync the selected address from CartBottomSection to PayoutController
+    final selectedAddressId = CartBottomSection.getSelectedAddressId();
+    if (selectedAddressId != null) {
+      final addressController = Get.find<AddressController>();
+      final selectedAddr = addressController.addresses.firstWhereOrNull(
+        (addr) => addr.id == selectedAddressId,
+      );
+      if (selectedAddr != null) {
+        payoutController.selectShippingAddress(selectedAddr);
+      }
+    } else {
+      // If no address selected in CartBottomSection, select the default address
+      final addressController = Get.find<AddressController>();
+      final defaultAddr = addressController.defaultAddress;
+      if (defaultAddr != null) {
+        payoutController.selectShippingAddress(defaultAddr);
+        // Also set it in CartBottomSection for consistency
+        CartBottomSection.setSelectedAddressId(defaultAddr.id);
+      }
+    }
+
     final selectedShippingAddress = payoutController.selectedShippingAddress;
 
     // DEBUG: Print address information
@@ -186,18 +207,6 @@ class CartScreen extends StatelessWidget {
       isSelected: true,
     );
     payoutController.selectPaymentMethod(payoutPaymentMethod);
-
-    // Sync the selected address from CartBottomSection to PayoutController
-    final selectedAddressId = CartBottomSection.getSelectedAddressId();
-    if (selectedAddressId != null) {
-      final addressController = Get.find<AddressController>();
-      final selectedAddr = addressController.addresses.firstWhereOrNull(
-        (addr) => addr.id == selectedAddressId,
-      );
-      if (selectedAddr != null) {
-        payoutController.selectShippingAddress(selectedAddr);
-      }
-    }
 
     cartController.setPlacingOrder(true);
 

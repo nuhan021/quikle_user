@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:quikle_user/features/orders/data/models/order_model.dart';
 import 'package:quikle_user/features/orders/data/services/order_api_service.dart';
-import 'package:quikle_user/features/payment/data/services/payment_api_service.dart';
 import 'package:quikle_user/features/payment/presentation/screens/payment_webview_screen.dart';
 import 'package:quikle_user/features/payout/presentation/widgets/order_success_dialog.dart';
 import '../data/models/delivery_option_model.dart';
@@ -19,7 +18,6 @@ import '../../../core/utils/logging/logger.dart';
 class PayoutController extends GetxController {
   final PayoutService _payoutService = PayoutService();
   final OrderApiService _orderApiService = OrderApiService();
-  final PaymentApiService _paymentApiService = PaymentApiService();
   final _cartController = Get.find<CartController>();
   final _userController = Get.find<UserController>();
 
@@ -345,10 +343,15 @@ class PayoutController extends GetxController {
       selectPaymentMethod(_paymentMethods.first);
     }
 
-    // Auto-select first address if none selected and addresses available
+    // Auto-select default address if none selected and addresses available
     if (selectedShippingAddress == null &&
         _addressController.addresses.isNotEmpty) {
-      selectShippingAddress(_addressController.addresses.first);
+      final defaultAddr = _addressController.defaultAddress;
+      if (defaultAddr != null) {
+        selectShippingAddress(defaultAddr);
+      } else {
+        selectShippingAddress(_addressController.addresses.first);
+      }
     }
 
     if (selectedDeliveryOption == null ||
@@ -398,22 +401,10 @@ class PayoutController extends GetxController {
         '✅ Order created: ${orderData.orderId}, requires_payment: ${orderData.requiresPayment}',
       );
 
-      // Step 2: If payment is required, initiate Cashfree payment
+      // Step 2: If payment is required, open payment webview with the link from order response
       if (orderData.requiresPayment) {
         AppLoggerHelper.debug(
-          'Initiating Cashfree payment for order: ${orderData.orderId}',
-        );
-
-        final paymentResponse = await _paymentApiService.initiatePayment(
-          orderId: orderData.orderId,
-        );
-
-        if (!paymentResponse.success) {
-          throw Exception(paymentResponse.message);
-        }
-
-        AppLoggerHelper.debug(
-          '✅ Payment link received: ${paymentResponse.paymentLink}',
+          'Opening payment webview for order: ${orderData.orderId} with link: ${orderData.paymentLink}',
         );
 
         // Step 3: Open payment webview
@@ -421,7 +412,7 @@ class PayoutController extends GetxController {
 
         await Get.to(
           () => PaymentWebViewScreen(
-            paymentUrl: paymentResponse.paymentLink,
+            paymentUrl: orderData.paymentLink,
             orderId: orderData.orderId,
             onPaymentSuccess: () {
               _handlePaymentSuccess(orderData, finalShippingAddress);

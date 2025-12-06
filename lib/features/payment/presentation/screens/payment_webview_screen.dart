@@ -76,42 +76,13 @@ class _PaymentWebViewScreenState extends State<PaymentWebViewScreen> {
   }
 
   void _checkPaymentStatus(String url) {
-    // Check if URL indicates payment success or failure
-    // Cashfree success patterns:
-    // - /links/response/ URLs (after payment completion)
-    // - URLs containing 'success', 'payment_status=success', or 'status=success'
-
-    final isResponseUrl =
-        url.contains('/links/response/') || url.contains('/gateway/thankyou/');
-
-    if (isResponseUrl) {
-      // For Cashfree response URLs, we consider them as success
-      // unless they explicitly contain failure indicators
-      if (url.contains('failure') ||
-          url.contains('payment_status=failed') ||
-          url.contains('status=failed') ||
-          url.contains('cancel')) {
-        AppLoggerHelper.debug(
-          '❌ Payment failed/cancelled detected from URL: $url',
-        );
-        _handlePaymentFailure();
-      } else {
-        AppLoggerHelper.debug('✅ Payment successful detected from URL: $url');
-        _handlePaymentSuccess();
-      }
-    } else if (url.contains('success') ||
-        url.contains('payment_status=success') ||
-        url.contains('status=success')) {
-      AppLoggerHelper.debug('✅ Payment successful detected from URL: $url');
+    // Check for the success URL
+    if (url ==
+        'https://quikle-u4dv.onrender.com/payment/payment/test/pay-last') {
+      AppLoggerHelper.debug('✅ Payment successful detected: $url');
       _handlePaymentSuccess();
-    } else if (url.contains('failure') ||
-        url.contains('payment_status=failed') ||
-        url.contains('status=failed') ||
-        url.contains('cancel')) {
-      AppLoggerHelper.debug(
-        '❌ Payment failed/cancelled detected from URL: $url',
-      );
-      _handlePaymentFailure();
+    } else {
+      AppLoggerHelper.debug('Payment URL: $url');
     }
   }
 
@@ -123,16 +94,6 @@ class _PaymentWebViewScreenState extends State<PaymentWebViewScreen> {
 
     // Trigger success callback
     widget.onPaymentSuccess();
-  }
-
-  void _handlePaymentFailure() {
-    if (!mounted) return;
-
-    // Remove this screen from navigation stack
-    Navigator.of(context).pop();
-
-    // Trigger failure callback
-    widget.onPaymentFailed();
   }
 
   @override
@@ -157,7 +118,7 @@ class _PaymentWebViewScreenState extends State<PaymentWebViewScreen> {
                   TextButton(
                     onPressed: () {
                       Get.back(); // Close dialog
-                      _handlePaymentFailure();
+                      Navigator.of(context).pop(); // Close webview
                     },
                     child: const Text('Yes, Cancel'),
                   ),

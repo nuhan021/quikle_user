@@ -732,11 +732,7 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
   }
 
   void onFavoriteToggle(ProductModel product) {
-    if (FavoritesController.isProductFavorite(product.id)) {
-      FavoritesController.removeFromGlobalFavorites(product.id);
-    } else {
-      FavoritesController.addToGlobalFavorites(product.id);
-    }
+    Get.find<FavoritesController>().toggleFavorite(product);
 
     final isFavorite = FavoritesController.isProductFavorite(product.id);
     final updatedProduct = product.copyWith(isFavorite: isFavorite);

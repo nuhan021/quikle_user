@@ -386,11 +386,7 @@ class ProductSearchController extends GetxController {
   }
 
   void onFavoriteToggle(ProductModel product) {
-    if (FavoritesController.isProductFavorite(product.id)) {
-      FavoritesController.removeFromGlobalFavorites(product.id);
-    } else {
-      FavoritesController.addToGlobalFavorites(product.id);
-    }
+    Get.find<FavoritesController>().toggleFavorite(product);
     final index = _searchResults.indexWhere((p) => p.id == product.id);
     if (index != -1) {
       final isFav = FavoritesController.isProductFavorite(product.id);

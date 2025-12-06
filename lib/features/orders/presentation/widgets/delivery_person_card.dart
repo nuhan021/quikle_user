@@ -13,6 +13,8 @@ class DeliveryPersonCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final riderInfo = controller.order.riderInfo;
+
     return Container(
       padding: EdgeInsets.all(12.w),
       decoration: BoxDecoration(
@@ -25,11 +27,16 @@ class DeliveryPersonCard extends StatelessWidget {
           CircleAvatar(
             radius: 20.r,
             backgroundColor: const Color(0xFFF0F0F0),
-            child: Icon(
-              Icons.person,
-              color: const Color(0xFF7C7C7C),
-              size: 20.sp,
-            ),
+            backgroundImage: riderInfo?.riderImage != null
+                ? NetworkImage(riderInfo!.riderImage!)
+                : null,
+            child: riderInfo?.riderImage == null
+                ? Icon(
+                    Icons.person,
+                    color: const Color(0xFF7C7C7C),
+                    size: 20.sp,
+                  )
+                : null,
           ),
           SizedBox(width: 12.w),
           Expanded(
@@ -37,8 +44,7 @@ class DeliveryPersonCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  controller.trackingData.value!['deliveryPerson']['name'] ??
-                      'Delivery Person',
+                  riderInfo?.riderName ?? 'Delivery Person',
                   style: getTextStyle(
                     font: CustomFonts.inter,
                     fontSize: 14.sp,
@@ -61,7 +67,12 @@ class DeliveryPersonCard extends StatelessWidget {
           Row(
             children: [
               GestureDetector(
-                onTap: controller.contactDeliveryPerson,
+                onTap: () {
+                  final phone = riderInfo?.riderPhone;
+                  if (phone != null) {
+                    controller.contactDeliveryPerson(phone);
+                  }
+                },
                 child: Container(
                   padding: EdgeInsets.all(8.w),
                   decoration: BoxDecoration(
@@ -74,11 +85,7 @@ class DeliveryPersonCard extends StatelessWidget {
               SizedBox(width: 8.w), // spacing between icons
               GestureDetector(
                 onTap: () {
-                  //Navigate to chat screen ChatScreen
-                  final riderId =
-                      controller.trackingData.value!['deliveryPerson']['id']
-                          ?.toString() ??
-                      '3';
+                  final riderId = riderInfo?.riderId?.toString() ?? '3';
                   Get.to(() => ChatScreen(riderId: riderId));
                 },
                 child: Container(

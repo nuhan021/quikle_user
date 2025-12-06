@@ -162,9 +162,19 @@ class OrderApiService {
         AppLoggerHelper.debug('Order created successfully');
         AppLoggerHelper.debug('Order response: ${response.responseData}');
 
-        return OrderCreationResponse.fromJson(
+        final orderResponse = OrderCreationResponse.fromJson(
           response.responseData as Map<String, dynamic>,
         );
+
+        AppLoggerHelper.debug(
+          'Order ID: ${orderResponse.data.orderId}, Requires Payment: ${orderResponse.data.requiresPayment}',
+        );
+
+        AppLoggerHelper.debug(
+          'Payment Link: ${orderResponse.data.paymentLink}',
+        );
+
+        return orderResponse;
       }
 
       // Extract error message from response
