@@ -26,6 +26,10 @@ class OrderModel {
   final String? trackingNumber;
   final DateTime? estimatedDelivery;
   final Map<String, dynamic>? metadata;
+  final String? paymentStatus;
+  final String? paymentLink;
+  final List<Map<String, dynamic>>? vendors;
+  final Map<String, dynamic>? riderInfo;
 
   const OrderModel({
     required this.orderId,
@@ -45,6 +49,10 @@ class OrderModel {
     this.trackingNumber,
     this.estimatedDelivery,
     this.metadata,
+    this.paymentStatus,
+    this.paymentLink,
+    this.vendors,
+    this.riderInfo,
   });
 
   OrderModel copyWith({
@@ -65,6 +73,10 @@ class OrderModel {
     String? trackingNumber,
     DateTime? estimatedDelivery,
     Map<String, dynamic>? metadata,
+    String? paymentStatus,
+    String? paymentLink,
+    List<Map<String, dynamic>>? vendors,
+    Map<String, dynamic>? riderInfo,
   }) {
     return OrderModel(
       orderId: orderId ?? this.orderId,
@@ -84,6 +96,10 @@ class OrderModel {
       trackingNumber: trackingNumber ?? this.trackingNumber,
       estimatedDelivery: estimatedDelivery ?? this.estimatedDelivery,
       metadata: metadata ?? this.metadata,
+      paymentStatus: paymentStatus ?? this.paymentStatus,
+      paymentLink: paymentLink ?? this.paymentLink,
+      vendors: vendors ?? this.vendors,
+      riderInfo: riderInfo ?? this.riderInfo,
     );
   }
 
@@ -155,6 +171,10 @@ class OrderModel {
       'trackingNumber': trackingNumber,
       'estimatedDelivery': estimatedDelivery?.toIso8601String(),
       'metadata': metadata,
+      'paymentStatus': paymentStatus,
+      'paymentLink': paymentLink,
+      'vendors': vendors,
+      'riderInfo': riderInfo,
     };
   }
 
@@ -198,14 +218,14 @@ class OrderModel {
     final shippingAddress = ShippingAddressModel(
       id: sa['id'] ?? "",
       userId: json['user_id']?.toString() ?? "",
-      name: sa['fullName'] ?? "",
-      address: sa['addressLine1'] ?? "",
-      landmark: sa['addressLine2'],
+      name: sa['full_name'] ?? "",
+      address: sa['address_line1'] ?? "",
+      landmark: sa['address_line2'],
       city: sa['city'] ?? "",
       state: sa['state'] ?? "",
       country: sa['country'] ?? "",
-      zipCode: sa['postalCode'] ?? "",
-      phoneNumber: sa['phoneNumber'] ?? "",
+      zipCode: sa['postal_code'] ?? "",
+      phoneNumber: sa['phone_number'] ?? "",
       type: AddressType.home,
       isDefault: sa['isDefault'] ?? false,
       createdAt: DateTime.now(),
@@ -253,6 +273,12 @@ class OrderModel {
           ? DateTime.tryParse(json['estimated_delivery'])
           : null,
       metadata: json['metadata'] as Map<String, dynamic>?,
+      paymentStatus: json['payment_status'],
+      paymentLink: json['payment_link'],
+      vendors: (json['vendors'] as List?)
+          ?.map((e) => e as Map<String, dynamic>)
+          .toList(),
+      riderInfo: json['rider_info'] as Map<String, dynamic>?,
     );
   }
 }
