@@ -23,20 +23,20 @@ class OrderCreationData {
   final String status;
   final String trackingNumber;
   final double total;
-  final DeliveryOptionData deliveryOption;
-  final PaymentMethodData paymentMethod;
+  final String paymentStatus;
   final bool requiresPayment;
-  final String? paymentInstructions;
+  final String paymentLink;
+  final String cfOrderId;
 
   OrderCreationData({
     required this.orderId,
     required this.status,
     required this.trackingNumber,
     required this.total,
-    required this.deliveryOption,
-    required this.paymentMethod,
+    required this.paymentStatus,
     required this.requiresPayment,
-    this.paymentInstructions,
+    required this.paymentLink,
+    required this.cfOrderId,
   });
 
   factory OrderCreationData.fromJson(Map<String, dynamic> json) {
@@ -45,49 +45,10 @@ class OrderCreationData {
       status: json['status'] ?? '',
       trackingNumber: json['tracking_number'] ?? '',
       total: (json['total'] ?? 0).toDouble(),
-      deliveryOption: DeliveryOptionData.fromJson(
-        json['delivery_option'] ?? {},
-      ),
-      paymentMethod: PaymentMethodData.fromJson(json['payment_method'] ?? {}),
+      paymentStatus: json['payment_status'] ?? '',
       requiresPayment: json['requires_payment'] ?? false,
-      paymentInstructions: json['payment_instructions'],
-    );
-  }
-}
-
-class DeliveryOptionData {
-  final String type;
-  final String title;
-  final String description;
-  final double price;
-
-  DeliveryOptionData({
-    required this.type,
-    required this.title,
-    required this.description,
-    required this.price,
-  });
-
-  factory DeliveryOptionData.fromJson(Map<String, dynamic> json) {
-    return DeliveryOptionData(
-      type: json['type'] ?? '',
-      title: json['title'] ?? '',
-      description: json['description'] ?? '',
-      price: (json['price'] ?? 0).toDouble(),
-    );
-  }
-}
-
-class PaymentMethodData {
-  final String type;
-  final String name;
-
-  PaymentMethodData({required this.type, required this.name});
-
-  factory PaymentMethodData.fromJson(Map<String, dynamic> json) {
-    return PaymentMethodData(
-      type: json['type'] ?? '',
-      name: json['name'] ?? '',
+      paymentLink: json['payment_link'] ?? '',
+      cfOrderId: json['cf_order_id'] ?? '',
     );
   }
 }

@@ -142,11 +142,7 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen>
   }
 
   void _onFavoriteToggle(ProductModel product) {
-    if (FavoritesController.isProductFavorite(product.id)) {
-      FavoritesController.removeFromGlobalFavorites(product.id);
-    } else {
-      FavoritesController.addToGlobalFavorites(product.id);
-    }
+    Get.find<FavoritesController>().toggleFavorite(product);
 
     final isFav = FavoritesController.isProductFavorite(product.id);
     final updated = product.copyWith(isFavorite: isFav);

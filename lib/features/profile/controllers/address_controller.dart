@@ -100,17 +100,17 @@ class AddressController extends GetxController {
       // Add a small delay before showing snackbar to avoid initialization error
       await Future.delayed(const Duration(milliseconds: 100));
 
-      Get.snackbar(
-        'Success',
-        'Address added successfully',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.green[600],
-        colorText: Colors.white,
-        duration: const Duration(seconds: 2),
-        margin: const EdgeInsets.all(12),
-        borderRadius: 8,
-        icon: const Icon(Icons.check_circle, color: Colors.white),
-      );
+      // Get.snackbar(
+      //   'Success',
+      //   'Address added successfully',
+      //   snackPosition: SnackPosition.BOTTOM,
+      //   backgroundColor: Colors.green[600],
+      //   colorText: Colors.white,
+      //   duration: const Duration(seconds: 2),
+      //   margin: const EdgeInsets.all(12),
+      //   borderRadius: 8,
+      //   icon: const Icon(Icons.check_circle, color: Colors.white),
+      // );
     } catch (e) {
       Get.snackbar(
         'Error',

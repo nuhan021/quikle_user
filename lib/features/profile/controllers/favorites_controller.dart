@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:quikle_user/features/home/data/models/product_model.dart';
+import 'package:quikle_user/features/profile/services/favorites_service.dart';
 
 class FavoritesController extends GetxController {
   static final RxSet<String> _globalFavoriteIds = <String>{}.obs;
@@ -77,9 +78,20 @@ class FavoritesController extends GetxController {
     }
   }
 
-  void addToFavorites(ProductModel product) {
-    addToGlobalFavorites(product.id);
-    refreshFavorites();
+  Future<void> addToFavorites(ProductModel product) async {
+    final itemId = int.tryParse(product.id);
+    if (itemId != null) {
+      final success = await FavoritesService().addToFavorites(itemId);
+      if (success) {
+        addToGlobalFavorites(product.id);
+        refreshFavorites();
+      } else {
+        // Handle failure, maybe show error
+        print('Failed to add favorite');
+      }
+    } else {
+      print('Invalid product id: ${product.id}');
+    }
   }
 
   void removeFromFavorites(String productId) {
@@ -87,11 +99,11 @@ class FavoritesController extends GetxController {
     refreshFavorites();
   }
 
-  void toggleFavorite(ProductModel product) {
+  void toggleFavorite(ProductModel product) async {
     if (isProductFavorite(product.id)) {
       removeFromFavorites(product.id);
     } else {
-      addToFavorites(product);
+      await addToFavorites(product);
     }
   }
 

@@ -208,16 +208,23 @@ class OrderTrackingController extends GetxController {
     return null;
   }
 
-  void contactDeliveryPerson() {
-    if (trackingData.value != null) {
-      final deliveryPerson = trackingData.value!['deliveryPerson'];
-      if (deliveryPerson != null) {
-        Get.snackbar(
-          'Calling',
-          'Calling ${deliveryPerson['name']}...',
-          snackPosition: SnackPosition.BOTTOM,
-        );
-      }
+  void contactDeliveryPerson([String? phoneNumber]) {
+    final phone =
+        phoneNumber ?? trackingData.value?['deliveryPerson']?['phone'];
+    if (phone != null) {
+      Get.snackbar(
+        'Calling',
+        'Calling delivery person...',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      // Here you would implement the actual calling functionality
+      // For example: url_launcher to call the phone number
+    } else {
+      Get.snackbar(
+        'Error',
+        'Phone number not available',
+        snackPosition: SnackPosition.BOTTOM,
+      );
     }
   }
 

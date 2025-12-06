@@ -64,6 +64,10 @@ class CartBottomSection extends StatelessWidget {
     _selectedAddressIdForCart = null;
   }
 
+  static void setSelectedAddressId(String? id) {
+    _selectedAddressIdForCart = id;
+  }
+
   static String? getSelectedAddressId() {
     return _selectedAddressIdForCart;
   }
@@ -79,6 +83,14 @@ class CartBottomSection extends StatelessWidget {
           GetBuilder<AddressController>(
             init: AddressController(),
             builder: (controller) {
+              // Auto-select default address if none selected
+              if (_selectedAddressIdForCart == null) {
+                final defaultAddr = controller.defaultAddress;
+                if (defaultAddr != null) {
+                  _selectedAddressIdForCart = defaultAddr.id;
+                }
+              }
+
               final selectedAddress = _selectedAddressIdForCart != null
                   ? controller.addresses.firstWhereOrNull(
                       (addr) => addr.id == _selectedAddressIdForCart,
