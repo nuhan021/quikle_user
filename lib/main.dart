@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:quikle_user/app.dart';
 import 'package:quikle_user/core/services/network_controller.dart';
 import 'package:quikle_user/core/services/storage_service.dart';
@@ -8,6 +9,9 @@ import 'core/common/widgets/no_internet_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Firebase
+  // await Firebase.initializeApp();
 
   // Initialize services
   await StorageService.init();

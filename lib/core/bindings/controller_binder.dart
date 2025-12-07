@@ -1,5 +1,7 @@
 import 'package:get/get.dart';
 import 'package:quikle_user/core/common/widgets/cart_animation_overlay.dart';
+import 'package:quikle_user/core/notification/controllers/notification_controller.dart';
+import 'package:quikle_user/core/notification/services/notification_service.dart';
 import 'package:quikle_user/core/services/cart_position_service.dart';
 import 'package:quikle_user/features/user/data/services/user_service.dart';
 import 'package:quikle_user/features/user/controllers/user_controller.dart';
@@ -61,5 +63,9 @@ class ControllerBinder extends Bindings {
     Get.put<HelpSupportController>(HelpSupportController(), permanent: true);
     Get.put<LiveOrderController>(LiveOrderController(), permanent: true);
     Get.put<PrescriptionController>(PrescriptionController(), permanent: true);
+
+    //NotificationController
+    Get.put<NotificationService>(NotificationService(), permanent: true);
+    Get.put<NotificationController>(NotificationController(), permanent: true);
   }
 }

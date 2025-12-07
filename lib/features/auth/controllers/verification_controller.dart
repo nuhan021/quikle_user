@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:quikle_user/core/models/response_data.dart';
+import 'package:quikle_user/core/notification/controllers/notification_controller.dart';
 import 'package:quikle_user/features/auth/controllers/login_controller.dart';
 import 'package:quikle_user/features/auth/data/services/auth_service.dart';
 // ignore: unused_import
@@ -13,6 +14,8 @@ import '../presentation/screens/splash_wrapper.dart';
 class VerificationController extends GetxController {
   final RxList<String> otpDigits = List.generate(6, (_) => '').obs;
   final LoginController loginController = Get.find<LoginController>();
+  // final NotificationController notificationController =
+  //     Get.find<NotificationController>();
 
   // OTP Controller for pin_code_fields package
   final TextEditingController otpController = TextEditingController();
@@ -113,6 +116,15 @@ class VerificationController extends GetxController {
         }
 
         if (response.isSuccess) {
+          // try {
+          //   // Save FCM token after successful login/signup
+          //   final fcmToken = await notificationController.getFCMToken();
+          //   if (fcmToken != null && fcmToken.isNotEmpty) {
+          //     await notificationController.saveFCMToken(fcmToken);
+          //   }
+          // } catch (e) {
+          //   print('Could not save FCM token immediately after login: $e');
+          // }
           // Reload addresses after successful login
           try {
             final addressController = Get.find<AddressController>();
