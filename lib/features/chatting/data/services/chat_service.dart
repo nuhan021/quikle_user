@@ -31,7 +31,7 @@ class ChatService {
   }
 
   void sendMessage(String text) {
-    final message = {"to_type": "riders", "to_id": riderId, "text": text};
+    final message = {"to_type": "riders", "to_id": 3, "text": text};
     _channel.sink.add(jsonEncode(message));
   }
 

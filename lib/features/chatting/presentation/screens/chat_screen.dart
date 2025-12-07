@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:quikle_user/core/utils/logging/logger.dart';
 import 'package:quikle_user/features/chatting/controllers/chat_controller.dart';
 
 class ChatScreen extends StatelessWidget {
@@ -10,6 +11,7 @@ class ChatScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppLoggerHelper.debug('Opening chat screen for riderId: $riderId');
     final ChatController controller = Get.put(ChatController(riderId: riderId));
 
     return Scaffold(
