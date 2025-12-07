@@ -60,4 +60,7 @@ class ApiConstants {
 
   //Favorites api's
   static const String favorites = "$baseUrl/favourites/favorites/";
+
+  //Save FCM Token
+  static const String saveFcmToken = "$baseUrl/rider/save_token/";
 }
