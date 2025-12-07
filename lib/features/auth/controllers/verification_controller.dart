@@ -6,6 +6,7 @@ import 'package:quikle_user/features/auth/controllers/login_controller.dart';
 import 'package:quikle_user/features/auth/data/services/auth_service.dart';
 // ignore: unused_import
 import 'package:quikle_user/features/profile/controllers/address_controller.dart';
+import 'package:quikle_user/features/profile/controllers/favorites_controller.dart';
 
 import '../presentation/screens/splash_wrapper.dart';
 
@@ -119,6 +120,15 @@ class VerificationController extends GetxController {
           } catch (e) {
             // AddressController might not be initialized yet, that's ok
             print('Could not reload addresses immediately after login: $e');
+          }
+
+          // Load user favorites after successful login
+          try {
+            final favoritesController = Get.find<FavoritesController>();
+            await favoritesController.loadFavorites();
+          } catch (e) {
+            // FavoritesController might not be initialized yet, that's ok
+            print('Could not load favorites immediately after login: $e');
           }
 
           loginController.clearInputs();

@@ -3,6 +3,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:quikle_user/core/utils/logging/logger.dart';
 import 'package:quikle_user/features/auth/data/services/auth_service.dart';
+import 'package:quikle_user/features/profile/controllers/favorites_controller.dart';
 import 'package:quikle_user/routes/app_routes.dart';
 
 class LoginController extends GetxController {
@@ -201,6 +202,13 @@ class LoginController extends GetxController {
   //Log out
   Future<void> logout() async {
     await _auth.logout();
+    // Clear favorites on logout
+    try {
+      final favoritesController = Get.find<FavoritesController>();
+      favoritesController.clearAllFavorites();
+    } catch (e) {
+      print('Could not clear favorites on logout: $e');
+    }
     Get.offAllNamed(AppRoute.getLoginScreen());
   }
 

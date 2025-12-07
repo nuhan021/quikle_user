@@ -3,6 +3,7 @@ import 'package:quikle_user/core/services/network_caller.dart';
 import 'package:quikle_user/core/services/storage_service.dart';
 import 'package:quikle_user/core/utils/constants/api_constants.dart';
 import 'package:quikle_user/core/utils/logging/logger.dart';
+import 'package:quikle_user/features/home/data/models/product_model.dart';
 
 class FavoritesService {
   final NetworkCaller _networkCaller = NetworkCaller();
@@ -41,11 +42,9 @@ class FavoritesService {
     }
   }
 
-  Future<List<Map<String, dynamic>>> getFavorites() async {
+  Future<List<ProductModel>> getFavoriteProducts() async {
     final token = StorageService.token;
     final refreshToken = StorageService.refreshToken;
-
-    AppLoggerHelper.debug('Getting favorites');
 
     if (token == null || refreshToken == null) {
       print('No token found');
@@ -62,9 +61,22 @@ class FavoritesService {
       );
 
       if (response.isSuccess && response.responseData != null) {
-        AppLoggerHelper.debug('Favorites retrieved successfully');
-        final data = response.responseData as List;
-        return data.map((e) => e as Map<String, dynamic>).toList();
+        final List data = response.responseData;
+
+        return data.map((favItem) {
+          final productJson = favItem['item'] as Map<String, dynamic>;
+
+          // Inject needed fields so ProductModel works correctly
+          productJson['category_id'] =
+              productJson['category']?['id']?.toString() ?? '';
+
+          productJson['subcategory_id'] =
+              productJson['subcategory']?['id']?.toString() ?? '';
+
+          productJson['isFavorite'] = true;
+
+          return ProductModel.fromJson(productJson);
+        }).toList();
       } else {
         print('Failed to get favorites: ${response.errorMessage}');
         return [];
