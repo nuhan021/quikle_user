@@ -6,7 +6,6 @@ import 'package:quikle_user/core/utils/logging/logger.dart';
 class NotificationController extends GetxController {
   //Call the saveFCMToken from NotificationService here when needed
   Future<void> saveFCMToken(String token) async {
-    // Assuming NotificationService is properly set up and injected
     final notificationService = Get.find<NotificationService>();
     try {
       final response = await notificationService.saveFCMToken(token);
