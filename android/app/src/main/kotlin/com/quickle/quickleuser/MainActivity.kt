@@ -1,4 +1,4 @@
-package com.example.quikle_user
+package com.quickle.quickleuser
 
 import io.flutter.embedding.android.FlutterActivity
 
