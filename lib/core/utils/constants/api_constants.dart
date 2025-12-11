@@ -63,4 +63,11 @@ class ApiConstants {
 
   //Save FCM Token
   static const String saveFcmToken = "$baseUrl/rider/save_token/";
+
+  //Prescription api's
+  static const String uploadPrescription =
+      "$baseUrl/prescription/prescriptions/";
+  static const String getPrescriptions = "$baseUrl/prescription/prescriptions/";
+  static const String getPrescriptionById =
+      "$baseUrl/prescription/prescriptions/{id}/";
 }

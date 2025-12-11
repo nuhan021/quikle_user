@@ -43,7 +43,7 @@ class PrescriptionHeaderWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  prescription.fileName.split('.').first,
+                  'Prescription #${prescription.id}',
                   style: getTextStyle(
                     font: CustomFonts.inter,
                     fontSize: 16.sp,
