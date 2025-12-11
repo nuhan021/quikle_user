@@ -3,7 +3,16 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class OrderTrackingMapSection extends StatefulWidget {
-  const OrderTrackingMapSection({super.key});
+  final double? vendorLat;
+  final double? vendorLng;
+  final String? vendorName;
+
+  const OrderTrackingMapSection({
+    super.key,
+    this.vendorLat,
+    this.vendorLng,
+    this.vendorName,
+  });
 
   @override
   State<OrderTrackingMapSection> createState() =>
@@ -12,17 +21,14 @@ class OrderTrackingMapSection extends StatefulWidget {
 
 class _OrderTrackingMapSectionState extends State<OrderTrackingMapSection> {
   GoogleMapController? _mapController;
-
-  static const CameraPosition _initialPosition = CameraPosition(
-    target: LatLng(28.6139, 77.2090),
-    zoom: 15,
-  );
+  late CameraPosition _initialPosition;
+  final Set<Marker> _markers = {};
 
   @override
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16.w),
-      height: 250.h,
+      height: 350.h,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
@@ -39,15 +45,57 @@ class _OrderTrackingMapSectionState extends State<OrderTrackingMapSection> {
           initialCameraPosition: _initialPosition,
           onMapCreated: (GoogleMapController controller) {
             _mapController = controller;
+            // If vendor location available, animate camera to it and add marker
+            if (widget.vendorLat != null && widget.vendorLng != null) {
+              final vendorPos = LatLng(widget.vendorLat!, widget.vendorLng!);
+              controller.animateCamera(
+                CameraUpdate.newLatLngZoom(vendorPos, 15),
+              );
+              setState(() {
+                _markers.add(
+                  Marker(
+                    markerId: const MarkerId('vendor'),
+                    position: vendorPos,
+                    infoWindow: InfoWindow(
+                      title: widget.vendorName ?? 'Vendor',
+                    ),
+                  ),
+                );
+              });
+            }
           },
           zoomControlsEnabled: false,
           myLocationEnabled: true,
           myLocationButtonEnabled: false,
           compassEnabled: false,
           mapToolbarEnabled: false,
+          markers: _markers,
         ),
       ),
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.vendorLat != null && widget.vendorLng != null) {
+      _initialPosition = CameraPosition(
+        target: LatLng(widget.vendorLat!, widget.vendorLng!),
+        zoom: 15,
+      );
+      _markers.add(
+        Marker(
+          markerId: const MarkerId('vendor'),
+          position: LatLng(widget.vendorLat!, widget.vendorLng!),
+          infoWindow: InfoWindow(title: widget.vendorName ?? 'Vendor'),
+        ),
+      );
+    } else {
+      _initialPosition = const CameraPosition(
+        target: LatLng(28.6139, 77.2090),
+        zoom: 15,
+      );
+    }
   }
 
   @override
