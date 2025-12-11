@@ -78,13 +78,12 @@ class ProfileScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 8.h),
 
-                  ProfileMenuItem(
-                    assetIcon: ImagePath.notificationIcon,
-                    title: 'Notification Settings',
-                    onTap: () => _navigateToNotificationSettings(context),
-                  ),
-                  SizedBox(height: 8.h),
-
+                  // ProfileMenuItem(
+                  //   assetIcon: ImagePath.notificationIcon,
+                  //   title: 'Notification Settings',
+                  //   onTap: () => _navigateToNotificationSettings(context),
+                  // ),
+                  // SizedBox(height: 8.h),
                   ProfileMenuItem(
                     assetIcon: ImagePath.languageIcon,
                     title: 'Language Settings',
