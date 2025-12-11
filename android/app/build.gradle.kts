@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.quikle_user"
+    namespace = "com.quickle.quickleuser"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -21,7 +21,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.quikle_user"
+        applicationId = "com.quickle.quickleuser"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
