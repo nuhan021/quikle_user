@@ -9,6 +9,7 @@ class ChatController extends GetxController {
   final TextEditingController messageController = TextEditingController();
   final RxList<Message> messages = <Message>[].obs;
   late ChatService _chatService;
+  final RxBool isLoading = true.obs;
   final String riderId;
 
   ChatController({required this.riderId});
@@ -16,9 +17,28 @@ class ChatController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    _initAsync();
+  }
+
+  Future<void> _initAsync() async {
     final customerId = StorageService.userId?.toString() ?? '1';
     _chatService = ChatService(customerId: customerId, riderId: riderId);
+    await _loadHistory();
     _connect();
+  }
+
+  Future<void> _loadHistory() async {
+    try {
+      isLoading(true);
+      final history = await _chatService.fetchHistory(limit: 50);
+      if (history.isNotEmpty) {
+        messages.addAll(history);
+      }
+    } catch (e) {
+      // ignore errors for history load
+    } finally {
+      isLoading(false);
+    }
   }
 
   void _connect() {
