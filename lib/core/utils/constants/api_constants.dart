@@ -70,4 +70,8 @@ class ApiConstants {
   static const String getPrescriptions = "$baseUrl/prescription/prescriptions/";
   static const String getPrescriptionById =
       "$baseUrl/prescription/prescriptions/{id}/";
+
+  //Restaurant api's
+  static const String getRestaurants = "$authApi/restaurant/restaurants";
+  static const String getRestaurantProducts = "$baseUrl/items/food/";
 }
