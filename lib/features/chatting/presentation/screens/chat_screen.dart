@@ -51,8 +51,12 @@ class _ChatScreenState extends State<ChatScreen> {
       body: Column(
         children: [
           Expanded(
-            child: Obx(
-              () => ListView.builder(
+            child: Obx(() {
+              if (controller.isLoading.value) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              return ListView.builder(
                 controller: _scrollController,
                 reverse: true,
                 itemCount: controller.messages.length,
@@ -95,8 +99,8 @@ class _ChatScreenState extends State<ChatScreen> {
                     ),
                   );
                 },
-              ),
-            ),
+              );
+            }),
           ),
           Padding(
             padding: EdgeInsets.all(8.w),

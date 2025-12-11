@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/route_manager.dart';
 import 'package:quikle_user/core/common/styles/global_text_style.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
+import 'package:quikle_user/core/utils/logging/logger.dart';
 import 'package:quikle_user/features/chatting/presentation/screens/chat_screen.dart';
 import 'package:quikle_user/features/orders/controllers/order_tracking_controller.dart';
 
@@ -86,6 +87,9 @@ class DeliveryPersonCard extends StatelessWidget {
               GestureDetector(
                 onTap: () {
                   final riderId = riderInfo?.riderId?.toString() ?? '3';
+                  AppLoggerHelper.debug(
+                    'Navigating to chat with riderId: $riderId',
+                  );
                   Get.to(() => ChatScreen(riderId: riderId));
                 },
                 child: Container(
