@@ -6,12 +6,13 @@ import 'package:quikle_user/core/services/network_controller.dart';
 import 'package:quikle_user/core/services/storage_service.dart';
 import 'package:quikle_user/core/services/freshchat_service.dart';
 import 'core/common/widgets/no_internet_screen.dart';
+import 'firebase_options.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Firebase
-  // await Firebase.initializeApp();
+  // Initialize Firebase (required for FCM + any Firebase service)
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   // Initialize services
   await StorageService.init();
@@ -19,7 +20,7 @@ Future<void> main() async {
   // Initialize controllers
   final networkController = Get.put(NetworkController());
 
-  // Initialize Freshchat service for customer support
+  // Freshchat service
   Get.put(FreshchatService());
 
   bool isOverlayShown = false;
