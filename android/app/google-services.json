@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "948140389448",
+    "project_id": "quiklerider-22552",
+    "storage_bucket": "quiklerider-22552.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:948140389448:android:9e624ce4b7408dfc89d47d",
+        "android_client_info": {
+          "package_name": "com.example.quikle_rider"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC-6w9TFkbTRzefAyR7uUidqVLG_AODC_w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:948140389448:android:c81a99c0094dd41f89d47d",
+        "android_client_info": {
+          "package_name": "com.quickle.quickleuser"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC-6w9TFkbTRzefAyR7uUidqVLG_AODC_w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
