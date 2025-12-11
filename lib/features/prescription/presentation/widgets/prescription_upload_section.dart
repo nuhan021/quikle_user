@@ -155,6 +155,37 @@ class PrescriptionUploadSection extends StatelessWidget {
 
             SizedBox(height: 12.h),
 
+            // View All Prescriptions Button
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () => Get.toNamed('/prescription-list'),
+                icon: Icon(
+                  Icons.list_alt,
+                  size: 18.sp,
+                  color: Colors.blue.shade600,
+                ),
+                label: Text(
+                  'View All Prescriptions',
+                  style: getTextStyle(
+                    font: CustomFonts.inter,
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.blue.shade600,
+                  ),
+                ),
+                style: OutlinedButton.styleFrom(
+                  padding: EdgeInsets.symmetric(vertical: 12.h),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                  side: BorderSide(color: Colors.blue.shade600, width: 1.5),
+                ),
+              ),
+            ),
+
+            SizedBox(height: 12.h),
+
             Obx(() {
               if (controller.prescriptions.isEmpty)
                 return const SizedBox.shrink();

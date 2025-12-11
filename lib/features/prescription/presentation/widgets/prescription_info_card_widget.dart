@@ -52,11 +52,16 @@ class PrescriptionInfoCardWidget extends StatelessWidget {
           SizedBox(height: 16.h),
 
           _buildInfoRow('Status', _getStatusText(prescription.status)),
-          _buildInfoRow('File Name', prescription.fileName),
+          _buildInfoRow(
+            'File Name',
+            prescription.fileName.isNotEmpty ? prescription.fileName : 'N/A',
+          ),
           _buildInfoRow('Uploaded Date', _formatDate(prescription.uploadedAt)),
           _buildInfoRow(
             'Prescription ID',
-            prescription.id.substring(0, 8) + '...',
+            prescription.id.length > 8
+                ? '${prescription.id.substring(0, 8)}...'
+                : prescription.id,
           ),
 
           // Show regular notes for non-invalid prescriptions

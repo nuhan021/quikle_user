@@ -116,15 +116,16 @@ class VerificationController extends GetxController {
         }
 
         if (response.isSuccess) {
-          // try {
-          //   // Save FCM token after successful login/signup
-          //   final fcmToken = await notificationController.getFCMToken();
-          //   if (fcmToken != null && fcmToken.isNotEmpty) {
-          //     await notificationController.saveFCMToken(fcmToken);
-          //   }
-          // } catch (e) {
-          //   print('Could not save FCM token immediately after login: $e');
-          // }
+          try {
+            // Save FCM token after successful login/signup
+            final notificationController = Get.find<NotificationController>();
+            final fcmToken = await notificationController.getFCMToken();
+            if (fcmToken != null && fcmToken.isNotEmpty) {
+              await notificationController.saveFCMToken(fcmToken);
+            }
+          } catch (e) {
+            print('Could not save FCM token immediately after login: $e');
+          }
           // Reload addresses after successful login
           try {
             final addressController = Get.find<AddressController>();

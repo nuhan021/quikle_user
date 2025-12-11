@@ -21,6 +21,21 @@ class _PrescriptionListScreenState extends State<PrescriptionListScreen> {
   final GlobalKey _cartFabKey = GlobalKey(); // for locating the button
 
   @override
+  void initState() {
+    super.initState();
+    // Fetch prescriptions when screen loads
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      try {
+        final controller = Get.find<PrescriptionController>();
+        // Always load to ensure fresh data from API
+        controller.loadUserPrescriptions();
+      } catch (e) {
+        print('Error loading prescriptions: $e');
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final controller = Get.find<PrescriptionController>();
 
