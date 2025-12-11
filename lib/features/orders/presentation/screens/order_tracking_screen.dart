@@ -42,7 +42,11 @@ class OrderTrackingScreen extends StatelessWidget {
                       child: Column(
                         children: [
                           SizedBox(height: 16.h),
-                          const OrderTrackingMapSection(),
+                          OrderTrackingMapSection(
+                            vendorLat: order.vendorInfo?.storeLatitude,
+                            vendorLng: order.vendorInfo?.storeLongitude,
+                            vendorName: order.vendorInfo?.vendorName,
+                          ),
                           SizedBox(height: 12.h),
                           OrderTrackingSummary(
                             order: order,

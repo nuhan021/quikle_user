@@ -8,6 +8,7 @@ import 'package:quikle_user/features/payout/data/models/delivery_option_model.da
 import 'package:quikle_user/features/payout/data/models/payment_method_model.dart';
 import 'package:quikle_user/features/profile/data/models/shipping_address_model.dart';
 import 'rider_info_model.dart';
+import 'vendor_info_model.dart';
 
 class OrderModel {
   final String orderId;
@@ -30,6 +31,7 @@ class OrderModel {
   final String? paymentStatus;
   final String? paymentLink;
   final List<Map<String, dynamic>>? vendors;
+  final VendorInfo? vendorInfo;
   final RiderInfo? riderInfo;
 
   const OrderModel({
@@ -53,6 +55,7 @@ class OrderModel {
     this.paymentStatus,
     this.paymentLink,
     this.vendors,
+    this.vendorInfo,
     this.riderInfo,
   });
 
@@ -77,6 +80,7 @@ class OrderModel {
     String? paymentStatus,
     String? paymentLink,
     List<Map<String, dynamic>>? vendors,
+    VendorInfo? vendorInfo,
     RiderInfo? riderInfo,
   }) {
     return OrderModel(
@@ -100,6 +104,7 @@ class OrderModel {
       paymentStatus: paymentStatus ?? this.paymentStatus,
       paymentLink: paymentLink ?? this.paymentLink,
       vendors: vendors ?? this.vendors,
+      vendorInfo: vendorInfo ?? this.vendorInfo,
       riderInfo: riderInfo ?? this.riderInfo,
     );
   }
@@ -175,6 +180,7 @@ class OrderModel {
       'paymentStatus': paymentStatus,
       'paymentLink': paymentLink,
       'vendors': vendors,
+      'vendor_info': vendorInfo?.toJson(),
       'riderInfo': riderInfo?.toJson(),
     };
   }
@@ -279,6 +285,9 @@ class OrderModel {
       vendors: (json['vendors'] as List?)
           ?.map((e) => e as Map<String, dynamic>)
           .toList(),
+      vendorInfo: json['vendor_info'] != null
+          ? VendorInfo.fromJson(json['vendor_info'] as Map<String, dynamic>)
+          : null,
       riderInfo: json['rider_info'] != null
           ? RiderInfo.fromJson(json['rider_info'] as Map<String, dynamic>)
           : null,
