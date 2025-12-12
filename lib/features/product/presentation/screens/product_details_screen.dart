@@ -32,6 +32,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen>
   late AnimationController _navController;
   final GlobalKey _navKey = GlobalKey();
   double _navBarHeight = 0.0;
+  late final ProductController controller;
 
   @override
   void initState() {
@@ -41,6 +42,10 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen>
       duration: const Duration(milliseconds: 500),
       value: 1.0,
     );
+    controller = Get.put(ProductController());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.loadProductDetails(widget.product);
+    });
   }
 
   @override
@@ -91,11 +96,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen>
 
     final keyboardInset = MediaQuery.of(context).viewInsets.bottom;
     final isKeyboardOpen = keyboardInset > 0;
-
-    final controller = Get.put(ProductController());
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      controller.loadProductDetails(widget.product);
-    });
 
     return CartAnimationWrapper(
       child: AnnotatedRegion<SystemUiOverlayStyle>(
