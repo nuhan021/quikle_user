@@ -25,20 +25,20 @@ class DeliveryPersonCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          CircleAvatar(
-            radius: 20.r,
-            backgroundColor: const Color(0xFFF0F0F0),
-            backgroundImage: riderInfo?.riderImage != null
-                ? NetworkImage(riderInfo!.riderImage!)
-                : null,
-            child: riderInfo?.riderImage == null
-                ? Icon(
-                    Icons.person,
-                    color: const Color(0xFF7C7C7C),
-                    size: 20.sp,
-                  )
-                : null,
-          ),
+          // CircleAvatar(
+          //   radius: 20.r,
+          //   backgroundColor: const Color(0xFFF0F0F0),
+          //   backgroundImage: riderInfo?.riderImage != null
+          //       ? NetworkImage(riderInfo!.riderImage!)
+          //       : null,
+          //   child: riderInfo?.riderImage == null
+          //       ? Icon(
+          //           Icons.person,
+          //           color: const Color(0xFF7C7C7C),
+          //           size: 20.sp,
+          //         )
+          //       : null,
+          // ),
           SizedBox(width: 12.w),
           Expanded(
             child: Column(

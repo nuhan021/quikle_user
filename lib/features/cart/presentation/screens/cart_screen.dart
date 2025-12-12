@@ -284,7 +284,7 @@ class CartScreen extends StatelessWidget {
           }),
         ),
       ),
-      isScrollControlled: true, // 👈 full height if needed, goes above nav bar
+      isScrollControlled: true,
       backgroundColor: Colors.transparent,
     );
   }

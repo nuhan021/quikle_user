@@ -3,17 +3,22 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:quikle_user/core/utils/logging/logger.dart';
 import 'package:quikle_user/features/orders/controllers/order_tracking_controller.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:quikle_user/features/profile/data/models/shipping_address_model.dart';
 
 class OrderTrackingMapSection extends StatefulWidget {
   final double? vendorLat;
   final double? vendorLng;
   final String? vendorName;
+  final ShippingAddressModel? shippingAddress;
 
   const OrderTrackingMapSection({
     super.key,
     this.vendorLat,
     this.vendorLng,
+    this.shippingAddress,
     this.vendorName,
   });
 
@@ -80,8 +85,45 @@ class _OrderTrackingMapSectionState extends State<OrderTrackingMapSection> {
       );
     }
 
-    // Add customer marker from current location
+    // Add customer marker from order shipping address if provided,
+    // otherwise fall back to device current location
     try {
+      if (widget.shippingAddress != null) {
+        final addr = widget.shippingAddress!.fullAddress;
+        if (addr.isNotEmpty) {
+          final locations = await locationFromAddress(addr);
+          if (locations.isNotEmpty) {
+            final loc = locations.first;
+            if (mounted) {
+              setState(() {
+                _markers.add(
+                  Marker(
+                    markerId: const MarkerId('customer'),
+                    position: LatLng(loc.latitude, loc.longitude),
+                    infoWindow: InfoWindow(
+                      title: widget.shippingAddress!.name.isNotEmpty
+                          ? widget.shippingAddress!.name
+                          : 'Delivery Address',
+                      snippet: widget.shippingAddress!.fullAddress,
+                    ),
+                    icon: _customerIcon,
+                  ),
+                );
+                // If initial position was the default, move camera to customer
+                _mapController?.animateCamera(
+                  CameraUpdate.newLatLngZoom(
+                    LatLng(loc.latitude, loc.longitude),
+                    14,
+                  ),
+                );
+              });
+            }
+            return;
+          }
+        }
+      }
+
+      // Fallback to device GPS
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
@@ -188,6 +230,12 @@ class _OrderTrackingMapSectionState extends State<OrderTrackingMapSection> {
             child: Obx(() {
               // Update rider marker when location changes
               if (controller.riderLocation.value != null) {
+                AppLoggerHelper.debug(
+                  'Vendor location: ${widget.vendorLat}, ${widget.vendorLng}',
+                );
+                AppLoggerHelper.debug(
+                  'Updating rider location to: ${controller.riderLocation.value}',
+                );
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   _updateRiderMarker(controller.riderLocation.value!);
                 });

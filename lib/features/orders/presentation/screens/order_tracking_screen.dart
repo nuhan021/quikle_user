@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:quikle_user/core/common/widgets/customer_support_fab.dart';
+import 'package:quikle_user/core/utils/logging/logger.dart';
 import 'package:quikle_user/features/orders/controllers/order_tracking_controller.dart';
 import 'package:quikle_user/features/orders/data/models/order_model.dart';
 import 'package:quikle_user/features/orders/presentation/widgets/order_tracking_app_bar.dart';
@@ -25,6 +26,23 @@ class OrderTrackingScreen extends StatelessWidget {
     }
 
     controller.initializeWithOrder(order);
+    AppLoggerHelper.debug(
+      'OrderTrackingScreen initialized with order ID: ${order.vendorInfo!.vendorId}',
+    );
+    AppLoggerHelper.debug(
+      'OrderTrackingScreen initialized with order ID: ${order.vendorInfo!.vendorName}',
+    );
+    AppLoggerHelper.debug(
+      'OrderTrackingScreen initialized with order ID: ${order.vendorInfo!.storeLatitude}',
+    );
+    AppLoggerHelper.debug(
+      'OrderTrackingScreen initialized with order ID: ${order.vendorInfo!.storeLongitude}',
+    );
+
+    //SHipping address of the order
+    AppLoggerHelper.debug(
+      'OrderTrackingScreen initialized with order Shipping Address: ${order.shippingAddress.address}',
+    );
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
@@ -46,6 +64,7 @@ class OrderTrackingScreen extends StatelessWidget {
                             vendorLat: order.vendorInfo?.storeLatitude,
                             vendorLng: order.vendorInfo?.storeLongitude,
                             vendorName: order.vendorInfo?.vendorName,
+                            shippingAddress: order.shippingAddress,
                           ),
                           SizedBox(height: 12.h),
                           OrderTrackingSummary(
