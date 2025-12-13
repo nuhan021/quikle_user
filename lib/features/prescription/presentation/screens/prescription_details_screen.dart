@@ -119,7 +119,8 @@ class _PrescriptionDetailsScreenState extends State<PrescriptionDetailsScreen> {
                       ...prescription.vendorResponses.map((response) {
                         if (response.status == VendorResponseStatus.approved ||
                             response.status ==
-                                VendorResponseStatus.partiallyApproved) {
+                                VendorResponseStatus.partiallyApproved ||
+                            response.status == VendorResponseStatus.pending) {
                           return VendorResponseCard(
                             response: response,
                             controller: controller,
