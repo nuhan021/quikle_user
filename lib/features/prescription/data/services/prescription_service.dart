@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:collection/collection.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
+import 'package:quikle_user/core/utils/logging/logger.dart';
 import 'package:quikle_user/features/prescription/data/models/prescription_model.dart';
 import 'package:quikle_user/features/home/data/models/product_model.dart';
 import 'package:quikle_user/core/utils/constants/image_path.dart';
@@ -128,8 +129,7 @@ class PrescriptionService {
             uploadedAt: DateTime.parse(item['uploaded_at'] as String),
             status: _parseStatus(item['status'] as String),
             notes: item['notes'] as String?,
-            vendorResponses:
-                [], // Will be populated when vendor responses API is available
+            vendorResponses: [],
           );
           _prescriptions.add(prescription);
           print('Added prescription: ${prescription.id}');
@@ -357,13 +357,41 @@ class PrescriptionService {
   }
 
   Future<bool> deletePrescription(String prescriptionId) async {
-    await Future.delayed(const Duration(milliseconds: 500));
-    final index = _prescriptions.indexWhere((p) => p.id == prescriptionId);
-    if (index != -1) {
-      _prescriptions.removeAt(index);
+    try {
+      final token = StorageService.token;
+
+      // Make API call to delete
+      final url = ApiConstants.deletePrescription.replaceAll(
+        '{id}',
+        prescriptionId,
+      );
+
+      AppLoggerHelper.debug('Deleting prescription at URL: $url');
+
+      final response = await _networkCaller.deleteRequest(
+        url,
+        token: 'Bearer $token',
+      );
+
+      AppLoggerHelper.debug(
+        'Delete prescription response: ${response.responseData}, ${response.statusCode}',
+      );
+
+      if (!response.isSuccess) {
+        throw Exception(
+          response.errorMessage.isNotEmpty
+              ? response.errorMessage
+              : 'Failed to delete prescription',
+        );
+      }
+
+      // Remove from local cache
+      _prescriptions.removeWhere((p) => p.id == prescriptionId);
+
       return true;
+    } catch (e) {
+      throw Exception('Failed to delete prescription: $e');
     }
-    return false;
   }
 
   Future<bool> acceptVendorResponse(String responseId) async {
