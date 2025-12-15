@@ -66,4 +66,41 @@ class PaymentApiService {
       throw Exception('Failed to initiate payment: $e');
     }
   }
+
+  /// Confirm payment completion for an order
+  Future<void> confirmPayment({required String parentOrderId}) async {
+    try {
+      final token = StorageService.token;
+      final refreshToken = StorageService.refreshToken;
+
+      if (token == null || token.isEmpty) {
+        throw Exception('User not authenticated');
+      }
+
+      final Map<String, dynamic> requestBody = {
+        'parent_order_id': parentOrderId,
+      };
+
+      AppLoggerHelper.debug('Confirming payment for order: $parentOrderId');
+
+      final ResponseData response = await _networkCaller.postRequest(
+        ApiConstants.confirmPayment,
+        body: requestBody,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'refresh-token': '$refreshToken',
+        },
+      );
+
+      if (response.isSuccess) {
+        AppLoggerHelper.debug('✅ Payment confirmed successfully');
+      } else {
+        AppLoggerHelper.error('❌ Failed to confirm payment');
+        throw Exception('Failed to confirm payment');
+      }
+    } catch (e) {
+      AppLoggerHelper.error('❌ Error confirming payment', e);
+      throw Exception('Failed to confirm payment: $e');
+    }
+  }
 }

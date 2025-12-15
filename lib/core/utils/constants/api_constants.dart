@@ -53,6 +53,7 @@ class ApiConstants {
 
   //Payment api's
   static const String initiatePayment = "$baseUrl/payment/payment/initiate";
+  static const String confirmPayment = "$baseUrl/payment/payment/confirm";
 
   //Search api's
   static const String searchItems = "$baseUrl/items/items/";
