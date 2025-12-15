@@ -4,9 +4,11 @@ import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:quikle_user/core/services/storage_service.dart';
 import 'package:quikle_user/core/utils/constants/enums/order_enums.dart';
+import 'package:quikle_user/core/utils/logging/logger.dart';
 import 'package:quikle_user/features/orders/data/models/order_model.dart';
 import 'package:quikle_user/features/orders/data/services/order_tracking_service.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 
 class OrderTrackingController extends GetxController {
   final OrderTrackingService _trackingService = OrderTrackingService();
@@ -220,17 +222,12 @@ class OrderTrackingController extends GetxController {
     return null;
   }
 
-  void contactDeliveryPerson([String? phoneNumber]) {
+  void contactDeliveryPerson([String? phoneNumber]) async {
     final phone =
         phoneNumber ?? trackingData.value?['deliveryPerson']?['phone'];
     if (phone != null) {
-      Get.snackbar(
-        'Calling',
-        'Calling delivery person...',
-        snackPosition: SnackPosition.BOTTOM,
-      );
-      // Here you would implement the actual calling functionality
-      // For example: url_launcher to call the phone number
+      AppLoggerHelper.debug('Initiating call to delivery person at $phone');
+      bool? res = await FlutterPhoneDirectCaller.callNumber(phone);
     } else {
       Get.snackbar(
         'Error',
