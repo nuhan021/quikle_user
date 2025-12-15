@@ -142,6 +142,7 @@ class PayoutController extends GetxController {
     _cashfreeService.initialize(
       onPaymentSuccess: _handleCashfreePaymentSuccess,
       onPaymentError: _handleCashfreePaymentError,
+      onPaymentProcessing: _handlePaymentProcessing,
     );
 
     _couponController.addListener(_syncCouponText);
@@ -431,6 +432,7 @@ class PayoutController extends GetxController {
         await _cashfreeService.startPayment(
           cfOrderId: orderData.cfOrderId,
           paymentSessionId: orderData.paymentSessionId,
+          parentOrderId: orderData.parentOrderId,
         );
       } else {
         // Payment not required (e.g., COD)
@@ -450,9 +452,55 @@ class PayoutController extends GetxController {
   OrderCreationData? _pendingOrderData;
   ShippingAddressModel? _pendingShippingAddress;
 
+  /// Handle payment processing (called before confirmation API)
+  void _handlePaymentProcessing() {
+    AppLoggerHelper.debug('⏳ Processing payment confirmation...');
+    _isProcessingPayment.value = true;
+
+    // Show loading dialog
+    Get.dialog(
+      PopScope(
+        canPop: false,
+        child: Center(
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            margin: const EdgeInsets.symmetric(horizontal: 40),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const CircularProgressIndicator(),
+                const SizedBox(height: 16),
+                const Text(
+                  'Processing Payment',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Please wait while we confirm your payment...',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      barrierDismissible: false,
+    );
+  }
+
   /// Handle successful payment from Cashfree SDK
   void _handleCashfreePaymentSuccess(String orderId) {
     AppLoggerHelper.debug('✅ Cashfree payment successful for order: $orderId');
+
+    // Close the processing dialog if it's open
+    if (Get.isDialogOpen ?? false) {
+      Get.back();
+    }
 
     if (_pendingOrderData == null || _pendingShippingAddress == null) {
       AppLoggerHelper.error('❌ No pending order data found');
@@ -476,6 +524,11 @@ class PayoutController extends GetxController {
     AppLoggerHelper.error(
       '❌ Cashfree payment error for order $orderId: $errorMessage',
     );
+
+    // Close the processing dialog if it's open
+    if (Get.isDialogOpen ?? false) {
+      Get.back();
+    }
 
     _isProcessingPayment.value = false;
 

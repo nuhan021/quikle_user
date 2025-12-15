@@ -5,6 +5,7 @@ import 'package:flutter_cashfree_pg_sdk/api/cfsession/cfsession.dart';
 import 'package:flutter_cashfree_pg_sdk/utils/cfenums.dart';
 import 'package:flutter_cashfree_pg_sdk/utils/cfexceptions.dart';
 import '../../../core/utils/logging/logger.dart';
+import '../data/services/payment_api_service.dart';
 
 /// Cashfree Payment Service
 ///
@@ -13,6 +14,7 @@ import '../../../core/utils/logging/logger.dart';
 class CashfreePaymentService {
   final CFPaymentGatewayService _paymentGatewayService =
       CFPaymentGatewayService();
+  final PaymentApiService _paymentApiService = PaymentApiService();
 
   // Determine environment based on build mode
   // In production, use CFEnvironment.PRODUCTION
@@ -21,22 +23,46 @@ class CashfreePaymentService {
   // Callbacks
   void Function(String orderId)? _onPaymentSuccess;
   void Function(String orderId, String errorMessage)? _onPaymentError;
+  void Function()? _onPaymentProcessing;
+
+  // Store parent order ID for confirmation
+  String? _parentOrderId;
 
   /// Initialize the payment service with callbacks
   void initialize({
     required void Function(String orderId) onPaymentSuccess,
     required void Function(String orderId, String errorMessage) onPaymentError,
+    void Function()? onPaymentProcessing,
   }) {
     _onPaymentSuccess = onPaymentSuccess;
     _onPaymentError = onPaymentError;
+    _onPaymentProcessing = onPaymentProcessing;
 
     // Set up SDK callbacks
     _paymentGatewayService.setCallback(_verifyPayment, _onError);
   }
 
   /// Internal callback for payment verification
-  void _verifyPayment(String orderId) {
+  void _verifyPayment(String orderId) async {
     AppLoggerHelper.debug('✅ Payment verified for order: $orderId');
+
+    // Notify that payment is being processed
+    _onPaymentProcessing?.call();
+
+    // Call backend API to confirm payment
+    if (_parentOrderId != null) {
+      try {
+        AppLoggerHelper.debug(
+          'Confirming payment with backend for parent order: $_parentOrderId',
+        );
+        await _paymentApiService.confirmPayment(parentOrderId: _parentOrderId!);
+        AppLoggerHelper.debug('✅ Payment confirmed with backend');
+      } catch (e) {
+        AppLoggerHelper.error('❌ Failed to confirm payment with backend', e);
+        // Continue anyway, the payment was successful on Cashfree
+      }
+    }
+
     _onPaymentSuccess?.call(orderId);
   }
 
@@ -51,14 +77,20 @@ class CashfreePaymentService {
   ///
   /// [cfOrderId] - Cashfree order ID from backend
   /// [paymentSessionId] - Payment session ID from backend
+  /// [parentOrderId] - Parent order ID for confirmation
   Future<void> startPayment({
     required String cfOrderId,
     required String paymentSessionId,
+    required String parentOrderId,
   }) async {
     try {
+      // Store parent order ID for later confirmation
+      _parentOrderId = parentOrderId;
+
       AppLoggerHelper.debug('Starting Cashfree payment...');
       AppLoggerHelper.debug('CF Order ID: $cfOrderId');
       AppLoggerHelper.debug('Payment Session ID: $paymentSessionId');
+      AppLoggerHelper.debug('Parent Order ID: $parentOrderId');
 
       // Create session
       final session = _createSession(
