@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:quikle_user/features/orders/data/models/order_model.dart';
 import 'package:quikle_user/features/orders/data/services/order_api_service.dart';
-import 'package:quikle_user/features/payment/presentation/screens/payment_webview_screen.dart';
+import 'package:quikle_user/features/payment/data/models/order_creation_response.dart';
+import 'package:quikle_user/features/payment/services/cashfree_payment_service.dart';
 import 'package:quikle_user/features/payout/presentation/widgets/order_success_dialog.dart';
 import '../data/models/delivery_option_model.dart';
 import '../data/models/payment_method_model.dart';
@@ -18,6 +19,7 @@ import '../../../core/utils/logging/logger.dart';
 class PayoutController extends GetxController {
   final PayoutService _payoutService = PayoutService();
   final OrderApiService _orderApiService = OrderApiService();
+  final CashfreePaymentService _cashfreeService = CashfreePaymentService();
   final _cartController = Get.find<CartController>();
   final _userController = Get.find<UserController>();
 
@@ -135,6 +137,12 @@ class PayoutController extends GetxController {
     super.onInit();
     _loadInitialData();
     _updateDeliveryBasedOnUrgency(); // Set initial delivery type based on cart
+
+    // Initialize Cashfree payment service with callbacks
+    _cashfreeService.initialize(
+      onPaymentSuccess: _handleCashfreePaymentSuccess,
+      onPaymentError: _handleCashfreePaymentError,
+    );
 
     _couponController.addListener(_syncCouponText);
     _deliveryPreferenceController.addListener(() {
@@ -398,29 +406,31 @@ class PayoutController extends GetxController {
 
       final orderData = orderCreationResponse.data;
       AppLoggerHelper.debug(
-        '✅ Order created: ${orderData.orderId}, requires_payment: ${orderData.requiresPayment}',
+        '✅ Orders created: ${orderData.orders.length} order(s), Parent Order ID: ${orderData.parentOrderId}',
+      );
+      AppLoggerHelper.debug(
+        'Requires Payment: ${orderData.requiresPayment}, Total Amount: ${orderData.totalAmount}',
       );
 
-      // Step 2: If payment is required, open payment webview with the link from order response
+      // Step 2: If payment is required, use Cashfree SDK
       if (orderData.requiresPayment) {
         AppLoggerHelper.debug(
-          'Opening payment webview for order: ${orderData.orderId} with link: ${orderData.paymentLink}',
+          'Initiating Cashfree payment for CF Order ID: ${orderData.cfOrderId}',
+        );
+        AppLoggerHelper.debug(
+          'Payment Session ID: ${orderData.paymentSessionId}',
         );
 
-        // Step 3: Open payment webview
+        // Store order data for later use in callbacks
+        _pendingOrderData = orderData;
+        _pendingShippingAddress = finalShippingAddress;
+
+        // Start Cashfree payment
         _isProcessingPayment.value = false;
 
-        await Get.to(
-          () => PaymentWebViewScreen(
-            paymentUrl: orderData.paymentLink,
-            orderId: orderData.orderId,
-            onPaymentSuccess: () {
-              _handlePaymentSuccess(orderData, finalShippingAddress);
-            },
-            onPaymentFailed: () {
-              _handlePaymentFailure(orderData.orderId);
-            },
-          ),
+        await _cashfreeService.startPayment(
+          cfOrderId: orderData.cfOrderId,
+          paymentSessionId: orderData.paymentSessionId,
         );
       } else {
         // Payment not required (e.g., COD)
@@ -436,17 +446,68 @@ class PayoutController extends GetxController {
     }
   }
 
+  // Store pending order data for callback processing
+  OrderCreationData? _pendingOrderData;
+  ShippingAddressModel? _pendingShippingAddress;
+
+  /// Handle successful payment from Cashfree SDK
+  void _handleCashfreePaymentSuccess(String orderId) {
+    AppLoggerHelper.debug('✅ Cashfree payment successful for order: $orderId');
+
+    if (_pendingOrderData == null || _pendingShippingAddress == null) {
+      AppLoggerHelper.error('❌ No pending order data found');
+      Get.snackbar(
+        'Error',
+        'Payment completed but order data is missing. Please contact support.',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
+    _handlePaymentSuccess(_pendingOrderData!, _pendingShippingAddress!);
+
+    // Clear pending data
+    _pendingOrderData = null;
+    _pendingShippingAddress = null;
+  }
+
+  /// Handle payment error from Cashfree SDK
+  void _handleCashfreePaymentError(String orderId, String errorMessage) {
+    AppLoggerHelper.error(
+      '❌ Cashfree payment error for order $orderId: $errorMessage',
+    );
+
+    _isProcessingPayment.value = false;
+
+    Get.snackbar(
+      'Payment Failed',
+      errorMessage.isEmpty ? 'Payment failed. Please try again.' : errorMessage,
+      snackPosition: SnackPosition.BOTTOM,
+      duration: const Duration(seconds: 4),
+      backgroundColor: Get.theme.colorScheme.error,
+      colorText: Get.theme.colorScheme.onError,
+    );
+
+    // Clear pending data
+    _pendingOrderData = null;
+    _pendingShippingAddress = null;
+  }
+
   void _handlePaymentSuccess(
-    dynamic orderData,
+    OrderCreationData orderData,
     ShippingAddressModel finalShippingAddress,
   ) {
     AppLoggerHelper.debug(
-      '✅ Payment successful for order: ${orderData.orderId}',
+      '✅ Payment successful for parent order: ${orderData.parentOrderId}',
     );
 
-    // Create local order model for display
+    // Create local order model for display (using first order for UI)
+    final firstOrder = orderData.orders.isNotEmpty
+        ? orderData.orders.first
+        : null;
+
     final order = OrderModel(
-      orderId: orderData.orderId,
+      orderId: orderData.parentOrderId,
       userId: _userController.currentUserId ?? 'unknown_user',
       items: _cartController.cartItems,
       shippingAddress: finalShippingAddress,
@@ -454,17 +515,28 @@ class PayoutController extends GetxController {
       paymentMethod: selectedPaymentMethod!,
       subtotal: subtotal,
       deliveryFee: deliveryFee,
-      total: orderData.total,
+      total: orderData.totalAmount,
       couponCode: appliedCoupon?['isValid'] == true
           ? _couponController.text
           : null,
       discount: discountAmount > 0 ? discountAmount : null,
       orderDate: DateTime.now(),
       status: OrderStatus.pending,
-      trackingNumber: orderData.trackingNumber,
+      trackingNumber: firstOrder?.trackingNumber ?? '',
       metadata: {
         'deliveryPreference': selectedDeliveryPreference,
         'isUrgent': isUrgentDelivery,
+        'cfOrderId': orderData.cfOrderId,
+        'childOrders': orderData.orders
+            .map(
+              (o) => {
+                'orderId': o.orderId,
+                'vendorId': o.vendorId,
+                'trackingNumber': o.trackingNumber,
+                'total': o.total,
+              },
+            )
+            .toList(),
       },
     );
 
@@ -476,25 +548,13 @@ class PayoutController extends GetxController {
     Get.dialog(
       OrderSuccessDialog(
         order: order,
-        transactionId: orderData.orderId,
+        transactionId: orderData.parentOrderId,
         onContinue: () {
           Get.back();
           Get.offAllNamed('/home');
         },
       ),
       barrierDismissible: false,
-    );
-  }
-
-  void _handlePaymentFailure(String orderId) {
-    AppLoggerHelper.debug('❌ Payment failed for order: $orderId');
-    _isProcessingPayment.value = false;
-
-    Get.snackbar(
-      'Payment Failed',
-      'Your order was created but payment failed. Please try again.',
-      snackPosition: SnackPosition.BOTTOM,
-      duration: const Duration(seconds: 4),
     );
   }
 }
