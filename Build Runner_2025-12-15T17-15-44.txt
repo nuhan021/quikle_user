@@ -1,0 +1,55 @@
+
+Showing Recent Errors Only
+
+Build target GoogleMaps of project Pods with configuration Release
+
+PhaseScriptExecution [CP]\ Copy\ XCFrameworks /Users/softvence/Library/Developer/Xcode/DerivedData/Runner-fqlxezsvywtbmvgsnrrgnygzmlzq/Build/Intermediates.noindex/ArchiveIntermediates/Runner/IntermediateBuildFilesPath/Pods.build/Release-iphoneos/GoogleMaps.build/Script-C7BEFA87801B4DE37B8F83D8E58693E2.sh (in target 'GoogleMaps' from project 'Pods')
+    cd /Users/softvence/maruf/quikle_user/ios/Pods
+    /bin/sh -c /Users/softvence/Library/Developer/Xcode/DerivedData/Runner-fqlxezsvywtbmvgsnrrgnygzmlzq/Build/Intermediates.noindex/ArchiveIntermediates/Runner/IntermediateBuildFilesPath/Pods.build/Release-iphoneos/GoogleMaps.build/Script-C7BEFA87801B4DE37B8F83D8E58693E2.sh
+
+Selected xcframework slice ios-arm64
+rsync --delete -av --filter P .*.?????? --links --filter "- CVS/" --filter "- .svn/" --filter "- .git/" --filter "- .hg/" "/Users/softvence/maruf/quikle_user/ios/Pods/GoogleMaps/Base/Frameworks/GoogleMapsBase.xcframework/ios-arm64/*" "/Users/softvence/Library/Developer/Xcode/DerivedData/Runner-fqlxezsvywtbmvgsnrrgnygzmlzq/Build/Intermediates.noindex/ArchiveIntermediates/Runner/BuildProductsPath/Release-iphoneos/XCFrameworkIntermediates/GoogleMaps/Base"
+Transfer starting: 10 files
+GoogleMapsBase.framework/
+GoogleMapsBase.framework/GoogleMapsBase
+GoogleMapsBase.framework/Headers/
+GoogleMapsBase.framework/Headers/GMSCompatabilityMacros.h
+GoogleMapsBase.framework/Headers/GMSCoordinateBounds.h
+GoogleMapsBase.framework/Headers/GMSDeprecationMacros.h
+GoogleMapsBase.framework/Headers/GoogleMapsBase.h
+GoogleMapsBase.framework/Headers/module.modulemap.bak
+GoogleMapsBase.framework/Modules/
+GoogleMapsBase.framework/Modules/module.modulemap
+
+sent 6987380 bytes  received 192 bytes  134118464 bytes/sec
+total size is 6985380  speedup is 1.00
+Copied /Users/softvence/maruf/quikle_user/ios/Pods/GoogleMaps/Base/Frameworks/GoogleMapsBase.xcframework/ios-arm64 to /Users/softvence/Library/Developer/Xcode/DerivedData/Runner-fqlxezsvywtbmvgsnrrgnygzmlzq/Build/Intermediates.noindex/ArchiveIntermediates/Runner/BuildProductsPath/Release-iphoneos/XCFrameworkIntermediates/GoogleMaps/Base
+Selected xcframework slice ios-arm64
+rsync --delete -av --filter P .*.?????? --links --filter "- CVS/" --filter "- .svn/" --filter "- .git/" --filter "- .hg/" "/Users/softvence/maruf/quikle_user/ios/Pods/GoogleMaps/Maps/Frameworks/GoogleMaps.xcframework/ios-arm64/*" "/Users/softvence/Library/Developer/Xcode/DerivedData/Runner-fqlxezsvywtbmvgsnrrgnygzmlzq/Build/Intermediates.noindex/ArchiveIntermediates/Runner/BuildProductsPath/Release-iphoneos/XCFrameworkIntermediates/GoogleMaps/Maps"
+Command PhaseScriptExecution failed with a nonzero exit code
+
+Command PhaseScriptExecution failed with a nonzero exit code
+
+
+Build target FirebaseCoreInternal of project Pods with configuration Release
+/Users/softvence/maruf/quikle_user/ios/Pods/Pods.xcodeproj: warning: MODULEMAP_FILE has no effect if DEFINES_MODULE is not set (in target 'FirebaseCoreInternal' from project 'Pods')
+
+
+SwiftDriver FirebaseCoreInternal normal arm64 com.apple.xcode.tools.swift.compiler (in target 'FirebaseCoreInternal' from project 'Pods')
+    cd /Users/softvence/maruf/quikle_user/ios/Pods
+    builtin-SwiftDriver -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name FirebaseCoreInternal -O -whole-module-optimization -enforce-exclusivity\=checked @/Users/softvence/Library/Developer/Xcode/DerivedData/Runner-fqlxezsvywtbmvgsnrrgnygzmlzq/Build/Intermediates.noindex/ArchiveIntermediates/Runner/IntermediateBuildFilesPath/Pods.build/Release-iphoneos/FirebaseCoreInternal.build/Objects-normal/arm64/FirebaseCoreInternal.SwiftFileList -D COCOAPODS -enable-bare-slash-regex -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.0.sdk -target arm64-apple-ios12.0 -g -module-cache-path /Users/softvence/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -swift-version 5 -I /Users/softvence/Library/Developer/Xcode/DerivedData/Runner-fqlxezsvywtbmvgsnrrgnygzmlzq/Build/Intermediates.noindex/ArchiveIntermediates/Runner/BuildProductsPath/Release-iphoneos/FirebaseCoreInternal -F /Users/softvence/Library/Developer/Xcode/DerivedData/Runner-fqlxezsvywtbmvgsnrrgnygzmlzq/Build/Intermediates.noindex/ArchiveIntermediates/Runner/BuildProductsPath/Release-iphoneos/FirebaseCoreInternal -F /Users/softvence/Library/Developer/Xcode/DerivedData/Runner-fqlxezsvywtbmvgsnrrgnygzmlzq/Build/Intermediates.noindex/ArchiveIntermediates/Runner/BuildProductsPath/Release-iphoneos/GoogleUtilities -c -num-threads 10 -Xcc -ivfsstatcache -Xcc /Users/softvence/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphoneos26.0-23A339-3885c01c3e6b6a337905948deab2002e81ce72e5b06c9602b9d30b56f2eed08a.sdkstatcache -output-file-map /Users/softvence/Library/Developer/Xcode/DerivedData/Runner-fqlxezsvywtbmvgsnrrgnygzmlzq/Build/Intermediates.noindex/ArchiveIntermediates/Runner/IntermediateBuildFilesPath/Pods.build/Release-iphoneos/FirebaseCoreInternal.build/Objects-normal/arm64/FirebaseCoreInternal-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/softvence/Library/Developer/Xcode/DerivedData/Runner-fqlxezsvywtbmvgsnrrgnygzmlzq/Build/Intermediates.noindex/ArchiveIntermediates/Runner/IntermediateBuildFilesPath/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/softvence/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/softvence/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/softvence/Library/Developer/Xcode/DerivedData/Runner-fqlxezsvywtbmvgsnrrgnygzmlzq/Build/Intermediates.noindex/ArchiveIntermediates/Runner/IntermediateBuildFilesPath/Pods.build/Release-iphoneos/FirebaseCoreInternal.build/Objects-normal/arm64/FirebaseCoreInternal.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/softvence/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/softvence/Library/Developer/Xcode/DerivedData/Runner-fqlxezsvywtbmvgsnrrgnygzmlzq/Build/Intermediates.noindex/ArchiveIntermediates/Runner/IntermediateBuildFilesPath/Pods.build/Release-iphoneos/FirebaseCoreInternal.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/softvence/Library/Developer/Xcode/DerivedData/Runner-fqlxezsvywtbmvgsnrrgnygzmlzq/Build/Intermediates.noindex/ArchiveIntermediates/Runner/IntermediateBuildFilesPath/Pods.build/Release-iphoneos/FirebaseCoreInternal.build/Objects-normal/arm64/FirebaseCoreInternal_const_extract_protocols.json -Xcc -iquote -Xcc /Users/softvence/Library/Developer/Xcode/DerivedData/Runner-fqlxezsvywtbmvgsnrrgnygzmlzq/Build/Intermediates.noindex/ArchiveIntermediates/Runner/IntermediateBuildFilesPath/Pods.build/Release-iphoneos/FirebaseCoreInternal.build/FirebaseCoreInternal-generated-files.hmap -Xcc -I/Users/softvence/Library/Developer/Xcode/DerivedData/Runner-fqlxezsvywtbmvgsnrrgnygzmlzq/Build/Intermediates.noindex/ArchiveIntermediates/Runner/IntermediateBuildFilesPath/Pods.build/Release-iphoneos/FirebaseCoreInternal.build/FirebaseCoreInternal-own-target-headers.hmap -Xcc -I/Users/softvence/Library/Developer/Xcode/DerivedData/Runner-fqlxezsvywtbmvgsnrrgnygzmlzq/Build/Intermediates.noindex/ArchiveIntermediates/Runner/IntermediateBuildFilesPath/Pods.build/Release-iphoneos/FirebaseCoreInternal.build/FirebaseCoreInternal-all-target-headers.hmap -Xcc -iquote -Xcc /Users/softvence/Library/Developer/Xcode/DerivedData/Runner-fqlxezsvywtbmvgsnrrgnygzmlzq/Build/Intermediates.noindex/ArchiveIntermediates/Runner/IntermediateBuildFilesPath/Pods.build/Release-iphoneos/FirebaseCoreInternal.build/FirebaseCoreInternal-project-headers.hmap -Xcc -I/Users/softvence/Library/Developer/Xcode/DerivedData/Runner-fqlxezsvywtbmvgsnrrgnygzmlzq/Build/Intermediates.noindex/ArchiveIntermediates/Runner/BuildProductsPath/Release-iphoneos/FirebaseCoreInternal/include -Xcc -I/Users/softvence/Library/Developer/Xcode/DerivedData/Runner-fqlxezsvywtbmvgsnrrgnygzmlzq/Build/Intermediates.noindex/ArchiveIntermediates/Runner/IntermediateBuildFilesPath/Pods.build/Release-iphoneos/FirebaseCoreInternal.build/DerivedSources-normal/arm64 -Xcc -I/Users/softvence/Library/Developer/Xcode/DerivedData/Runner-fqlxezsvywtbmvgsnrrgnygzmlzq/Build/Intermediates.noindex/ArchiveIntermediates/Runner/IntermediateBuildFilesPath/Pods.build/Release-iphoneos/FirebaseCoreInternal.build/DerivedSources/arm64 -Xcc -I/Users/softvence/Library/Developer/Xcode/DerivedData/Runner-fqlxezsvywtbmvgsnrrgnygzmlzq/Build/Intermediates.noindex/ArchiveIntermediates/Runner/IntermediateBuildFilesPath/Pods.build/Release-iphoneos/FirebaseCoreInternal.build/DerivedSources -Xcc -DPOD_CONFIGURATION_RELEASE\=1 -Xcc -DCOCOAPODS\=1 -Xcc -DPERMISSION_MICROPHONE\=1 -Xcc -DPERMISSION_SPEECH_RECOGNITION\=1 -emit-objc-header -emit-objc-header-path /Users/softvence/Library/Developer/Xcode/DerivedData/Runner-fqlxezsvywtbmvgsnrrgnygzmlzq/Build/Intermediates.noindex/ArchiveIntermediates/Runner/IntermediateBuildFilesPath/Pods.build/Release-iphoneos/FirebaseCoreInternal.build/Objects-normal/arm64/FirebaseCoreInternal-Swift.h -working-directory /Users/softvence/maruf/quikle_user/ios/Pods -no-emit-module-separately-wmo
+
+/Users/softvence/maruf/quikle_user/ios/Pods/FirebaseCoreInternal/FirebaseCore/Internal/Sources/HeartbeatLogging/HeartbeatsPayload.swift:20:19: error: Unable to find module dependency: 'GoogleUtilities'
+  internal import GoogleUtilities
+                  ^ (in target 'FirebaseCoreInternal' from project 'Pods')
+/Users/softvence/maruf/quikle_user/ios/Pods/FirebaseCoreInternal/FirebaseCore/Internal/Sources/HeartbeatLogging/HeartbeatsPayload.swift:20:19: note: A dependency of main module 'FirebaseCoreInternal'
+  internal import GoogleUtilities
+                  ^ (in target 'FirebaseCoreInternal' from project 'Pods')
+
+/Users/softvence/maruf/quikle_user/ios/Pods/FirebaseCoreInternal/FirebaseCore/Internal/Sources/HeartbeatLogging/HeartbeatsPayload.swift:20:19: Unable to find module dependency: 'GoogleUtilities'
+  internal import GoogleUtilities
+                  ^
+
+
+
+Build failed    15/12/25, 5:15 PM    7.0 seconds

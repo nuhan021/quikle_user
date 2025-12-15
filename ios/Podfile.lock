@@ -1,6 +1,15 @@
 PODS:
   - app_settings (5.1.1):
     - Flutter
+  - CashfreeAnalyticsSDK (2.2.0):
+    - CFNetworkSDK (= 2.2.0)
+  - CashfreePG (2.2.4):
+    - CashfreePGUISDK (= 2.2.4)
+  - CashfreePGCoreSDK (2.2.4):
+    - CashfreeAnalyticsSDK (= 2.2.0)
+  - CashfreePGUISDK (2.2.4):
+    - CashfreePGCoreSDK (= 2.2.4)
+  - CFNetworkSDK (2.2.0)
   - connectivity_plus (0.0.1):
     - Flutter
   - CwlCatchException (2.2.1):
@@ -73,7 +82,12 @@ PODS:
     - GoogleUtilities/UserDefaults (~> 8.1)
     - nanopb (~> 3.30910.0)
   - Flutter (1.0.0)
+  - flutter_cashfree_pg_sdk (0.0.1):
+    - CashfreePG (= 2.2.4)
+    - Flutter
   - flutter_local_notifications (0.0.1):
+    - Flutter
+  - flutter_phone_direct_caller (0.0.1):
     - Flutter
   - freshchat_sdk (0.10.26):
     - Flutter
@@ -139,9 +153,9 @@ PODS:
   - permission_handler_apple (9.3.0):
     - Flutter
   - PromisesObjC (2.4.0)
-  - SDWebImage (5.21.2):
-    - SDWebImage/Core (= 5.21.2)
-  - SDWebImage/Core (5.21.2)
+  - SDWebImage (5.21.5):
+    - SDWebImage/Core (= 5.21.5)
+  - SDWebImage/Core (5.21.5)
   - shared_preferences_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
@@ -166,7 +180,9 @@ DEPENDENCIES:
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
   - firebase_messaging (from `.symlinks/plugins/firebase_messaging/ios`)
   - Flutter (from `Flutter`)
+  - flutter_cashfree_pg_sdk (from `.symlinks/plugins/flutter_cashfree_pg_sdk/ios`)
   - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
+  - flutter_phone_direct_caller (from `.symlinks/plugins/flutter_phone_direct_caller/ios`)
   - freshchat_sdk (from `.symlinks/plugins/freshchat_sdk/ios`)
   - geocoding_ios (from `.symlinks/plugins/geocoding_ios/ios`)
   - geolocator_apple (from `.symlinks/plugins/geolocator_apple/darwin`)
@@ -184,6 +200,11 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
+    - CashfreeAnalyticsSDK
+    - CashfreePG
+    - CashfreePGCoreSDK
+    - CashfreePGUISDK
+    - CFNetworkSDK
     - CwlCatchException
     - CwlCatchExceptionSupport
     - DKImagePickerController
@@ -216,8 +237,12 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/firebase_messaging/ios"
   Flutter:
     :path: Flutter
+  flutter_cashfree_pg_sdk:
+    :path: ".symlinks/plugins/flutter_cashfree_pg_sdk/ios"
   flutter_local_notifications:
     :path: ".symlinks/plugins/flutter_local_notifications/ios"
+  flutter_phone_direct_caller:
+    :path: ".symlinks/plugins/flutter_phone_direct_caller/ios"
   freshchat_sdk:
     :path: ".symlinks/plugins/freshchat_sdk/ios"
   geocoding_ios:
@@ -249,6 +274,11 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   app_settings: 5127ae0678de1dcc19f2293271c51d37c89428b2
+  CashfreeAnalyticsSDK: ae25b71a54607c920d519103d154d9727ca2c15a
+  CashfreePG: 6554c215b8eabc9fa13e59c847262b8ba6f29ff6
+  CashfreePGCoreSDK: 133e1ba5aeb8a89bf2188eb3312c88fcad084c75
+  CashfreePGUISDK: 5e943fcca20c45b66c9837bbb87ebbfb75c013a5
+  CFNetworkSDK: 4e431b55f607544f5ca45bc1a36a13e602f51841
   connectivity_plus: cb623214f4e1f6ef8fe7403d580fdad517d2f7dd
   CwlCatchException: 7acc161b299a6de7f0a46a6ed741eae2c8b4d75a
   CwlCatchExceptionSupport: 54ccab8d8c78907b57f99717fb19d4cc3bce02dc
@@ -263,7 +293,9 @@ SPEC CHECKSUMS:
   FirebaseInstallations: 317270fec08a5d418fdbc8429282238cab3ac843
   FirebaseMessaging: 3b26e2cee503815e01c3701236b020aa9b576f09
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
+  flutter_cashfree_pg_sdk: 969a7cfdec1a6b13fd0a1c2d1d0acd9d1768107a
   flutter_local_notifications: a5a732f069baa862e728d839dd2ebb904737effb
+  flutter_phone_direct_caller: 7d5d72794577b96f12b4b6da13a9ef90ba438665
   freshchat_sdk: 8281b246da71f1b415b1aa1b0e03b118d9591a7b
   FreshchatSDK: 759c03c3f29df68e6fcfd65a98f1f3d3df8e6e09
   geocoding_ios: 33776c9ebb98d037b5e025bb0e7537f6dd19646e
@@ -280,7 +312,7 @@ SPEC CHECKSUMS:
   path_provider_foundation: 080d55be775b7414fd5a5ef3ac137b97b097e564
   permission_handler_apple: 4ed2196e43d0651e8ff7ca3483a069d469701f2d
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
-  SDWebImage: 9f177d83116802728e122410fb25ad88f5c7608a
+  SDWebImage: e9c98383c7572d713c1a0d7dd2783b10599b9838
   shared_preferences_foundation: 9e1978ff2562383bd5676f64ec4e9aa8fa06a6f7
   speech_to_text: 3b313d98516d3d0406cea424782ec25470c59d19
   SwiftyGif: 706c60cf65fa2bc5ee0313beece843c8eb8194d4
@@ -288,6 +320,6 @@ SPEC CHECKSUMS:
   video_player_avfoundation: 2cef49524dd1f16c5300b9cd6efd9611ce03639b
   webview_flutter_wkwebview: 8ebf4fded22593026f7dbff1fbff31ea98573c8d
 
-PODFILE CHECKSUM: 8d1aebdd7b1db504c71a9d4982ff391ca527016f
+PODFILE CHECKSUM: f9f149af5b9e23158d5f39bbd26286e165c2f864
 
 COCOAPODS: 1.16.2
