@@ -41,7 +41,10 @@ class ProductSearchController extends GetxController {
   final _currentOffset = 0.obs;
   final _totalResults = 0.obs;
   final _hasMoreResults = true.obs;
-  static const int _pageSize = 20;
+  static const int _pageSize = 9;
+
+  // Search version to ignore stale requests
+  int _searchVersion = 0;
 
   final _isListening = false.obs;
   bool get isListening => _isListening.value;
@@ -124,6 +127,10 @@ class ProductSearchController extends GetxController {
     _hasSearched.value = false;
     _currentOffset.value = 0;
     _hasMoreResults.value = true;
+    _isLoading.value = false;
+    _isLoadingMore.value = false;
+    _totalResults.value = 0;
+    _searchVersion++; // Invalidate any pending requests
   }
 
   void _startPlaceholderRotation() {
@@ -285,6 +292,7 @@ class ProductSearchController extends GetxController {
       _searchResults.clear();
       _hasMoreResults.value = true;
       _hasSearched.value = true; // Mark that user has searched
+      _searchVersion++; // Increment version for new search
       _performSearch(query);
     }
   }
@@ -314,12 +322,19 @@ class ProductSearchController extends GetxController {
       _isLoading.value = true;
     }
 
+    final currentVersion = _searchVersion; // Capture version at start
+
     try {
       final result = await _searchService.searchProducts(
         query: query,
         offset: _currentOffset.value,
         limit: _pageSize,
       );
+
+      // Ignore results if search was cleared or new search started
+      if (currentVersion != _searchVersion) {
+        return;
+      }
 
       List<ProductModel> products = result['products'] as List<ProductModel>;
 

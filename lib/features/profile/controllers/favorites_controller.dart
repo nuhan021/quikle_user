@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:quikle_user/features/home/data/models/product_model.dart';
 import 'package:quikle_user/features/profile/services/favorites_service.dart';
@@ -61,7 +62,7 @@ class FavoritesController extends GetxController {
     _favoriteProducts.removeWhere((p) => !_globalFavoriteIds.contains(p.id));
   }
 
-  Future<void> addToFavorites(ProductModel product) async {
+  Future<bool> addToFavorites(ProductModel product) async {
     final itemId = int.tryParse(product.id);
     if (itemId != null) {
       final result = await FavoritesService().addToFavorites(itemId);
@@ -69,27 +70,54 @@ class FavoritesController extends GetxController {
         _globalFavoriteIds.add(product.id);
         product = product.copyWith(isFavorite: true);
         _favoriteProducts.add(product);
+        return true;
       }
     }
+    return false;
   }
 
-  void removeFromFavorites(String productId) async {
+  Future<bool> removeFromFavorites(String productId) async {
     final itemId = int.tryParse(productId);
     if (itemId != null) {
       final success = await FavoritesService().removeFromFavorites(itemId);
       if (success) {
         _globalFavoriteIds.remove(productId);
         _favoriteProducts.removeWhere((p) => p.id == productId);
+        return true;
       }
     }
+    return false;
   }
 
   void toggleFavorite(ProductModel product) async {
     if (isProductFavorite(product.id)) {
-      removeFromFavorites(product.id);
+      final success = await removeFromFavorites(product.id);
+      if (success) {
+        _showFavoritePopup('${product.title} removed from favorites', false);
+      }
     } else {
-      await addToFavorites(product);
+      final success = await addToFavorites(product);
+      if (success) {
+        _showFavoritePopup('${product.title} added to favorites', true);
+      }
     }
+  }
+
+  void _showFavoritePopup(String message, bool isAdded) {
+    Get.defaultDialog(
+      title: isAdded ? 'Added to Favorites' : 'Removed from Favorites',
+      middleText: message,
+      backgroundColor: isAdded ? Colors.green.shade100 : Colors.red.shade100,
+      titleStyle: TextStyle(color: isAdded ? Colors.green : Colors.red),
+      middleTextStyle: TextStyle(color: Colors.black),
+      barrierDismissible: true,
+    );
+    // Auto close after 2 seconds
+    Future.delayed(const Duration(seconds: 2), () {
+      if (Get.isDialogOpen ?? false) {
+        Get.back();
+      }
+    });
   }
 
   void clearAllFavorites() {

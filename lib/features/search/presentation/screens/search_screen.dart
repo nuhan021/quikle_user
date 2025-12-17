@@ -10,18 +10,31 @@ import 'package:quikle_user/core/common/widgets/unified_product_card.dart';
 import 'package:quikle_user/core/common/widgets/voice_search_overlay.dart';
 import 'package:quikle_user/core/common/widgets/custom_order_suggestion_widget.dart';
 
-class SearchScreen extends StatelessWidget {
+class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final ProductSearchController controller = Get.put(
-      ProductSearchController(),
-    );
+  State<SearchScreen> createState() => _SearchScreenState();
+}
 
+class _SearchScreenState extends State<SearchScreen> {
+  late final ProductSearchController controller;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = Get.put(ProductSearchController());
+    // Clear search every time the screen is created
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.clearSearch();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        controller.clearSearch(); // Clear search when going back
+        // Controller will be cleaned up by onReady() next time screen is opened
         return true;
       },
       child: Scaffold(
@@ -32,7 +45,7 @@ class SearchScreen extends StatelessWidget {
           leading: IconButton(
             icon: Icon(Icons.arrow_back, color: AppColors.ebonyBlack),
             onPressed: () {
-              controller.clearSearch(); // Clear search when back button pressed
+              // Controller will be cleaned up by onReady() next time screen is opened
               Get.back();
             },
           ),
@@ -324,50 +337,74 @@ class SearchScreen extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: NotificationListener<ScrollNotification>(
-              onNotification: (ScrollNotification scrollInfo) {
-                // Load more when user scrolls to 80% of the list
-                if (scrollInfo.metrics.pixels >=
-                    scrollInfo.metrics.maxScrollExtent * 0.8) {
-                  controller.loadMoreResults();
-                }
-                return false;
-              },
-              child: GridView.builder(
-                padding: EdgeInsets.symmetric(horizontal: 16.w),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  crossAxisSpacing: 8.w,
-                  mainAxisSpacing: 8.h,
-                  childAspectRatio: 0.60,
-                ),
-                itemCount:
-                    controller.searchResults.length +
-                    (controller.hasMoreResults ? 1 : 0),
-                itemBuilder: (context, index) {
-                  // Show loading indicator at the end if there are more results
-                  if (index >= controller.searchResults.length) {
-                    return Center(
-                      child: Padding(
-                        padding: EdgeInsets.all(16.w),
-                        child: CircularProgressIndicator(
-                          color: AppColors.primary,
-                          strokeWidth: 2,
-                        ),
-                      ),
-                    );
-                  }
+            child: SingleChildScrollView(
+              padding: EdgeInsets.symmetric(horizontal: 16.w),
+              child: Column(
+                children: [
+                  GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3,
+                      crossAxisSpacing: 8.w,
+                      mainAxisSpacing: 8.h,
+                      childAspectRatio: 0.60,
+                    ),
+                    itemCount: controller.searchResults.length,
+                    itemBuilder: (context, index) {
+                      final product = controller.searchResults[index];
+                      return UnifiedProductCard(
+                        product: product,
+                        onTap: () => controller.onProductPressed(product),
+                        onAddToCart: () =>
+                            controller.onAddToCartPressed(product),
+                        onFavoriteToggle: () =>
+                            controller.onFavoriteToggle(product),
+                        variant: ProductCardVariant.category,
+                      );
+                    },
+                  ),
 
-                  final product = controller.searchResults[index];
-                  return UnifiedProductCard(
-                    product: product,
-                    onTap: () => controller.onProductPressed(product),
-                    onAddToCart: () => controller.onAddToCartPressed(product),
-                    onFavoriteToggle: () =>
-                        controller.onFavoriteToggle(product),
-                    variant: ProductCardVariant.category,
-                  );
-                },
+                  // Load More Button
+                  if (controller.hasMoreResults)
+                    Padding(
+                      padding: EdgeInsets.symmetric(vertical: 16.h),
+                      child: controller.isLoadingMore
+                          ? Center(
+                              child: CircularProgressIndicator(
+                                color: AppColors.primary,
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : SizedBox(
+                              width: double.infinity,
+                              child: OutlinedButton(
+                                onPressed: controller.loadMoreResults,
+                                style: OutlinedButton.styleFrom(
+                                  padding: EdgeInsets.symmetric(vertical: 14.h),
+                                  side: BorderSide(
+                                    color: AppColors.primary,
+                                    width: 1.5,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8.r),
+                                  ),
+                                ),
+                                child: Text(
+                                  'Load More',
+                                  style: getTextStyle(
+                                    font: CustomFonts.inter,
+                                    fontSize: 14.sp,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.primary,
+                                  ),
+                                ),
+                              ),
+                            ),
+                    ),
+
+                  SizedBox(height: 16.h),
+                ],
               ),
             ),
           ),

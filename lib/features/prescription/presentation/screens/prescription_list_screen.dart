@@ -174,22 +174,10 @@ class _PrescriptionListScreenState extends State<PrescriptionListScreen> {
           ],
         ),
 
-        // ✅ This replaces the old hard-coded Positioned(...)
-        floatingActionButton: SafeArea(
-          // SafeArea ensures it clears system gesture/nav bars
-          child: Padding(
-            // Optional: add consistent spacing from edges
-            padding: EdgeInsets.only(right: 16.w, bottom: 16.h),
-            child: Container(
-              key: _cartFabKey, // so we can compute the target position
-              child: const FloatingCartButton(),
-            ),
-          ),
+        floatingActionButton: Container(
+          key: _cartFabKey,
+          child: const FloatingCartButton(),
         ),
-
-        // Optional: If this screen has its own bottomNavigationBar,
-        // the FAB will automatically float above it.
-        // bottomNavigationBar: YourBottomNavBar(),
         floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       ),
     );
