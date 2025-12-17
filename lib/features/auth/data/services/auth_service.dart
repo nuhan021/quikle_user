@@ -18,19 +18,13 @@ class AuthService {
 
   final NetworkCaller _networkCaller = NetworkCaller();
 
-  // Unified method for sending OTP - handles both login and signup
   Future<ResponseData> sendOtp(
     String phone, {
     String? name,
     String purpose = 'login',
   }) async {
     try {
-      final fields = {'phone': phone, 'purpose': purpose};
-
-      // Add name field if provided (for signup)
-      if (name != null && name.isNotEmpty) {
-        fields['name'] = name;
-      }
+      final fields = {'phone': phone, 'purpose': purpose, 'name': name ?? ''};
 
       final ResponseData response = await _networkCaller.multipartRequest(
         ApiConstants.sendOtp,
@@ -69,7 +63,9 @@ class AuthService {
         return ResponseData(
           isSuccess: false,
           statusCode: response.statusCode,
-          errorMessage: 'Invalid OTP. Please try again.',
+          errorMessage: response.errorMessage.isNotEmpty
+              ? response.errorMessage
+              : 'Invalid OTP. Please try again.',
           responseData: null,
         );
       }
@@ -82,7 +78,6 @@ class AuthService {
 
       await verifyToken();
 
-      // Load user profile after login
       await UserService.instance.refreshUser();
 
       return ResponseData(
@@ -131,7 +126,6 @@ class AuthService {
 
       await verifyToken();
 
-      // Load user profile after signup
       await UserService.instance.refreshUser();
 
       return ResponseData(
@@ -160,10 +154,7 @@ class AuthService {
     bool isLogin = true,
   }) async {
     try {
-      // Determine the purpose based on whether it's login or signup
       final purpose = isLogin ? 'login' : 'signup';
-
-      // Call the sendOtp method with the appropriate parameters
       final response = await sendOtp(phone, name: name, purpose: purpose);
 
       return response;

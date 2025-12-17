@@ -20,9 +20,7 @@ class LoginController extends GetxController {
   void onInit() {
     super.onInit();
     _auth = Get.find<AuthService>();
-    // Clear name field visibility when phone changes so server check is fresh.
     phoneController.addListener(() {
-      // If user edits phone after previously showing name field, hide it and reset existing flag
       if (showNameField.value || !isExistingUser.value) {
         showNameField.value = false;
         isExistingUser.value = true;
@@ -40,27 +38,29 @@ class LoginController extends GetxController {
         final phoneTrim = phoneController.text.trim();
         final nameTrim = nameController.text.trim();
 
-        // Determine the purpose based on whether we're showing the name field
+        // Build full phone with +91 prefix. phoneController holds only local digits.
+        String fullPhone;
+        if (phoneTrim.startsWith('+')) {
+          fullPhone = phoneTrim;
+        } else if (phoneTrim.startsWith('0')) {
+          fullPhone = '+91' + phoneTrim.replaceFirst(RegExp(r'^0+'), '');
+        } else {
+          fullPhone = '+91' + phoneTrim;
+        }
+
         final purpose = showNameField.value ? 'signup' : 'login';
 
-        // Send OTP to server with appropriate purpose
         final response = await _auth.sendOtp(
-          phoneTrim,
+          fullPhone,
           name: showNameField.value ? nameTrim : null,
           purpose: purpose,
         );
 
-        // Handle success response (200)
         if (response.statusCode == 200 && response.isSuccess) {
           final userExists = !showNameField.value;
 
           AppLoggerHelper.debug('Response Data: ${response.responseData}');
 
-          //////*********************************************************** */
-          ///
-          ///
-          ///
-          ///
           final FlutterLocalNotificationsPlugin _localNotifications =
               FlutterLocalNotificationsPlugin();
           await _localNotifications.show(
@@ -78,18 +78,10 @@ class LoginController extends GetxController {
               iOS: DarwinNotificationDetails(),
             ),
           );
-
-          //////*********************************************************** */
-          ///
-          ///
-          ///
-          ///
-          ///
-          ///
           Get.toNamed(
             AppRoute.getVerify(),
             arguments: {
-              'phone': phoneTrim,
+              'phone': fullPhone,
               'name': showNameField.value ? nameTrim : null,
               'isLogin': userExists,
             },
@@ -98,44 +90,50 @@ class LoginController extends GetxController {
           return;
         }
 
-        // Handle user not found (400) - show name field for signup
         if (response.statusCode == 400 && !showNameField.value) {
-          // User doesn't exist, show name field for registration
-          clearInputs();
-          showNameField.value = true;
-          isExistingUser.value = false;
+          final resend = await _auth.sendOtp(
+            fullPhone,
+            name: '',
+            purpose: 'signup',
+          );
+
           isLoading.value = false;
 
-          Get.snackbar(
-            'Account Not Found',
-            'Please enter your name to create a new account',
-            snackPosition: SnackPosition.TOP,
-            backgroundColor: Colors.orange.withValues(alpha: 0.1),
-            colorText: Colors.orange,
-          );
+          if (resend.statusCode == 200 && resend.isSuccess) {
+            final FlutterLocalNotificationsPlugin _localNotifications2 =
+                FlutterLocalNotificationsPlugin();
+            try {
+              await _localNotifications2.show(
+                1,
+                "You have a new OTP",
+                resend.responseData['message'],
+                const NotificationDetails(
+                  android: AndroidNotificationDetails(
+                    'otp_channel',
+                    'OTP Notifications',
+                    channelDescription: 'Notifications for OTP codes',
+                    importance: Importance.max,
+                    priority: Priority.high,
+                  ),
+                  iOS: DarwinNotificationDetails(),
+                ),
+              );
+            } catch (_) {}
+
+            Get.toNamed(
+              AppRoute.getVerify(),
+              arguments: {'phone': fullPhone, 'name': '', 'isLogin': false},
+            );
+            return;
+          }
           return;
         }
 
-        // Handle other errors
         errorMessage.value = response.errorMessage.isNotEmpty
             ? response.errorMessage
             : 'Something went wrong. Please try again.';
-        Get.snackbar(
-          'Error',
-          errorMessage.value,
-          snackPosition: SnackPosition.TOP,
-          backgroundColor: Colors.red.withValues(alpha: 0.1),
-          colorText: Colors.red,
-        );
       } catch (e) {
         errorMessage.value = 'Something went wrong. Please try again.';
-        Get.snackbar(
-          'Error',
-          'Something went wrong. Please try again.',
-          snackPosition: SnackPosition.TOP,
-          backgroundColor: Colors.red.withValues(alpha: 0.1),
-          colorText: Colors.red,
-        );
       } finally {
         isLoading.value = false;
       }
@@ -147,13 +145,12 @@ class LoginController extends GetxController {
 
     if (phone.isEmpty) {
       errorMessage.value = 'Please enter your phone number';
-      Get.snackbar(
-        'Validation Error',
-        'Please enter your phone number',
-        snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.orange.withValues(alpha: 0.1),
-        colorText: Colors.orange,
-      );
+      return false;
+    }
+    // Expect user to enter 10 digits (local part) since +91 is prefixed
+    final digitsOnly = phone.replaceAll(RegExp(r'\D'), '');
+    if (digitsOnly.length != 10) {
+      errorMessage.value = 'Please enter a 10-digit mobile number';
       return false;
     }
 
@@ -161,25 +158,11 @@ class LoginController extends GetxController {
       final name = nameController.text.trim();
       if (name.isEmpty) {
         errorMessage.value = 'Please enter your full name';
-        Get.snackbar(
-          'Validation Error',
-          'Please enter your full name',
-          snackPosition: SnackPosition.TOP,
-          backgroundColor: Colors.orange.withValues(alpha: 0.1),
-          colorText: Colors.orange,
-        );
         return false;
       }
 
       if (name.length < 2) {
         errorMessage.value = 'Name must be at least 2 characters long';
-        Get.snackbar(
-          'Validation Error',
-          'Name must be at least 2 characters long',
-          snackPosition: SnackPosition.TOP,
-          backgroundColor: Colors.orange.withValues(alpha: 0.1),
-          colorText: Colors.orange,
-        );
         return false;
       }
     }
@@ -187,7 +170,6 @@ class LoginController extends GetxController {
     return true;
   }
 
-  // Legacy methods for backward compatibility
   Future<void> onTapLogin() async => onTapContinue();
   void onTapCreateAccount() => onTapContinue();
 
@@ -199,10 +181,9 @@ class LoginController extends GetxController {
     phoneController.text = '';
   }
 
-  //Log out
   Future<void> logout() async {
     await _auth.logout();
-    // Clear favorites on logout
+
     try {
       final favoritesController = Get.find<FavoritesController>();
       favoritesController.clearAllFavorites();

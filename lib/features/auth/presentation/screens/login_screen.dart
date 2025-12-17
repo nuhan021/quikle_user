@@ -49,7 +49,6 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-  // ------------------ TOP SECTION ------------------
   Widget _buildTopSection(BuildContext context) {
     final base = ProductIcons.asProviders();
     final maxRows = _calculateCarouselRows(context);
@@ -147,7 +146,6 @@ class LoginScreen extends StatelessWidget {
     return 0.15;
   }
 
-  // ------------------ CONTENT SECTION ------------------
   Widget _buildContentSection(LoginController controller) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16.w),
@@ -202,10 +200,73 @@ class LoginScreen extends StatelessWidget {
             ),
           ),
           SizedBox(height: 10.h),
-          _styledTextField(
-            controller: controller.phoneController,
-            hintText: 'Enter mobile number',
-            keyboardType: TextInputType.phone,
+          // Phone field with fixed +91 prefix (user enters 10 digits)
+          Container(
+            width: double.infinity,
+            height: 52.h,
+            padding: EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+            decoration: ShapeDecoration(
+              shape: RoundedRectangleBorder(
+                side: const BorderSide(width: 1, color: Color(0xFF7C7C7C)),
+                borderRadius: BorderRadius.circular(8.r),
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 12.w),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(8.r),
+                      bottomLeft: Radius.circular(8.r),
+                    ),
+                  ),
+                  child: Text(
+                    '+91',
+                    style: getTextStyle(
+                      font: CustomFonts.inter,
+                      color: AppColors.eggshellWhite,
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12.w),
+                    child: TextField(
+                      controller: controller.phoneController,
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        LengthLimitingTextInputFormatter(10),
+                      ],
+                      enableSuggestions: false,
+                      autocorrect: false,
+                      style: getTextStyle(
+                        font: CustomFonts.inter,
+                        color: AppColors.eggshellWhite,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      cursorColor: const Color(0xFFF8F8F8),
+                      decoration: InputDecoration(
+                        isCollapsed: true,
+                        border: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        hintText: 'Enter mobile number',
+                        hintStyle: getTextStyle(
+                          font: CustomFonts.inter,
+                          color: AppColors.featherGrey,
+                        ),
+                        counterText: "",
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
           Obx(() {
             return AnimatedContainer(
