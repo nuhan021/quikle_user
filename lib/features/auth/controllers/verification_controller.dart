@@ -8,6 +8,7 @@ import 'package:quikle_user/features/auth/data/services/auth_service.dart';
 // ignore: unused_import
 import 'package:quikle_user/features/profile/controllers/address_controller.dart';
 import 'package:quikle_user/features/profile/controllers/favorites_controller.dart';
+import 'package:quikle_user/features/prescription/controllers/prescription_controller.dart';
 
 import '../presentation/screens/splash_wrapper.dart';
 
@@ -142,6 +143,22 @@ class VerificationController extends GetxController {
           } catch (e) {
             // FavoritesController might not be initialized yet, that's ok
             print('Could not load favorites immediately after login: $e');
+          }
+
+          // Load prescription data after successful login
+          try {
+            final prescriptionController = Get.find<PrescriptionController>();
+            await Future.wait([
+              prescriptionController.loadUserPrescriptions(),
+              prescriptionController.loadPrescriptionMedicines(),
+              prescriptionController.loadRecentPrescriptionMedicines(),
+              prescriptionController.loadPrescriptionStats(),
+            ]);
+          } catch (e) {
+            // PrescriptionController might not be initialized yet, that's ok
+            print(
+              'Could not load prescription data immediately after login: $e',
+            );
           }
 
           loginController.clearInputs();
