@@ -41,6 +41,16 @@ class _OrderTrackingMapSectionState extends State<OrderTrackingMapSection> {
     _setInitialPosition();
     _initializeDefaultMarkers();
     _initializeMarkers();
+    _setupRiderLocationListener();
+  }
+
+  void _setupRiderLocationListener() {
+    final controller = Get.find<OrderTrackingController>();
+    ever(controller.riderLocation, (LatLng? newLocation) {
+      if (newLocation != null && mounted) {
+        _updateRiderMarker(newLocation);
+      }
+    });
   }
 
   void _setInitialPosition() {
@@ -227,33 +237,18 @@ class _OrderTrackingMapSectionState extends State<OrderTrackingMapSection> {
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(12.r),
-            child: Obx(() {
-              // Update rider marker when location changes
-              if (controller.riderLocation.value != null) {
-                AppLoggerHelper.debug(
-                  'Vendor location: ${widget.vendorLat}, ${widget.vendorLng}',
-                );
-                AppLoggerHelper.debug(
-                  'Updating rider location to: ${controller.riderLocation.value}',
-                );
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  _updateRiderMarker(controller.riderLocation.value!);
-                });
-              }
-
-              return GoogleMap(
-                initialCameraPosition: _initialPosition,
-                onMapCreated: (GoogleMapController mapController) {
-                  _mapController = mapController;
-                },
-                zoomControlsEnabled: false,
-                myLocationEnabled: true,
-                myLocationButtonEnabled: false,
-                compassEnabled: false,
-                mapToolbarEnabled: false,
-                markers: _markers,
-              );
-            }),
+            child: GoogleMap(
+              initialCameraPosition: _initialPosition,
+              onMapCreated: (GoogleMapController mapController) {
+                _mapController = mapController;
+              },
+              zoomControlsEnabled: false,
+              myLocationEnabled: true,
+              myLocationButtonEnabled: false,
+              compassEnabled: false,
+              mapToolbarEnabled: false,
+              markers: _markers,
+            ),
           ),
           // Custom Zoom Controls
           Positioned(

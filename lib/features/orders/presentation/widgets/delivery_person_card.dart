@@ -86,11 +86,11 @@ class DeliveryPersonCard extends StatelessWidget {
               SizedBox(width: 8.w), // spacing between icons
               GestureDetector(
                 onTap: () {
-                  final riderId = riderInfo?.riderId?.toString() ?? '3';
+                  final rider = riderInfo;
                   AppLoggerHelper.debug(
-                    'Navigating to chat with riderId: $riderId',
+                    'Navigating to chat with rider: ${rider?.riderName ?? rider?.riderId}',
                   );
-                  Get.to(() => ChatScreen(riderId: riderId));
+                  Get.to(() => ChatScreen(rider: rider));
                 },
                 child: Container(
                   padding: EdgeInsets.all(8.w),
