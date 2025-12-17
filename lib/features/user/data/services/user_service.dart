@@ -6,6 +6,7 @@ import 'package:quikle_user/core/services/storage_service.dart';
 import 'package:quikle_user/core/utils/constants/api_constants.dart';
 import 'package:quikle_user/core/utils/logging/logger.dart';
 import 'package:quikle_user/routes/app_routes.dart';
+import 'package:quikle_user/features/prescription/controllers/prescription_controller.dart';
 import '../models/user_model.dart';
 
 class UserService extends GetxController {
@@ -172,6 +173,17 @@ class UserService extends GetxController {
       }
     } catch (e) {
       AppLoggerHelper.debug('Error resetting Freshchat on logout: $e');
+    }
+
+    // Clear prescription data before logout
+    try {
+      if (Get.isRegistered<PrescriptionController>()) {
+        final prescriptionController = Get.find<PrescriptionController>();
+        prescriptionController.clearData();
+        AppLoggerHelper.debug('Prescription data cleared on logout');
+      }
+    } catch (e) {
+      AppLoggerHelper.debug('Error clearing prescription data on logout: $e');
     }
 
     await StorageService.logoutUser();

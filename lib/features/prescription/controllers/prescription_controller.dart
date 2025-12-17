@@ -52,6 +52,22 @@ class PrescriptionController extends GetxController {
     super.onClose();
   }
 
+  /// Clear all prescription data (call on logout)
+  void clearData() {
+    prescriptions.clear();
+    prescriptionMedicines.clear();
+    recentPrescriptionMedicines.clear();
+    selectedPrescription.value = null;
+    prescriptionStats.clear();
+    uploadNotes.value = '';
+    uploadProgress.value = 0.0;
+    isUploading.value = false;
+    isLoading.value = false;
+    isRefreshing.value = false;
+    lastUpdateTime.value = null;
+    _stopAutoUpdate();
+  }
+
   /// Start automatic updates for active prescriptions
   void _startAutoUpdate() {
     _autoUpdateTimer = Timer.periodic(_autoUpdateInterval, (timer) {

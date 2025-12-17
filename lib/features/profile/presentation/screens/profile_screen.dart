@@ -137,8 +137,11 @@ class ProfileScreen extends StatelessWidget {
   void _navigateToOrders(BuildContext context) {
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(
-        builder: (context) => const MainScreen(initialIndex: 1),
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            const MainScreen(initialIndex: 1),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) =>
+            child,
       ),
       (route) => false,
     );
