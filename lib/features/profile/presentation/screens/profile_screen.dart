@@ -99,6 +99,20 @@ class ProfileScreen extends StatelessWidget {
                   SizedBox(height: 8.h),
 
                   ProfileMenuItem(
+                    assetIcon: ImagePath.privacyIcon,
+                    title: 'Privacy Policy',
+                    onTap: () => _navigateToPrivacyPolicy(context),
+                  ),
+                  SizedBox(height: 8.h),
+
+                  ProfileMenuItem(
+                    assetIcon: ImagePath.termsIcon,
+                    title: 'Terms & Conditions',
+                    onTap: () => _navigateToTermsConditions(context),
+                  ),
+                  SizedBox(height: 8.h),
+
+                  ProfileMenuItem(
                     assetIcon: ImagePath.signOutIcon,
                     title: 'Sign out',
                     onTap: () => _showSignOutDialog(context),
@@ -160,6 +174,14 @@ class ProfileScreen extends StatelessWidget {
 
   void _navigateToHelpSupport(BuildContext context) {
     Get.toNamed(AppRoute.getHelpSupport());
+  }
+
+  void _navigateToPrivacyPolicy(BuildContext context) {
+    Get.toNamed(AppRoute.getPrivacyPolicy());
+  }
+
+  void _navigateToTermsConditions(BuildContext context) {
+    Get.toNamed(AppRoute.getTermsConditions());
   }
 
   void _showSignOutDialog(BuildContext context) {
