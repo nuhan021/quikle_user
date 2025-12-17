@@ -10,6 +10,7 @@ import 'package:quikle_user/routes/app_routes.dart';
 class CategoryDetailController extends GetxController {
   final CategoryService _categoryService = CategoryService();
   late final CartController _cartController;
+  late final FavoritesController _favoritesController;
 
   late final CategoryModel category;
 
@@ -24,6 +25,7 @@ class CategoryDetailController extends GetxController {
   void onInit() {
     super.onInit();
     _cartController = Get.find<CartController>();
+    _favoritesController = Get.find<FavoritesController>();
 
     category = Get.arguments as CategoryModel;
     categoryTitle.value = category.title;
@@ -133,11 +135,7 @@ class CategoryDetailController extends GetxController {
   }
 
   void onFavoriteToggle(ProductModel product) {
-    if (FavoritesController.isProductFavorite(product.id)) {
-      FavoritesController.removeFromGlobalFavorites(product.id);
-    } else {
-      FavoritesController.addToGlobalFavorites(product.id);
-    }
+    _favoritesController.toggleFavorite(product);
 
     final isFavorite = FavoritesController.isProductFavorite(product.id);
     final updatedProduct = product.copyWith(isFavorite: isFavorite);
@@ -155,13 +153,5 @@ class CategoryDetailController extends GetxController {
     if (recommendedIndex != -1) {
       recommendedProducts[recommendedIndex] = updatedProduct;
     }
-
-    // Get.snackbar(
-    //   isFavorite ? 'Added to Favorites' : 'Removed from Favorites',
-    //   isFavorite
-    //       ? '${product.title} has been added to your favorites.'
-    //       : '${product.title} has been removed from your favorites.',
-    //   duration: const Duration(seconds: 2),
-    // );
   }
 }

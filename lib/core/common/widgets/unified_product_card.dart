@@ -367,13 +367,17 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
             width: double.infinity,
             padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 6.h),
             decoration: BoxDecoration(
-              color: isUrgent ? Color(0xFFFFEBEE) : Colors.white,
+              color: isUrgent ? Colors.red.shade500 : Colors.white,
               border: Border.all(color: Colors.red, width: 1),
               borderRadius: BorderRadius.circular(12.r),
             ),
             child: Row(
               children: [
-                Icon(Icons.access_time, size: 10.sp, color: Colors.red),
+                Icon(
+                  Icons.access_time,
+                  size: 10.sp,
+                  color: isUrgent ? Colors.white : Colors.red,
+                ),
                 Expanded(
                   child: Text(
                     'Urgent Delivery',
@@ -381,7 +385,7 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
                       font: CustomFonts.inter,
                       fontSize: 9.sp,
                       fontWeight: FontWeight.w700,
-                      color: Colors.red,
+                      color: isUrgent ? Colors.white : Colors.red,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
