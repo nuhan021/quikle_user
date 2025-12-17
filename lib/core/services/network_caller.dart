@@ -186,11 +186,23 @@ class NetworkCaller {
         errorMessage: '',
       );
     } else if (response.statusCode == 400) {
+      String errMsg;
+      if (decoded is Map && decoded['detail'] != null) {
+        errMsg = decoded['detail'].toString();
+      } else if (decoded is Map && decoded['message'] != null) {
+        errMsg = decoded['message'].toString();
+      } else if (decoded is Map && decoded['error'] != null) {
+        errMsg = decoded['error'].toString();
+      } else {
+        errMsg = _extractErrorMessages(
+          decoded != null ? decoded['errorSources'] : null,
+        );
+      }
       return ResponseData(
         isSuccess: false,
         statusCode: response.statusCode,
         responseData: decoded,
-        errorMessage: _extractErrorMessages(decoded['errorSources']),
+        errorMessage: errMsg,
       );
     } else if (response.statusCode == 401) {
       return ResponseData(

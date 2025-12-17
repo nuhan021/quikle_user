@@ -30,17 +30,20 @@ class ProfileCard extends StatelessWidget {
       child: Column(
         children: [
           Text(
-            name,
+            (name.isEmpty || name == 'Unknown User')
+                ? 'No name provided'
+                : name,
             style: getTextStyle(
               font: CustomFonts.obviously,
               fontSize: 16.sp,
               fontWeight: FontWeight.w500,
               color: AppColors.ebonyBlack,
             ),
+            textAlign: TextAlign.center,
           ),
           SizedBox(height: 4.h),
           Text(
-            email,
+            email.isEmpty ? 'No email provided' : email,
             style: getTextStyle(
               font: CustomFonts.inter,
               fontSize: 14.sp,

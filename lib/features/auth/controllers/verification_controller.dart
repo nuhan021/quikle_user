@@ -2,10 +2,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:quikle_user/core/models/response_data.dart';
+import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:quikle_user/core/notification/controllers/notification_controller.dart';
 import 'package:quikle_user/features/auth/controllers/login_controller.dart';
 import 'package:quikle_user/features/auth/data/services/auth_service.dart';
-// ignore: unused_import
 import 'package:quikle_user/features/profile/controllers/address_controller.dart';
 import 'package:quikle_user/features/profile/controllers/favorites_controller.dart';
 import 'package:quikle_user/features/prescription/controllers/prescription_controller.dart';
@@ -15,20 +15,16 @@ import '../presentation/screens/splash_wrapper.dart';
 class VerificationController extends GetxController {
   final RxList<String> otpDigits = List.generate(6, (_) => '').obs;
   final LoginController loginController = Get.find<LoginController>();
-  // final NotificationController notificationController =
-  //     Get.find<NotificationController>();
 
-  // OTP Controller for pin_code_fields package
   final TextEditingController otpController = TextEditingController();
 
-  // Read arguments dynamically so the controller works correctly when reused
   String get phone => (Get.arguments is Map && Get.arguments['phone'] != null)
       ? Get.arguments['phone'].toString()
       : '+8801XXXXXXXX';
 
-  String? get name => (Get.arguments is Map && Get.arguments['name'] != null)
+  String get name => (Get.arguments is Map && Get.arguments['name'] != null)
       ? Get.arguments['name'].toString()
-      : null;
+      : '';
 
   bool get isLogin => (Get.arguments is Map && Get.arguments['isLogin'] != null)
       ? Get.arguments['isLogin'] as bool
@@ -44,6 +40,10 @@ class VerificationController extends GetxController {
   final isResending = false.obs;
   final errorMessage = ''.obs;
 
+  // Controller used to trigger pin code field error animations (shake/clear)
+  final StreamController<ErrorAnimationType> errorController =
+      StreamController<ErrorAnimationType>.broadcast();
+
   final RxInt secondsLeft = 30.obs;
   Timer? _timer;
 
@@ -53,9 +53,7 @@ class VerificationController extends GetxController {
   void onInit() {
     super.onInit();
     _auth = Get.find<AuthService>();
-    // ensure any stale OTP data is cleared when controller initializes
     _clearOtp();
-    // _startTimer();
   }
 
   void startTimer() {
@@ -107,18 +105,14 @@ class VerificationController extends GetxController {
       try {
         late ResponseData response;
 
-        // Check if this is a signup or login flow
-        if (!isLogin && name != null && name!.isNotEmpty) {
-          // Signup flow - hit the signup API
-          response = await _auth.signupWithOtp(phone, name!, code);
+        if (!isLogin) {
+          response = await _auth.signupWithOtp(phone, name, code);
         } else {
-          // Login flow - hit the verify OTP API
           response = await _auth.login(phone, code);
         }
 
         if (response.isSuccess) {
           try {
-            // Save FCM token after successful login/signup
             final notificationController = Get.find<NotificationController>();
             final fcmToken = await notificationController.getFCMToken();
             if (fcmToken != null && fcmToken.isNotEmpty) {
@@ -127,25 +121,20 @@ class VerificationController extends GetxController {
           } catch (e) {
             print('Could not save FCM token immediately after login: $e');
           }
-          // Reload addresses after successful login
           try {
             final addressController = Get.find<AddressController>();
             await addressController.loadAddresses();
           } catch (e) {
-            // AddressController might not be initialized yet, that's ok
             print('Could not reload addresses immediately after login: $e');
           }
 
-          // Load user favorites after successful login
           try {
             final favoritesController = Get.find<FavoritesController>();
             await favoritesController.loadFavorites();
           } catch (e) {
-            // FavoritesController might not be initialized yet, that's ok
             print('Could not load favorites immediately after login: $e');
           }
 
-          // Load prescription data after successful login
           try {
             final prescriptionController = Get.find<PrescriptionController>();
             await Future.wait([
@@ -155,7 +144,6 @@ class VerificationController extends GetxController {
               prescriptionController.loadPrescriptionStats(),
             ]);
           } catch (e) {
-            // PrescriptionController might not be initialized yet, that's ok
             print(
               'Could not load prescription data immediately after login: $e',
             );
@@ -164,27 +152,35 @@ class VerificationController extends GetxController {
           loginController.clearInputs();
           loginController.clearPhone();
           clearOtp();
-          // Get.offAllNamed(AppRoute.getWelcome());
           Get.offAll(() => const SplashWrapper());
         } else {
-          errorMessage.value = response.errorMessage;
-          Get.snackbar(
-            'Error',
-            response.errorMessage,
-            snackPosition: SnackPosition.TOP,
-            backgroundColor: Colors.red.withValues(alpha: 0.1),
-            colorText: Colors.red,
-          );
+          // For 400 responses, decide between invalid vs expired messages
+          if (response.statusCode == 400) {
+            final err = response.errorMessage.toLowerCase();
+            if (err.contains('expired') ||
+                err.contains('not found') ||
+                err.contains('notfound')) {
+              errorMessage.value = 'OTP has expired. Please resend.';
+            } else if (err.contains('invalid')) {
+              errorMessage.value = 'Invalid OTP. Please try again.';
+            } else {
+              errorMessage.value = response.errorMessage;
+            }
+
+            try {
+              errorController.add(ErrorAnimationType.shake);
+              Future.delayed(const Duration(milliseconds: 1400), () {
+                try {
+                  errorController.add(ErrorAnimationType.clear);
+                } catch (_) {}
+              });
+            } catch (_) {}
+          } else {
+            errorMessage.value = response.errorMessage;
+          }
         }
       } catch (e) {
         errorMessage.value = 'Something went wrong. Please try again.';
-        Get.snackbar(
-          'Error',
-          'Something went wrong. Please try again.',
-          snackPosition: SnackPosition.TOP,
-          backgroundColor: Colors.red.withValues(alpha: 0.1),
-          colorText: Colors.red,
-        );
       } finally {
         isVerifying.value = false;
       }
@@ -210,39 +206,17 @@ class VerificationController extends GetxController {
       if (response.isSuccess) {
         if (response.responseData != null &&
             response.responseData['message'] != null) {}
-
-        // Get.snackbar(
-        //   'Success',
-        //   message,
-        //   snackPosition: SnackPosition.TOP,
-        //   backgroundColor: Colors.green.withValues(alpha: 0.1),
-        //   colorText: Colors.green,
-        // );
         startTimer();
       } else {
-        Get.snackbar(
-          'Error',
-          response.errorMessage,
-          snackPosition: SnackPosition.TOP,
-          backgroundColor: Colors.red.withValues(alpha: 0.1),
-          colorText: Colors.red,
-        );
+        errorMessage.value = response.errorMessage;
       }
     } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Failed to resend OTP. Please try again.',
-        snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.red.withValues(alpha: 0.1),
-        colorText: Colors.red,
-      );
+      errorMessage.value = 'Failed to resend OTP. Please try again.';
     } finally {
       isResending.value = false;
     }
   }
 
-  /// Clear OTP inputs held in the controller (text fields and our observable list).
-  /// Call this when leaving the verification flow so stale OTP isn't shown later.
   void clearOtp() {
     otpController.clear();
     for (int i = 0; i < digits.length; i++) {
@@ -266,6 +240,9 @@ class VerificationController extends GetxController {
     otpController.dispose();
     for (final c in digits) c.dispose();
     for (final f in focuses) f.dispose();
+    try {
+      errorController.close();
+    } catch (_) {}
     super.onClose();
   }
 }
