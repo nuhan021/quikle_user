@@ -109,8 +109,8 @@ class CartBottomSection extends StatelessWidget {
                     padding: EdgeInsets.only(right: 8.w),
                     child: Image.asset(
                       ImagePath.homeIcon,
-                      width: 40.w,
-                      height: 40.h,
+                      width: 24.w,
+                      height: 24.h,
                     ),
                   ),
                   SizedBox(width: 8.w),
@@ -122,7 +122,7 @@ class CartBottomSection extends StatelessWidget {
                           '$addressTypeText',
                           style: getTextStyle(
                             font: CustomFonts.inter,
-                            fontSize: 16.sp,
+                            fontSize: 12.sp,
                             fontWeight: FontWeight.w500,
                             color: AppColors.ebonyBlack,
                           ),
@@ -131,7 +131,7 @@ class CartBottomSection extends StatelessWidget {
                           addressDetails,
                           style: getTextStyle(
                             font: CustomFonts.inter,
-                            fontSize: 14.sp,
+                            fontSize: 10.sp,
                             color: Colors.grey[600]!,
                           ),
                           maxLines: 1,

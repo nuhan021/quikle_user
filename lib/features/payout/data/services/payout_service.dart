@@ -10,14 +10,14 @@ class PayoutService {
     return [
       DeliveryOptionModel(
         type: DeliveryType.combined,
-        title: 'Combined Delivery',
+        title: 'Combined',
         description: 'Products delivered together (cheaper)',
         price: 1.99,
         isSelected: true,
       ),
       DeliveryOptionModel(
         type: DeliveryType.split,
-        title: 'Split Delivery',
+        title: 'Split',
         description: 'Faster delivery by different riders',
         price: 3.99,
         isSelected: false,

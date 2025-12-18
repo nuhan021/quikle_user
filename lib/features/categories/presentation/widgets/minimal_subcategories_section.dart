@@ -54,6 +54,7 @@ class MinimalSubcategoriesSection extends StatelessWidget {
             width: double.infinity,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
+
               primary: false,
               padding: EdgeInsets.zero,
               itemCount: subcategories.length + 1,
@@ -150,12 +151,10 @@ class MinimalSubcategoriesSection extends StatelessWidget {
                         ),
                         SizedBox(height: 4.h),
                         SizedBox(
-                          width: 50.w,
+                          // width: 50.w,
                           child: Text(
                             subcategory.title,
                             textAlign: TextAlign.center,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
                             style: getTextStyle(
                               font: CustomFonts.inter,
                               fontSize: 12.sp,
