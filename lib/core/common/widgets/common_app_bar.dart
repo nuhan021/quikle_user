@@ -37,7 +37,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.showNotification = true,
     this.showProfile = true,
     this.showRestartButton = false, // ← default off
-    this.backgroundColor = Colors.white,
+    this.backgroundColor = AppColors.eggshellWhite,
     this.addressWidget,
     this.isFromHome = false,
   });

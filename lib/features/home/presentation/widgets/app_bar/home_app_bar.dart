@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:quikle_user/core/common/widgets/address_widget.dart';
 import 'package:quikle_user/core/common/widgets/common_app_bar.dart';
+import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/routes/app_routes.dart';
 
 class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -16,7 +17,7 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
       showBackButton: false,
       showNotification: false,
       showProfile: false,
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.eggshellWhite,
       actions: [
         IconButton(
           icon: const Icon(Iconsax.empty_wallet, color: Colors.black),

@@ -253,6 +253,9 @@ class PayoutController extends GetxController {
     // If turning off urgent delivery, remove urgent status from all items
     if (!_isUrgentDelivery.value) {
       _clearAllUrgentItems();
+    } else {
+      // If turning on urgent delivery, restore urgent status to medicine items
+      _restoreUrgentItemsForMedicines();
     }
 
     // Update delivery options
@@ -268,6 +271,17 @@ class PayoutController extends GetxController {
     }
     // Reset user toggle flag since we've manually cleared all urgent items
     _userToggledUrgent.value = false;
+  }
+
+  void _restoreUrgentItemsForMedicines() {
+    // Restore urgent status to medicine items when urgent delivery is turned on
+    for (final item in _cartController.cartItems) {
+      final isMedicine =
+          item.product.isPrescriptionMedicine || item.product.isOTC;
+      if (isMedicine && !_cartController.isProductUrgent(item.product)) {
+        _cartController.toggleProductUrgentStatus(item.product);
+      }
+    }
   }
 
   void _updateDeliveryBasedOnUrgency() {
