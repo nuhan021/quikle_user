@@ -118,7 +118,9 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
     return Container(
       decoration: ShapeDecoration(
         color: AppColors.textWhite,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16.r),
+        ),
         shadows: [
           BoxShadow(
             color: AppColors.cardColor,
@@ -173,8 +175,8 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
 
           if (widget.product.isMedicine && widget.product.isOTC)
             Positioned(
-              top: 4.h,
-              left: 4.w,
+              top: 6.h,
+              left: 6.w,
               child: Container(
                 padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
                 decoration: BoxDecoration(
