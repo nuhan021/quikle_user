@@ -6,7 +6,7 @@ import 'package:quikle_user/core/utils/constants/enums/address_type_enums.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 import 'package:quikle_user/features/home/presentation/widgets/address/adress_sheet_widget.dart';
 import 'package:quikle_user/features/profile/controllers/address_controller.dart';
-import 'package:quikle_user/routes/app_routes.dart';
+import 'package:quikle_user/features/profile/presentation/screens/add_address_screen.dart';
 
 class AddressWidget extends StatelessWidget {
   final AddressController addressController = Get.find<AddressController>();
@@ -21,7 +21,7 @@ class AddressWidget extends StatelessWidget {
         return GestureDetector(
           onTap: () async {
             if (controller.addresses.isEmpty) {
-              Get.toNamed(AppRoute.getAddAddress());
+              AddAddressScreen.show(context);
               return;
             }
 

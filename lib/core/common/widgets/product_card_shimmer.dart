@@ -31,9 +31,8 @@ class ProductCardShimmer extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Image section with exact card structure
-            Flexible(
+            Expanded(
               flex: 3,
-              fit: FlexFit.loose,
               child: Stack(
                 children: [
                   Container(
@@ -66,9 +65,8 @@ class ProductCardShimmer extends StatelessWidget {
             ),
 
             // Product info section
-            Flexible(
+            Expanded(
               flex: 3,
-              fit: FlexFit.loose,
               child: Padding(
                 padding: EdgeInsets.all(6.w),
                 child: Column(
@@ -78,13 +76,13 @@ class ProductCardShimmer extends StatelessWidget {
                     // Product title placeholder
                     Container(
                       width: double.infinity,
-                      height: 12.h,
+                      height: 10.h,
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(4.r),
                       ),
                     ),
-                    SizedBox(height: 6.h),
+                    SizedBox(height: 5.h),
 
                     // Rating and delivery time placeholder
                     Row(
@@ -130,7 +128,7 @@ class ProductCardShimmer extends StatelessWidget {
                         ),
                       ],
                     ),
-                    SizedBox(height: 4.h),
+                    SizedBox(height: 3.h),
 
                     // Price and cart button placeholder
                     Row(
@@ -140,7 +138,7 @@ class ProductCardShimmer extends StatelessWidget {
                         // Price
                         Container(
                           width: 50.w,
-                          height: 12.h,
+                          height: 10.h,
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(4.r),
@@ -149,8 +147,8 @@ class ProductCardShimmer extends StatelessWidget {
                         SizedBox(width: 4.w),
                         // Cart button
                         Container(
-                          width: 22.w,
-                          height: 22.w,
+                          width: 20.w,
+                          height: 20.w,
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(4.r),

@@ -7,7 +7,6 @@ import 'package:quikle_user/core/utils/constants/enums/address_type_enums.dart';
 import 'package:quikle_user/core/utils/constants/image_path.dart';
 import 'package:quikle_user/features/profile/controllers/address_controller.dart';
 import 'package:quikle_user/features/profile/presentation/screens/add_address_screen.dart';
-import 'package:quikle_user/routes/app_routes.dart';
 
 Future<String?> showAddressSelectionSheet(AddressController addressController) {
   return Get.bottomSheet<String>(
@@ -313,7 +312,7 @@ class _EmptyAddresses extends StatelessWidget {
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
-              Get.toNamed(AppRoute.getAddAddress());
+              AddAddressScreen.show(context);
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.gradientColor,
