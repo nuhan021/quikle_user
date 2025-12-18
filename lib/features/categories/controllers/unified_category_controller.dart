@@ -125,7 +125,27 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
       currentCategory = args['category'] as CategoryModel;
       categoryTitle.value = currentCategory.title;
       _startPlaceholderRotation();
-      _loadCategoryData();
+
+      // Check if subcategories are preloaded from categories screen
+      if (args.containsKey('preloadedSubcategories')) {
+        final preloadedSubs =
+            args['preloadedSubcategories'] as List<SubcategoryModel>;
+        print(
+          '✅ Using preloaded subcategories (${preloadedSubs.length} items) - skipping API call',
+        );
+        _loadCategoryDataWithPreloadedSubcategories(preloadedSubs);
+      } else {
+        _loadCategoryData();
+      }
+
+      // Check if we should auto-select a subcategory
+      if (args.containsKey('autoSelectSubcategory')) {
+        final autoSelectSub = args['autoSelectSubcategory'] as SubcategoryModel;
+        // Delay the selection until after data is loaded
+        Future.delayed(const Duration(milliseconds: 500), () {
+          onSubcategoryTap(autoSelectSub);
+        });
+      }
     }
   }
 
@@ -209,6 +229,170 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
       print('Error loading category data: $e');
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  /// Load category data using preloaded subcategories (skip subcategory API call)
+  Future<void> _loadCategoryDataWithPreloadedSubcategories(
+    List<SubcategoryModel> preloadedSubcategories,
+  ) async {
+    try {
+      isLoading.value = true;
+
+      await _loadShopData();
+
+      if (isGroceryCategory) {
+        // For grocery, use preloaded main categories
+        allCategories.value = preloadedSubcategories;
+        availableSubcategories.value = preloadedSubcategories;
+        sectionTitle.value = 'Select Category';
+        selectedMainCategory.value = null;
+        filterSubcategories.clear();
+
+        // Still need to fetch products
+        await _fetchProductsForGrocery();
+      } else if (isFoodCategory) {
+        // For food, use preloaded subcategories
+        allCategories.value = preloadedSubcategories;
+        availableSubcategories.value = preloadedSubcategories;
+        sectionTitle.value = 'Popular Items';
+        selectedSubcategory.value = null;
+
+        // Fetch products and restaurants
+        await Future.wait([_fetchProductsForCategory(), _loadRestaurants()]);
+      } else {
+        // For other categories, use preloaded subcategories
+        allCategories.value = preloadedSubcategories;
+        availableSubcategories.value = preloadedSubcategories;
+        sectionTitle.value = 'Popular Items';
+        selectedSubcategory.value = null;
+
+        // Fetch products
+        await _fetchProductsForCategory();
+      }
+    } catch (e) {
+      print('Error loading category data with preloaded subcategories: $e');
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  /// Helper: Fetch products for grocery category
+  Future<void> _fetchProductsForGrocery() async {
+    try {
+      // Try cache first
+      final cachedProducts = await _cacheService.getCachedProducts(
+        categoryId: currentCategory.id,
+      );
+
+      if (cachedProducts != null) {
+        allProducts.value = cachedProducts;
+        displayProducts.value = cachedProducts;
+        productsTitle.value = 'All ${currentCategory.title}';
+        currentOffset.value = 0;
+        hasMore.value = true;
+
+        // Refresh in background
+        _refreshProductsInBackground();
+        return;
+      }
+
+      // Fetch from API
+      final products = await _categoryService.fetchAllProductsByCategory(
+        currentCategory.id,
+        limit: 9,
+      );
+
+      allProducts.value = products;
+      displayProducts.value = products;
+      productsTitle.value = 'All ${currentCategory.title}';
+      currentOffset.value = 0;
+      hasMore.value = true;
+
+      // Cache products
+      await _cacheService.cacheProducts(
+        categoryId: currentCategory.id,
+        products: products,
+      );
+    } catch (e) {
+      print('Error fetching products for grocery: $e');
+    }
+  }
+
+  /// Helper: Fetch products for regular category
+  Future<void> _fetchProductsForCategory() async {
+    try {
+      // Try cache first
+      final cachedProducts = await _cacheService.getCachedProducts(
+        categoryId: currentCategory.id,
+      );
+
+      if (cachedProducts != null) {
+        allProducts.value = cachedProducts;
+        displayProducts.value = cachedProducts;
+        productsTitle.value = 'All ${currentCategory.title}';
+        currentOffset.value = 0;
+        hasMore.value = true;
+
+        // Refresh in background
+        _refreshProductsInBackground();
+        return;
+      }
+
+      // Fetch from API
+      final products = await _categoryService.fetchAllProductsByCategory(
+        currentCategory.id,
+        limit: 9,
+      );
+
+      allProducts.value = products;
+      displayProducts.value = products;
+      productsTitle.value = 'All ${currentCategory.title}';
+      currentOffset.value = 0;
+      hasMore.value = true;
+
+      // Cache products
+      await _cacheService.cacheProducts(
+        categoryId: currentCategory.id,
+        products: products,
+      );
+    } catch (e) {
+      print('Error fetching products for category: $e');
+    }
+  }
+
+  /// Helper: Load restaurants for food category
+  Future<void> _loadRestaurants() async {
+    try {
+      final restaurants = await _restaurantService.getTopRestaurants(limit: 25);
+      topRestaurants.value = restaurants;
+      showRestaurants.value = true;
+    } catch (e) {
+      print('Error loading restaurants: $e');
+    }
+  }
+
+  /// Helper: Refresh products in background
+  Future<void> _refreshProductsInBackground() async {
+    try {
+      final products = await _categoryService.fetchAllProductsByCategory(
+        currentCategory.id,
+        limit: 9,
+      );
+
+      // Only update if data changed
+      if (products.length != allProducts.length) {
+        allProducts.value = products;
+        displayProducts.value = products;
+
+        // Update cache
+        await _cacheService.cacheProducts(
+          categoryId: currentCategory.id,
+          products: products,
+        );
+      }
+    } catch (e) {
+      print('Error refreshing products in background: $e');
     }
   }
 
