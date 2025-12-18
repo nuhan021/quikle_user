@@ -144,7 +144,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
       overflow: TextOverflow.ellipsis,
       style: getTextStyle(
         font: CustomFonts.obviously,
-        fontSize: 14.sp,
+        fontSize: 18.sp,
         fontWeight: FontWeight.w500,
         color: txtColor,
       ),
