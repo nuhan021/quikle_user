@@ -52,6 +52,18 @@ class HomeController extends GetxController with VoiceSearchMixin {
     _isLoading.value = true;
     try {
       _categories.value = await _homeService.fetchCategories();
+      // Sort categories to ensure All, Food, Groceries, Medicine are first
+      List<CategoryModel> sortedCategories = [];
+      sortedCategories.addAll(_categories.where((c) => c.title == 'All'));
+      sortedCategories.addAll(_categories.where((c) => c.title == 'Food'));
+      sortedCategories.addAll(_categories.where((c) => c.title == 'Groceries'));
+      sortedCategories.addAll(_categories.where((c) => c.title == 'Medicine'));
+      sortedCategories.addAll(
+        _categories.where(
+          (c) => !['All', 'Food', 'Groceries', 'Medicine'].contains(c.title),
+        ),
+      );
+      _categories.value = sortedCategories;
       _products.value = await _homeService.fetchAllProducts();
       await _loadContent();
     } finally {
@@ -66,6 +78,12 @@ class HomeController extends GetxController with VoiceSearchMixin {
   Future<void> _loadContent() async {
     if (_selectedCategoryId.value == '0') {
       _productSections.value = await _homeService.fetchProductSections();
+      // Sort product sections by category order
+      _productSections.sort((a, b) {
+        final catA = _categories.indexWhere((c) => c.id == a.categoryId);
+        final catB = _categories.indexWhere((c) => c.id == b.categoryId);
+        return catA.compareTo(catB);
+      });
       _filteredProducts.clear();
     } else {
       _filteredProducts.value = _products
