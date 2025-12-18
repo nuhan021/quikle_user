@@ -9,6 +9,8 @@ import 'package:quikle_user/features/search/controllers/search_controller.dart';
 import 'package:quikle_user/core/common/widgets/unified_product_card.dart';
 import 'package:quikle_user/core/common/widgets/voice_search_overlay.dart';
 import 'package:quikle_user/core/common/widgets/custom_order_suggestion_widget.dart';
+import 'package:quikle_user/core/common/widgets/cart_animation_overlay.dart';
+import 'package:quikle_user/core/common/widgets/floating_cart_button.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -32,157 +34,162 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        // Controller will be cleaned up by onReady() next time screen is opened
-        return true;
-      },
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        appBar: AppBar(
+    return CartAnimationWrapper(
+      child: WillPopScope(
+        onWillPop: () async {
+          // Controller will be cleaned up by onReady() next time screen is opened
+          return true;
+        },
+        child: Scaffold(
           backgroundColor: Colors.white,
-          elevation: 0,
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: AppColors.ebonyBlack),
-            onPressed: () {
-              // Controller will be cleaned up by onReady() next time screen is opened
-              Get.back();
-            },
-          ),
-          title: Text(
-            'Search Products',
-            style: getTextStyle(
-              font: CustomFonts.obviously,
-              fontSize: 18.sp,
-              fontWeight: FontWeight.w600,
-              color: AppColors.ebonyBlack,
+          appBar: AppBar(
+            backgroundColor: Colors.white,
+            elevation: 0,
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back, color: AppColors.ebonyBlack),
+              onPressed: () {
+                // Controller will be cleaned up by onReady() next time screen is opened
+                Get.back();
+              },
             ),
-          ),
-          centerTitle: true,
-        ),
-        body: Stack(
-          children: [
-            SafeArea(
-              child: Column(
-                children: [
-                  Container(
-                    padding: EdgeInsets.all(16.w),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Container(
-                            height: 48.h,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFF8F9FA),
-                              borderRadius: BorderRadius.circular(8.r),
-                            ),
-                            child: Row(
-                              children: [
-                                SizedBox(width: 16.w),
-                                Icon(
-                                  Icons.search,
-                                  color: Colors.grey,
-                                  size: 20.w,
-                                ),
-                                SizedBox(width: 12.w),
-                                Expanded(
-                                  child: Obx(
-                                    () => TextField(
-                                      controller: controller.searchController,
-                                      onChanged: controller.onSearchChanged,
-                                      onSubmitted: (value) {
-                                        if (value.isNotEmpty) {
-                                          controller.performSearchNow(value);
-                                        }
-                                      },
-                                      textInputAction: TextInputAction.search,
-                                      decoration: InputDecoration(
-                                        hintText:
-                                            controller.currentPlaceholder.value,
-                                        hintStyle: getTextStyle(
-                                          font: CustomFonts.inter,
-                                          color: Colors.grey,
-                                          fontSize: 16,
-                                        ),
-                                        border: InputBorder.none,
-                                        enabledBorder: InputBorder.none,
-                                        focusedBorder: InputBorder.none,
-                                      ),
-                                      style: getTextStyle(
-                                        font: CustomFonts.inter,
-                                        fontSize: 16,
-                                        color: AppColors.ebonyBlack,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(width: 8.w),
-                                Obx(
-                                  () => GestureDetector(
-                                    onTap: controller.toggleVoiceRecognition,
-                                    child: Container(
-                                      padding: EdgeInsets.all(8.w),
-                                      decoration: BoxDecoration(
-                                        color: controller.isListening
-                                            ? AppColors.primary.withValues(
-                                                alpha: 0.1,
-                                              )
-                                            : Colors.transparent,
-                                        borderRadius: BorderRadius.circular(
-                                          6.r,
-                                        ),
-                                      ),
-                                      child: Image.asset(
-                                        ImagePath.voiceIcon,
-                                        height: 20.w,
-                                        width: 20.w,
-                                        color: controller.isListening
-                                            ? AppColors.primary
-                                            : Colors.grey,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(width: 12.w),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  Expanded(
-                    child: Obx(() {
-                      if (controller.isLoading) {
-                        return Center(
-                          child: CircularProgressIndicator(
-                            color: AppColors.primary,
-                          ),
-                        );
-                      }
-
-                      if (controller.searchQuery.isEmpty) {
-                        return _buildSuggestionsView(controller);
-                      } else {
-                        return _buildSearchResults(controller);
-                      }
-                    }),
-                  ),
-                ],
+            title: Text(
+              'Search Products',
+              style: getTextStyle(
+                font: CustomFonts.obviously,
+                fontSize: 18.sp,
+                fontWeight: FontWeight.w600,
+                color: AppColors.ebonyBlack,
               ),
             ),
+            centerTitle: true,
+          ),
+          body: Stack(
+            children: [
+              SafeArea(
+                child: Column(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(16.w),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Container(
+                              height: 48.h,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF8F9FA),
+                                borderRadius: BorderRadius.circular(8.r),
+                              ),
+                              child: Row(
+                                children: [
+                                  SizedBox(width: 16.w),
+                                  Icon(
+                                    Icons.search,
+                                    color: Colors.grey,
+                                    size: 20.w,
+                                  ),
+                                  SizedBox(width: 12.w),
+                                  Expanded(
+                                    child: Obx(
+                                      () => TextField(
+                                        controller: controller.searchController,
+                                        onChanged: controller.onSearchChanged,
+                                        onSubmitted: (value) {
+                                          if (value.isNotEmpty) {
+                                            controller.performSearchNow(value);
+                                          }
+                                        },
+                                        textInputAction: TextInputAction.search,
+                                        decoration: InputDecoration(
+                                          hintText: controller
+                                              .currentPlaceholder
+                                              .value,
+                                          hintStyle: getTextStyle(
+                                            font: CustomFonts.inter,
+                                            color: Colors.grey,
+                                            fontSize: 16,
+                                          ),
+                                          border: InputBorder.none,
+                                          enabledBorder: InputBorder.none,
+                                          focusedBorder: InputBorder.none,
+                                        ),
+                                        style: getTextStyle(
+                                          font: CustomFonts.inter,
+                                          fontSize: 16,
+                                          color: AppColors.ebonyBlack,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(width: 8.w),
+                                  Obx(
+                                    () => GestureDetector(
+                                      onTap: controller.toggleVoiceRecognition,
+                                      child: Container(
+                                        padding: EdgeInsets.all(8.w),
+                                        decoration: BoxDecoration(
+                                          color: controller.isListening
+                                              ? AppColors.primary.withValues(
+                                                  alpha: 0.1,
+                                                )
+                                              : Colors.transparent,
+                                          borderRadius: BorderRadius.circular(
+                                            6.r,
+                                          ),
+                                        ),
+                                        child: Image.asset(
+                                          ImagePath.voiceIcon,
+                                          height: 20.w,
+                                          width: 20.w,
+                                          color: controller.isListening
+                                              ? AppColors.primary
+                                              : Colors.grey,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(width: 12.w),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
 
-            Obx(() {
-              if (!controller.isListening) return const SizedBox.shrink();
-              return VoiceSearchOverlay(
-                soundLevel: controller.soundLevel.value,
-                onCancel: () async {
-                  await controller.toggleVoiceRecognition();
-                },
-              );
-            }),
-          ],
+                    Expanded(
+                      child: Obx(() {
+                        if (controller.isLoading) {
+                          return Center(
+                            child: CircularProgressIndicator(
+                              color: AppColors.primary,
+                            ),
+                          );
+                        }
+
+                        if (controller.searchQuery.isEmpty) {
+                          return _buildSuggestionsView(controller);
+                        } else {
+                          return _buildSearchResults(controller);
+                        }
+                      }),
+                    ),
+                  ],
+                ),
+              ),
+
+              Obx(() {
+                if (!controller.isListening) return const SizedBox.shrink();
+                return VoiceSearchOverlay(
+                  soundLevel: controller.soundLevel.value,
+                  onCancel: () async {
+                    await controller.toggleVoiceRecognition();
+                  },
+                );
+              }),
+
+              const FloatingCartButton(),
+            ],
+          ),
         ),
       ),
     );

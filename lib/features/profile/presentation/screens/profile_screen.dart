@@ -6,10 +6,11 @@ import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 import 'package:quikle_user/core/utils/constants/image_path.dart';
 import 'package:quikle_user/features/profile/controllers/profile_controller.dart';
-import 'package:quikle_user/features/profile/presentation/screens/language_settings_screen.dart';
 import 'package:quikle_user/features/profile/presentation/widgets/unified_profile_app_bar.dart';
 import 'package:quikle_user/features/profile/presentation/widgets/profile_card.dart';
 import 'package:quikle_user/features/profile/presentation/widgets/profile_menu_item.dart';
+import 'package:quikle_user/features/profile/presentation/widgets/profile_section_header.dart';
+import 'package:quikle_user/features/profile/presentation/widgets/profile_grid_item.dart';
 import 'package:quikle_user/routes/app_routes.dart';
 import 'package:quikle_user/features/profile/presentation/screens/my_profile_screen.dart';
 import 'package:quikle_user/features/main/presentation/screens/main_screen.dart';
@@ -32,16 +33,49 @@ class ProfileScreen extends StatelessWidget {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.w),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(height: 14.h),
+
+                  // Profile Card
                   Obx(() {
                     final user = controller.userService.currentUser;
                     return ProfileCard(
                       name: user?.name ?? controller.nameController.text,
-                      email: user?.email ?? controller.emailController.text,
+                      email: user?.phone ?? controller.phoneController.text,
                     );
                   }),
                   SizedBox(height: 16.h),
+                  GridView.count(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    crossAxisCount: 3,
+                    crossAxisSpacing: 12.w,
+                    mainAxisSpacing: 12.h,
+                    childAspectRatio: 0.95,
+                    children: [
+                      ProfileGridItem(
+                        assetIcon: ImagePath.addressIcon,
+                        title: 'Address Book',
+                        onTap: () => _navigateToAddressBook(context),
+                      ),
+                      ProfileGridItem(
+                        assetIcon: ImagePath.paymentIcon,
+                        title: 'Payment Method',
+                        onTap: () => _navigateToPaymentMethod(context),
+                      ),
+                      ProfileGridItem(
+                        assetIcon: ImagePath.helpIcon,
+                        title: 'Help & Support',
+                        onTap: () => _navigateToHelpSupport(context),
+                      ),
+                    ],
+                  ),
+
+                  SizedBox(height: 24.h),
+
+                  // Your Information Section
+                  const ProfileSectionHeader(title: 'Your Information'),
 
                   ProfileMenuItem(
                     assetIcon: ImagePath.myProfileIcon,
@@ -65,58 +99,18 @@ class ProfileScreen extends StatelessWidget {
                   SizedBox(height: 8.h),
 
                   ProfileMenuItem(
-                    assetIcon: ImagePath.addressIcon,
-                    title: 'Address Book',
-                    onTap: () => _navigateToAddressBook(context),
-                  ),
-                  SizedBox(height: 8.h),
-
-                  ProfileMenuItem(
-                    assetIcon: ImagePath.paymentIcon,
-                    title: 'Payment Method',
-                    onTap: () => _navigateToPaymentMethod(context),
-                  ),
-                  SizedBox(height: 8.h),
-
-                  // ProfileMenuItem(
-                  //   assetIcon: ImagePath.notificationIcon,
-                  //   title: 'Notification Settings',
-                  //   onTap: () => _navigateToNotificationSettings(context),
-                  // ),
-                  // SizedBox(height: 8.h),
-                  ProfileMenuItem(
-                    assetIcon: ImagePath.languageIcon,
-                    title: 'Language Settings',
-                    onTap: () => _navigateToLanguageSettings(context),
-                  ),
-                  SizedBox(height: 8.h),
-
-                  ProfileMenuItem(
-                    assetIcon: ImagePath.helpIcon,
-                    title: 'Help & Support',
-                    onTap: () => _navigateToHelpSupport(context),
-                  ),
-                  SizedBox(height: 8.h),
-
-                  ProfileMenuItem(
-                    assetIcon: ImagePath.privacyIcon,
-                    title: 'Privacy Policy',
-                    onTap: () => _navigateToPrivacyPolicy(context),
-                  ),
-                  SizedBox(height: 8.h),
-
-                  ProfileMenuItem(
-                    assetIcon: ImagePath.termsIcon,
-                    title: 'Terms & Conditions',
-                    onTap: () => _navigateToTermsConditions(context),
+                    assetIcon: ImagePath.prescriptionIcon,
+                    title: 'Prescription',
+                    onTap: () => _navigateToPrescriptionPage(context),
                   ),
                   SizedBox(height: 8.h),
 
                   ProfileMenuItem(
                     assetIcon: ImagePath.signOutIcon,
-                    title: 'Sign out',
+                    title: 'Sign Out',
                     onTap: () => _showSignOutDialog(context),
                   ),
+
                   SizedBox(height: 100.h),
                 ],
               ),
@@ -159,32 +153,12 @@ class ProfileScreen extends StatelessWidget {
     Get.toNamed(AppRoute.getPaymentMethods());
   }
 
-  void _navigateToNotificationSettings(BuildContext context) {
-    Get.toNamed(AppRoute.getNotificationSettings());
-  }
-
-  void _navigateToLanguageSettings(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) => const LanguageSettingsSheet(),
-    );
+  void _navigateToPrescriptionPage(BuildContext context) {
+    Get.toNamed(AppRoute.getPrescription());
   }
 
   void _navigateToHelpSupport(BuildContext context) {
     Get.toNamed(AppRoute.getHelpSupport());
-  }
-
-  void _navigateToPrivacyPolicy(BuildContext context) {
-    Get.toNamed(AppRoute.getPrivacyPolicy());
-  }
-
-  void _navigateToTermsConditions(BuildContext context) {
-    Get.toNamed(AppRoute.getTermsConditions());
   }
 
   void _showSignOutDialog(BuildContext context) {

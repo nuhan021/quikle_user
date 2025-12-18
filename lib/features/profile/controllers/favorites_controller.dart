@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:quikle_user/core/common/styles/global_text_style.dart';
+import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 import 'package:quikle_user/features/home/data/models/product_model.dart';
 import 'package:quikle_user/features/profile/services/favorites_service.dart';
 
@@ -93,31 +95,35 @@ class FavoritesController extends GetxController {
     if (isProductFavorite(product.id)) {
       final success = await removeFromFavorites(product.id);
       if (success) {
-        _showFavoritePopup('${product.title} removed from favorites', false);
+        _showFavoritePopup(
+          '${product.title} removed from favorites',
+          isAdded: false,
+        );
       }
     } else {
       final success = await addToFavorites(product);
       if (success) {
-        _showFavoritePopup('${product.title} added to favorites', true);
+        _showFavoritePopup(
+          '${product.title} added to favorites',
+          isAdded: true,
+        );
       }
     }
   }
 
-  void _showFavoritePopup(String message, bool isAdded) {
-    Get.defaultDialog(
-      title: isAdded ? 'Added to Favorites' : 'Removed from Favorites',
-      middleText: message,
+  void _showFavoritePopup(String message, {required bool isAdded}) {
+    Get.rawSnackbar(
+      messageText: Text(
+        message,
+        style: getTextStyle(color: Colors.black, font: CustomFonts.obviously),
+      ),
+      snackPosition: SnackPosition.TOP,
       backgroundColor: isAdded ? Colors.green.shade100 : Colors.red.shade100,
-      titleStyle: TextStyle(color: isAdded ? Colors.green : Colors.red),
-      middleTextStyle: TextStyle(color: Colors.black),
-      barrierDismissible: true,
+      icon: Icon(Icons.favorite, color: isAdded ? Colors.green : Colors.red),
+      duration: const Duration(seconds: 2),
+      margin: const EdgeInsets.all(12),
+      shouldIconPulse: false,
     );
-    // Auto close after 2 seconds
-    Future.delayed(const Duration(seconds: 2), () {
-      if (Get.isDialogOpen ?? false) {
-        Get.back();
-      }
-    });
   }
 
   void clearAllFavorites() {

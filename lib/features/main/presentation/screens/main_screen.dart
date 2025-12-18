@@ -111,15 +111,11 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                   child: SizeTransition(
                     axisAlignment: 1.0,
                     sizeFactor: _navController,
-                    child: SafeArea(
-                      top: false,
-                      bottom: true,
-                      child: KeyedSubtree(
-                        key: _navKey,
-                        child: CustomNavBar(
-                          currentIndex: _currentIndex,
-                          onTap: _onNavItemTapped,
-                        ),
+                    child: KeyedSubtree(
+                      key: _navKey,
+                      child: CustomNavBar(
+                        currentIndex: _currentIndex,
+                        onTap: _onNavItemTapped,
                       ),
                     ),
                   ),

@@ -64,6 +64,7 @@ class AppRoute {
   static const String splashWrapper = '/splashWrapper';
   static const String _privacyPolicy = '/privacy-policy';
   static const String _termsConditions = '/terms-conditions';
+  static const String _prescription = '/prescription';
 
   static String getSplashScreen() => _splash;
   static String getLoginScreen() => _login;
@@ -99,6 +100,7 @@ class AppRoute {
   static String getSplashWrapper() => splashWrapper;
   static String getPrivacyPolicy() => _privacyPolicy;
   static String getTermsConditions() => _termsConditions;
+  static String getPrescription() => _prescription;
 
   static final List<GetPage<dynamic>> routes = <GetPage>[
     GetPage(name: _splash, page: () => const SplashScreen()),
@@ -170,6 +172,7 @@ class AppRoute {
     GetPage(name: AppRoute.splashWrapper, page: () => const SplashWrapper()),
     GetPage(name: _privacyPolicy, page: () => const PrivacyPolicyScreen()),
     GetPage(name: _termsConditions, page: () => const TermsConditionsScreen()),
+    GetPage(name: _prescription, page: () => const PrescriptionListScreen()),
     // GetPage(
     //   name: _home,
     //   page: () => const _PlaceholderHome(),
