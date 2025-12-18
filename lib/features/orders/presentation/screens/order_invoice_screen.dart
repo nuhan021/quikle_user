@@ -9,6 +9,7 @@ import 'package:quikle_user/features/orders/data/models/order_model.dart';
 import 'package:quikle_user/features/orders/presentation/widgets/order_status_helpers.dart';
 import 'package:quikle_user/features/profile/presentation/widgets/unified_profile_app_bar.dart';
 import 'package:quikle_user/features/orders/presentation/screens/order_tracking_screen.dart';
+import 'package:quikle_user/core/common/widgets/customer_support_fab.dart';
 
 class OrderInvoiceScreen extends StatelessWidget {
   final OrderModel order;
@@ -21,48 +22,53 @@ class OrderInvoiceScreen extends StatelessWidget {
       backgroundColor: AppColors.homeGrey,
       body: SafeArea(
         bottom: false,
-        child: Column(
+        child: Stack(
           children: [
-            UnifiedProfileAppBar(
-              title: 'Order Details',
-              showBackButton: true,
-              showActionButton: order.isTrackable,
-              actionText: order.isTrackable ? 'Track Order' : null,
-              onActionPressed: order.isTrackable
-                  ? () => Get.to(() => OrderTrackingScreen(order: order))
-                  : null,
-            ),
-            Expanded(
-              child: Padding(
-                padding: EdgeInsets.only(
-                  left: 16.w,
-                  right: 16.w,
-                  top: 16.h,
-                  bottom: MediaQuery.of(context).padding.bottom,
+            Column(
+              children: [
+                UnifiedProfileAppBar(
+                  title: 'Order Details',
+                  showBackButton: true,
+                  showActionButton: order.isTrackable,
+                  actionText: order.isTrackable ? 'Track Order' : null,
+                  onActionPressed: order.isTrackable
+                      ? () => Get.to(() => OrderTrackingScreen(order: order))
+                      : null,
                 ),
-                child: SingleChildScrollView(
-                  // physics: const ClampingScrollPhysics(),
-                  physics: const ClampingScrollPhysics(),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildOrderHeader(),
-                      SizedBox(height: 16.h),
-                      _buildOrderItems(),
-                      SizedBox(height: 16.h),
-                      _buildPricingDetails(),
-                      SizedBox(height: 16.h),
-                      _buildPaymentInfo(),
-                      SizedBox(height: 16.h),
-                      _buildShippingAddress(),
-                      SizedBox(height: 16.h),
-                      _buildDeliveryInfo(),
-                      SizedBox(height: 24.h),
-                    ],
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                      left: 16.w,
+                      right: 16.w,
+                      top: 16.h,
+                      bottom: MediaQuery.of(context).padding.bottom,
+                    ),
+                    child: SingleChildScrollView(
+                      // physics: const ClampingScrollPhysics(),
+                      physics: const ClampingScrollPhysics(),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildOrderHeader(),
+                          SizedBox(height: 16.h),
+                          _buildOrderItems(),
+                          SizedBox(height: 16.h),
+                          _buildPricingDetails(),
+                          SizedBox(height: 16.h),
+                          _buildPaymentInfo(),
+                          SizedBox(height: 16.h),
+                          _buildShippingAddress(),
+                          SizedBox(height: 16.h),
+                          _buildDeliveryInfo(),
+                          SizedBox(height: 24.h),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
-              ),
+              ],
             ),
+            const CustomerSupportFAB(),
           ],
         ),
       ),

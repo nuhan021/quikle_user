@@ -348,7 +348,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       crossAxisCount: 3,
                       crossAxisSpacing: 8.w,
                       mainAxisSpacing: 8.h,
-                      childAspectRatio: 0.60,
+                      childAspectRatio: 0.65,
                     ),
                     itemCount: controller.searchResults.length,
                     itemBuilder: (context, index) {

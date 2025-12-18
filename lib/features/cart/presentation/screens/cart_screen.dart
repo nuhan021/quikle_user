@@ -3,10 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import '../../controllers/cart_controller.dart';
-import '../../../home/controllers/home_controller.dart';
 import '../widgets/cart_app_bar.dart';
 import '../widgets/cart_items_section.dart';
-import '../widgets/you_may_like_section.dart';
 import '../widgets/cart_bottom_section.dart';
 import '../../../payout/presentation/widgets/order_summary_section.dart';
 import '../../../payout/presentation/widgets/delivery_options_section.dart';
@@ -23,7 +21,6 @@ class CartScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cartController = Get.find<CartController>();
-    final homeController = Get.find<HomeController>();
     final payoutController = Get.put(PayoutController());
 
     return Scaffold(
@@ -52,22 +49,22 @@ class CartScreen extends StatelessWidget {
                   children: [
                     SizedBox(height: 16.h),
                     const ReceiverDetails(),
-                    SizedBox(height: 12.h),
+                    SizedBox(height: 8.h),
                     const CartItemsSection(),
-                    SizedBox(height: 19.h),
+                    SizedBox(height: 8.h),
                     const DeliveryOptionsSection(),
-                    SizedBox(height: 19.h),
+                    SizedBox(height: 8.h),
                     const CouponSection(),
-                    SizedBox(height: 19.h),
+                    SizedBox(height: 8.h),
                     const OrderSummarySection(),
                     SizedBox(height: 19.h),
-                    YouMayLikeSection(
-                      onAddToCart: cartController.addToCart,
-                      onFavoriteToggle: homeController.onFavoriteToggle,
-                      onProductTap: (p) =>
-                          Get.toNamed('/product-details', arguments: p),
-                    ),
-                    SizedBox(height: 19.h),
+                    // YouMayLikeSection(
+                    //   onAddToCart: cartController.addToCart,
+                    //   onFavoriteToggle: homeController.onFavoriteToggle,
+                    //   onProductTap: (p) =>
+                    //       Get.toNamed('/product-details', arguments: p),
+                    // ),
+                    // SizedBox(height: 19.h),
                   ],
                 ),
               ),
@@ -211,7 +208,6 @@ class CartScreen extends StatelessWidget {
     cartController.setPlacingOrder(true);
 
     try {
-      // Use PayoutController's placeOrder which handles the entire Cashfree flow
       await payoutController.placeOrder();
     } catch (e) {
       // Extract error message

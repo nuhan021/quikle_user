@@ -32,7 +32,7 @@ class ReceiverDetails extends StatelessWidget {
                 '$receiverName ${receiverPhone.isNotEmpty ? "($receiverPhone)" : ""}',
                 style: getTextStyle(
                   font: CustomFonts.inter,
-                  fontSize: 14.sp,
+                  fontSize: 12.sp,
                   fontWeight: FontWeight.w600,
                   color: AppColors.ebonyBlack,
                 ),
@@ -53,7 +53,7 @@ class ReceiverDetails extends StatelessWidget {
                   'Change',
                   style: getTextStyle(
                     font: CustomFonts.inter,
-                    fontSize: 13.sp,
+                    fontSize: 11.sp,
                     fontWeight: FontWeight.w600,
                     color: AppColors.beakYellow,
                   ),
