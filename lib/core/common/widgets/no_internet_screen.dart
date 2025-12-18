@@ -78,9 +78,17 @@ class NoInternetScreen extends StatelessWidget {
                       ),
                       child: ElevatedButton(
                         onPressed: () async {
-                          AppSettings.openAppSettingsPanel(
-                            AppSettingsPanelType.internetConnectivity,
-                          );
+                          if (GetPlatform.isAndroid) {
+                            // Android: Use the smooth Connectivity Panel
+                            await AppSettings.openAppSettingsPanel(
+                              AppSettingsPanelType.internetConnectivity,
+                            );
+                          } else {
+                            // iOS: Open Wi-Fi/App Settings
+                            await AppSettings.openAppSettings(
+                              type: AppSettingsType.wifi,
+                            );
+                          }
                         },
                         style: ElevatedButton.styleFrom(
                           side: BorderSide.none,

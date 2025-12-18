@@ -475,30 +475,43 @@ class PayoutController extends GetxController {
     Get.dialog(
       PopScope(
         canPop: false,
-        child: Center(
-          child: Container(
-            padding: const EdgeInsets.all(24),
-            margin: const EdgeInsets.symmetric(horizontal: 40),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const CircularProgressIndicator(),
-                const SizedBox(height: 16),
-                const Text(
-                  'Processing Payment',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Please wait while we confirm your payment...',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-                ),
-              ],
+        child: Material(
+          type: MaterialType.transparency,
+          child: Center(
+            child: Container(
+              padding: const EdgeInsets.all(24),
+              margin: const EdgeInsets.symmetric(horizontal: 40),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const CircularProgressIndicator(),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Processing Payment',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                      decoration: TextDecoration.none,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Please wait while we confirm your payment...',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[600],
+                      decoration: TextDecoration.none,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
