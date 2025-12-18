@@ -65,7 +65,7 @@ dependencies:
   build_runner: ^2.9.0
   animated_bottom_navigation_bar: ^1.4.0
   connectivity_plus: ^7.0.0
-  app_settings: ^6.1.1
+  app_settings: ^7.0.0
   pin_code_fields: ^8.0.1
   freshchat_sdk: ^0.10.26
   webview_flutter: ^4.10.0

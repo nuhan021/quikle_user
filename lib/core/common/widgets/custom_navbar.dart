@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconsax/iconsax.dart';
@@ -21,57 +22,66 @@ class CustomNavBar extends StatelessWidget {
     final media = MediaQuery.of(context);
     final bottomInset = media.padding.bottom;
 
-    return Container(
-      padding: EdgeInsets.only(
-        top: 8.h,
-        left: 8.w,
-        right: 8.w,
-        bottom: bottomInset > 0 ? bottomInset : 8.h,
+    return ClipRRect(
+      borderRadius: BorderRadius.only(
+        topLeft: Radius.circular(16.r),
+        topRight: Radius.circular(16.r),
       ),
-      decoration: BoxDecoration(
-        color: Colors.black,
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(16.r),
-          topRight: Radius.circular(16.r),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+        child: Container(
+          padding: EdgeInsets.only(
+            top: 8.h,
+            left: 8.w,
+            right: 8.w,
+            bottom: bottomInset > 0 ? bottomInset : 8.h,
+          ),
+          decoration: BoxDecoration(
+            color: Colors.black.withValues(alpha: 0.7),
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(16.r),
+              topRight: Radius.circular(16.r),
+            ),
+            border: Border(
+              top: BorderSide(width: 2.w, color: AppColors.gradientColor),
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              _NavItem(
+                inactiveIcon: ImagePath.homeNav,
+                activeIcon: ImagePath.homeActiveNav,
+                label: 'Home',
+                isSelected: currentIndex == 0,
+                onTap: () => onTap(0),
+              ),
+              _NavItem(
+                inactiveIcon: ImagePath.orderIcon,
+                activeIcon: ImagePath.orderActiveIcon,
+                label: 'All Orders',
+                isSelected: currentIndex == 1,
+                onTap: () => onTap(1),
+              ),
+              _NavItem(
+                inactiveIcon: ImagePath.categoryIcon,
+                activeIcon: ImagePath.categoryActiveIcon,
+                label: 'Categories',
+                isSelected: currentIndex == 2,
+                onTap: () => onTap(2),
+              ),
+              _NavItem(
+                inactiveIcon: ImagePath.profile,
+                activeIcon: ImagePath.profile,
+                label: 'Profile',
+                isSelected: currentIndex == 3,
+                onTap: () => onTap(3),
+                isProfile: true,
+              ),
+            ],
+          ),
         ),
-        border: Border(
-          top: BorderSide(width: 2.w, color: AppColors.gradientColor),
-        ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          _NavItem(
-            inactiveIcon: ImagePath.homeNav,
-            activeIcon: ImagePath.homeActiveNav,
-            label: 'Home',
-            isSelected: currentIndex == 0,
-            onTap: () => onTap(0),
-          ),
-          _NavItem(
-            inactiveIcon: ImagePath.orderIcon,
-            activeIcon: ImagePath.orderActiveIcon,
-            label: 'All Orders',
-            isSelected: currentIndex == 1,
-            onTap: () => onTap(1),
-          ),
-          _NavItem(
-            inactiveIcon: ImagePath.categoryIcon,
-            activeIcon: ImagePath.categoryActiveIcon,
-            label: 'Categories',
-            isSelected: currentIndex == 2,
-            onTap: () => onTap(2),
-          ),
-          _NavItem(
-            inactiveIcon: ImagePath.profile,
-            activeIcon: ImagePath.profile,
-            label: 'Profile',
-            isSelected: currentIndex == 3,
-            onTap: () => onTap(3),
-            isProfile: true,
-          ),
-        ],
       ),
     );
   }
