@@ -10,6 +10,8 @@ class ShippingAddressModel {
   final String country;
   final String zipCode;
   final String? landmark;
+  final String? flatHouseBuilding;
+  final String? floorNumber;
   final String phoneNumber;
   final String? email;
   final AddressType type;
@@ -28,6 +30,8 @@ class ShippingAddressModel {
     this.country = 'India',
     required this.zipCode,
     this.landmark,
+    this.flatHouseBuilding,
+    this.floorNumber,
     required this.phoneNumber,
     this.email,
     required this.type,
@@ -47,6 +51,8 @@ class ShippingAddressModel {
     String? country,
     String? zipCode,
     String? landmark,
+    String? flatHouseBuilding,
+    String? floorNumber,
     String? phoneNumber,
     String? email,
     AddressType? type,
@@ -65,6 +71,8 @@ class ShippingAddressModel {
       country: country ?? this.country,
       zipCode: zipCode ?? this.zipCode,
       landmark: landmark ?? this.landmark,
+      flatHouseBuilding: flatHouseBuilding ?? this.flatHouseBuilding,
+      floorNumber: floorNumber ?? this.floorNumber,
       phoneNumber: phoneNumber ?? this.phoneNumber,
       email: email ?? this.email,
       type: type ?? this.type,
@@ -118,6 +126,9 @@ class ShippingAddressModel {
       'phone_number': phoneNumber,
       'email': email ?? '',
       'addressType': addressTypeValue,
+      'flat_house_building': flatHouseBuilding ?? '',
+      'floor_number': floorNumber ?? '',
+      'nearby_landmark': landmark ?? '',
       'is_default': isDefault,
     };
   }
@@ -148,7 +159,9 @@ class ShippingAddressModel {
       state: json['state'] as String,
       country: json['country'] as String? ?? 'India',
       zipCode: json['postal_code'] as String,
-      landmark: json['address_line2'] as String?,
+      landmark: json['nearby_landmark'] as String?,
+      flatHouseBuilding: json['flat_house_building'] as String?,
+      floorNumber: json['floor_number'] as String?,
       phoneNumber: json['phone_number'] as String,
       email: json['email'] as String?,
       type: addressType,

@@ -7,6 +7,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:http/http.dart' as http;
 import 'package:quikle_user/features/profile/controllers/add_address_controller.dart';
+import 'package:quikle_user/features/profile/presentation/screens/add_address_screen.dart';
 
 class MapAddressPickerController extends GetxController {
   // Google Maps API Key
@@ -592,11 +593,23 @@ class MapAddressPickerController extends GetxController {
       print('✅ Set zip code: $zipCode');
     }
 
-    // Go back to the add address screen first
+    // Go back to close the map screen
     Get.back();
 
-    // Show success message after a small delay (after navigation completes)
-    Future.delayed(const Duration(milliseconds: 300), () {
+    // Show the address details sheet after a small delay (after navigation completes)
+    Future.delayed(const Duration(milliseconds: 10), () {
+      // Import is needed at top: import 'package:quikle_user/features/profile/presentation/screens/add_address_screen.dart';
+      // Show the address details bottom sheet
+      if (Get.context != null) {
+        showModalBottomSheet(
+          context: Get.context!,
+          isScrollControlled: true,
+          backgroundColor: Colors.transparent,
+          builder: (context) => const AddressDetailsScreen(addressToEdit: null),
+        );
+      }
+
+      // Show success message
       Get.snackbar(
         'Success',
         'Address selected from map',
