@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:quikle_user/features/profile/data/services/address_service.dart';
 import 'package:quikle_user/features/profile/data/models/shipping_address_model.dart';
 import 'package:quikle_user/features/profile/controllers/address_controller.dart';
@@ -10,14 +13,18 @@ class AddAddressController extends GetxController {
   final _addressController = Get.find<AddressController>();
 
   final nameController = TextEditingController();
+  final phoneController = TextEditingController();
+  final flatHouseBuildingController = TextEditingController();
+  final floorNumberController = TextEditingController();
+  final nearbyLandmarkController = TextEditingController();
   final addressController = TextEditingController();
   final zipCodeController = TextEditingController();
-  final phoneController = TextEditingController();
   final stateTextController = TextEditingController();
   final cityTextController = TextEditingController();
 
   final isLoading = false.obs;
   final isDefault = false.obs;
+  final useCurrentLocation = false.obs;
 
   final selectedCountry = Rxn<String>();
   final selectedState = Rxn<String>();
@@ -25,9 +32,11 @@ class AddAddressController extends GetxController {
   final selectedAddressType = Rxn<AddressType>();
 
   final nameError = ''.obs;
+  final phoneError = ''.obs;
+  final flatHouseBuildingError = ''.obs;
+  final nearbyLandmarkError = ''.obs;
   final addressError = ''.obs;
   final zipCodeError = ''.obs;
-  final phoneError = ''.obs;
   final stateError = ''.obs;
 
   final countries = <String>[].obs;
@@ -44,9 +53,12 @@ class AddAddressController extends GetxController {
   @override
   void onClose() {
     nameController.dispose();
+    phoneController.dispose();
+    flatHouseBuildingController.dispose();
+    floorNumberController.dispose();
+    nearbyLandmarkController.dispose();
     addressController.dispose();
     zipCodeController.dispose();
-    phoneController.dispose();
     stateTextController.dispose();
     cityTextController.dispose();
     super.onClose();
@@ -63,14 +75,21 @@ class AddAddressController extends GetxController {
     nameController.addListener(() {
       if (nameError.value.isNotEmpty) nameError.value = '';
     });
+    phoneController.addListener(() {
+      if (phoneError.value.isNotEmpty) phoneError.value = '';
+    });
+    flatHouseBuildingController.addListener(() {
+      if (flatHouseBuildingError.value.isNotEmpty)
+        flatHouseBuildingError.value = '';
+    });
+    nearbyLandmarkController.addListener(() {
+      if (nearbyLandmarkError.value.isNotEmpty) nearbyLandmarkError.value = '';
+    });
     addressController.addListener(() {
       if (addressError.value.isNotEmpty) addressError.value = '';
     });
     zipCodeController.addListener(() {
       if (zipCodeError.value.isNotEmpty) zipCodeError.value = '';
-    });
-    phoneController.addListener(() {
-      if (phoneError.value.isNotEmpty) phoneError.value = '';
     });
   }
 
@@ -118,6 +137,139 @@ class AddAddressController extends GetxController {
 
   void setAddressType(AddressType type) {
     selectedAddressType.value = type;
+  }
+
+  void setUseCurrentLocation(bool value) {
+    useCurrentLocation.value = value;
+  }
+
+  /// Get current location and reverse geocode to get address details
+  Future<bool> getCurrentLocationAndPopulateAddress() async {
+    try {
+      isLoading.value = true;
+
+      // Check and request location permission
+      var permission = await Permission.location.status;
+      if (permission.isDenied) {
+        permission = await Permission.location.request();
+        if (permission.isDenied) {
+          Get.snackbar(
+            'Permission Denied',
+            'Location permission is required to use current location',
+            snackPosition: SnackPosition.BOTTOM,
+          );
+          return false;
+        }
+      }
+
+      if (permission.isPermanentlyDenied) {
+        Get.snackbar(
+          'Permission Required',
+          'Please enable location permission in app settings',
+          snackPosition: SnackPosition.BOTTOM,
+          mainButton: TextButton(
+            onPressed: () => openAppSettings(),
+            child: const Text('Settings'),
+          ),
+        );
+        return false;
+      }
+
+      // Check if location services are enabled
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        Get.snackbar(
+          'Location Service Disabled',
+          'Please enable location services to continue',
+          snackPosition: SnackPosition.BOTTOM,
+        );
+        return false;
+      }
+
+      // Get current position
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      // Reverse geocode to get address
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+
+      if (placemarks.isNotEmpty) {
+        Placemark place = placemarks.first;
+
+        // Build full address string
+        String fullAddress = '';
+        if (place.street != null && place.street!.isNotEmpty) {
+          fullAddress += place.street!;
+        }
+        if (place.subLocality != null && place.subLocality!.isNotEmpty) {
+          if (fullAddress.isNotEmpty) fullAddress += ', ';
+          fullAddress += place.subLocality!;
+        }
+        if (place.locality != null && place.locality!.isNotEmpty) {
+          if (fullAddress.isNotEmpty) fullAddress += ', ';
+          fullAddress += place.locality!;
+        }
+
+        // Populate the address controller
+        addressController.text = fullAddress;
+
+        // Set city
+        if (place.locality != null && place.locality!.isNotEmpty) {
+          selectedCity.value = place.locality;
+          cityTextController.text = place.locality!;
+        } else if (place.subAdministrativeArea != null &&
+            place.subAdministrativeArea!.isNotEmpty) {
+          selectedCity.value = place.subAdministrativeArea;
+          cityTextController.text = place.subAdministrativeArea!;
+        }
+
+        // Set state
+        if (place.administrativeArea != null &&
+            place.administrativeArea!.isNotEmpty) {
+          selectedState.value = place.administrativeArea;
+          stateTextController.text = place.administrativeArea!;
+        }
+
+        // Set country
+        if (place.country != null && place.country!.isNotEmpty) {
+          selectedCountry.value = place.country;
+        }
+
+        // Set zip code/postal code
+        if (place.postalCode != null && place.postalCode!.isNotEmpty) {
+          zipCodeController.text = place.postalCode!;
+        }
+
+        Get.snackbar(
+          'Success',
+          'Location detected successfully',
+          snackPosition: SnackPosition.BOTTOM,
+          duration: const Duration(seconds: 2),
+        );
+
+        return true;
+      } else {
+        Get.snackbar(
+          'Error',
+          'Unable to get address from location',
+          snackPosition: SnackPosition.BOTTOM,
+        );
+        return false;
+      }
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to get current location: ${e.toString()}',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   void toggleIsDefault() {
@@ -174,7 +326,7 @@ class AddAddressController extends GetxController {
   }
 */
   Future<void> addAddress() async {
-    // Basic validation
+    // Basic validation - only validate user-visible fields
     if (nameController.text.trim().isEmpty) {
       nameError.value = 'Full name is required';
       return;
@@ -185,24 +337,34 @@ class AddAddressController extends GetxController {
       return;
     }
 
-    if (addressController.text.trim().isEmpty) {
-      addressError.value = 'Address is required';
+    if (flatHouseBuildingController.text.trim().isEmpty) {
+      flatHouseBuildingError.value = 'This field is required';
       return;
     }
 
-    if (selectedState.value == null || selectedState.value!.isEmpty) {
-      Get.snackbar('Validation Error', 'Please select a state');
+    if (nearbyLandmarkController.text.trim().isEmpty) {
+      nearbyLandmarkError.value = 'Landmark is required';
       return;
+    }
+
+    if (addressController.text.trim().isEmpty) {
+      addressError.value = 'Full address is required';
+      return;
+    }
+
+    // Note: Country, State, City, and Zip Code will be auto-populated from map/current location
+    // For now, we'll use default values. You should implement the location services to populate these.
+    if (selectedState.value == null || selectedState.value!.isEmpty) {
+      selectedState.value =
+          'DefaultState'; // TODO: Get from map/location service
     }
 
     if (selectedCity.value == null || selectedCity.value!.isEmpty) {
-      Get.snackbar('Validation Error', 'Please select a city');
-      return;
+      selectedCity.value = 'DefaultCity'; // TODO: Get from map/location service
     }
 
     if (zipCodeController.text.trim().isEmpty) {
-      zipCodeError.value = 'Zip code is required';
-      return;
+      zipCodeController.text = '000000'; // TODO: Get from map/location service
     }
 
     try {
@@ -217,6 +379,9 @@ class AddAddressController extends GetxController {
         state: selectedState.value!,
         country: selectedCountry.value ?? 'India',
         zipCode: zipCodeController.text.trim(),
+        landmark: nearbyLandmarkController.text.trim(),
+        flatHouseBuilding: flatHouseBuildingController.text.trim(),
+        floorNumber: floorNumberController.text.trim(),
         phoneNumber: phoneController.text.trim(),
         type: selectedAddressType.value!,
         isDefault: isDefault.value,
@@ -238,9 +403,12 @@ class AddAddressController extends GetxController {
 
   void clearForm() {
     nameController.clear();
+    phoneController.clear();
+    flatHouseBuildingController.clear();
+    floorNumberController.clear();
+    nearbyLandmarkController.clear();
     addressController.clear();
     zipCodeController.clear();
-    phoneController.clear();
     stateTextController.clear();
     cityTextController.clear();
     selectedCountry.value = 'India';
@@ -248,6 +416,7 @@ class AddAddressController extends GetxController {
     selectedCity.value = null;
     selectedAddressType.value = AddressType.home;
     isDefault.value = false;
+    useCurrentLocation.value = false;
     cities.clear(); // Clear cities when form is cleared
     _clearErrors();
   }
@@ -258,18 +427,23 @@ class AddAddressController extends GetxController {
 
   void _clearErrors() {
     nameError.value = '';
+    phoneError.value = '';
+    flatHouseBuildingError.value = '';
+    nearbyLandmarkError.value = '';
     addressError.value = '';
     zipCodeError.value = '';
-    phoneError.value = '';
     stateError.value = '';
   }
 
   // Pre-fill form for editing an existing address
   void prefillAddress(ShippingAddressModel address) {
     nameController.text = address.name;
+    phoneController.text = address.phoneNumber;
+    flatHouseBuildingController.text = address.flatHouseBuilding ?? '';
+    floorNumberController.text = address.floorNumber ?? '';
+    nearbyLandmarkController.text = address.landmark ?? '';
     addressController.text = address.address;
     zipCodeController.text = address.zipCode;
-    phoneController.text = address.phoneNumber;
 
     selectedCountry.value = address.country;
     _loadStatesForCountry(address.country);
@@ -286,7 +460,7 @@ class AddAddressController extends GetxController {
 
   // Update an existing address
   Future<void> updateAddress(String addressId) async {
-    // Basic validation
+    // Basic validation - only validate user-visible fields
     if (nameController.text.trim().isEmpty) {
       nameError.value = 'Full name is required';
       return;
@@ -297,24 +471,34 @@ class AddAddressController extends GetxController {
       return;
     }
 
-    if (addressController.text.trim().isEmpty) {
-      addressError.value = 'Address is required';
+    if (flatHouseBuildingController.text.trim().isEmpty) {
+      flatHouseBuildingError.value = 'This field is required';
       return;
     }
 
-    if (selectedState.value == null || selectedState.value!.isEmpty) {
-      Get.snackbar('Validation Error', 'Please select a state');
+    if (nearbyLandmarkController.text.trim().isEmpty) {
+      nearbyLandmarkError.value = 'Landmark is required';
       return;
+    }
+
+    if (addressController.text.trim().isEmpty) {
+      addressError.value = 'Full address is required';
+      return;
+    }
+
+    // Note: Country, State, City, and Zip Code will be auto-populated from map/current location
+    // For now, we'll use default values if not already set
+    if (selectedState.value == null || selectedState.value!.isEmpty) {
+      selectedState.value =
+          'DefaultState'; // TODO: Get from map/location service
     }
 
     if (selectedCity.value == null || selectedCity.value!.isEmpty) {
-      Get.snackbar('Validation Error', 'Please select a city');
-      return;
+      selectedCity.value = 'DefaultCity'; // TODO: Get from map/location service
     }
 
     if (zipCodeController.text.trim().isEmpty) {
-      zipCodeError.value = 'Zip code is required';
-      return;
+      zipCodeController.text = '000000'; // TODO: Get from map/location service
     }
 
     try {
@@ -329,6 +513,9 @@ class AddAddressController extends GetxController {
         state: selectedState.value!,
         country: selectedCountry.value ?? 'India',
         zipCode: zipCodeController.text.trim(),
+        landmark: nearbyLandmarkController.text.trim(),
+        flatHouseBuilding: flatHouseBuildingController.text.trim(),
+        floorNumber: floorNumberController.text.trim(),
         phoneNumber: phoneController.text.trim(),
         type: selectedAddressType.value!,
         isDefault: isDefault.value,

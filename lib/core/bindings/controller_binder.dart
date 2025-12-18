@@ -3,6 +3,7 @@ import 'package:quikle_user/core/common/widgets/cart_animation_overlay.dart';
 import 'package:quikle_user/core/notification/controllers/notification_controller.dart';
 import 'package:quikle_user/core/notification/services/notification_service.dart';
 import 'package:quikle_user/core/services/cart_position_service.dart';
+import 'package:quikle_user/features/profile/controllers/add_address_controller.dart';
 import 'package:quikle_user/features/user/data/services/user_service.dart';
 import 'package:quikle_user/features/user/controllers/user_controller.dart';
 import 'package:quikle_user/features/auth/controllers/login_controller.dart';
@@ -56,6 +57,7 @@ class ControllerBinder extends Bindings {
     Get.put<CartPositionService>(CartPositionService(), permanent: true);
     Get.put<FavoritesController>(FavoritesController(), permanent: true);
     Get.put<AddressController>(AddressController(), permanent: true);
+    Get.put<AddAddressController>(AddAddressController(), permanent: true);
     Get.put<PaymentMethodController>(
       PaymentMethodController(),
       permanent: true,
