@@ -2,6 +2,7 @@ import 'package:quikle_user/core/models/response_data.dart';
 import 'package:quikle_user/core/services/network_caller.dart';
 import 'package:quikle_user/core/services/storage_service.dart';
 import 'package:quikle_user/core/utils/constants/api_constants.dart';
+import 'package:quikle_user/core/utils/constants/enums/order_enums.dart';
 import 'package:quikle_user/core/utils/logging/logger.dart';
 import 'package:quikle_user/features/cart/data/models/cart_item_model.dart';
 import 'package:quikle_user/features/orders/data/models/order_model.dart';
@@ -72,9 +73,16 @@ class OrderApiService {
         final data = response.responseData as Map<String, dynamic>;
         final ordersList = data['orders'] as List<dynamic>;
 
-        return ordersList
+        final allOrders = ordersList
             .map((json) => OrderModel.fromJson(json as Map<String, dynamic>))
             .toList();
+
+        // Filter out orders with pending status
+        final filteredOrders = allOrders
+            .where((order) => order.status != OrderStatus.pending)
+            .toList();
+
+        return filteredOrders;
       }
 
       AppLoggerHelper.warning('No orders found or API call failed');
