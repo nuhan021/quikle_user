@@ -468,6 +468,7 @@ class MapAddressPickerController extends GetxController {
     addAddressController.addressController.text = fullAddress.value.isNotEmpty
         ? fullAddress.value
         : streetAddress;
+    addAddressController.isAddressFromMap.value = true; // Mark as from map
 
     // Set country first
     if (country.isNotEmpty) {
@@ -609,18 +610,18 @@ class MapAddressPickerController extends GetxController {
         );
       }
 
-      // Show success message
-      Get.snackbar(
-        'Success',
-        'Address selected from map',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.green[600],
-        colorText: Colors.white,
-        duration: const Duration(seconds: 2),
-        margin: const EdgeInsets.all(12),
-        borderRadius: 8,
-        icon: const Icon(Icons.check_circle, color: Colors.white),
-      );
+      // // Show success message
+      // Get.snackbar(
+      //   'Success',
+      //   'Address selected from map',
+      //   snackPosition: SnackPosition.BOTTOM,
+      //   backgroundColor: Colors.green[600],
+      //   colorText: Colors.white,
+      //   duration: const Duration(seconds: 2),
+      //   margin: const EdgeInsets.all(12),
+      //   borderRadius: 8,
+      //   icon: const Icon(Icons.check_circle, color: Colors.white),
+      // );
     });
   }
 }

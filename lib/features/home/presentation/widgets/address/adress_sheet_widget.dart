@@ -7,6 +7,7 @@ import 'package:quikle_user/core/utils/constants/enums/address_type_enums.dart';
 import 'package:quikle_user/core/utils/constants/image_path.dart';
 import 'package:quikle_user/features/profile/controllers/address_controller.dart';
 import 'package:quikle_user/features/profile/presentation/screens/add_address_screen.dart';
+import 'package:iconsax/iconsax.dart';
 
 Future<String?> showAddressSelectionSheet(AddressController addressController) {
   return Get.bottomSheet<String>(
@@ -144,107 +145,130 @@ class _AddressSelectionSheet extends StatelessWidget {
                         return Column(
                           children: items.map((address) {
                             final isSelected = currentDefaultId == address.id;
-                            return GestureDetector(
-                              onTap: () {
-                                Navigator.pop(context, address.id);
-                              },
-                              child: Container(
-                                margin: const EdgeInsets.only(bottom: 12),
-                                padding: const EdgeInsets.all(16),
-                                decoration: BoxDecoration(
+                            return Container(
+                              margin: const EdgeInsets.only(bottom: 12),
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: isSelected
+                                    ? AppColors.gradientColor.withOpacity(0.15)
+                                    : Colors.grey[50],
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
                                   color: isSelected
-                                      ? AppColors.gradientColor.withOpacity(
-                                          0.15,
-                                        )
-                                      : Colors.grey[50],
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color: isSelected
-                                        ? AppColors.gradientColor
-                                        : Colors.grey[300]!,
-                                    width: isSelected ? 2 : 1,
-                                  ),
+                                      ? AppColors.gradientColor
+                                      : Colors.grey[300]!,
+                                  width: isSelected ? 2 : 1,
                                 ),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.all(8),
-                                      child: Image.asset(
-                                        address.type == AddressType.home
-                                            ? ImagePath.homeAddressIcon
-                                            : address.type == AddressType.office
-                                            ? ImagePath.officeAddressIcon
-                                            : ImagePath.addressIcon,
-                                        width: 30,
-                                        height: 30,
-                                        fit: BoxFit.contain,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                              ),
+                              child: Row(
+                                children: [
+                                  // Tap to select address
+                                  Expanded(
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        Navigator.pop(context, address.id);
+                                      },
+                                      child: Row(
                                         children: [
-                                          Row(
-                                            children: [
-                                              Text(
-                                                '${_getAddressTypeLabel(address.type)} - ${address.name}',
-                                                style: getTextStyle(
-                                                  font: CustomFonts.inter,
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w600,
-                                                  color: AppColors.ebonyBlack,
-                                                ),
-                                              ),
-                                              if (address.isDefault) ...[
-                                                const SizedBox(width: 8),
-                                                Container(
-                                                  padding:
-                                                      const EdgeInsets.symmetric(
-                                                        horizontal: 8,
-                                                        vertical: 2,
-                                                      ),
-                                                  decoration: BoxDecoration(
-                                                    color:
-                                                        AppColors.gradientColor,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          10,
+                                          Container(
+                                            padding: const EdgeInsets.all(8),
+                                            child: Image.asset(
+                                              address.type == AddressType.home
+                                                  ? ImagePath.homeAddressIcon
+                                                  : address.type ==
+                                                        AddressType.office
+                                                  ? ImagePath.officeAddressIcon
+                                                  : ImagePath.addressIcon,
+                                              width: 30,
+                                              height: 30,
+                                              fit: BoxFit.contain,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 12),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    Flexible(
+                                                      child: Text(
+                                                        '${_getAddressTypeLabel(address.type)} - ${address.name}',
+                                                        style: getTextStyle(
+                                                          font:
+                                                              CustomFonts.inter,
+                                                          fontSize: 14,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          color: AppColors
+                                                              .ebonyBlack,
                                                         ),
-                                                  ),
-                                                  child: Text(
-                                                    'Current',
-                                                    style: getTextStyle(
-                                                      font: CustomFonts.inter,
-                                                      fontSize: 10,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      color: Colors.white,
+                                                        maxLines: 1,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                      ),
                                                     ),
+                                                    if (address.isDefault) ...[
+                                                      const SizedBox(width: 8),
+                                                      Container(
+                                                        padding:
+                                                            const EdgeInsets.symmetric(
+                                                              horizontal: 8,
+                                                              vertical: 2,
+                                                            ),
+                                                        decoration: BoxDecoration(
+                                                          color: AppColors
+                                                              .gradientColor,
+                                                          borderRadius:
+                                                              BorderRadius.circular(
+                                                                10,
+                                                              ),
+                                                        ),
+                                                        child: Text(
+                                                          'Current',
+                                                          style: getTextStyle(
+                                                            font: CustomFonts
+                                                                .inter,
+                                                            fontSize: 10,
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            color: Colors.white,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ],
+                                                ),
+                                                const SizedBox(height: 4),
+                                                Text(
+                                                  _formatAddress(
+                                                    address.address,
+                                                    address.city,
                                                   ),
+                                                  style: getTextStyle(
+                                                    font: CustomFonts.inter,
+                                                    fontSize: 12,
+                                                    color:
+                                                        AppColors.featherGrey,
+                                                  ),
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
                                                 ),
                                               ],
-                                            ],
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            _formatAddress(
-                                              address.address,
-                                              address.city,
                                             ),
-                                            style: getTextStyle(
-                                              font: CustomFonts.inter,
-                                              fontSize: 12,
-                                              color: AppColors.featherGrey,
-                                            ),
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
                                           ),
                                         ],
                                       ),
                                     ),
-                                    AnimatedContainer(
+                                  ),
+                                  // Radio button for selection
+                                  GestureDetector(
+                                    onTap: () {
+                                      Navigator.pop(context, address.id);
+                                    },
+                                    child: AnimatedContainer(
                                       duration: const Duration(
                                         milliseconds: 200,
                                       ),
@@ -258,8 +282,92 @@ class _AddressSelectionSheet extends StatelessWidget {
                                         size: 24,
                                       ),
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  // Menu button for edit/delete
+                                  PopupMenuButton<String>(
+                                    icon: Icon(
+                                      Icons.more_vert,
+                                      color: AppColors.textSecondary,
+                                      size: 20,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    onSelected: (value) {
+                                      if (value == 'edit') {
+                                        Navigator.pop(context);
+                                        Future.delayed(
+                                          const Duration(milliseconds: 200),
+                                          () {
+                                            AddAddressScreen.show(
+                                              Get.context!,
+                                              addressToEdit: address,
+                                            );
+                                          },
+                                        );
+                                      } else if (value == 'delete') {
+                                        Navigator.pop(context);
+                                        Future.delayed(
+                                          const Duration(milliseconds: 200),
+                                          () {
+                                            _showDeleteConfirmation(
+                                              Get.context!,
+                                              address,
+                                              addressController,
+                                            );
+                                          },
+                                        );
+                                      }
+                                    },
+                                    itemBuilder: (context) => [
+                                      PopupMenuItem(
+                                        value: 'edit',
+                                        child: Row(
+                                          children: [
+                                            Icon(
+                                              Iconsax.edit_2,
+                                              size: 18,
+                                              color: AppColors.ebonyBlack,
+                                            ),
+                                            const SizedBox(width: 12),
+                                            Text(
+                                              'Edit',
+                                              style: getTextStyle(
+                                                font: CustomFonts.inter,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500,
+                                                color: AppColors.ebonyBlack,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      PopupMenuItem(
+                                        value: 'delete',
+                                        child: Row(
+                                          children: [
+                                            Icon(
+                                              Iconsax.trash,
+                                              size: 18,
+                                              color: AppColors.error,
+                                            ),
+                                            const SizedBox(width: 12),
+                                            Text(
+                                              'Delete',
+                                              style: getTextStyle(
+                                                font: CustomFonts.inter,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500,
+                                                color: AppColors.error,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
                               ),
                             );
                           }).toList(),
@@ -278,6 +386,67 @@ class _AddressSelectionSheet extends StatelessWidget {
 
   void _navigateToAddAddress(BuildContext context) {
     AddAddressScreen.show(context);
+  }
+
+  void _showDeleteConfirmation(
+    BuildContext context,
+    address,
+    AddressController controller,
+  ) {
+    Get.dialog(
+      AlertDialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        title: Text(
+          'Delete Address',
+          style: getTextStyle(
+            font: CustomFonts.inter,
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: AppColors.ebonyBlack,
+          ),
+        ),
+        content: Text(
+          'Are you sure you want to delete this address? This action cannot be undone.',
+          style: getTextStyle(
+            font: CustomFonts.inter,
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
+            color: AppColors.textSecondary,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text(
+              'Cancel',
+              style: getTextStyle(
+                font: CustomFonts.inter,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () async {
+              Get.back(); // Close dialog
+              await Future.delayed(const Duration(milliseconds: 100));
+              controller.deleteAddress(address.id);
+            },
+            child: Text(
+              'Delete',
+              style: getTextStyle(
+                font: CustomFonts.inter,
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: AppColors.error,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
