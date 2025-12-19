@@ -212,6 +212,7 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
                                               selectedSubcategory: controller
                                                   .selectedSubcategory
                                                   .value,
+
                                               onSubcategoryTap:
                                                   controller.onSubcategoryTap,
                                             ),

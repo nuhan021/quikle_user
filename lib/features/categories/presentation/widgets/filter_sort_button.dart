@@ -23,7 +23,7 @@ class FilterSortButton extends StatelessWidget {
       final activeCount = controller.selectedFilters.length;
 
       return Container(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+        padding: EdgeInsets.only(left: 16.w, right: 16.w, bottom: 8.h),
         child: Row(
           children: [
             // Sort Button

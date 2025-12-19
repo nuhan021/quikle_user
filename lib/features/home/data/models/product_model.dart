@@ -65,10 +65,10 @@ class ProductModel {
       discountPercentage: isCachedData
           ? (json['discount'] as String?) ?? ''
           : (json['discount'] != null ? json['discount'].toString() : null),
-      // imagePath: isCachedData
-      //     ? (json['imagePath'] as String?) ?? ''
-      //     : (json['image'] as String?) ?? '',
-      imagePath: 'assets/images/logo.png',
+      imagePath: isCachedData
+          ? (json['imagePath'] as String?) ?? ''
+          : (json['image'] as String?) ?? '',
+      // imagePath: 'assets/images/logo.png',
       categoryId: isCachedData
           ? (json['categoryId'] as String?) ?? ''
           : json['category_id']?.toString() ?? '',

@@ -151,6 +151,11 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
   }
 
   Widget _buildImageSection() {
+    final imagePath = widget.product.imagePath ?? '';
+    final isNetworkImage =
+        imagePath.isNotEmpty &&
+        (imagePath.startsWith('http://') || imagePath.startsWith('https://'));
+
     return GestureDetector(
       onTap: widget.onTap,
       behavior: HitTestBehavior.opaque,
@@ -166,11 +171,49 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
               ),
             ),
             clipBehavior: Clip.antiAlias,
-            child: Image.asset(
-              widget.product.imagePath,
-              fit: BoxFit.contain,
-              filterQuality: FilterQuality.high,
-            ),
+            child: isNetworkImage
+                ? Image.network(
+                    imagePath,
+                    fit: BoxFit.contain,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Center(
+                        child: SizedBox(
+                          width: 24.w,
+                          height: 24.w,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            value: loadingProgress.expectedTotalBytes != null
+                                ? loadingProgress.cumulativeBytesLoaded /
+                                      loadingProgress.expectedTotalBytes!
+                                : null,
+                          ),
+                        ),
+                      );
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      return Center(
+                        child: Icon(
+                          Icons.broken_image,
+                          size: 28.sp,
+                          color: AppColors.featherGrey,
+                        ),
+                      );
+                    },
+                  )
+                : (imagePath.isNotEmpty
+                      ? Image.asset(
+                          imagePath,
+                          fit: BoxFit.contain,
+                          filterQuality: FilterQuality.high,
+                        )
+                      : Center(
+                          child: Icon(
+                            Icons.image,
+                            size: 28.sp,
+                            color: AppColors.featherGrey,
+                          ),
+                        )),
           ),
 
           if (widget.product.isMedicine && widget.product.isOTC)

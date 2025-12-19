@@ -60,7 +60,13 @@ class MinimalSubcategoriesSection extends StatelessWidget {
               itemCount: subcategories.length + 1,
               itemBuilder: (context, index) {
                 if (index == 0) {
+                  // Show the selected subcategory's icon at index 0 when available,
+                  // otherwise fall back to the category icon. The logical selection
+                  // state for "All" remains when selectedSubcategory == null.
                   final isSelected = selectedSubcategory == null;
+                  final displayImagePath =
+                      selectedSubcategory?.iconPath ?? categoryIconPath;
+
                   return GestureDetector(
                     onTap: () => onSubcategoryTap(null),
                     child: Container(
@@ -89,10 +95,7 @@ class MinimalSubcategoriesSection extends StatelessWidget {
                             ),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(12.r),
-                              child: Image.asset(
-                                categoryIconPath,
-                                fit: BoxFit.cover,
-                              ),
+                              child: _buildImage(displayImagePath),
                             ),
                           ),
                           SizedBox(height: 4.h),
