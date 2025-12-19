@@ -59,8 +59,6 @@ class _LiveOrderIndicatorState extends State<LiveOrderIndicator>
 
   @override
   Widget build(BuildContext context) {
-    final double systemBottomInset = MediaQuery.of(context).viewPadding.bottom;
-
     return GetBuilder<LiveOrderController>(
       init: LiveOrderController(),
       builder: (controller) {

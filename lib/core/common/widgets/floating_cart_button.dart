@@ -33,7 +33,6 @@ class _FloatingCartButtonState extends State<FloatingCartButton> {
   @override
   Widget build(BuildContext context) {
     final cartController = Get.find<CartController>();
-    final double systemBottomInset = MediaQuery.of(context).viewPadding.bottom;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       try {
         final positionService = Get.find<CartPositionService>();
