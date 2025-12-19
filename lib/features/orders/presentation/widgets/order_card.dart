@@ -133,7 +133,7 @@ class OrderCard extends StatelessWidget {
             SizedBox(height: 8.h),
             Container(height: 1.h, color: const Color(0xFFEEEEEE)),
             SizedBox(height: 12.h),
-            
+
             if (order.items.isNotEmpty)
               ...order.items.map((item) => OrderItemWidget(item: item))
             else
@@ -163,7 +163,7 @@ class OrderCard extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  '\$${order.total.toStringAsFixed(2)}',
+                  '₹${order.total.toStringAsFixed(2)}',
                   style: getTextStyle(
                     font: CustomFonts.obviously,
                     fontSize: 16.sp,

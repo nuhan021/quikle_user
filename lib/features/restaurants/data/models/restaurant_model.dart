@@ -25,7 +25,7 @@ class SignatureDish {
       name: json['title'] ?? '',
       image: '', // API doesn't provide signature dish images
       description: '',
-      price: '\$${price.toStringAsFixed(2)}',
+      price: '₹${price.toStringAsFixed(2)}',
       isPopular: false,
     );
   }

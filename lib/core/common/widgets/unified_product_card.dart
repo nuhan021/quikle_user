@@ -511,7 +511,7 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
                   if (widget.quantity != null) ...[
                     SizedBox(height: 6.h),
                     Text(
-                      'Total: \$ ${(widget.quantity! * _getNumericPrice()).toStringAsFixed(2)}',
+                      'Total: ₹${(widget.quantity! * _getNumericPrice()).toStringAsFixed(2)}',
                       style: getTextStyle(
                         font: CustomFonts.inter,
                         fontSize: 14.sp,

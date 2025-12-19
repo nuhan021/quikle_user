@@ -71,7 +71,7 @@ class PayoutService {
           'isValid': true,
           'discountType': 'fixed',
           'discountValue': 20.0,
-          'message': 'You saved \$20!',
+          'message': 'You saved ₹20!',
         };
       default:
         return {'isValid': false, 'message': 'Invalid coupon code'};

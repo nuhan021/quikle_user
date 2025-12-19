@@ -276,7 +276,7 @@ class OrderInvoiceScreen extends StatelessWidget {
             itemBuilder: (context, index) {
               final item = order.items[index];
               final unitPrice = double.parse(
-                item.product.price.replaceAll('\$', '').trim(),
+                item.product.price.replaceAll('₹', '').trim(),
               );
               final lineTotal = unitPrice * item.quantity;
 
@@ -367,7 +367,7 @@ class OrderInvoiceScreen extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              '\$${lineTotal.toStringAsFixed(2)}',
+                              '₹${lineTotal.toStringAsFixed(2)}',
                               style: getTextStyle(
                                 font: CustomFonts.obviously,
                                 fontSize: 14.sp,
@@ -440,7 +440,7 @@ class OrderInvoiceScreen extends StatelessWidget {
                 ),
               ),
               Text(
-                '\$${order.total.toStringAsFixed(2)}',
+                '₹${order.total.toStringAsFixed(2)}',
                 style: getTextStyle(
                   font: CustomFonts.obviously,
                   fontSize: 14.sp,
@@ -474,8 +474,8 @@ class OrderInvoiceScreen extends StatelessWidget {
         ),
         Text(
           isDiscount
-              ? '-\$${amount.abs().toStringAsFixed(2)}'
-              : '\$${amount.toStringAsFixed(2)}',
+              ? '-₹${amount.abs().toStringAsFixed(2)}'
+              : '₹${amount.toStringAsFixed(2)}',
           style: getTextStyle(
             font: CustomFonts.inter,
             fontSize: 14.sp,

@@ -12,9 +12,9 @@ class OrderSummarySection extends StatelessWidget {
 
   String _formatItemPrice(double value) {
     if (value == value.roundToDouble()) {
-      return '\$${value.toStringAsFixed(0)}';
+      return '₹${value.toStringAsFixed(0)}';
     }
-    return '\$${value.toStringAsFixed(2)}';
+    return '₹${value.toStringAsFixed(2)}';
   }
 
   @override
@@ -71,7 +71,7 @@ class OrderSummarySection extends StatelessWidget {
 
             if (cartItems.isNotEmpty)
               ListView.separated(
-                padding: EdgeInsets.zero, 
+                padding: EdgeInsets.zero,
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: cartItems.length,
@@ -82,7 +82,7 @@ class OrderSummarySection extends StatelessWidget {
                   final isLast = index == cartItems.length - 1;
 
                   final unitPrice = double.parse(
-                    item.product.price.replaceAll('\$', '').trim(),
+                    item.product.price.replaceAll('₹', '').trim(),
                   );
                   final lineTotal = unitPrice * item.quantity;
 

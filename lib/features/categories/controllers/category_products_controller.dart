@@ -507,7 +507,7 @@ class CategoryProductsController extends GetxController with VoiceSearchMixin {
           products = products.where((product) {
             final price =
                 double.tryParse(
-                  product.price.replaceAll('\$', '').replaceAll('৳', ''),
+                  product.price.replaceAll('₹', '').replaceAll('৳', ''),
                 ) ??
                 0.0;
             return price < 99;
@@ -517,7 +517,7 @@ class CategoryProductsController extends GetxController with VoiceSearchMixin {
           products = products.where((product) {
             final price =
                 double.tryParse(
-                  product.price.replaceAll('\$', '').replaceAll('৳', ''),
+                  product.price.replaceAll('₹', '').replaceAll('৳', ''),
                 ) ??
                 0.0;
             return price >= 100 && price <= 199;
@@ -527,7 +527,7 @@ class CategoryProductsController extends GetxController with VoiceSearchMixin {
           products = products.where((product) {
             final price =
                 double.tryParse(
-                  product.price.replaceAll('\$', '').replaceAll('৳', ''),
+                  product.price.replaceAll('₹', '').replaceAll('৳', ''),
                 ) ??
                 0.0;
             return price >= 200 && price <= 499;
@@ -537,7 +537,7 @@ class CategoryProductsController extends GetxController with VoiceSearchMixin {
           products = products.where((product) {
             final price =
                 double.tryParse(
-                  product.price.replaceAll('\$', '').replaceAll('৳', ''),
+                  product.price.replaceAll('₹', '').replaceAll('৳', ''),
                 ) ??
                 0.0;
             return price >= 500;
@@ -558,12 +558,12 @@ class CategoryProductsController extends GetxController with VoiceSearchMixin {
         products.sort((a, b) {
           final priceA =
               double.tryParse(
-                a.price.replaceAll('\$', '').replaceAll('৳', ''),
+                a.price.replaceAll('₹', '').replaceAll('৳', ''),
               ) ??
               0.0;
           final priceB =
               double.tryParse(
-                b.price.replaceAll('\$', '').replaceAll('৳', ''),
+                b.price.replaceAll('₹', '').replaceAll('৳', ''),
               ) ??
               0.0;
           return priceA.compareTo(priceB);
@@ -573,12 +573,12 @@ class CategoryProductsController extends GetxController with VoiceSearchMixin {
         products.sort((a, b) {
           final priceA =
               double.tryParse(
-                a.price.replaceAll('\$', '').replaceAll('৳', ''),
+                a.price.replaceAll('₹', '').replaceAll('৳', ''),
               ) ??
               0.0;
           final priceB =
               double.tryParse(
-                b.price.replaceAll('\$', '').replaceAll('৳', ''),
+                b.price.replaceAll('₹', '').replaceAll('৳', ''),
               ) ??
               0.0;
           return priceB.compareTo(priceA);
