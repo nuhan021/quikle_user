@@ -80,152 +80,70 @@ class CartBottomSection extends StatelessWidget {
       child: Column(
         children: [
           // Address row
-          GetBuilder<AddressController>(
-            init: AddressController(),
-            builder: (controller) {
-              // Auto-select default address if none selected
-              if (_selectedAddressIdForCart == null) {
-                final defaultAddr = controller.defaultAddress;
-                if (defaultAddr != null) {
-                  _selectedAddressIdForCart = defaultAddr.id;
-                }
-              }
-
-              final selectedAddress = _selectedAddressIdForCart != null
-                  ? controller.addresses.firstWhereOrNull(
-                      (addr) => addr.id == _selectedAddressIdForCart,
-                    )
-                  : controller.defaultAddress;
-
-              final addressTypeText = selectedAddress != null
-                  ? _getAddressTypeText(selectedAddress.type)
-                  : 'Home';
-              final addressDetails =
-                  selectedAddress?.address ?? 'No address selected';
-
-              return Row(
-                children: [
-                  Container(
-                    padding: EdgeInsets.only(right: 8.w),
-                    child: Image.asset(
-                      ImagePath.homeIcon,
-                      width: 24.w,
-                      height: 24.h,
-                    ),
-                  ),
-                  SizedBox(width: 8.w),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '$addressTypeText',
-                          style: getTextStyle(
-                            font: CustomFonts.inter,
-                            fontSize: 12.sp,
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.ebonyBlack,
-                          ),
-                        ),
-                        Text(
-                          addressDetails,
-                          style: getTextStyle(
-                            font: CustomFonts.inter,
-                            fontSize: 10.sp,
-                            color: Colors.grey[600]!,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () => _showAddressSelection(context),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.keyboard_arrow_down,
-                          size: 25.sp,
-                          color: Colors.grey[600],
-                        ),
-                        SizedBox(width: 4.w),
-                        Text(
-                          'Change',
-                          style: getTextStyle(
-                            font: CustomFonts.inter,
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.beakYellow,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              );
-            },
-          ),
-
-          SizedBox(height: 16.h),
-
-          // ======== COMPACT PAY USING + EXPANDED PLACE ORDER ========
           Row(
             children: [
-              // Compact Pay Using button (intrinsic width)
-              Obx(() {
-                final paymentController = Get.find<PaymentMethodController>();
-                final selectedMethod = paymentController.selectedPaymentMethod;
+              // Payment method box (takes remaining space)
+              Expanded(
+                child: Obx(() {
+                  final paymentController = Get.find<PaymentMethodController>();
+                  final selectedMethod =
+                      paymentController.selectedPaymentMethod;
 
-                return GestureDetector(
-                  onTap: onPaymentMethodTap,
-                  child: Container(
-                    padding: EdgeInsets.symmetric(
-                      vertical: 12.h,
-                      horizontal: 10.w,
-                    ),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: AppColors.ebonyBlack),
-                      borderRadius: BorderRadius.circular(8.r),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (selectedMethod != null &&
-                            selectedMethod.type.iconPath != null) ...[
-                          Image.asset(
-                            selectedMethod.type.iconPath!,
-                            width: 16.w,
-                            height: 16.h,
+                  return GestureDetector(
+                    onTap: onPaymentMethodTap,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        vertical: 12.h,
+                        horizontal: 10.w,
+                      ),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: AppColors.ebonyBlack),
+                        borderRadius: BorderRadius.circular(8.r),
+                      ),
+                      child: Row(
+                        children: [
+                          if (selectedMethod != null &&
+                              selectedMethod.type.iconPath != null) ...[
+                            Image.asset(
+                              selectedMethod.type.iconPath!,
+                              width: 16.w,
+                              height: 16.h,
+                            ),
+                            SizedBox(width: 4.w),
+                          ],
+                          Expanded(
+                            child: Text(
+                              selectedMethod?.type.displayName ?? 'Pay Using',
+                              style: getTextStyle(
+                                font: CustomFonts.inter,
+                                fontSize: (selectedMethod != null)
+                                    ? 11.sp
+                                    : 13.sp,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
-                          SizedBox(width: 4.w),
-                        ],
-                        Text(
-                          selectedMethod?.type.displayName ?? 'Pay Using',
-                          style: getTextStyle(
-                            font: CustomFonts.inter,
-                            fontSize: 13.sp,
-                            fontWeight: FontWeight.w600,
+                          SizedBox(width: 2.w),
+                          Icon(
+                            Icons.keyboard_arrow_down,
+                            size: 16.sp,
                             color: Colors.black,
                           ),
-                        ),
-                        SizedBox(width: 2.w),
-                        Icon(
-                          Icons.keyboard_arrow_down,
-                          size: 16.sp,
-                          color: Colors.black,
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                );
-              }),
+                  );
+                }),
+              ),
 
               SizedBox(width: 12.w),
 
-              // Expanded Place Order button with total (takes remaining space)
-              Expanded(
+              // Place Order button sized to its intrinsic content so the
+              // total price and 'Place order' text are always visible.
+              IntrinsicWidth(
                 child: Obx(() {
                   final cartController = Get.find<CartController>();
                   final isPlacingOrder = cartController.isPlacingOrder;
@@ -266,19 +184,16 @@ class CartBottomSection extends StatelessWidget {
                               ],
                             )
                           : Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              mainAxisSize: MainAxisSize.min,
                               children: [
-                                // Total price (left)
-                                Flexible(
-                                  child: Text(
-                                    '₹ ${totalAmount.toStringAsFixed(2)}',
-                                    style: getTextStyle(
-                                      font: CustomFonts.inter,
-                                      fontSize: 14.sp,
-                                      fontWeight: FontWeight.w700,
-                                      color: Colors.white,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
+                                // Total price (left) - keep full content visible
+                                Text(
+                                  '₹ ${totalAmount.toStringAsFixed(2)}',
+                                  style: getTextStyle(
+                                    font: CustomFonts.inter,
+                                    fontSize: 14.sp,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.white,
                                   ),
                                 ),
 

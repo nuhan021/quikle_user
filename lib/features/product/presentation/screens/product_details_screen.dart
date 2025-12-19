@@ -96,6 +96,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen>
 
     final keyboardInset = MediaQuery.of(context).viewInsets.bottom;
     final isKeyboardOpen = keyboardInset > 0;
+    final systemNavHeight = MediaQuery.of(context).padding.bottom;
 
     return CartAnimationWrapper(
       child: AnnotatedRegion<SystemUiOverlayStyle>(
@@ -119,9 +120,12 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen>
                     child: AnimatedBuilder(
                       animation: _navController,
                       builder: (context, _) {
+                        // include system navigation bar height so content is
+                        // padded above both the app's navbar and the system nav
                         final bottomInset = isKeyboardOpen
                             ? 0.0
-                            : _navController.value * _navBarHeight;
+                            : _navController.value *
+                                  (_navBarHeight + systemNavHeight);
                         return Padding(
                           padding: EdgeInsets.only(bottom: bottomInset),
                           child: Obx(
@@ -257,10 +261,13 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen>
               AnimatedBuilder(
                 animation: _navController,
                 builder: (_, __) {
+                  // place the floating cart above keyboard OR above the
+                  // custom navbar + system nav (if present)
                   final inset = isKeyboardOpen
-                      ? keyboardInset
-                      : (_navController.value * _navBarHeight);
-                  return FloatingCartButton(bottomInset: inset + 28.h);
+                      ? (keyboardInset + systemNavHeight)
+                      : (_navController.value *
+                            (_navBarHeight + systemNavHeight));
+                  return FloatingCartButton(bottomInset: inset);
                 },
               ),
             ],
