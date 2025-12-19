@@ -1195,21 +1195,47 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
       }
     }
 
-    products = products.where((product) {
-      final price = double.tryParse(product.price.replaceAll('\$', '')) ?? 0.0;
-      return price >= priceRange[0] && price <= priceRange[1];
-    }).toList();
-
     for (String filter in selectedFilters) {
       switch (filter) {
-        case 'rating_4_plus':
-          products = products
-              .where((product) => product.rating >= 4.0)
-              .toList();
+        case 'below_99':
+          products = products.where((product) {
+            final price =
+                double.tryParse(
+                  product.price.replaceAll('\$', '').replaceAll('৳', ''),
+                ) ??
+                0.0;
+            return price < 99;
+          }).toList();
           break;
-        case 'fast_delivery':
+        case '100_199':
+          products = products.where((product) {
+            final price =
+                double.tryParse(
+                  product.price.replaceAll('\$', '').replaceAll('৳', ''),
+                ) ??
+                0.0;
+            return price >= 100 && price <= 199;
+          }).toList();
           break;
-        case 'discount':
+        case '200_499':
+          products = products.where((product) {
+            final price =
+                double.tryParse(
+                  product.price.replaceAll('\$', '').replaceAll('৳', ''),
+                ) ??
+                0.0;
+            return price >= 200 && price <= 499;
+          }).toList();
+          break;
+        case 'above_500':
+          products = products.where((product) {
+            final price =
+                double.tryParse(
+                  product.price.replaceAll('\$', '').replaceAll('৳', ''),
+                ) ??
+                0.0;
+            return price >= 500;
+          }).toList();
           break;
       }
     }
@@ -1373,7 +1399,8 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
 
       if (newProducts.isNotEmpty) {
         allProducts.addAll(newProducts);
-        displayProducts.addAll(newProducts);
+        // Apply current filters and sorting to new products
+        _applyFiltersAndSearch();
         print('📦 Total products now: ${displayProducts.length}');
       } else {
         print('⚠️ No new products received');
