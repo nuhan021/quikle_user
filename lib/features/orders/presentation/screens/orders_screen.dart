@@ -21,7 +21,6 @@ class OrdersScreen extends StatelessWidget {
 
     return Scaffold(
       body: SafeArea(
-        bottom: false,
         child: Column(
           children: [
             const UnifiedProfileAppBar(

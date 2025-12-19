@@ -35,8 +35,9 @@ class SubcategoryGridSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Category title
+        // Reduced vertical padding to tighten space between sections
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
           child: Row(
             children: [
               // Category icon
@@ -122,27 +123,38 @@ class SubcategoryGridSection extends StatelessWidget {
           ),
         ),
 
-        // Subcategories grid - 3 items per row
+        // Subcategories laid out with Wrap so items size to available width
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 16.w),
-          child: GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
-              crossAxisSpacing: 8.w,
-              mainAxisSpacing: 8.h,
-              childAspectRatio: 1.0,
-            ),
-            itemCount: subcategories.length,
-            itemBuilder: (context, index) {
-              final subcategory = subcategories[index];
-              return _buildSubcategoryCard(subcategory);
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final spacing = 8.w;
+              final runSpacing = 6.h;
+              final crossCount = 3;
+              final totalSpacing = spacing * (crossCount - 1);
+              final itemWidth =
+                  (constraints.maxWidth - totalSpacing) / crossCount;
+
+              return Wrap(
+                spacing: spacing,
+                runSpacing: runSpacing,
+                children: subcategories.map((subcategory) {
+                  // Use fixed square size so all cards across rows keep the same
+                  // width and height. This prevents rows with fewer items from
+                  // showing taller/shorter cards.
+                  return SizedBox(
+                    width: itemWidth,
+                    height: itemWidth,
+                    child: _buildSubcategoryCard(subcategory),
+                  );
+                }).toList(),
+              );
             },
           ),
         ),
 
-        SizedBox(height: 4.h),
+        // Small bottom gap to separate sections slightly
+        SizedBox(height: 6.h),
       ],
     );
   }
@@ -287,66 +299,76 @@ class SubcategoryGridSection extends StatelessWidget {
           ),
         ),
 
-        // Subcategories grid shimmer
+        // Subcategories shimmer laid out using Wrap for consistent compact look
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 16.w),
-          child: GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
-              crossAxisSpacing: 12.w,
-              mainAxisSpacing: 12.h,
-              childAspectRatio: 1.0,
-            ),
-            itemCount: 6, // Show 6 shimmer items
-            itemBuilder: (context, index) {
-              return Shimmer.fromColors(
-                baseColor: Colors.grey[300]!,
-                highlightColor: Colors.grey[100]!,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16.r),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: .05),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // Icon shimmer
-                      Container(
-                        width: 56.w,
-                        height: 56.w,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final spacing = 8.w;
+              final runSpacing = 8.h;
+              final crossCount = 3;
+              final totalSpacing = spacing * (crossCount - 1);
+              final itemWidth =
+                  (constraints.maxWidth - totalSpacing) / crossCount;
+
+              return Wrap(
+                spacing: spacing,
+                runSpacing: runSpacing,
+                children: List.generate(6, (index) {
+                  return SizedBox(
+                    width: itemWidth,
+                    height: itemWidth,
+                    child: Shimmer.fromColors(
+                      baseColor: Colors.grey[300]!,
+                      highlightColor: Colors.grey[100]!,
+                      child: Container(
+                        margin: EdgeInsets.zero,
                         decoration: BoxDecoration(
-                          color: Colors.grey[200],
-                          borderRadius: BorderRadius.circular(8.r),
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16.r),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: .05),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            // Icon shimmer
+                            Container(
+                              width: 56.w,
+                              height: 56.w,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[200],
+                                borderRadius: BorderRadius.circular(8.r),
+                              ),
+                            ),
+                            SizedBox(height: 8.h),
+                            // Title shimmer
+                            Container(
+                              width: 60.w,
+                              height: 12.h,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[200],
+                                borderRadius: BorderRadius.circular(4.r),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      SizedBox(height: 8.h),
-                      // Title shimmer
-                      Container(
-                        width: 60.w,
-                        height: 12.h,
-                        decoration: BoxDecoration(
-                          color: Colors.grey[200],
-                          borderRadius: BorderRadius.circular(4.r),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                    ),
+                  );
+                }),
               );
             },
           ),
         ),
 
-        SizedBox(height: 24.h),
+        // Make shimmer bottom spacing consistent
+        SizedBox(height: 6.h),
       ],
     );
   }

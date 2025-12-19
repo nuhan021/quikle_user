@@ -30,12 +30,7 @@ class CustomNavBar extends StatelessWidget {
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
         child: Container(
-          padding: EdgeInsets.only(
-            top: 8.h,
-            left: 8.w,
-            right: 8.w,
-            bottom: bottomInset > 0 ? bottomInset : 8.h,
-          ),
+          padding: EdgeInsets.only(top: 8.h, left: 8.w, right: 8.w, bottom: 0),
           decoration: BoxDecoration(
             color: Colors.black.withValues(alpha: 0.7),
             borderRadius: BorderRadius.only(

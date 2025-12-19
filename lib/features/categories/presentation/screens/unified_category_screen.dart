@@ -153,7 +153,7 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
 
                     final totalHeaderHeight =
                         SearchAndFiltersSection.kPreferredHeight +
-                        60.h + // Height for FilterSortButton
+                        47.h +
                         (hasPopular
                             ? PopularItemsSection.kPreferredHeight
                             : 0) +
