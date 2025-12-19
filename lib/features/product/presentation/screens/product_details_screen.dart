@@ -206,14 +206,14 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen>
                                           //       controller.onReplyToQuestion,
                                           // ),
                                           SizedBox(height: 24.h),
-                                          YouMayLikeSection(
-                                            onAddToCart: (p) => controller
-                                                .addToCartFromSimilar(p),
-                                            onFavoriteToggle: (p) => controller
-                                                .onFavoriteToggleFromSimilar(p),
-                                            onProductTap: (p) => controller
-                                                .onSimilarProductTap(p),
-                                          ),
+                                          // YouMayLikeSection(
+                                          //   onAddToCart: (p) => controller
+                                          //       .addToCartFromSimilar(p),
+                                          //   onFavoriteToggle: (p) => controller
+                                          //       .onFavoriteToggleFromSimilar(p),
+                                          //   onProductTap: (p) => controller
+                                          //       .onSimilarProductTap(p),
+                                          // ),
                                         ],
                                       ),
                                     ),
@@ -260,7 +260,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen>
                   final inset = isKeyboardOpen
                       ? keyboardInset
                       : (_navController.value * _navBarHeight);
-                  return FloatingCartButton(bottomInset: inset);
+                  return FloatingCartButton(bottomInset: inset + 28.h);
                 },
               ),
             ],

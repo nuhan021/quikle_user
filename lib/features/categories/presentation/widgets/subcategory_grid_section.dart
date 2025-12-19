@@ -44,17 +44,44 @@ class SubcategoryGridSection extends StatelessWidget {
                 width: 42.w,
                 height: 42.w,
                 child: Center(
-                  child: Image.asset(
-                    categoryIconPath,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Icon(
-                        Icons.category,
-                        size: 20.w,
-                        color: AppColors.primary,
-                      );
-                    },
-                  ),
+                  child: categoryIconPath.toLowerCase().startsWith('http')
+                      ? Image.network(
+                          categoryIconPath,
+                          fit: BoxFit.cover,
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return SizedBox(
+                              width: 20.w,
+                              height: 20.w,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2.0,
+                                value:
+                                    loadingProgress.expectedTotalBytes != null
+                                    ? loadingProgress.cumulativeBytesLoaded /
+                                          loadingProgress.expectedTotalBytes!
+                                    : null,
+                              ),
+                            );
+                          },
+                          errorBuilder: (context, error, stackTrace) {
+                            return Icon(
+                              Icons.broken_image,
+                              size: 20.w,
+                              color: AppColors.primary,
+                            );
+                          },
+                        )
+                      : Image.asset(
+                          categoryIconPath,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Icon(
+                              Icons.category,
+                              size: 20.w,
+                              color: AppColors.primary,
+                            );
+                          },
+                        ),
                 ),
               ),
               SizedBox(width: 12.w),
@@ -105,7 +132,7 @@ class SubcategoryGridSection extends StatelessWidget {
               crossAxisCount: 3,
               crossAxisSpacing: 8.w,
               mainAxisSpacing: 8.h,
-              childAspectRatio: 1,
+              childAspectRatio: 1.0,
             ),
             itemCount: subcategories.length,
             itemBuilder: (context, index) {
@@ -143,17 +170,43 @@ class SubcategoryGridSection extends StatelessWidget {
               width: 56.w,
               height: 56.w,
               child: Center(
-                child: Image.asset(
-                  subcategory.iconPath,
-                  fit: BoxFit.contain,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Icon(
-                      Icons.fastfood,
-                      size: 32.w,
-                      color: AppColors.primary,
-                    );
-                  },
-                ),
+                child: subcategory.iconPath.toLowerCase().startsWith('http')
+                    ? Image.network(
+                        subcategory.iconPath,
+                        fit: BoxFit.contain,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return SizedBox(
+                            width: 24.w,
+                            height: 24.w,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.0,
+                              value: loadingProgress.expectedTotalBytes != null
+                                  ? loadingProgress.cumulativeBytesLoaded /
+                                        loadingProgress.expectedTotalBytes!
+                                  : null,
+                            ),
+                          );
+                        },
+                        errorBuilder: (context, error, stackTrace) {
+                          return Icon(
+                            Icons.fastfood,
+                            size: 32.w,
+                            color: AppColors.primary,
+                          );
+                        },
+                      )
+                    : Image.asset(
+                        subcategory.iconPath,
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Icon(
+                            Icons.fastfood,
+                            size: 32.w,
+                            color: AppColors.primary,
+                          );
+                        },
+                      ),
               ),
             ),
 
