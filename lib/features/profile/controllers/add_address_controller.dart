@@ -25,6 +25,7 @@ class AddAddressController extends GetxController {
   final isLoading = false.obs;
   final isDefault = false.obs;
   final useCurrentLocation = false.obs;
+  final isAddressFromMap = false.obs; // Track if address was selected from map
 
   final selectedCountry = Rxn<String>();
   final selectedState = Rxn<String>();
@@ -216,6 +217,7 @@ class AddAddressController extends GetxController {
 
         // Populate the address controller
         addressController.text = fullAddress;
+        isAddressFromMap.value = true; // Mark as from map
 
         // Set city
         if (place.locality != null && place.locality!.isNotEmpty) {
@@ -342,10 +344,10 @@ class AddAddressController extends GetxController {
       return;
     }
 
-    if (nearbyLandmarkController.text.trim().isEmpty) {
-      nearbyLandmarkError.value = 'Landmark is required';
-      return;
-    }
+    // if (nearbyLandmarkController.text.trim().isEmpty) {
+    //   nearbyLandmarkError.value = 'Landmark is required';
+    //   return;
+    // }
 
     if (addressController.text.trim().isEmpty) {
       addressError.value = 'Full address is required';
@@ -384,7 +386,7 @@ class AddAddressController extends GetxController {
         floorNumber: floorNumberController.text.trim(),
         phoneNumber: phoneController.text.trim(),
         type: selectedAddressType.value!,
-        isDefault: isDefault.value,
+        isDefault: true, // Always send true to database
         createdAt: DateTime.now(),
       );
 
@@ -417,6 +419,7 @@ class AddAddressController extends GetxController {
     selectedAddressType.value = AddressType.home;
     isDefault.value = false;
     useCurrentLocation.value = false;
+    isAddressFromMap.value = false; // Reset map flag
     cities.clear(); // Clear cities when form is cleared
     _clearErrors();
   }
@@ -476,10 +479,10 @@ class AddAddressController extends GetxController {
       return;
     }
 
-    if (nearbyLandmarkController.text.trim().isEmpty) {
-      nearbyLandmarkError.value = 'Landmark is required';
-      return;
-    }
+    // if (nearbyLandmarkController.text.trim().isEmpty) {
+    //   nearbyLandmarkError.value = 'Landmark is required';
+    //   return;
+    // }
 
     if (addressController.text.trim().isEmpty) {
       addressError.value = 'Full address is required';
@@ -518,7 +521,7 @@ class AddAddressController extends GetxController {
         floorNumber: floorNumberController.text.trim(),
         phoneNumber: phoneController.text.trim(),
         type: selectedAddressType.value!,
-        isDefault: isDefault.value,
+        isDefault: isDefault.value, // Keep existing value when updating
         createdAt: DateTime.now(),
       );
 

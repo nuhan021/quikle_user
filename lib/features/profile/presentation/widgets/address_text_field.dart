@@ -13,6 +13,7 @@ class AddressTextField extends StatelessWidget {
   final int maxLines;
   final RxString? errorText;
   final TextInputType? keyboardType;
+  final bool enabled;
 
   const AddressTextField({
     super.key,
@@ -22,6 +23,7 @@ class AddressTextField extends StatelessWidget {
     this.maxLines = 1,
     this.errorText,
     this.keyboardType,
+    this.enabled = true,
   });
 
   @override
@@ -31,19 +33,24 @@ class AddressTextField extends StatelessWidget {
       children: [
         Container(
           decoration: BoxDecoration(
-            color: AppColors.backgroundLight,
+            color: enabled ? AppColors.backgroundLight : Colors.grey.shade100,
             borderRadius: BorderRadius.circular(12.r),
-            border: Border.all(color: AppColors.cardColor, width: 1.5.w),
+            border: Border.all(
+              color: enabled ? AppColors.cardColor : Colors.grey.shade300,
+              width: 1.5.w,
+            ),
           ),
           child: TextFormField(
             controller: controller,
             keyboardType: keyboardType,
             maxLines: maxLines,
+            enabled: enabled,
+            readOnly: !enabled,
             style: getTextStyle(
               font: CustomFonts.inter,
               fontSize: 14.sp,
               fontWeight: FontWeight.w500,
-              color: AppColors.textPrimary,
+              color: enabled ? AppColors.textPrimary : AppColors.textSecondary,
             ),
             decoration: InputDecoration(
               hintText: hintText,
@@ -58,7 +65,9 @@ class AddressTextField extends StatelessWidget {
                       padding: EdgeInsets.only(left: 12.w, right: 8.w),
                       child: Icon(
                         icon,
-                        color: AppColors.textSecondary,
+                        color: enabled
+                            ? AppColors.textSecondary
+                            : Colors.grey.shade400,
                         size: 22.sp,
                       ),
                     )
@@ -66,6 +75,7 @@ class AddressTextField extends StatelessWidget {
               border: InputBorder.none,
               focusedBorder: InputBorder.none,
               enabledBorder: InputBorder.none,
+              disabledBorder: InputBorder.none,
               errorBorder: InputBorder.none,
               contentPadding: EdgeInsets.symmetric(
                 horizontal: icon != null ? 8.w : 16.w,

@@ -103,9 +103,9 @@ class SubcategoryGridSection extends StatelessWidget {
             physics: const NeverScrollableScrollPhysics(),
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 3,
-              crossAxisSpacing: 12.w,
-              mainAxisSpacing: 12.h,
-              childAspectRatio: 1.0,
+              crossAxisSpacing: 8.w,
+              mainAxisSpacing: 8.h,
+              childAspectRatio: 1,
             ),
             itemCount: subcategories.length,
             itemBuilder: (context, index) {
@@ -115,7 +115,7 @@ class SubcategoryGridSection extends StatelessWidget {
           ),
         ),
 
-        SizedBox(height: 24.h),
+        SizedBox(height: 4.h),
       ],
     );
   }

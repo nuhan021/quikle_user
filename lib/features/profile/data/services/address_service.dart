@@ -282,7 +282,7 @@ class AddressService extends GetxService {
         'phone_number': address.phoneNumber,
         'email': address.email ?? '',
         'addressType': addressTypeValue,
-        'make_default': address.isDefault,
+        'make_default': true,
       };
 
       // Add optional fields only if they have values

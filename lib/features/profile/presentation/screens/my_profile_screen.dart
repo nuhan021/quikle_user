@@ -5,12 +5,65 @@ import 'package:quikle_user/core/common/styles/global_text_style.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 import 'package:quikle_user/features/profile/controllers/profile_controller.dart';
+import 'package:quikle_user/core/utils/logging/logger.dart';
 import 'package:quikle_user/features/profile/presentation/widgets/profile_card.dart';
 import 'package:quikle_user/features/profile/presentation/widgets/unified_profile_app_bar.dart';
 
-class MyProfileScreen extends StatelessWidget {
+class MyProfileScreen extends StatefulWidget {
   MyProfileScreen({super.key});
-  final ProfileController controller = Get.find<ProfileController>();
+
+  @override
+  State<MyProfileScreen> createState() => _MyProfileScreenState();
+}
+
+class _MyProfileScreenState extends State<MyProfileScreen> {
+  late final ProfileController controller;
+
+  // Local controllers owned by this screen to avoid attaching disposed
+  // TextEditingControllers from the ProfileController into the widget tree.
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _address1Controller = TextEditingController();
+  final _address2Controller = TextEditingController();
+  final _postalCodeController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    // Resolve the ProfileController if registered. If not, create one to
+    // avoid runtime errors (typical flows should have the controller registered).
+    try {
+      controller = Get.find<ProfileController>();
+    } catch (e) {
+      AppLoggerHelper.debug('ProfileController not found via Get.find(): $e');
+      controller = Get.put(ProfileController());
+    }
+
+    // Initialize local controllers from the profile controller safely.
+    try {
+      _nameController.text = controller.nameController.text;
+      _emailController.text = controller.emailController.text;
+      _phoneController.text = controller.phoneController.text;
+      _address1Controller.text = controller.address1Controller.text;
+      _address2Controller.text = controller.address2Controller.text;
+      _postalCodeController.text = controller.postalCodeController.text;
+    } catch (e) {
+      AppLoggerHelper.debug('Failed to read text from ProfileController: $e');
+    }
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _phoneController.dispose();
+    _address1Controller.dispose();
+    _address2Controller.dispose();
+    _postalCodeController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Obx(() {
@@ -23,7 +76,7 @@ class MyProfileScreen extends StatelessWidget {
           actionText: isSaving ? 'Saving...' : (isEditing ? 'Save' : 'Edit'),
           onActionPressed: isSaving
               ? null
-              : (isEditing ? controller.saveProfile : controller.enableEditing),
+              : (isEditing ? _onSavePressed : _onEditPressed),
           showBackButton: true,
           showActionButton: true,
         ),
@@ -37,8 +90,8 @@ class MyProfileScreen extends StatelessWidget {
                 child: Column(
                   children: [
                     ProfileCard(
-                      name: controller.nameController.text,
-                      email: controller.emailController.text,
+                      name: _nameController.text,
+                      email: _emailController.text,
                     ),
                     SizedBox(height: 24.h),
                     _buildProfileSection(isEditing, isSaving),
@@ -50,6 +103,62 @@ class MyProfileScreen extends StatelessWidget {
         ),
       );
     });
+  }
+
+  void _onEditPressed() {
+    try {
+      if (!controller.isClosed) {
+        controller.enableEditing();
+      } else {
+        Get.snackbar(
+          'Error',
+          'Profile is not available',
+          snackPosition: SnackPosition.TOP,
+        );
+      }
+    } catch (e) {
+      AppLoggerHelper.debug('Error enabling edit: $e');
+      Get.snackbar(
+        'Error',
+        'Unable to enable editing',
+        snackPosition: SnackPosition.TOP,
+      );
+    }
+  }
+
+  Future<void> _onSavePressed() async {
+    try {
+      if (controller.isClosed) {
+        Get.snackbar(
+          'Error',
+          'Profile controller is not available',
+          snackPosition: SnackPosition.TOP,
+        );
+        return;
+      }
+
+      // Copy local controller values back to the profile controller's
+      // TextEditingControllers so saveProfile() works as expected.
+      try {
+        controller.nameController.text = _nameController.text;
+        controller.emailController.text = _emailController.text;
+        controller.phoneController.text = _phoneController.text;
+        controller.address1Controller.text = _address1Controller.text;
+        controller.address2Controller.text = _address2Controller.text;
+        controller.postalCodeController.text = _postalCodeController.text;
+      } catch (e) {
+        AppLoggerHelper.debug('Failed to copy back to ProfileController: $e');
+      }
+
+      await controller.saveProfile();
+    } catch (e) {
+      AppLoggerHelper.debug('Error saving profile: $e');
+      Get.snackbar(
+        'Error',
+        'Failed to save profile',
+        snackPosition: SnackPosition.TOP,
+      );
+    }
   }
 
   Widget _buildProfileSection(bool isEditing, bool isSaving) {
@@ -72,37 +181,37 @@ class MyProfileScreen extends StatelessWidget {
           _buildHeader(isEditing, isSaving),
           SizedBox(height: 24.h),
           _buildEditableField(
-            controller: controller.nameController,
+            controller: _nameController,
             label: 'Full Name',
             enabled: isEditing,
           ),
           SizedBox(height: 20.h),
           _buildEditableField(
-            controller: controller.emailController,
+            controller: _emailController,
             label: 'Email Address',
             enabled: isEditing,
           ),
           SizedBox(height: 20.h),
           _buildEditableField(
-            controller: controller.phoneController,
+            controller: _phoneController,
             label: 'Phone Number',
             enabled: isEditing,
           ),
           SizedBox(height: 20.h),
           _buildEditableField(
-            controller: controller.address1Controller,
+            controller: _address1Controller,
             label: 'Address Line 1',
             enabled: isEditing,
           ),
           SizedBox(height: 20.h),
           _buildEditableField(
-            controller: controller.address2Controller,
+            controller: _address2Controller,
             label: 'Address Line 2',
             enabled: isEditing,
           ),
           SizedBox(height: 20.h),
           _buildEditableField(
-            controller: controller.postalCodeController,
+            controller: _postalCodeController,
             label: 'Postal Code',
             enabled: isEditing,
           ),
@@ -127,7 +236,7 @@ class MyProfileScreen extends StatelessWidget {
         GestureDetector(
           onTap: isSaving
               ? null
-              : (isEditing ? controller.saveProfile : controller.enableEditing),
+              : (isEditing ? _onSavePressed : _onEditPressed),
           child: Container(
             padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
             decoration: BoxDecoration(

@@ -11,6 +11,7 @@ import 'package:quikle_user/features/profile/presentation/widgets/address_type_s
 import 'package:quikle_user/features/profile/presentation/widgets/location_options.dart';
 import 'package:quikle_user/features/profile/presentation/widgets/bottom_sheet_header.dart';
 import 'package:quikle_user/features/profile/presentation/widgets/address_text_field.dart';
+import 'package:quikle_user/features/profile/presentation/screens/map_address_picker_screen.dart';
 
 /// First Sheet - Address Type & Location Selection
 class AddAddressScreen extends StatelessWidget {
@@ -212,13 +213,86 @@ class AddressDetailsScreen extends StatelessWidget {
 
                     SizedBox(height: 16.h),
 
-                    AddressTextField(
-                      controller: controller.addressController,
-                      hintText: 'Full Address',
-                      icon: Icons.edit_location_alt_rounded,
-                      maxLines: 3,
-                      errorText: controller.addressError,
-                    ),
+                    // Full Address Field - Non-editable if from map or current location
+                    Obx(() {
+                      final isFromMapOrLocation =
+                          controller.isAddressFromMap.value ||
+                          controller.useCurrentLocation.value;
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: AddressTextField(
+                                  controller: controller.addressController,
+                                  hintText: 'Full Address',
+                                  icon: Icons.edit_location_alt_rounded,
+                                  maxLines: 3,
+                                  errorText: controller.addressError,
+                                  enabled: !isFromMapOrLocation,
+                                ),
+                              ),
+                              if (isFromMapOrLocation) ...[
+                                SizedBox(width: 8.w),
+                                InkWell(
+                                  onTap: () {
+                                    // Close current sheet and open map
+                                    Navigator.of(context).pop();
+                                    Future.delayed(
+                                      const Duration(milliseconds: 300),
+                                      () {
+                                        Get.find<AddAddressController>()
+                                                .isAddressFromMap
+                                                .value =
+                                            false;
+                                        Get.find<AddAddressController>()
+                                                .useCurrentLocation
+                                                .value =
+                                            false;
+                                        MapAddressPickerScreen.show(
+                                          Get.context!,
+                                        );
+                                      },
+                                    );
+                                  },
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 12.w,
+                                      vertical: 12.h,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.beakYellow,
+                                      borderRadius: BorderRadius.circular(10.r),
+                                    ),
+                                    child: Icon(
+                                      Icons.edit_location_rounded,
+                                      color: Colors.white,
+                                      size: 20.sp,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                          if (isFromMapOrLocation) ...[
+                            SizedBox(height: 8.h),
+                            Padding(
+                              padding: EdgeInsets.only(left: 4.w),
+                              child: Text(
+                                'Address selected from ${controller.useCurrentLocation.value ? "current location" : "map"}. Tap the icon to change.',
+                                style: getTextStyle(
+                                  font: CustomFonts.inter,
+                                  fontSize: 11.sp,
+                                  fontWeight: FontWeight.w400,
+                                  color: AppColors.textSecondary,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
+                      );
+                    }),
 
                     SizedBox(height: 28.h),
 
@@ -249,52 +323,6 @@ class AddressDetailsScreen extends StatelessWidget {
                       icon: Icons.phone_rounded,
                       keyboardType: TextInputType.phone,
                       errorText: controller.phoneError,
-                    ),
-
-                    SizedBox(height: 24.h),
-
-                    // Make Default Switch
-                    Container(
-                      padding: EdgeInsets.all(16.w),
-                      decoration: BoxDecoration(
-                        color: AppColors.homeGrey.withOpacity(0.5),
-                        borderRadius: BorderRadius.circular(12.r),
-                        border: Border.all(
-                          color: AppColors.cardColor,
-                          width: 1.w,
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.bookmark_rounded,
-                            color: AppColors.textPrimary,
-                            size: 22.sp,
-                          ),
-                          SizedBox(width: 12.w),
-                          Expanded(
-                            child: Text(
-                              'Set as default address',
-                              style: getTextStyle(
-                                font: CustomFonts.inter,
-                                fontSize: 15.sp,
-                                fontWeight: FontWeight.w500,
-                                color: AppColors.textPrimary,
-                              ),
-                            ),
-                          ),
-                          Obx(
-                            () => Switch(
-                              value: controller.isDefault.value,
-                              onChanged: (value) =>
-                                  controller.setDefault(value),
-                              activeColor: AppColors.beakYellow,
-                              activeTrackColor: AppColors.beakYellow
-                                  .withOpacity(0.5),
-                            ),
-                          ),
-                        ],
-                      ),
                     ),
 
                     SizedBox(height: 32.h),

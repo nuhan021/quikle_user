@@ -1,33 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:lottie/lottie.dart';
 import 'package:quikle_user/core/common/styles/global_text_style.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
-import 'package:quikle_user/features/orders/data/models/order_model.dart';
 
-class OrderSuccessDialog extends StatelessWidget {
-  final OrderModel order;
-  final String transactionId;
-  final VoidCallback? onContinue;
+class PaymentFailureDialog extends StatelessWidget {
+  final String errorMessage;
+  final VoidCallback? onRetry;
 
-  const OrderSuccessDialog({
+  const PaymentFailureDialog({
     super.key,
-    required this.order,
-    required this.transactionId,
-    this.onContinue,
+    required this.errorMessage,
+    this.onRetry,
   });
 
   @override
   Widget build(BuildContext context) {
-    // Auto close after a short branded animation time and call onContinue
-    Future.delayed(const Duration(seconds: 2), () {
-      if (Get.isDialogOpen ?? false) {
-        Get.back();
-        if (onContinue != null) onContinue!();
-      }
+    // Auto-close after short delay and allow safe dismissal
+    Future.delayed(const Duration(milliseconds: 2500), () {
+      if (Get.isDialogOpen ?? false) Get.back();
     });
+
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       insetPadding: const EdgeInsets.symmetric(horizontal: 24),
@@ -40,19 +34,22 @@ class OrderSuccessDialog extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            SizedBox(
-              width: 300.h,
-              height: 300.h,
-              child: Lottie.asset('assets/json/Success.json', repeat: false),
+            // Payment failure image
+            Image.asset(
+              'assets/images/fail_payment.png',
+              width: 250.w,
+              height: 250.w,
+              fit: BoxFit.contain,
             ),
 
-            // const SizedBox(height: 20),
+            const SizedBox(height: 20),
+
             Text(
-              "Your order is confirmed",
+              "Payment Failed!",
               style: getTextStyle(
                 font: CustomFonts.obviously,
-                fontSize: 20,
-                fontWeight: FontWeight.w500,
+                fontSize: 22,
+                fontWeight: FontWeight.w600,
                 color: AppColors.ebonyBlack,
               ),
               textAlign: TextAlign.center,
@@ -61,19 +58,16 @@ class OrderSuccessDialog extends StatelessWidget {
             const SizedBox(height: 12),
 
             Text(
-              "Thank you for shopping with us.\n"
-              "Your order will reach you soon.",
+              "Your payment didn't go through.\nPlease try again.",
               style: const TextStyle(
-                fontSize: 14,
+                fontSize: 15,
                 color: Colors.black54,
                 height: 1.5,
               ),
               textAlign: TextAlign.center,
             ),
-
             const SizedBox(height: 24),
-
-            // Intentionally no CTA - dialog auto-dismisses to show live order updates
+            // Intentionally no buttons: dialog auto-closes and is dismissible by tapping outside
           ],
         ),
       ),

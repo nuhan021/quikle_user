@@ -1,5 +1,5 @@
 PODS:
-  - app_settings (5.1.1):
+  - app_settings (6.1.2):
     - Flutter
   - CashfreeAnalyticsSDK (2.2.0):
     - CFNetworkSDK (= 2.2.0)
@@ -273,7 +273,7 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/webview_flutter_wkwebview/darwin"
 
 SPEC CHECKSUMS:
-  app_settings: 5127ae0678de1dcc19f2293271c51d37c89428b2
+  app_settings: 0341ec6daa4f0c50f5a421bf0ad7c36084db6e90
   CashfreeAnalyticsSDK: ae25b71a54607c920d519103d154d9727ca2c15a
   CashfreePG: 6554c215b8eabc9fa13e59c847262b8ba6f29ff6
   CashfreePGCoreSDK: 133e1ba5aeb8a89bf2188eb3312c88fcad084c75

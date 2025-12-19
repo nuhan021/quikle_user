@@ -46,7 +46,7 @@ class _FloatingCartButtonState extends State<FloatingCartButton> {
         return const SizedBox.shrink();
       }
 
-      final double bottomPadding = widget.bottomInset + systemBottomInset + 4.h;
+      final double bottomPadding = widget.bottomInset + 4.h;
 
       return Padding(
         padding: EdgeInsets.only(bottom: bottomPadding, right: 16.w),

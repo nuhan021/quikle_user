@@ -32,46 +32,52 @@ class CustomerSupportFAB extends StatelessWidget {
     }
 
     return Positioned(
+      // increased default offset slightly to account for larger FAB size
       bottom: bottom ?? 90.h,
-      right: right ?? 16.w,
+      right: right ?? 20.w,
       child: Obx(() {
         final unreadCount = freshchatService.unreadMessageCount.value;
 
         return Stack(
           clipBehavior: Clip.none,
           children: [
-            // Main FAB
-            FloatingActionButton(
-              onPressed:
-                  onPressed ?? () => _handleSupportPress(freshchatService),
-              backgroundColor: AppColors.primary,
-              elevation: 4,
-              child: Icon(
-                Icons.support_agent_rounded,
-                color: Colors.white,
-                size: 28.sp,
+            // Main (enlarged) FAB - wrapped in SizedBox to make it larger than default
+            SizedBox(
+              width: 64.w,
+              height: 64.h,
+              child: FloatingActionButton(
+                onPressed:
+                    onPressed ?? () => _handleSupportPress(freshchatService),
+                backgroundColor: AppColors.primary,
+                elevation: 6,
+                child: Icon(
+                  Icons.support_agent_rounded,
+                  color: Colors.white,
+                  size: 36.sp,
+                ),
               ),
             ),
 
             // Unread badge
             if (unreadCount > 0)
               Positioned(
-                top: -4.h,
-                right: -4.w,
+                // move badge out a little further to better sit on the larger FAB
+                top: -6.h,
+                right: -6.w,
                 child: Container(
-                  padding: EdgeInsets.all(4.w),
+                  padding: EdgeInsets.all(5.w),
                   decoration: BoxDecoration(
                     color: Colors.red,
                     shape: BoxShape.circle,
                     border: Border.all(color: Colors.white, width: 2),
                   ),
-                  constraints: BoxConstraints(minWidth: 20.w, minHeight: 20.h),
+                  constraints: BoxConstraints(minWidth: 24.w, minHeight: 24.h),
                   child: Center(
                     child: Text(
                       unreadCount > 99 ? '99+' : '$unreadCount',
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 10.sp,
+                        fontSize: 12.sp,
                         fontWeight: FontWeight.bold,
                       ),
                     ),

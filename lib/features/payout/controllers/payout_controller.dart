@@ -5,6 +5,7 @@ import 'package:quikle_user/features/orders/data/services/order_api_service.dart
 import 'package:quikle_user/features/payment/data/models/order_creation_response.dart';
 import 'package:quikle_user/features/payment/services/cashfree_payment_service.dart';
 import 'package:quikle_user/features/payout/presentation/widgets/order_success_dialog.dart';
+import 'package:quikle_user/features/payout/presentation/widgets/payment_failure_dialog.dart';
 import '../data/models/delivery_option_model.dart';
 import '../data/models/payment_method_model.dart';
 import '../../profile/data/models/shipping_address_model.dart';
@@ -456,9 +457,33 @@ class PayoutController extends GetxController {
       AppLoggerHelper.error('❌ Error placing order', e);
       _isProcessingPayment.value = false;
 
-      // Don't use Get.snackbar here as it may not have overlay context
-      // The error will be caught and displayed by CartScreen
-      rethrow;
+      // Show payment failure dialog for any payment-related errors
+      String errorMessage = 'Something went wrong. Please try again.';
+
+      // Extract meaningful error message
+      if (e.toString().contains('Cashfree') ||
+          e.toString().contains('payment') ||
+          e.toString().contains('session')) {
+        errorMessage =
+            'Payment initialization failed. Please check your connection and try again.';
+      } else if (e.toString().contains('Exception:')) {
+        // Extract the actual error message
+        final match = RegExp(r'Exception:\s*(.+)').firstMatch(e.toString());
+        if (match != null && match.group(1) != null) {
+          errorMessage = match.group(1)!;
+        }
+      }
+
+      Get.dialog(
+        PaymentFailureDialog(
+          errorMessage: errorMessage,
+          onRetry: () {
+            // Retry the payment by calling placeOrder again
+            placeOrder();
+          },
+        ),
+        barrierDismissible: true,
+      );
     }
   }
 
@@ -559,18 +584,22 @@ class PayoutController extends GetxController {
 
     _isProcessingPayment.value = false;
 
-    Get.snackbar(
-      'Payment Failed',
-      errorMessage.isEmpty ? 'Payment failed. Please try again.' : errorMessage,
-      snackPosition: SnackPosition.BOTTOM,
-      duration: const Duration(seconds: 4),
-      backgroundColor: Get.theme.colorScheme.error,
-      colorText: Get.theme.colorScheme.onError,
+    // Show payment failure dialog instead of snackbar
+    Get.dialog(
+      PaymentFailureDialog(
+        errorMessage: errorMessage.isEmpty
+            ? 'Something went wrong with your payment'
+            : errorMessage,
+        onRetry: () {
+          // Retry the payment by calling placeOrder again
+          placeOrder();
+        },
+      ),
+      barrierDismissible: true,
     );
 
-    // Clear pending data
-    _pendingOrderData = null;
-    _pendingShippingAddress = null;
+    // Don't clear pending data yet - user might retry
+    // Only clear if they cancel
   }
 
   void _handlePaymentSuccess(

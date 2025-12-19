@@ -18,25 +18,26 @@ class HelpSupportScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.homeGrey,
 
-      floatingActionButton: const CustomerSupportFAB(),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-
       body: SafeArea(
-        child: Column(
+        child: Stack(
           children: [
-            const UnifiedProfileAppBar(
-              title: 'Help & Support',
-              showActionButton: false,
-            ),
+            Column(
+              children: [
+                const UnifiedProfileAppBar(
+                  title: 'Help & Support',
+                  showActionButton: false,
+                ),
 
-            Expanded(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.all(16.w),
-                child: Column(children: [_buildFaqSection(controller)]),
-              ),
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: EdgeInsets.all(16.w),
+                    child: Column(children: [_buildFaqSection(controller)]),
+                  ),
+                ),
+              ],
             ),
-
-            // ❌ REMOVE: CustomerSupportFAB from here
+            // Customer Support FAB
+            const CustomerSupportFAB(),
           ],
         ),
       ),
