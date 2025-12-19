@@ -57,11 +57,11 @@ class ProductModel {
       title: (json['title'] as String?) ?? '',
       description: (json['description'] as String?) ?? '',
       price: isCachedData
-          ? (json['price'] as String?) ?? '\$0'
-          : '\$${json['sell_price'] ?? 0}',
+          ? (json['price'] as String?) ?? '₹0'
+          : '₹${json['sell_price'] ?? 0}',
       beforeDiscountPrice: isCachedData
           ? (json['beforeDiscountPrice'] as String?) ?? ''
-          : (json['price'] != null ? '\$${json['price']}' : null),
+          : (json['price'] != null ? '₹${json['price']}' : null),
       discountPercentage: isCachedData
           ? (json['discount'] as String?) ?? ''
           : (json['discount'] != null ? json['discount'].toString() : null),

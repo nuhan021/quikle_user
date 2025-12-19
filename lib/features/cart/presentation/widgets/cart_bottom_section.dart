@@ -271,7 +271,7 @@ class CartBottomSection extends StatelessWidget {
                                 // Total price (left)
                                 Flexible(
                                   child: Text(
-                                    '\$ ${totalAmount.toStringAsFixed(2)}',
+                                    '₹ ${totalAmount.toStringAsFixed(2)}',
                                     style: getTextStyle(
                                       font: CustomFonts.inter,
                                       fontSize: 14.sp,

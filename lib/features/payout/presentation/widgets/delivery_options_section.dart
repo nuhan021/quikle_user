@@ -196,7 +196,7 @@ class DeliveryOptionsSection extends StatelessWidget {
             ),
             SizedBox(width: 6.w),
             Text(
-              '\$${option.price.toStringAsFixed(2)}',
+              '₹${option.price.toStringAsFixed(2)}',
               style: getTextStyle(
                 font: CustomFonts.inter,
                 fontSize: 12.sp,
