@@ -30,6 +30,10 @@ class CategoryProductsController extends GetxController with VoiceSearchMixin {
   final selectedSubcategory = Rxn<SubcategoryModel>();
   final searchQuery = ''.obs;
 
+  // Filter and Sort state
+  final selectedSortOption = 'relevance'.obs;
+  final selectedFilters = <String>[].obs;
+
   // Pagination state
   final isLoadingMore = false.obs;
   final hasMore = true.obs;
@@ -405,9 +409,7 @@ class CategoryProductsController extends GetxController with VoiceSearchMixin {
   }
 
   void _filterProductsBySubcategory(String subcategoryId) {
-    displayProducts.value = allProducts
-        .where((product) => product.subcategoryId == subcategoryId)
-        .toList();
+    _applyFiltersAndSearch();
   }
 
   Future<void> loadMoreProducts() async {
@@ -440,7 +442,9 @@ class CategoryProductsController extends GetxController with VoiceSearchMixin {
       hasMore.value = result['hasMore'] as bool;
 
       if (newProducts.isNotEmpty) {
-        displayProducts.addAll(newProducts);
+        allProducts.addAll(newProducts);
+        // Apply current filters and sorting to new products
+        _applyFiltersAndSearch();
         currentOffset.value = displayProducts.length;
         print(
           '✅ Loaded ${newProducts.length} more products. Total: ${displayProducts.length}',
@@ -459,31 +463,137 @@ class CategoryProductsController extends GetxController with VoiceSearchMixin {
 
   void onSearchChanged(String query) {
     searchQuery.value = query;
-    if (query.isEmpty) {
-      if (selectedSubcategory.value != null) {
-        _filterProductsBySubcategory(selectedSubcategory.value!.id);
-      } else {
-        displayProducts.value = allProducts;
-      }
-      return;
+    _applyFiltersAndSearch();
+  }
+
+  void onSortChanged(String sortOption) {
+    selectedSortOption.value = sortOption;
+    _applySorting();
+  }
+
+  void onFilterChanged(List<String> filters) {
+    selectedFilters.value = filters;
+    _applyFiltersAndSearch();
+  }
+
+  void _applyFiltersAndSearch() {
+    List<ProductModel> products = allProducts.toList();
+
+    // Apply search filter
+    if (searchQuery.value.isNotEmpty) {
+      products = products.where((product) {
+        return product.title.toLowerCase().contains(
+              searchQuery.value.toLowerCase(),
+            ) ||
+            product.description.toLowerCase().contains(
+              searchQuery.value.toLowerCase(),
+            );
+      }).toList();
     }
 
-    List<ProductModel> baseProducts = selectedSubcategory.value != null
-        ? allProducts
-              .where(
-                (product) =>
-                    product.subcategoryId == selectedSubcategory.value!.id,
-              )
-              .toList()
-        : allProducts;
+    // Apply subcategory filter
+    if (selectedSubcategory.value != null) {
+      products = products
+          .where(
+            (product) => product.subcategoryId == selectedSubcategory.value!.id,
+          )
+          .toList();
+    }
 
-    displayProducts.value = baseProducts
-        .where(
-          (product) =>
-              product.title.toLowerCase().contains(query.toLowerCase()) ||
-              product.description.toLowerCase().contains(query.toLowerCase()),
-        )
-        .toList();
+    // Apply price range filters
+    for (String filter in selectedFilters) {
+      switch (filter) {
+        case 'below_99':
+          products = products.where((product) {
+            final price =
+                double.tryParse(
+                  product.price.replaceAll('₹', '').replaceAll('৳', ''),
+                ) ??
+                0.0;
+            return price < 99;
+          }).toList();
+          break;
+        case '100_199':
+          products = products.where((product) {
+            final price =
+                double.tryParse(
+                  product.price.replaceAll('₹', '').replaceAll('৳', ''),
+                ) ??
+                0.0;
+            return price >= 100 && price <= 199;
+          }).toList();
+          break;
+        case '200_499':
+          products = products.where((product) {
+            final price =
+                double.tryParse(
+                  product.price.replaceAll('₹', '').replaceAll('৳', ''),
+                ) ??
+                0.0;
+            return price >= 200 && price <= 499;
+          }).toList();
+          break;
+        case 'above_500':
+          products = products.where((product) {
+            final price =
+                double.tryParse(
+                  product.price.replaceAll('₹', '').replaceAll('৳', ''),
+                ) ??
+                0.0;
+            return price >= 500;
+          }).toList();
+          break;
+      }
+    }
+
+    displayProducts.value = products;
+    _applySorting();
+  }
+
+  void _applySorting() {
+    List<ProductModel> products = displayProducts.toList();
+
+    switch (selectedSortOption.value) {
+      case 'price_low_high':
+        products.sort((a, b) {
+          final priceA =
+              double.tryParse(
+                a.price.replaceAll('₹', '').replaceAll('৳', ''),
+              ) ??
+              0.0;
+          final priceB =
+              double.tryParse(
+                b.price.replaceAll('₹', '').replaceAll('৳', ''),
+              ) ??
+              0.0;
+          return priceA.compareTo(priceB);
+        });
+        break;
+      case 'price_high_low':
+        products.sort((a, b) {
+          final priceA =
+              double.tryParse(
+                a.price.replaceAll('₹', '').replaceAll('৳', ''),
+              ) ??
+              0.0;
+          final priceB =
+              double.tryParse(
+                b.price.replaceAll('₹', '').replaceAll('৳', ''),
+              ) ??
+              0.0;
+          return priceB.compareTo(priceA);
+        });
+        break;
+      case 'rating':
+        products.sort((a, b) => b.rating.compareTo(a.rating));
+        break;
+      case 'relevance':
+      default:
+        // Keep original order
+        break;
+    }
+
+    displayProducts.value = products;
   }
 
   void onProductTap(ProductModel product) {

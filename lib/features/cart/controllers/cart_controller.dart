@@ -150,6 +150,11 @@ class CartController extends GetxController {
   // Check if there are any urgent items in cart
   bool get hasUrgentItems => _cartService.hasUrgentItems;
 
+  // Check if there are any medicine items in cart
+  bool get hasMedicineItems => _cartItems.any(
+    (item) => item.product.isPrescriptionMedicine || item.product.isOTC,
+  );
+
   // Check if a specific product is marked as urgent in cart
   bool isProductUrgent(ProductModel product) {
     return _cartService.isProductUrgent(product);

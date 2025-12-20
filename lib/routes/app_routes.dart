@@ -26,6 +26,8 @@ import 'package:quikle_user/features/orders/presentation/screens/order_invoice_s
 import 'package:quikle_user/features/orders/data/models/order_model.dart';
 import 'package:quikle_user/features/prescription/presentation/screens/prescription_list_screen.dart';
 import 'package:quikle_user/features/prescription/presentation/screens/prescription_details_screen.dart';
+import 'package:quikle_user/features/profile/presentation/screens/privacy_policy_screen.dart';
+import 'package:quikle_user/features/profile/presentation/screens/terms_conditions_screen.dart';
 
 class AppRoute {
   static const String _splash = '/';
@@ -60,6 +62,9 @@ class AppRoute {
   static const String _prescriptionList = '/prescription-list';
   static const String _prescriptionDetails = '/prescription-details';
   static const String splashWrapper = '/splashWrapper';
+  static const String _privacyPolicy = '/privacy-policy';
+  static const String _termsConditions = '/terms-conditions';
+  static const String _prescription = '/prescription';
 
   static String getSplashScreen() => _splash;
   static String getLoginScreen() => _login;
@@ -93,6 +98,9 @@ class AppRoute {
   static String getPrescriptionList() => _prescriptionList;
   static String getPrescriptionDetails() => _prescriptionDetails;
   static String getSplashWrapper() => splashWrapper;
+  static String getPrivacyPolicy() => _privacyPolicy;
+  static String getTermsConditions() => _termsConditions;
+  static String getPrescription() => _prescription;
 
   static final List<GetPage<dynamic>> routes = <GetPage>[
     GetPage(name: _splash, page: () => const SplashScreen()),
@@ -162,6 +170,9 @@ class AppRoute {
       page: () => const PrescriptionDetailsScreen(),
     ),
     GetPage(name: AppRoute.splashWrapper, page: () => const SplashWrapper()),
+    GetPage(name: _privacyPolicy, page: () => const PrivacyPolicyScreen()),
+    GetPage(name: _termsConditions, page: () => const TermsConditionsScreen()),
+    GetPage(name: _prescription, page: () => const PrescriptionListScreen()),
     // GetPage(
     //   name: _home,
     //   page: () => const _PlaceholderHome(),

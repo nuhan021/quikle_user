@@ -118,7 +118,9 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
     return Container(
       decoration: ShapeDecoration(
         color: AppColors.textWhite,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16.r),
+        ),
         shadows: [
           BoxShadow(
             color: AppColors.cardColor,
@@ -149,6 +151,11 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
   }
 
   Widget _buildImageSection() {
+    final imagePath = widget.product.imagePath ?? '';
+    final isNetworkImage =
+        imagePath.isNotEmpty &&
+        (imagePath.startsWith('http://') || imagePath.startsWith('https://'));
+
     return GestureDetector(
       onTap: widget.onTap,
       behavior: HitTestBehavior.opaque,
@@ -164,17 +171,55 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
               ),
             ),
             clipBehavior: Clip.antiAlias,
-            child: Image.asset(
-              widget.product.imagePath,
-              fit: BoxFit.contain,
-              filterQuality: FilterQuality.high,
-            ),
+            child: isNetworkImage
+                ? Image.network(
+                    imagePath,
+                    fit: BoxFit.contain,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Center(
+                        child: SizedBox(
+                          width: 24.w,
+                          height: 24.w,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            value: loadingProgress.expectedTotalBytes != null
+                                ? loadingProgress.cumulativeBytesLoaded /
+                                      loadingProgress.expectedTotalBytes!
+                                : null,
+                          ),
+                        ),
+                      );
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      return Center(
+                        child: Icon(
+                          Icons.broken_image,
+                          size: 28.sp,
+                          color: AppColors.featherGrey,
+                        ),
+                      );
+                    },
+                  )
+                : (imagePath.isNotEmpty
+                      ? Image.asset(
+                          imagePath,
+                          fit: BoxFit.contain,
+                          filterQuality: FilterQuality.high,
+                        )
+                      : Center(
+                          child: Icon(
+                            Icons.image,
+                            size: 28.sp,
+                            color: AppColors.featherGrey,
+                          ),
+                        )),
           ),
 
           if (widget.product.isMedicine && widget.product.isOTC)
             Positioned(
-              top: 4.h,
-              left: 4.w,
+              top: 6.h,
+              left: 6.w,
               child: Container(
                 padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
                 decoration: BoxDecoration(
@@ -367,13 +412,17 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
             width: double.infinity,
             padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 6.h),
             decoration: BoxDecoration(
-              color: isUrgent ? Color(0xFFFFEBEE) : Colors.white,
+              color: isUrgent ? Colors.red.shade500 : Colors.white,
               border: Border.all(color: Colors.red, width: 1),
               borderRadius: BorderRadius.circular(12.r),
             ),
             child: Row(
               children: [
-                Icon(Icons.access_time, size: 10.sp, color: Colors.red),
+                Icon(
+                  Icons.access_time,
+                  size: 10.sp,
+                  color: isUrgent ? Colors.white : Colors.red,
+                ),
                 Expanded(
                   child: Text(
                     'Urgent Delivery',
@@ -381,7 +430,7 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
                       font: CustomFonts.inter,
                       fontSize: 9.sp,
                       fontWeight: FontWeight.w700,
-                      color: Colors.red,
+                      color: isUrgent ? Colors.white : Colors.red,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -505,7 +554,7 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
                   if (widget.quantity != null) ...[
                     SizedBox(height: 6.h),
                     Text(
-                      'Total: \$ ${(widget.quantity! * _getNumericPrice()).toStringAsFixed(2)}',
+                      'Total: ₹${(widget.quantity! * _getNumericPrice()).toStringAsFixed(2)}',
                       style: getTextStyle(
                         font: CustomFonts.inter,
                         fontSize: 14.sp,

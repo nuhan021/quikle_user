@@ -18,6 +18,7 @@ import 'package:quikle_user/features/categories/presentation/widgets/category_pr
 import 'package:quikle_user/features/categories/presentation/widgets/minimal_subcategories_section.dart';
 import 'package:quikle_user/features/categories/presentation/widgets/minimal_subcategories_shimmer.dart';
 import 'package:quikle_user/features/categories/presentation/widgets/load_more_products_shimmer.dart';
+import 'package:quikle_user/features/categories/presentation/widgets/filter_sort_button.dart';
 import 'package:quikle_user/features/orders/presentation/widgets/live_order_indicator.dart';
 
 class CategoryProductsScreen extends StatefulWidget {
@@ -141,8 +142,12 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
                     final subcategoriesHeight = hasSubcategories
                         ? MinimalSubcategoriesSection.kPreferredHeight
                         : 0.0;
+                    final filterSortHeight =
+                        60.h; // Height for filter/sort button
                     final totalHeaderHeight =
-                        searchBlockHeight + subcategoriesHeight;
+                        searchBlockHeight +
+                        subcategoriesHeight +
+                        filterSortHeight;
                     final selectedSubcategoryId =
                         controller.selectedSubcategory.value?.id ?? 'none';
 
@@ -177,6 +182,13 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
                                 ),
                               ),
                             ),
+                            filterSortSection: SizedBox(
+                              height: filterSortHeight,
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                                child: FilterSortButton(controller: controller),
+                              ),
+                            ),
                             subcategoriesSection:
                                 hasSubcategories ||
                                     controller.isLoadingSubcategories.value
@@ -200,6 +212,7 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
                                               selectedSubcategory: controller
                                                   .selectedSubcategory
                                                   .value,
+
                                               onSubcategoryTap:
                                                   controller.onSubcategoryTap,
                                             ),
@@ -298,7 +311,7 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
                     sizeFactor: _navController,
                     child: SafeArea(
                       top: false,
-                      bottom: true,
+                      bottom: false,
                       child: KeyedSubtree(
                         key: _navKey,
                         child: CustomNavBar(
@@ -347,12 +360,14 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
 
 class _CategoryHeaderDelegate extends SliverPersistentHeaderDelegate {
   final Widget searchSection;
+  final Widget filterSortSection;
   final Widget subcategoriesSection;
   final double totalHeight;
   final Object? rebuildToken;
 
   _CategoryHeaderDelegate({
     required this.searchSection,
+    required this.filterSortSection,
     required this.subcategoriesSection,
     required this.totalHeight,
     this.rebuildToken,
@@ -370,11 +385,15 @@ class _CategoryHeaderDelegate extends SliverPersistentHeaderDelegate {
     double shrinkOffset,
     bool overlapsContent,
   ) {
-    return Container(
-      color: AppColors.homeGrey,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [searchSection, subcategoriesSection],
+    return SizedBox(
+      height: totalHeight,
+      child: Container(
+        color: AppColors.homeGrey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [searchSection, filterSortSection, subcategoriesSection],
+        ),
       ),
     );
   }

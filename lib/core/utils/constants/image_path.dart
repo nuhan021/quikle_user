@@ -122,4 +122,7 @@ class ImagePath {
   static const String sunflowerOil = 'assets/icons/sunflowerOil.png';
   static const String toothPaste = 'assets/icons/toothPaste.png';
   static const String wheatBread = 'assets/icons/wheatBread.png';
+  static const String privacyIcon = 'assets/icons/privacy.png';
+  static const String termsIcon = 'assets/icons/terms.png';
+  static const String prescriptionIcon = 'assets/icons/prescription.png';
 }

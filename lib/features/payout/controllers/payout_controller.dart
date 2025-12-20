@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:quikle_user/features/orders/data/models/order_model.dart';
+import 'package:quikle_user/features/orders/data/services/order_api_service.dart';
+import 'package:quikle_user/features/payment/data/models/order_creation_response.dart';
+import 'package:quikle_user/features/payment/services/cashfree_payment_service.dart';
 import 'package:quikle_user/features/payout/presentation/widgets/order_success_dialog.dart';
+import 'package:quikle_user/features/payout/presentation/widgets/payment_failure_dialog.dart';
 import '../data/models/delivery_option_model.dart';
 import '../data/models/payment_method_model.dart';
 import '../../profile/data/models/shipping_address_model.dart';
@@ -11,9 +15,12 @@ import '../../cart/controllers/cart_controller.dart';
 import '../../user/controllers/user_controller.dart';
 import '../../../core/utils/constants/enums/order_enums.dart';
 import '../../../core/utils/constants/enums/delivery_enums.dart';
+import '../../../core/utils/logging/logger.dart';
 
 class PayoutController extends GetxController {
   final PayoutService _payoutService = PayoutService();
+  final OrderApiService _orderApiService = OrderApiService();
+  final CashfreePaymentService _cashfreeService = CashfreePaymentService();
   final _cartController = Get.find<CartController>();
   final _userController = Get.find<UserController>();
 
@@ -132,6 +139,13 @@ class PayoutController extends GetxController {
     _loadInitialData();
     _updateDeliveryBasedOnUrgency(); // Set initial delivery type based on cart
 
+    // Initialize Cashfree payment service with callbacks
+    _cashfreeService.initialize(
+      onPaymentSuccess: _handleCashfreePaymentSuccess,
+      onPaymentError: _handleCashfreePaymentError,
+      onPaymentProcessing: _handlePaymentProcessing,
+    );
+
     _couponController.addListener(_syncCouponText);
     _deliveryPreferenceController.addListener(() {
       _selectedDeliveryPreference.value =
@@ -240,6 +254,9 @@ class PayoutController extends GetxController {
     // If turning off urgent delivery, remove urgent status from all items
     if (!_isUrgentDelivery.value) {
       _clearAllUrgentItems();
+    } else {
+      // If turning on urgent delivery, restore urgent status to medicine items
+      _restoreUrgentItemsForMedicines();
     }
 
     // Update delivery options
@@ -255,6 +272,17 @@ class PayoutController extends GetxController {
     }
     // Reset user toggle flag since we've manually cleared all urgent items
     _userToggledUrgent.value = false;
+  }
+
+  void _restoreUrgentItemsForMedicines() {
+    // Restore urgent status to medicine items when urgent delivery is turned on
+    for (final item in _cartController.cartItems) {
+      final isMedicine =
+          item.product.isPrescriptionMedicine || item.product.isOTC;
+      if (isMedicine && !_cartController.isProductUrgent(item.product)) {
+        _cartController.toggleProductUrgentStatus(item.product);
+      }
+    }
   }
 
   void _updateDeliveryBasedOnUrgency() {
@@ -339,10 +367,15 @@ class PayoutController extends GetxController {
       selectPaymentMethod(_paymentMethods.first);
     }
 
-    // Auto-select first address if none selected and addresses available
+    // Auto-select default address if none selected and addresses available
     if (selectedShippingAddress == null &&
         _addressController.addresses.isNotEmpty) {
-      selectShippingAddress(_addressController.addresses.first);
+      final defaultAddr = _addressController.defaultAddress;
+      if (defaultAddr != null) {
+        selectShippingAddress(defaultAddr);
+      } else {
+        selectShippingAddress(_addressController.addresses.first);
+      }
     }
 
     if (selectedDeliveryOption == null ||
@@ -355,70 +388,282 @@ class PayoutController extends GetxController {
     _isProcessingPayment.value = true;
 
     try {
-      final orderId = 'ORD_${DateTime.now().millisecondsSinceEpoch}';
-      final paymentResult = await _payoutService.processPayment(
-        amount: totalAmount,
+      // Determine final shipping address to attach to order.
+      // If user provided a different receiver, copy the selected address but
+      // replace name and phone number.
+      ShippingAddressModel finalShippingAddress = selectedShippingAddress!;
+      if (isDifferentReceiver && receiverName.isNotEmpty) {
+        finalShippingAddress = selectedShippingAddress!.copyWith(
+          name: receiverName,
+          phoneNumber: receiverPhone.isNotEmpty
+              ? receiverPhone
+              : selectedShippingAddress!.phoneNumber,
+        );
+      }
+
+      // Set loading state
+      _isProcessingPayment.value = true;
+
+      // Step 1: Create order with backend API
+      AppLoggerHelper.debug('Creating order with backend API...');
+      final orderCreationResponse = await _orderApiService.createOrder(
+        items: _cartController.cartItems,
+        shippingAddress: finalShippingAddress,
+        deliveryOption: selectedDeliveryOption!,
         paymentMethod: selectedPaymentMethod!,
-        orderId: orderId,
+        couponCode: appliedCoupon?['isValid'] == true
+            ? _couponController.text
+            : null,
       );
 
-      if (paymentResult['success'] == true) {
-        // Determine final shipping address to attach to order.
-        // If user provided a different receiver, copy the selected address but
-        // replace name and phone number.
-        ShippingAddressModel finalShippingAddress = selectedShippingAddress!;
-        if (isDifferentReceiver && receiverName.isNotEmpty) {
-          finalShippingAddress = selectedShippingAddress!.copyWith(
-            name: receiverName,
-            phoneNumber: receiverPhone.isNotEmpty
-                ? receiverPhone
-                : selectedShippingAddress!.phoneNumber,
-          );
-        }
+      if (!orderCreationResponse.success) {
+        throw Exception(orderCreationResponse.message);
+      }
 
-        final order = OrderModel(
-          orderId: orderId,
-          userId: _userController.currentUserId ?? 'unknown_user',
-          items: _cartController.cartItems,
-          shippingAddress: finalShippingAddress,
-          deliveryOption: selectedDeliveryOption!,
-          paymentMethod: selectedPaymentMethod!,
-          subtotal: subtotal,
-          deliveryFee: deliveryFee,
-          total: totalAmount,
-          couponCode: appliedCoupon?['isValid'] == true
-              ? _couponController.text
-              : null,
-          discount: discountAmount > 0 ? discountAmount : null,
-          orderDate: DateTime.now(),
-          status: OrderStatus.pending,
-          transactionId: paymentResult['transactionId'],
-          metadata: {
-            'deliveryPreference': selectedDeliveryPreference,
-            'isUrgent': isUrgentDelivery,
-          },
+      final orderData = orderCreationResponse.data;
+      AppLoggerHelper.debug(
+        '✅ Orders created: ${orderData.orders.length} order(s), Parent Order ID: ${orderData.parentOrderId}',
+      );
+      AppLoggerHelper.debug(
+        'Requires Payment: ${orderData.requiresPayment}, Total Amount: ${orderData.totalAmount}',
+      );
+
+      // Step 2: If payment is required, use Cashfree SDK
+      if (orderData.requiresPayment) {
+        AppLoggerHelper.debug(
+          'Initiating Cashfree payment for CF Order ID: ${orderData.cfOrderId}',
+        );
+        AppLoggerHelper.debug(
+          'Payment Session ID: ${orderData.paymentSessionId}',
         );
 
-        _cartController.clearCart();
+        // Store order data for later use in callbacks
+        _pendingOrderData = orderData;
+        _pendingShippingAddress = finalShippingAddress;
 
-        Get.dialog(
-          OrderSuccessDialog(
-            order: order,
-            transactionId: paymentResult['transactionId'],
-            onContinue: () {
-              Get.back();
-              Get.offAllNamed('/main');
-            },
-          ),
-          barrierDismissible: false,
+        // Start Cashfree payment
+        _isProcessingPayment.value = false;
+
+        await _cashfreeService.startPayment(
+          cfOrderId: orderData.cfOrderId,
+          paymentSessionId: orderData.paymentSessionId,
+          parentOrderId: orderData.parentOrderId,
         );
       } else {
-        Get.snackbar('Payment Failed', paymentResult['message']);
+        // Payment not required (e.g., COD)
+        _handlePaymentSuccess(orderData, finalShippingAddress);
       }
     } catch (e) {
-      Get.snackbar('Error', 'Failed to place order. Please try again.');
-    } finally {
+      AppLoggerHelper.error('❌ Error placing order', e);
       _isProcessingPayment.value = false;
+
+      // Show payment failure dialog for any payment-related errors
+      String errorMessage = 'Something went wrong. Please try again.';
+
+      // Extract meaningful error message
+      if (e.toString().contains('Cashfree') ||
+          e.toString().contains('payment') ||
+          e.toString().contains('session')) {
+        errorMessage =
+            'Payment initialization failed. Please check your connection and try again.';
+      } else if (e.toString().contains('Exception:')) {
+        // Extract the actual error message
+        final match = RegExp(r'Exception:\s*(.+)').firstMatch(e.toString());
+        if (match != null && match.group(1) != null) {
+          errorMessage = match.group(1)!;
+        }
+      }
+
+      Get.dialog(
+        PaymentFailureDialog(
+          errorMessage: errorMessage,
+          onRetry: () {
+            // Retry the payment by calling placeOrder again
+            placeOrder();
+          },
+        ),
+        barrierDismissible: true,
+      );
     }
+  }
+
+  // Store pending order data for callback processing
+  OrderCreationData? _pendingOrderData;
+  ShippingAddressModel? _pendingShippingAddress;
+
+  /// Handle payment processing (called before confirmation API)
+  void _handlePaymentProcessing() {
+    AppLoggerHelper.debug('⏳ Processing payment confirmation...');
+    _isProcessingPayment.value = true;
+
+    // Show loading dialog
+    Get.dialog(
+      PopScope(
+        canPop: false,
+        child: Material(
+          type: MaterialType.transparency,
+          child: Center(
+            child: Container(
+              padding: const EdgeInsets.all(24),
+              margin: const EdgeInsets.symmetric(horizontal: 40),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const CircularProgressIndicator(),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Processing Payment',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                      decoration: TextDecoration.none,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Please wait while we confirm your payment...',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[600],
+                      decoration: TextDecoration.none,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+      barrierDismissible: false,
+    );
+  }
+
+  /// Handle successful payment from Cashfree SDK
+  void _handleCashfreePaymentSuccess(String orderId) {
+    AppLoggerHelper.debug('✅ Cashfree payment successful for order: $orderId');
+
+    // Close the processing dialog if it's open
+    if (Get.isDialogOpen ?? false) {
+      Get.back();
+    }
+
+    if (_pendingOrderData == null || _pendingShippingAddress == null) {
+      AppLoggerHelper.error('❌ No pending order data found');
+      Get.snackbar(
+        'Error',
+        'Payment completed but order data is missing. Please contact support.',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
+    _handlePaymentSuccess(_pendingOrderData!, _pendingShippingAddress!);
+
+    // Clear pending data
+    _pendingOrderData = null;
+    _pendingShippingAddress = null;
+  }
+
+  /// Handle payment error from Cashfree SDK
+  void _handleCashfreePaymentError(String orderId, String errorMessage) {
+    AppLoggerHelper.error(
+      '❌ Cashfree payment error for order $orderId: $errorMessage',
+    );
+
+    // Close the processing dialog if it's open
+    if (Get.isDialogOpen ?? false) {
+      Get.back();
+    }
+
+    _isProcessingPayment.value = false;
+
+    // Show payment failure dialog instead of snackbar
+    Get.dialog(
+      PaymentFailureDialog(
+        errorMessage: errorMessage.isEmpty
+            ? 'Something went wrong with your payment'
+            : errorMessage,
+        onRetry: () {
+          // Retry the payment by calling placeOrder again
+          placeOrder();
+        },
+      ),
+      barrierDismissible: true,
+    );
+
+    // Don't clear pending data yet - user might retry
+    // Only clear if they cancel
+  }
+
+  void _handlePaymentSuccess(
+    OrderCreationData orderData,
+    ShippingAddressModel finalShippingAddress,
+  ) {
+    AppLoggerHelper.debug(
+      '✅ Payment successful for parent order: ${orderData.parentOrderId}',
+    );
+
+    // Create local order model for display (using first order for UI)
+    final firstOrder = orderData.orders.isNotEmpty
+        ? orderData.orders.first
+        : null;
+
+    final order = OrderModel(
+      orderId: orderData.parentOrderId,
+      userId: _userController.currentUserId ?? 'unknown_user',
+      items: _cartController.cartItems,
+      shippingAddress: finalShippingAddress,
+      deliveryOption: selectedDeliveryOption!,
+      paymentMethod: selectedPaymentMethod!,
+      subtotal: subtotal,
+      deliveryFee: deliveryFee,
+      total: orderData.totalAmount,
+      couponCode: appliedCoupon?['isValid'] == true
+          ? _couponController.text
+          : null,
+      discount: discountAmount > 0 ? discountAmount : null,
+      orderDate: DateTime.now(),
+      status: OrderStatus.pending,
+      trackingNumber: firstOrder?.trackingNumber ?? '',
+      metadata: {
+        'deliveryPreference': selectedDeliveryPreference,
+        'isUrgent': isUrgentDelivery,
+        'cfOrderId': orderData.cfOrderId,
+        'childOrders': orderData.orders
+            .map(
+              (o) => {
+                'orderId': o.orderId,
+                'vendorId': o.vendorId,
+                'trackingNumber': o.trackingNumber,
+                'total': o.total,
+              },
+            )
+            .toList(),
+      },
+    );
+
+    // Clear cart
+    _cartController.clearCart();
+    _isProcessingPayment.value = false;
+
+    // Show success dialog
+    Get.dialog(
+      OrderSuccessDialog(
+        order: order,
+        transactionId: orderData.parentOrderId,
+        onContinue: () {
+          Get.back();
+          Get.offAllNamed('/home');
+        },
+      ),
+      barrierDismissible: false,
+    );
   }
 }

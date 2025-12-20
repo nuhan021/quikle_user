@@ -24,7 +24,39 @@ class ProductImageWidget extends StatelessWidget {
       ),
       child: Stack(
         children: [
-          Center(child: Image.asset(imagePath, fit: BoxFit.cover)),
+          Positioned.fill(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12.r),
+              child: Image.network(
+                imagePath,
+                fit: BoxFit.contain,
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Center(
+                    child: SizedBox(
+                      width: 24.w,
+                      height: 24.w,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.w,
+                        value: loadingProgress.expectedTotalBytes != null
+                            ? loadingProgress.cumulativeBytesLoaded /
+                                  (loadingProgress.expectedTotalBytes ?? 1)
+                            : null,
+                      ),
+                    ),
+                  );
+                },
+                errorBuilder: (context, error, stackTrace) => Container(
+                  color: Colors.grey[200],
+                  child: Icon(
+                    Icons.broken_image,
+                    size: 48.sp,
+                    color: Colors.grey,
+                  ),
+                ),
+              ),
+            ),
+          ),
           Positioned(
             top: 16.h,
             right: 16.w,

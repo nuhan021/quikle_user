@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:quikle_user/core/common/styles/global_text_style.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
+import 'package:quikle_user/features/main/presentation/screens/main_screen.dart';
 import 'package:quikle_user/features/orders/controllers/orders_controller.dart';
 import 'package:quikle_user/features/orders/presentation/widgets/brief_order_card.dart';
 import 'package:quikle_user/features/orders/presentation/screens/order_invoice_screen.dart';
@@ -20,7 +21,6 @@ class OrdersScreen extends StatelessWidget {
 
     return Scaffold(
       body: SafeArea(
-        bottom: false,
         child: Column(
           children: [
             const UnifiedProfileAppBar(
@@ -132,7 +132,7 @@ class OrdersScreen extends StatelessWidget {
                         ),
                         SizedBox(height: 32.h),
                         ElevatedButton(
-                          onPressed: () => Get.back(),
+                          onPressed: () => _navigateToOrders(context),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.beakYellow,
                             padding: EdgeInsets.symmetric(
@@ -258,6 +258,19 @@ class OrdersScreen extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+
+  void _navigateToOrders(BuildContext context) {
+    Navigator.pushAndRemoveUntil(
+      context,
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            const MainScreen(initialIndex: 0),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) =>
+            child,
+      ),
+      (route) => false,
     );
   }
 }

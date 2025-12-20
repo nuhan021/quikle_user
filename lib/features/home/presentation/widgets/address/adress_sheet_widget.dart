@@ -7,7 +7,7 @@ import 'package:quikle_user/core/utils/constants/enums/address_type_enums.dart';
 import 'package:quikle_user/core/utils/constants/image_path.dart';
 import 'package:quikle_user/features/profile/controllers/address_controller.dart';
 import 'package:quikle_user/features/profile/presentation/screens/add_address_screen.dart';
-import 'package:quikle_user/routes/app_routes.dart';
+import 'package:iconsax/iconsax.dart';
 
 Future<String?> showAddressSelectionSheet(AddressController addressController) {
   return Get.bottomSheet<String>(
@@ -36,17 +36,14 @@ class _AddressSelectionSheet extends StatelessWidget {
 
   String _formatAddress(String address, String city) {
     final parts = address.split(',');
-
-    // Take the first two comma-separated parts
     final usefulParts = parts.take(2).map((e) => e.trim()).toList();
-
     final shortAddress = usefulParts.join(', ');
-
     return '$shortAddress, $city';
   }
 
   @override
   Widget build(BuildContext context) {
+    final maxHeight = MediaQuery.of(context).size.height * 0.8;
     return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
@@ -54,231 +51,334 @@ class _AddressSelectionSheet extends StatelessWidget {
       ),
       child: SafeArea(
         top: false,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              margin: const EdgeInsets.only(top: 12),
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Select Delivery Address',
-                        style: getTextStyle(
-                          font: CustomFonts.inter,
-                          fontSize: 14, // Slightly larger for emphasis
-                          fontWeight: FontWeight.w600,
-                          color: const Color(0xFF2A2A2A),
-                        ),
-                      ),
-                      InkWell(
-                        onTap: () => _navigateToAddAddress(Get.context!),
-                        borderRadius: BorderRadius.circular(16),
-                        child: AnimatedContainer(
-                          duration: const Duration(
-                            milliseconds: 200,
-                          ), // Smooth animation
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 14,
-                            vertical: 8,
-                          ),
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [
-                                Color(0xFF26A69A), // Teal
-                                Color(0xFF4DD0E1), // Cyan
-                              ],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                            borderRadius: BorderRadius.circular(
-                              14,
-                            ), // Softer corners
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.1),
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.add,
-                                color: Colors.white, // White for contrast
-                                size: 16, // Slightly larger for visibility
-                              ),
-                              const SizedBox(
-                                width: 8,
-                              ), // More spacing for balance
-                              Text(
-                                'Add Address',
-                                style: getTextStyle(
-                                  font: CustomFonts.inter,
-                                  fontSize:
-                                      14, // Slightly larger for readability
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxHeight: maxHeight),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  margin: const EdgeInsets.only(top: 12),
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(2),
                   ),
-                  const SizedBox(height: 16),
-                  Obx(() {
-                    final items = addressController.addresses;
-                    if (items.isEmpty) {
-                      return _EmptyAddresses();
-                    }
-                    final currentDefaultId =
-                        addressController.defaultAddress?.id;
-                    return Column(
-                      children: items.map((address) {
-                        final isSelected = currentDefaultId == address.id;
-                        return GestureDetector(
-                          onTap: () {
-                            Navigator.pop(context, address.id);
-                          },
-                          child: Container(
-                            margin: const EdgeInsets.only(bottom: 12),
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: isSelected
-                                  ? AppColors.gradientColor.withValues(
-                                      alpha: 0.15,
-                                    )
-                                  : Colors.grey[50],
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: isSelected
-                                    ? AppColors.gradientColor
-                                    : Colors.grey[300]!,
-                                width: isSelected ? 2 : 1,
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Select Delivery Address',
+                            style: getTextStyle(
+                              font: CustomFonts.inter,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: const Color(0xFF2A2A2A),
+                            ),
+                          ),
+                          InkWell(
+                            onTap: () => _navigateToAddAddress(Get.context!),
+                            borderRadius: BorderRadius.circular(16),
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 8,
+                              ),
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: [
+                                    Color(0xFF26A69A),
+                                    Color(0xFF4DD0E1),
+                                  ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                                borderRadius: BorderRadius.circular(14),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.1),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.add,
+                                    color: Colors.white,
+                                    size: 16,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'Add Address',
+                                    style: getTextStyle(
+                                      font: CustomFonts.inter,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                            child: Row(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(8),
-                                  // decoration: BoxDecoration(
-                                  //   color: isSelected
-                                  //       ? AppColors.gradientColor
-                                  //       : Colors.grey[400],
-                                  //   borderRadius: BorderRadius.circular(8),
-                                  // ),
-                                  child: Image.asset(
-                                    address.type == AddressType.home
-                                        ? ImagePath.homeAddressIcon
-                                        : address.type == AddressType.office
-                                        ? ImagePath.officeAddressIcon
-                                        : ImagePath.addressIcon,
-                                    width: 30,
-                                    height: 30,
-                                    fit: BoxFit.contain,
-                                    //color: Colors.white,
-                                  ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Obx(() {
+                        final items = addressController.addresses;
+                        if (items.isEmpty) {
+                          return _EmptyAddresses();
+                        }
+                        final currentDefaultId =
+                            addressController.defaultAddress?.id;
+                        return Column(
+                          children: items.map((address) {
+                            final isSelected = currentDefaultId == address.id;
+                            return Container(
+                              margin: const EdgeInsets.only(bottom: 12),
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: isSelected
+                                    ? AppColors.gradientColor.withOpacity(0.15)
+                                    : Colors.grey[50],
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: isSelected
+                                      ? AppColors.gradientColor
+                                      : Colors.grey[300]!,
+                                  width: isSelected ? 2 : 1,
                                 ),
-
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
+                              ),
+                              child: Row(
+                                children: [
+                                  // Tap to select address
+                                  Expanded(
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        Navigator.pop(context, address.id);
+                                      },
+                                      child: Row(
                                         children: [
-                                          Text(
-                                            '${_getAddressTypeLabel(address.type)} - ${address.name}',
-                                            style: getTextStyle(
-                                              font: CustomFonts.inter,
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w600,
-                                              color: AppColors.ebonyBlack,
+                                          Container(
+                                            padding: const EdgeInsets.all(8),
+                                            child: Image.asset(
+                                              address.type == AddressType.home
+                                                  ? ImagePath.homeAddressIcon
+                                                  : address.type ==
+                                                        AddressType.office
+                                                  ? ImagePath.officeAddressIcon
+                                                  : ImagePath.addressIcon,
+                                              width: 30,
+                                              height: 30,
+                                              fit: BoxFit.contain,
                                             ),
                                           ),
-                                          if (address.isDefault) ...[
-                                            const SizedBox(width: 8),
-                                            Container(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                    horizontal: 8,
-                                                    vertical: 2,
-                                                  ),
-                                              decoration: BoxDecoration(
-                                                color: AppColors.gradientColor,
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                              ),
-                                              child: Text(
-                                                'Current',
-                                                style: getTextStyle(
-                                                  font: CustomFonts.inter,
-                                                  fontSize: 10,
-                                                  fontWeight: FontWeight.w500,
-                                                  color: Colors.white,
+                                          const SizedBox(width: 12),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    Flexible(
+                                                      child: Text(
+                                                        '${_getAddressTypeLabel(address.type)} - ${address.name}',
+                                                        style: getTextStyle(
+                                                          font:
+                                                              CustomFonts.inter,
+                                                          fontSize: 14,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          color: AppColors
+                                                              .ebonyBlack,
+                                                        ),
+                                                        maxLines: 1,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                      ),
+                                                    ),
+                                                    if (address.isDefault) ...[
+                                                      const SizedBox(width: 8),
+                                                      Container(
+                                                        padding:
+                                                            const EdgeInsets.symmetric(
+                                                              horizontal: 8,
+                                                              vertical: 2,
+                                                            ),
+                                                        decoration: BoxDecoration(
+                                                          color: AppColors
+                                                              .gradientColor,
+                                                          borderRadius:
+                                                              BorderRadius.circular(
+                                                                10,
+                                                              ),
+                                                        ),
+                                                        child: Text(
+                                                          'Current',
+                                                          style: getTextStyle(
+                                                            font: CustomFonts
+                                                                .inter,
+                                                            fontSize: 10,
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            color: Colors.white,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ],
                                                 ),
+                                                const SizedBox(height: 4),
+                                                Text(
+                                                  _formatAddress(
+                                                    address.address,
+                                                    address.city,
+                                                  ),
+                                                  style: getTextStyle(
+                                                    font: CustomFonts.inter,
+                                                    fontSize: 12,
+                                                    color:
+                                                        AppColors.featherGrey,
+                                                  ),
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  // Radio button for selection
+                                  GestureDetector(
+                                    onTap: () {
+                                      Navigator.pop(context, address.id);
+                                    },
+                                    child: AnimatedContainer(
+                                      duration: const Duration(
+                                        milliseconds: 200,
+                                      ),
+                                      child: Icon(
+                                        isSelected
+                                            ? Icons.radio_button_checked
+                                            : Icons.radio_button_unchecked,
+                                        color: isSelected
+                                            ? AppColors.gradientColor
+                                            : Colors.grey[400],
+                                        size: 24,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  // Menu button for edit/delete
+                                  PopupMenuButton<String>(
+                                    icon: Icon(
+                                      Icons.more_vert,
+                                      color: AppColors.textSecondary,
+                                      size: 20,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    onSelected: (value) {
+                                      if (value == 'edit') {
+                                        Navigator.pop(context);
+                                        Future.delayed(
+                                          const Duration(milliseconds: 200),
+                                          () {
+                                            AddAddressScreen.show(
+                                              Get.context!,
+                                              addressToEdit: address,
+                                            );
+                                          },
+                                        );
+                                      } else if (value == 'delete') {
+                                        Navigator.pop(context);
+                                        Future.delayed(
+                                          const Duration(milliseconds: 200),
+                                          () {
+                                            _showDeleteConfirmation(
+                                              Get.context!,
+                                              address,
+                                              addressController,
+                                            );
+                                          },
+                                        );
+                                      }
+                                    },
+                                    itemBuilder: (context) => [
+                                      PopupMenuItem(
+                                        value: 'edit',
+                                        child: Row(
+                                          children: [
+                                            Icon(
+                                              Iconsax.edit_2,
+                                              size: 18,
+                                              color: AppColors.ebonyBlack,
+                                            ),
+                                            const SizedBox(width: 12),
+                                            Text(
+                                              'Edit',
+                                              style: getTextStyle(
+                                                font: CustomFonts.inter,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500,
+                                                color: AppColors.ebonyBlack,
                                               ),
                                             ),
                                           ],
-                                        ],
+                                        ),
                                       ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        _formatAddress(
-                                          address.address,
-                                          address.city,
+                                      PopupMenuItem(
+                                        value: 'delete',
+                                        child: Row(
+                                          children: [
+                                            Icon(
+                                              Iconsax.trash,
+                                              size: 18,
+                                              color: AppColors.error,
+                                            ),
+                                            const SizedBox(width: 12),
+                                            Text(
+                                              'Delete',
+                                              style: getTextStyle(
+                                                font: CustomFonts.inter,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500,
+                                                color: AppColors.error,
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                        style: getTextStyle(
-                                          font: CustomFonts.inter,
-                                          fontSize: 12,
-                                          color: AppColors.featherGrey,
-                                        ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
                                       ),
                                     ],
                                   ),
-                                ),
-                                AnimatedContainer(
-                                  duration: const Duration(milliseconds: 200),
-                                  child: Icon(
-                                    isSelected
-                                        ? Icons.radio_button_checked
-                                        : Icons.radio_button_unchecked,
-                                    color: isSelected
-                                        ? AppColors.gradientColor
-                                        : Colors.grey[400],
-                                    size: 24,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
+                                ],
+                              ),
+                            );
+                          }).toList(),
                         );
-                      }).toList(),
-                    );
-                  }),
-                ],
-              ),
+                      }),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -286,6 +386,67 @@ class _AddressSelectionSheet extends StatelessWidget {
 
   void _navigateToAddAddress(BuildContext context) {
     AddAddressScreen.show(context);
+  }
+
+  void _showDeleteConfirmation(
+    BuildContext context,
+    address,
+    AddressController controller,
+  ) {
+    Get.dialog(
+      AlertDialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        title: Text(
+          'Delete Address',
+          style: getTextStyle(
+            font: CustomFonts.inter,
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: AppColors.ebonyBlack,
+          ),
+        ),
+        content: Text(
+          'Are you sure you want to delete this address? This action cannot be undone.',
+          style: getTextStyle(
+            font: CustomFonts.inter,
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
+            color: AppColors.textSecondary,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text(
+              'Cancel',
+              style: getTextStyle(
+                font: CustomFonts.inter,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () async {
+              Get.back(); // Close dialog
+              await Future.delayed(const Duration(milliseconds: 100));
+              controller.deleteAddress(address.id);
+            },
+            child: Text(
+              'Delete',
+              style: getTextStyle(
+                font: CustomFonts.inter,
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: AppColors.error,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -320,7 +481,7 @@ class _EmptyAddresses extends StatelessWidget {
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
-              Get.toNamed(AppRoute.getAddAddress());
+              AddAddressScreen.show(context);
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.gradientColor,

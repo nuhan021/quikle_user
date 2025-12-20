@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:lottie/lottie.dart';
 import 'package:quikle_user/core/common/styles/global_text_style.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
@@ -38,18 +40,13 @@ class OrderSuccessDialog extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              width: 80,
-              height: 80,
-              decoration: const BoxDecoration(
-                color: Colors.green,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.check, color: Colors.white, size: 50),
+            SizedBox(
+              width: 300.h,
+              height: 300.h,
+              child: Lottie.asset('assets/json/Success.json', repeat: false),
             ),
 
-            const SizedBox(height: 20),
-
+            // const SizedBox(height: 20),
             Text(
               "Your order is confirmed",
               style: getTextStyle(

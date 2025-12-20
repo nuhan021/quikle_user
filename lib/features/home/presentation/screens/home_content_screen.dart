@@ -90,11 +90,13 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                         maxExtent: filtersHeaderHeight,
                         backgroundColor: AppColors.homeGrey,
                         shouldAddElevation: true,
+                        enableGlassEffect: true,
+                        blurSigma: 10.0,
                         builder: (context, shrinkOffset, overlapsContent) {
                           return SizedBox(
                             height: filtersHeaderHeight,
                             child: Container(
-                              color: AppColors.homeGrey,
+                              color: Colors.transparent,
                               child: Align(
                                 alignment: Alignment.topCenter,
                                 child: Column(

@@ -1,5 +1,9 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:quikle_user/core/common/styles/global_text_style.dart';
+import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 import 'package:quikle_user/features/home/data/models/product_model.dart';
+import 'package:quikle_user/features/profile/services/favorites_service.dart';
 
 class FavoritesController extends GetxController {
   static final RxSet<String> _globalFavoriteIds = <String>{}.obs;
@@ -29,70 +33,97 @@ class FavoritesController extends GetxController {
   void onInit() {
     super.onInit();
     loadFavorites();
-
-    ever(_globalFavoriteIds, (Set<String> favoriteIds) {
-      refreshFavorites();
-    });
   }
 
-  void loadFavorites() {
+  // 🔥 FIXED: Load favorites directly into ProductModel
+  Future<void> loadFavorites() async {
     try {
       _isLoading.value = true;
 
-      if (_globalFavoriteIds.isEmpty) {
-        _initializeSampleFavorites();
+      // Already returns List<ProductModel>
+      final products = await FavoritesService().getFavoriteProducts();
+
+      final favIds = <String>{};
+
+      for (final product in products) {
+        favIds.add(product.id);
       }
 
-      refreshFavorites();
+      _favoriteProducts.assignAll(products);
+      _globalFavoriteIds.assignAll(favIds);
     } catch (e) {
       print('Error loading favorites: $e');
-
       _favoriteProducts.clear();
     } finally {
       _isLoading.value = false;
     }
   }
 
-  void _initializeSampleFavorites() {
-    final sampleFavoriteIds = [
-      'produce_fruits_1',
-      'dairy_yogurt_1',
-      'produce_fruits_2',
-      'food_pizza_1',
-      'produce_fruits_6',
-      'dairy_milk_1',
-    ];
-
-    _globalFavoriteIds.addAll(sampleFavoriteIds);
+  // 🔥 FIXED: Refresh uses already loaded models (no API)
+  Future<void> refreshFavorites() async {
+    _favoriteProducts.removeWhere((p) => !_globalFavoriteIds.contains(p.id));
   }
 
-  void refreshFavorites() {
-    try {
-      // Static data removed - favorites should be fetched from API
-      // For now, just clear the list
-      _favoriteProducts.clear();
-    } catch (e) {
-      print('Error refreshing favorites: $e');
-      _favoriteProducts.clear();
+  Future<bool> addToFavorites(ProductModel product) async {
+    final itemId = int.tryParse(product.id);
+    if (itemId != null) {
+      final result = await FavoritesService().addToFavorites(itemId);
+      if (result != null) {
+        _globalFavoriteIds.add(product.id);
+        product = product.copyWith(isFavorite: true);
+        _favoriteProducts.add(product);
+        return true;
+      }
     }
+    return false;
   }
 
-  void addToFavorites(ProductModel product) {
-    addToGlobalFavorites(product.id);
-    refreshFavorites();
+  Future<bool> removeFromFavorites(String productId) async {
+    final itemId = int.tryParse(productId);
+    if (itemId != null) {
+      final success = await FavoritesService().removeFromFavorites(itemId);
+      if (success) {
+        _globalFavoriteIds.remove(productId);
+        _favoriteProducts.removeWhere((p) => p.id == productId);
+        return true;
+      }
+    }
+    return false;
   }
 
-  void removeFromFavorites(String productId) {
-    removeFromGlobalFavorites(productId);
-    refreshFavorites();
-  }
-
-  void toggleFavorite(ProductModel product) {
+  void toggleFavorite(ProductModel product) async {
     if (isProductFavorite(product.id)) {
-      removeFromFavorites(product.id);
+      final success = await removeFromFavorites(product.id);
+      if (success) {
+        _showFavoritePopup(
+          '${product.title} removed from favorites',
+          isAdded: false,
+        );
+      }
     } else {
-      addToFavorites(product);
+      final success = await addToFavorites(product);
+      if (success) {
+        _showFavoritePopup(
+          '${product.title} added to favorites',
+          isAdded: true,
+        );
+      }
     }
+  }
+
+  void _showFavoritePopup(String message, {required bool isAdded}) {
+    Get.rawSnackbar(
+      messageText: Text(
+        message,
+        style: getTextStyle(color: Colors.black, font: CustomFonts.obviously),
+      ),
+      snackPosition: SnackPosition.TOP,
+      backgroundColor: isAdded ? Colors.green.shade100 : Colors.red.shade100,
+      icon: Icon(Icons.favorite, color: isAdded ? Colors.green : Colors.red),
+      duration: const Duration(seconds: 2),
+      margin: const EdgeInsets.all(12),
+      shouldIconPulse: false,
+    );
   }
 
   void clearAllFavorites() {

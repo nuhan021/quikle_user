@@ -119,7 +119,7 @@ class OrderTrackingSummary extends StatelessWidget {
               ),
             ),
             Text(
-              '\$${order.total.toStringAsFixed(2)}',
+              '₹${order.total.toStringAsFixed(2)}',
               style: getTextStyle(
                 font: CustomFonts.obviously,
                 fontSize: 12.sp,

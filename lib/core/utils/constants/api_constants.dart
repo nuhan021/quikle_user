@@ -1,6 +1,5 @@
 class ApiConstants {
-  static const String baseUrl =
-      "https://adorningly-unstampeded-zetta.ngrok-free.dev";
+  static const String baseUrl = "https://quikle-u4dv.onrender.com";
 
   //For auth api's
   static const String authApi = "$baseUrl/auth";
@@ -52,6 +51,30 @@ class ApiConstants {
   static const String createOrder = "$baseUrl/customer/orders/";
   static const String getOrders = "$baseUrl/customer/orders/";
 
+  //Payment api's
+  static const String initiatePayment = "$baseUrl/payment/payment/initiate";
+  static const String confirmPayment = "$baseUrl/payment/payment/confirm";
+
   //Search api's
   static const String searchItems = "$baseUrl/items/items/";
+  static const String getItemById = "$baseUrl/items/items/{id}/";
+
+  //Favorites api's
+  static const String favorites = "$baseUrl/favourites/favorites/";
+
+  //Save FCM Token
+  static const String saveFcmToken = "$baseUrl/rider/save_token/";
+
+  //Prescription api's
+  static const String uploadPrescription =
+      "$baseUrl/prescription/prescriptions/";
+  static const String getPrescriptions = "$baseUrl/prescription/prescriptions/";
+  static const String getPrescriptionById =
+      "$baseUrl/prescription/prescriptions/{id}/";
+  static const String deletePrescription =
+      "$baseUrl/prescription/prescriptions/{id}";
+
+  //Restaurant api's
+  static const String getRestaurants = "$authApi/restaurant/restaurants";
+  static const String getRestaurantProducts = "$baseUrl/items/food/";
 }

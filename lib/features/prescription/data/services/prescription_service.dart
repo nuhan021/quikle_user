@@ -1,26 +1,31 @@
 import 'dart:io';
 import 'dart:math';
 import 'package:collection/collection.dart';
+import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
+import 'package:quikle_user/core/utils/logging/logger.dart';
 import 'package:quikle_user/features/prescription/data/models/prescription_model.dart';
 import 'package:quikle_user/features/home/data/models/product_model.dart';
 import 'package:quikle_user/core/utils/constants/image_path.dart';
+import 'package:quikle_user/core/utils/constants/api_constants.dart';
+import 'package:quikle_user/core/services/network_caller.dart';
+import 'package:quikle_user/core/services/storage_service.dart';
 
 class PrescriptionService {
   // In-memory mock store
   static final List<PrescriptionModel> _prescriptions = [];
+  final NetworkCaller _networkCaller = NetworkCaller();
 
-  // ---------- Helpers (handy for future real uploads) ----------
-  //bool _isPdfPath(String path) => path.toLowerCase().endsWith('.pdf');
-
-  // String _inferMime(String path) {
-  //   final p = path.toLowerCase();
-  //   if (p.endsWith('.pdf')) return 'application/pdf';
-  //   if (p.endsWith('.png')) return 'image/png';
-  //   if (p.endsWith('.jpg') || p.endsWith('.jpeg')) return 'image/jpeg';
-  //   if (p.endsWith('.heic')) return 'image/heic';
-  //   if (p.endsWith('.webp')) return 'image/webp';
-  //   return 'application/octet-stream';
-  // }
+  // ---------- Helpers ----------
+  String _inferMime(String path) {
+    final p = path.toLowerCase();
+    if (p.endsWith('.pdf')) return 'application/pdf';
+    if (p.endsWith('.png')) return 'image/png';
+    if (p.endsWith('.jpg') || p.endsWith('.jpeg')) return 'image/jpeg';
+    if (p.endsWith('.heic')) return 'image/heic';
+    if (p.endsWith('.webp')) return 'image/webp';
+    return 'application/octet-stream';
+  }
 
   // ---------- Public API ----------
   Future<PrescriptionModel> uploadPrescription({
@@ -28,46 +33,239 @@ class PrescriptionService {
     required File imageFile, // can be image OR pdf
     String? notes,
   }) async {
-    // Simulate network delay
-    await Future.delayed(const Duration(seconds: 2));
+    try {
+      final token = StorageService.token;
+      final mime = _inferMime(imageFile.path);
+      final fileName = imageFile.path.split('/').last;
 
-    final prescriptionId = 'presc_${DateTime.now().millisecondsSinceEpoch}';
+      // Create multipart file
+      final multipartFile = await http.MultipartFile.fromPath(
+        'image_path',
+        imageFile.path,
+        contentType: MediaType.parse(mime),
+      );
 
-    // (Optional) Use MIME for debug/logging (kept here for future real API)
-    //final mime = _inferMime(imageFile.path);
-    // print('Uploading file ${imageFile.path} with mime: $mime');
+      // Make API call
+      final response = await _networkCaller.multipartRequest(
+        ApiConstants.uploadPrescription,
+        files: [multipartFile],
+        token: 'Bearer $token',
+      );
 
-    final prescription = PrescriptionModel(
-      id: prescriptionId,
-      userId: userId,
-      imagePath: imageFile.path, // path to file (image or pdf)
-      fileName: imageFile.path.split('/').last,
-      uploadedAt: DateTime.now(),
-      status: PrescriptionStatus.uploaded,
-      notes: notes,
-      // If your model later adds fields like isPdf/mimeType, set them here using _isPdfPath/mime
-    );
+      if (!response.isSuccess || response.responseData == null) {
+        throw Exception(
+          response.errorMessage.isNotEmpty
+              ? response.errorMessage
+              : 'Failed to upload prescription',
+        );
+      }
 
-    _prescriptions.add(prescription);
+      // Parse response
+      final data = response.responseData;
+      final prescription = PrescriptionModel(
+        id: data['id'].toString(),
+        userId: data['user_id'].toString(),
+        imagePath: data['image_path'] as String,
+        fileName: data['file_name'] as String? ?? fileName,
+        uploadedAt: DateTime.parse(data['uploaded_at'] as String),
+        status: _parseStatus(data['status'] as String),
+        notes: data['notes'] as String?,
+        vendorResponses: [],
+      );
 
-    // Kick off mock processing → response
-    _simulateVendorProcessing(prescriptionId);
+      _prescriptions.add(prescription);
 
-    return prescription;
+      return prescription;
+    } catch (e) {
+      throw Exception('Failed to upload prescription: $e');
+    }
+  }
+
+  PrescriptionStatus _parseStatus(String status) {
+    switch (status.toLowerCase()) {
+      case 'uploaded':
+        return PrescriptionStatus.uploaded;
+      case 'under_review':
+      case 'underreview':
+        return PrescriptionStatus.underReview;
+      case 'valid':
+        return PrescriptionStatus.valid;
+      case 'invalid':
+        return PrescriptionStatus.invalid;
+      case 'medicines_ready':
+      case 'medicinesready':
+        return PrescriptionStatus.medicinesReady;
+      default:
+        return PrescriptionStatus.uploaded;
+    }
   }
 
   Future<List<PrescriptionModel>> getUserPrescriptions(String userId) async {
-    await Future.delayed(const Duration(milliseconds: 500));
-    return _prescriptions.where((p) => p.userId == userId).toList()
-      ..sort((a, b) => b.uploadedAt.compareTo(a.uploadedAt));
+    try {
+      final token = StorageService.token;
+
+      // Fetch from API
+      final response = await _networkCaller.getRequest(
+        ApiConstants.getPrescriptions,
+        token: 'Bearer $token',
+      );
+
+      print('getUserPrescriptions response: ${response.isSuccess}');
+      print('getUserPrescriptions data: ${response.responseData}');
+
+      if (response.isSuccess && response.responseData != null) {
+        // Clear local storage and repopulate from API
+        _prescriptions.clear();
+
+        final List<dynamic> data = response.responseData as List<dynamic>;
+        print('Number of prescriptions from API: ${data.length}');
+
+        for (var item in data) {
+          final prescription = PrescriptionModel(
+            id: item['id'].toString(),
+            userId: item['user_id'].toString(),
+            imagePath: item['image_path'] as String,
+            fileName: item['file_name'] as String? ?? '',
+            uploadedAt: DateTime.parse(item['uploaded_at'] as String),
+            status: _parseStatus(item['status'] as String),
+            notes: item['notes'] as String?,
+            vendorResponses: [],
+          );
+          _prescriptions.add(prescription);
+          print('Added prescription: ${prescription.id}');
+        }
+      }
+
+      print('Total prescriptions in list: ${_prescriptions.length}');
+
+      // Return sorted by upload date
+      return _prescriptions.where((p) => p.userId == userId).toList()
+        ..sort((a, b) => b.uploadedAt.compareTo(a.uploadedAt));
+    } catch (e) {
+      print('Error in getUserPrescriptions: $e');
+      // If API fails, return local data
+      return _prescriptions.where((p) => p.userId == userId).toList()
+        ..sort((a, b) => b.uploadedAt.compareTo(a.uploadedAt));
+    }
   }
 
   Future<PrescriptionModel?> getPrescriptionById(String prescriptionId) async {
-    await Future.delayed(const Duration(milliseconds: 300));
     try {
+      final token = StorageService.token;
+
+      // Fetch from API
+      final url = ApiConstants.getPrescriptionById.replaceAll(
+        '{id}',
+        prescriptionId,
+      );
+      final response = await _networkCaller.getRequest(
+        url,
+        token: 'Bearer $token',
+      );
+
+      if (response.isSuccess && response.responseData != null) {
+        final item = response.responseData;
+
+        // Parse vendor responses
+        final vendorResponsesList = <PrescriptionResponseModel>[];
+        if (item['vendor_responses'] != null) {
+          final responses = item['vendor_responses'] as List<dynamic>;
+          for (var vendorResp in responses) {
+            // Parse medicines
+            final medicinesList = <ProductModel>[];
+            if (vendorResp['medicines'] != null) {
+              final medicines = vendorResp['medicines'] as List<dynamic>;
+              for (var med in medicines) {
+                final medicine = ProductModel(
+                  id: med['id'].toString(),
+                  title: med['name'] as String,
+                  description: med['brand'] as String,
+                  price: med['price'].toString(),
+                  imagePath: med['image_path'] as String? ?? ImagePath.vitaminC,
+                  categoryId: '3',
+                  subcategoryId: 'medicine_prescription',
+                  shopId: med['vendor_id'].toString(),
+                  rating: 4.5,
+                  weight: med['dosage'] as String?,
+                  isOTC: false,
+                  hasPrescriptionUploaded: true,
+                  productType: 'prescription_medicine',
+                  isPrescriptionMedicine: true,
+                  prescriptionId: prescriptionId,
+                  vendorResponseId: 'med_${med['id']}_${med['quantity'] ?? 1}',
+                );
+                medicinesList.add(medicine);
+              }
+            }
+
+            final vendorResponse = PrescriptionResponseModel(
+              id: vendorResp['id'].toString(),
+              prescriptionId: vendorResp['prescription_id'].toString(),
+              vendorId: vendorResp['vendor_id'].toString(),
+              vendorName: vendorResp['vendor_name'] as String,
+              medicines: medicinesList,
+              totalAmount:
+                  double.tryParse(vendorResp['total_amount'].toString()) ?? 0.0,
+              status: _parseVendorStatus(vendorResp['status'] as String),
+              respondedAt: DateTime.parse(vendorResp['responded_at'] as String),
+              notes: vendorResp['notes'] as String?,
+            );
+            vendorResponsesList.add(vendorResponse);
+          }
+        }
+
+        final prescription = PrescriptionModel(
+          id: item['id'].toString(),
+          userId: item['user_id'].toString(),
+          imagePath: item['image_path'] as String,
+          fileName: item['file_name'] as String? ?? '',
+          uploadedAt: DateTime.parse(item['uploaded_at'] as String),
+          status: _parseStatus(item['status'] as String),
+          notes: item['notes'] as String?,
+          vendorResponses: vendorResponsesList,
+        );
+
+        // Update local cache
+        final index = _prescriptions.indexWhere((p) => p.id == prescriptionId);
+        if (index != -1) {
+          _prescriptions[index] = prescription;
+        } else {
+          _prescriptions.add(prescription);
+        }
+
+        return prescription;
+      }
+
+      // Fallback to local data if API fails
       return _prescriptions.firstWhere((p) => p.id == prescriptionId);
     } catch (_) {
-      return null;
+      // Return local data if available
+      try {
+        return _prescriptions.firstWhere((p) => p.id == prescriptionId);
+      } catch (_) {
+        return null;
+      }
+    }
+  }
+
+  VendorResponseStatus _parseVendorStatus(String status) {
+    switch (status.toLowerCase()) {
+      case 'pending':
+        return VendorResponseStatus.pending;
+      case 'approved':
+        return VendorResponseStatus.approved;
+      case 'partially_approved':
+      case 'partiallyapproved':
+        return VendorResponseStatus.partiallyApproved;
+      case 'rejected':
+        return VendorResponseStatus.rejected;
+      case 'expired':
+        return VendorResponseStatus.expired;
+      case 'medicinesready':
+      case 'medicines_ready':
+        return VendorResponseStatus.approved;
+      default:
+        return VendorResponseStatus.pending;
     }
   }
 
@@ -159,13 +357,41 @@ class PrescriptionService {
   }
 
   Future<bool> deletePrescription(String prescriptionId) async {
-    await Future.delayed(const Duration(milliseconds: 500));
-    final index = _prescriptions.indexWhere((p) => p.id == prescriptionId);
-    if (index != -1) {
-      _prescriptions.removeAt(index);
+    try {
+      final token = StorageService.token;
+
+      // Make API call to delete
+      final url = ApiConstants.deletePrescription.replaceAll(
+        '{id}',
+        prescriptionId,
+      );
+
+      AppLoggerHelper.debug('Deleting prescription at URL: $url');
+
+      final response = await _networkCaller.deleteRequest(
+        url,
+        token: 'Bearer $token',
+      );
+
+      AppLoggerHelper.debug(
+        'Delete prescription response: ${response.responseData}, ${response.statusCode}',
+      );
+
+      if (!response.isSuccess) {
+        throw Exception(
+          response.errorMessage.isNotEmpty
+              ? response.errorMessage
+              : 'Failed to delete prescription',
+        );
+      }
+
+      // Remove from local cache
+      _prescriptions.removeWhere((p) => p.id == prescriptionId);
+
       return true;
+    } catch (e) {
+      throw Exception('Failed to delete prescription: $e');
     }
-    return false;
   }
 
   Future<bool> acceptVendorResponse(String responseId) async {

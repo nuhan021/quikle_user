@@ -20,8 +20,8 @@ class SubSubcategoryModel {
       id: json['id'].toString(),
       name: json['name'] as String,
       description: json['description'] as String?,
-      // avatar: json['avatar'] as String,
-      avatar: 'assets/images/logo.png',
+      avatar: json['avatar'] as String,
+      // avatar: 'assets/images/logo.png',
       createdAt: json['created_at'] as String,
       subcategory: SubcategoryInfo.fromJson(
         json['subcategory'] as Map<String, dynamic>,

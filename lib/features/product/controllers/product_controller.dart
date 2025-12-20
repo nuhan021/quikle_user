@@ -232,11 +232,7 @@ class ProductController extends GetxController {
 
   void onFavoriteToggle() {
     if (_product.value != null) {
-      if (FavoritesController.isProductFavorite(_product.value!.id)) {
-        FavoritesController.removeFromGlobalFavorites(_product.value!.id);
-      } else {
-        FavoritesController.addToGlobalFavorites(_product.value!.id);
-      }
+      Get.find<FavoritesController>().toggleFavorite(_product.value!);
 
       final isFavorite = FavoritesController.isProductFavorite(
         _product.value!.id,

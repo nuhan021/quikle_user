@@ -93,8 +93,8 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
             max: 100,
             divisions: 20,
             labels: RangeLabels(
-              '\$${_priceRange.start.round()}',
-              '\$${_priceRange.end.round()}',
+              '₹${_priceRange.start.round()}',
+              '₹${_priceRange.end.round()}',
             ),
             onChanged: (values) {
               setState(() {
@@ -108,7 +108,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '\$${_priceRange.start.round()}',
+                '₹${_priceRange.start.round()}',
                 style: getTextStyle(
                   font: CustomFonts.inter,
                   fontSize: 12.sp,
@@ -116,7 +116,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                 ),
               ),
               Text(
-                '\$${_priceRange.end.round()}',
+                '₹${_priceRange.end.round()}',
                 style: getTextStyle(
                   font: CustomFonts.inter,
                   fontSize: 12.sp,

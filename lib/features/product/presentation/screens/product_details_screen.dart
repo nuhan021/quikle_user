@@ -32,6 +32,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen>
   late AnimationController _navController;
   final GlobalKey _navKey = GlobalKey();
   double _navBarHeight = 0.0;
+  late final ProductController controller;
 
   @override
   void initState() {
@@ -41,6 +42,10 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen>
       duration: const Duration(milliseconds: 500),
       value: 1.0,
     );
+    controller = Get.put(ProductController());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.loadProductDetails(widget.product);
+    });
   }
 
   @override
@@ -91,11 +96,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen>
 
     final keyboardInset = MediaQuery.of(context).viewInsets.bottom;
     final isKeyboardOpen = keyboardInset > 0;
-
-    final controller = Get.put(ProductController());
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      controller.loadProductDetails(widget.product);
-    });
+    final systemNavHeight = MediaQuery.of(context).padding.bottom;
 
     return CartAnimationWrapper(
       child: AnnotatedRegion<SystemUiOverlayStyle>(
@@ -119,9 +120,12 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen>
                     child: AnimatedBuilder(
                       animation: _navController,
                       builder: (context, _) {
+                        // include system navigation bar height so content is
+                        // padded above both the app's navbar and the system nav
                         final bottomInset = isKeyboardOpen
                             ? 0.0
-                            : _navController.value * _navBarHeight;
+                            : _navController.value *
+                                  (_navBarHeight + systemNavHeight);
                         return Padding(
                           padding: EdgeInsets.only(bottom: bottomInset),
                           child: Obx(
@@ -206,14 +210,14 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen>
                                           //       controller.onReplyToQuestion,
                                           // ),
                                           SizedBox(height: 24.h),
-                                          YouMayLikeSection(
-                                            onAddToCart: (p) => controller
-                                                .addToCartFromSimilar(p),
-                                            onFavoriteToggle: (p) => controller
-                                                .onFavoriteToggleFromSimilar(p),
-                                            onProductTap: (p) => controller
-                                                .onSimilarProductTap(p),
-                                          ),
+                                          // YouMayLikeSection(
+                                          //   onAddToCart: (p) => controller
+                                          //       .addToCartFromSimilar(p),
+                                          //   onFavoriteToggle: (p) => controller
+                                          //       .onFavoriteToggleFromSimilar(p),
+                                          //   onProductTap: (p) => controller
+                                          //       .onSimilarProductTap(p),
+                                          // ),
                                         ],
                                       ),
                                     ),
@@ -257,9 +261,12 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen>
               AnimatedBuilder(
                 animation: _navController,
                 builder: (_, __) {
+                  // place the floating cart above keyboard OR above the
+                  // custom navbar + system nav (if present)
                   final inset = isKeyboardOpen
-                      ? keyboardInset
-                      : (_navController.value * _navBarHeight);
+                      ? (keyboardInset + systemNavHeight)
+                      : (_navController.value *
+                            (_navBarHeight + systemNavHeight));
                   return FloatingCartButton(bottomInset: inset);
                 },
               ),

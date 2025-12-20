@@ -17,7 +17,7 @@ class CategoriesSection extends StatelessWidget {
   final Function(CategoryModel) onCategoryTap;
   final String selectedCategoryId;
   final bool showTitle;
-  static double get kHeight => 70.h;
+  static double get kHeight => 64.h;
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +33,7 @@ class CategoriesSection extends StatelessWidget {
 
         return Container(
           width: double.infinity,
-          padding: EdgeInsets.symmetric(vertical: 16.h),
+          padding: EdgeInsets.only(top: 16.h, bottom: 4.h),
           //decoration: const BoxDecoration(color: Color(0x33CFCFCF)),
           child: SizedBox(
             height: listHeight,

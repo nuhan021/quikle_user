@@ -10,14 +10,14 @@ class PayoutService {
     return [
       DeliveryOptionModel(
         type: DeliveryType.combined,
-        title: 'Combined Delivery',
+        title: 'Combined',
         description: 'Products delivered together (cheaper)',
         price: 1.99,
         isSelected: true,
       ),
       DeliveryOptionModel(
         type: DeliveryType.split,
-        title: 'Split Delivery',
+        title: 'Split',
         description: 'Faster delivery by different riders',
         price: 3.99,
         isSelected: false,
@@ -71,7 +71,7 @@ class PayoutService {
           'isValid': true,
           'discountType': 'fixed',
           'discountValue': 20.0,
-          'message': 'You saved \$20!',
+          'message': 'You saved ₹20!',
         };
       default:
         return {'isValid': false, 'message': 'Invalid coupon code'};

@@ -2,16 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:quikle_user/core/common/widgets/voice_search_overlay.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
-import 'package:quikle_user/features/home/controllers/home_controller.dart';
-import 'package:quikle_user/features/home/presentation/widgets/categories/categories_section.dart';
-import 'package:quikle_user/features/home/presentation/widgets/products/product_section.dart';
+import 'package:quikle_user/features/categories/controllers/categories_screen_controller.dart';
 import 'package:quikle_user/features/profile/presentation/widgets/unified_profile_app_bar.dart';
-import 'package:quikle_user/core/common/widgets/slivers/fixed_widget_header_delegate.dart';
-
-import '../../../home/presentation/widgets/search/search_bar.dart'
-    as custom_search;
+import 'package:quikle_user/features/categories/presentation/widgets/subcategory_grid_section.dart';
+import 'package:quikle_user/features/categories/presentation/widgets/category_screen_shimmer.dart';
 
 class CategoriesScreen extends StatefulWidget {
   const CategoriesScreen({super.key});
@@ -21,7 +16,9 @@ class CategoriesScreen extends StatefulWidget {
 }
 
 class _CategoriesScreenState extends State<CategoriesScreen> {
-  final HomeController controller = Get.find<HomeController>();
+  final CategoriesScreenController controller = Get.put(
+    CategoriesScreenController(),
+  );
   final ScrollController _scroll = ScrollController();
 
   @override
@@ -39,167 +36,73 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
       ),
     );
 
-    final double categoriesHeaderHeight =
-        CategoriesSection.kHeight + 32.h; // list height + vertical padding
-    final double searchBarHeight = custom_search.SearchBar.kPreferredHeight;
-    final double filtersHeaderHeight =
-        categoriesHeaderHeight + searchBarHeight + 4.h;
-
     return Scaffold(
       backgroundColor: AppColors.homeGrey,
-      body: Stack(
-        children: [
-          SafeArea(
-            child: CustomScrollView(
-              controller: _scroll,
-              physics: const AlwaysScrollableScrollPhysics(
-                parent: ClampingScrollPhysics(),
-              ),
-              slivers: [
-                const SliverToBoxAdapter(
-                  child: UnifiedProfileAppBar(
-                    title: 'All Categories',
-                    showBackButton: false,
-                  ),
-                ),
-                SliverPersistentHeader(
-                  pinned: true,
-                  delegate: FixedWidgetHeaderDelegate(
-                    minExtent: filtersHeaderHeight,
-                    maxExtent: filtersHeaderHeight,
-                    backgroundColor: AppColors.homeGrey,
-                    shouldAddElevation: true,
-                    builder: (context, shrink, overlaps) {
-                      return Container(
-                        color: AppColors.homeGrey,
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            custom_search.SearchBar(
-                              onTap: controller.onSearchPressed,
-                              onVoiceTap: controller.onVoiceSearchPressed,
-                            ),
-                            Obx(
-                              () => CategoriesSection(
-                                categories: controller.categories,
-                                onCategoryTap: controller.onCategoryPressed,
-                                selectedCategoryId:
-                                    controller.selectedCategoryId,
-                                showTitle: true,
-                              ),
-                            ),
-                            SizedBox(height: 4.h),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                Obx(() {
-                  if (controller.isLoading) {
-                    return const SliverFillRemaining(
-                      hasScrollBody: false,
-                      child: Center(child: CircularProgressIndicator()),
-                    );
-                  }
-
-                  if (controller.isShowingAllCategories) {
-                    return SliverPadding(
-                      padding: EdgeInsets.only(bottom: 100.h),
-                      sliver: SliverList(
-                        delegate: SliverChildBuilderDelegate((context, index) {
-                          final section = controller.productSections[index];
-                          return ProductSection(
-                            section: section,
-                            onProductTap: controller.onProductPressed,
-                            onAddToCart: controller.onAddToCartPressed,
-                            onViewAllTap: () =>
-                                controller.onViewAllPressed(section.categoryId),
-                            categoryIconPath: controller.getCategoryIconPath(
-                              section.categoryId,
-                            ),
-                            categoryTitle: controller.getCategoryTitle(
-                              section.categoryId,
-                            ),
-                            onFavoriteToggle: controller.onFavoriteToggle,
-                          );
-                        }, childCount: controller.productSections.length),
-                      ),
-                    );
-                  }
-
-                  return SliverPadding(
-                    padding: EdgeInsets.only(bottom: 100.h),
-                    sliver: SliverToBoxAdapter(
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16.w),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            if (controller.filteredProducts.isNotEmpty) ...[
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    controller.categories
-                                        .firstWhere(
-                                          (cat) =>
-                                              cat.id ==
-                                              controller.selectedCategoryId,
-                                        )
-                                        .title,
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                  GestureDetector(
-                                    onTap: () => controller.onViewAllPressed(
-                                      controller.selectedCategoryId,
-                                    ),
-                                    child: const Text(
-                                      'View all',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                        color: Color(0xFFFF6B35),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ] else ...[
-                              const Center(
-                                child: Text(
-                                  'No products found for this category',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
-                }),
-              ],
-            ),
+      body: SafeArea(
+        child: CustomScrollView(
+          controller: _scroll,
+          physics: const AlwaysScrollableScrollPhysics(
+            parent: ClampingScrollPhysics(),
           ),
-          Obx(() {
-            if (!controller.isListening) {
-              return const SizedBox.shrink();
-            }
-            return VoiceSearchOverlay(
-              soundLevel: controller.soundLevel,
-              onCancel: controller.stopVoiceSearch,
-            );
-          }),
-        ],
+          slivers: [
+            const SliverToBoxAdapter(
+              child: UnifiedProfileAppBar(
+                title: 'All Categories',
+                showBackButton: false,
+              ),
+            ),
+            Obx(() {
+              if (controller.isLoading) {
+                return SliverPadding(
+                  padding: EdgeInsets.only(bottom: 100.h, top: 8.h),
+                  sliver: const SliverToBoxAdapter(
+                    child: CategoriesScreenShimmer(),
+                  ),
+                );
+              }
+
+              // Show all subcategories grouped by category
+              final groupedSubcategories = controller.groupedSubcategories;
+
+              if (groupedSubcategories.isEmpty) {
+                return const SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Center(
+                    child: Text(
+                      'No categories found',
+                      style: TextStyle(fontSize: 16, color: Colors.grey),
+                    ),
+                  ),
+                );
+              }
+
+              return SliverPadding(
+                padding: EdgeInsets.only(bottom: 100.h, top: 8.h),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    final categoryId = groupedSubcategories.keys.elementAt(
+                      index,
+                    );
+                    final subcategories = groupedSubcategories[categoryId]!;
+                    final categoryTitle =
+                        controller.getCategoryTitle(categoryId) ?? '';
+                    final categoryIconPath =
+                        controller.getCategoryIconPath(categoryId) ?? '';
+
+                    return SubcategoryGridSection(
+                      categoryTitle: categoryTitle,
+                      categoryIconPath: categoryIconPath,
+                      subcategories: subcategories,
+                      onSubcategoryTap: controller.onSubcategoryPressed,
+                      onViewAllTap: () =>
+                          controller.onViewAllPressed(categoryId),
+                    );
+                  }, childCount: groupedSubcategories.length),
+                ),
+              );
+            }),
+          ],
+        ),
       ),
     );
   }

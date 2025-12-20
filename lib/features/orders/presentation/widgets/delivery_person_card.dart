@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/route_manager.dart';
 import 'package:quikle_user/core/common/styles/global_text_style.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
+import 'package:quikle_user/core/utils/logging/logger.dart';
+import 'package:quikle_user/features/chatting/presentation/screens/chat_screen.dart';
 import 'package:quikle_user/features/orders/controllers/order_tracking_controller.dart';
 
 class DeliveryPersonCard extends StatelessWidget {
@@ -11,6 +14,8 @@ class DeliveryPersonCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final riderInfo = controller.order.riderInfo;
+
     return Container(
       padding: EdgeInsets.all(12.w),
       decoration: BoxDecoration(
@@ -20,23 +25,27 @@ class DeliveryPersonCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          CircleAvatar(
-            radius: 20.r,
-            backgroundColor: const Color(0xFFF0F0F0),
-            child: Icon(
-              Icons.person,
-              color: const Color(0xFF7C7C7C),
-              size: 20.sp,
-            ),
-          ),
+          // CircleAvatar(
+          //   radius: 20.r,
+          //   backgroundColor: const Color(0xFFF0F0F0),
+          //   backgroundImage: riderInfo?.riderImage != null
+          //       ? NetworkImage(riderInfo!.riderImage!)
+          //       : null,
+          //   child: riderInfo?.riderImage == null
+          //       ? Icon(
+          //           Icons.person,
+          //           color: const Color(0xFF7C7C7C),
+          //           size: 20.sp,
+          //         )
+          //       : null,
+          // ),
           SizedBox(width: 12.w),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  controller.trackingData.value!['deliveryPerson']['name'] ??
-                      'Delivery Person',
+                  riderInfo?.riderName ?? 'Delivery Person',
                   style: getTextStyle(
                     font: CustomFonts.inter,
                     fontSize: 14.sp,
@@ -56,16 +65,43 @@ class DeliveryPersonCard extends StatelessWidget {
               ],
             ),
           ),
-          GestureDetector(
-            onTap: controller.contactDeliveryPerson,
-            child: Container(
-              padding: EdgeInsets.all(8.w),
-              decoration: BoxDecoration(
-                color: const Color(0xFF06BD4C),
-                borderRadius: BorderRadius.circular(6.r),
+          Row(
+            children: [
+              GestureDetector(
+                onTap: () {
+                  final phone = riderInfo?.riderPhone;
+                  if (phone != null) {
+                    controller.contactDeliveryPerson(phone);
+                  }
+                },
+                child: Container(
+                  padding: EdgeInsets.all(8.w),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF06BD4C),
+                    borderRadius: BorderRadius.circular(6.r),
+                  ),
+                  child: Icon(Icons.phone, color: Colors.white, size: 16.sp),
+                ),
               ),
-              child: Icon(Icons.phone, color: Colors.white, size: 16.sp),
-            ),
+              SizedBox(width: 8.w), // spacing between icons
+              GestureDetector(
+                onTap: () {
+                  final rider = riderInfo;
+                  AppLoggerHelper.debug(
+                    'Navigating to chat with rider: ${rider?.riderName ?? rider?.riderId}',
+                  );
+                  Get.to(() => ChatScreen(rider: rider));
+                },
+                child: Container(
+                  padding: EdgeInsets.all(8.w),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF06A0BD), // blue-ish chat color
+                    borderRadius: BorderRadius.circular(6.r),
+                  ),
+                  child: Icon(Icons.chat, color: Colors.white, size: 16.sp),
+                ),
+              ),
+            ],
           ),
         ],
       ),

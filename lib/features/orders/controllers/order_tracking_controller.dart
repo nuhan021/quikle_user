@@ -1,8 +1,14 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:get/get.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:quikle_user/core/services/storage_service.dart';
 import 'package:quikle_user/core/utils/constants/enums/order_enums.dart';
+import 'package:quikle_user/core/utils/logging/logger.dart';
 import 'package:quikle_user/features/orders/data/models/order_model.dart';
 import 'package:quikle_user/features/orders/data/services/order_tracking_service.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 
 class OrderTrackingController extends GetxController {
   final OrderTrackingService _trackingService = OrderTrackingService();
@@ -15,6 +21,11 @@ class OrderTrackingController extends GetxController {
   final deliverySteps = <Map<String, dynamic>>[].obs;
   final estimatedTime = ''.obs;
   final deliveryPersonLocation = Rx<Map<String, dynamic>?>(null);
+
+  // WebSocket for real-time rider location
+  WebSocketChannel? _locationChannel;
+  final riderLocation = Rx<LatLng?>(null);
+  final isWebSocketConnected = false.obs;
 
   OrderModel? _order;
   OrderModel get order => _order!;
@@ -29,12 +40,14 @@ class OrderTrackingController extends GetxController {
       _order = Get.arguments as OrderModel;
       loadTrackingData();
       _startLocationUpdates();
+      _connectToWebSocket();
     }
   }
 
   @override
   void onClose() {
     _locationTimer?.cancel();
+    _disconnectWebSocket();
     super.onClose();
   }
 
@@ -43,6 +56,7 @@ class OrderTrackingController extends GetxController {
       _order = orderModel;
       loadTrackingData();
       _startLocationUpdates();
+      _connectToWebSocket();
     }
   }
 
@@ -208,16 +222,18 @@ class OrderTrackingController extends GetxController {
     return null;
   }
 
-  void contactDeliveryPerson() {
-    if (trackingData.value != null) {
-      final deliveryPerson = trackingData.value!['deliveryPerson'];
-      if (deliveryPerson != null) {
-        Get.snackbar(
-          'Calling',
-          'Calling ${deliveryPerson['name']}...',
-          snackPosition: SnackPosition.BOTTOM,
-        );
-      }
+  void contactDeliveryPerson([String? phoneNumber]) async {
+    final phone =
+        phoneNumber ?? trackingData.value?['deliveryPerson']?['phone'];
+    if (phone != null) {
+      AppLoggerHelper.debug('Initiating call to delivery person at $phone');
+      bool? res = await FlutterPhoneDirectCaller.callNumber(phone);
+    } else {
+      Get.snackbar(
+        'Error',
+        'Phone number not available',
+        snackPosition: SnackPosition.BOTTOM,
+      );
     }
   }
 
@@ -227,5 +243,75 @@ class OrderTrackingController extends GetxController {
       'Tracking info shared',
       snackPosition: SnackPosition.BOTTOM,
     );
+  }
+
+  // WebSocket Methods
+  void _connectToWebSocket() {
+    try {
+      final customerId = StorageService.userId;
+      if (customerId == null) {
+        print('⚠️ Cannot connect to WebSocket: Customer ID is null');
+        return;
+      }
+
+      final wsUrl =
+          'wss://quikle-u4dv.onrender.com/rider/ws/location/customers/$customerId';
+      print('🔌 Connecting to WebSocket: $wsUrl');
+
+      _locationChannel = WebSocketChannel.connect(Uri.parse(wsUrl));
+      isWebSocketConnected.value = true;
+
+      _locationChannel!.stream.listen(
+        (dynamic message) {
+          try {
+            final data = jsonDecode(message as String) as Map<String, dynamic>;
+            print('📍 Received location update: $data');
+
+            if (data['type'] == 'location_send') {
+              final lat = (data['latitude'] as num).toDouble();
+              final lng = (data['longitude'] as num).toDouble();
+
+              riderLocation.value = LatLng(lat, lng);
+              print('✅ Rider location updated: $lat, $lng');
+            }
+          } catch (e) {
+            print('❌ Error parsing WebSocket message: $e');
+          }
+        },
+        onError: (error) {
+          print('❌ WebSocket error: $error');
+          isWebSocketConnected.value = false;
+          _reconnectWebSocket();
+        },
+        onDone: () {
+          print('🔌 WebSocket connection closed');
+          isWebSocketConnected.value = false;
+          _reconnectWebSocket();
+        },
+      );
+
+      print('✅ WebSocket connected successfully');
+    } catch (e) {
+      print('❌ Error connecting to WebSocket: $e');
+      isWebSocketConnected.value = false;
+    }
+  }
+
+  void _disconnectWebSocket() {
+    _locationChannel?.sink.close();
+    _locationChannel = null;
+    isWebSocketConnected.value = false;
+    print('🔌 WebSocket disconnected');
+  }
+
+  void _reconnectWebSocket() {
+    if (_order != null && isActiveDelivery) {
+      Future.delayed(const Duration(seconds: 5), () {
+        if (!isWebSocketConnected.value) {
+          print('🔄 Attempting to reconnect WebSocket...');
+          _connectToWebSocket();
+        }
+      });
+    }
   }
 }

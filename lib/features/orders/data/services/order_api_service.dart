@@ -2,12 +2,14 @@ import 'package:quikle_user/core/models/response_data.dart';
 import 'package:quikle_user/core/services/network_caller.dart';
 import 'package:quikle_user/core/services/storage_service.dart';
 import 'package:quikle_user/core/utils/constants/api_constants.dart';
+import 'package:quikle_user/core/utils/constants/enums/order_enums.dart';
 import 'package:quikle_user/core/utils/logging/logger.dart';
 import 'package:quikle_user/features/cart/data/models/cart_item_model.dart';
 import 'package:quikle_user/features/orders/data/models/order_model.dart';
 import 'package:quikle_user/features/payout/data/models/delivery_option_model.dart';
 import 'package:quikle_user/features/payout/data/models/payment_method_model.dart';
 import 'package:quikle_user/features/profile/data/models/shipping_address_model.dart';
+import 'package:quikle_user/features/payment/data/models/order_creation_response.dart';
 
 /// Order API Service
 ///
@@ -67,24 +69,20 @@ class OrderApiService {
       );
 
       if (response.isSuccess && response.responseData != null) {
-        final responseMap = response.responseData as Map<String, dynamic>;
+        // API returns a MAP with orders list
+        final data = response.responseData as Map<String, dynamic>;
+        final ordersList = data['orders'] as List<dynamic>;
 
-        if (responseMap['success'] == true && responseMap['data'] != null) {
-          final data = responseMap['data'] as Map<String, dynamic>;
-          final ordersList = data['orders'] as List<dynamic>? ?? [];
+        final allOrders = ordersList
+            .map((json) => OrderModel.fromJson(json as Map<String, dynamic>))
+            .toList();
 
-          // AppLoggerHelper.debug('Fetched ${ordersList.length} orders from API');
+        // Filter out orders with pending status
+        final filteredOrders = allOrders
+            .where((order) => order.status != OrderStatus.pending)
+            .toList();
 
-          final orders = ordersList
-              .map((json) => OrderModel.fromJson(json as Map<String, dynamic>))
-              .toList();
-
-          // AppLoggerHelper.debug(
-          //   'Order date and time parsed successfully: ${orders.map((o) => o.orderDate).toList()}',
-          // );
-
-          return orders;
-        }
+        return filteredOrders;
       }
 
       AppLoggerHelper.warning('No orders found or API call failed');
@@ -96,7 +94,7 @@ class OrderApiService {
   }
 
   /// Create a new order
-  Future<ResponseData> createOrder({
+  Future<OrderCreationResponse> createOrder({
     required List<CartItemModel> items,
     required ShippingAddressModel shippingAddress,
     required DeliveryOptionModel deliveryOption,
@@ -168,10 +166,23 @@ class OrderApiService {
         },
       );
 
-      if (response.isSuccess) {
+      if (response.isSuccess && response.responseData != null) {
         AppLoggerHelper.debug('Order created successfully');
         AppLoggerHelper.debug('Order response: ${response.responseData}');
-        return response;
+
+        final orderResponse = OrderCreationResponse.fromJson(
+          response.responseData as Map<String, dynamic>,
+        );
+
+        AppLoggerHelper.debug(
+          'Order ID: ${orderResponse.data.orderId}, Requires Payment: ${orderResponse.data.requiresPayment}',
+        );
+
+        AppLoggerHelper.debug(
+          'Payment Link: ${orderResponse.data.paymentLink}',
+        );
+
+        return orderResponse;
       }
 
       // Extract error message from response

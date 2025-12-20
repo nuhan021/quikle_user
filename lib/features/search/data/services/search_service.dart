@@ -9,7 +9,7 @@ class SearchService {
   Future<Map<String, dynamic>> searchProducts({
     required String query,
     int offset = 0,
-    int limit = 20,
+    int limit = 9,
   }) async {
     try {
       final queryParams = {

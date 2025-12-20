@@ -54,12 +54,19 @@ class MinimalSubcategoriesSection extends StatelessWidget {
             width: double.infinity,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
+
               primary: false,
               padding: EdgeInsets.zero,
               itemCount: subcategories.length + 1,
               itemBuilder: (context, index) {
                 if (index == 0) {
+                  // Show the selected subcategory's icon at index 0 when available,
+                  // otherwise fall back to the category icon. The logical selection
+                  // state for "All" remains when selectedSubcategory == null.
                   final isSelected = selectedSubcategory == null;
+                  final displayImagePath =
+                      selectedSubcategory?.iconPath ?? categoryIconPath;
+
                   return GestureDetector(
                     onTap: () => onSubcategoryTap(null),
                     child: Container(
@@ -88,10 +95,7 @@ class MinimalSubcategoriesSection extends StatelessWidget {
                             ),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(12.r),
-                              child: Image.asset(
-                                categoryIconPath,
-                                fit: BoxFit.cover,
-                              ),
+                              child: _buildImage(displayImagePath),
                             ),
                           ),
                           SizedBox(height: 4.h),
@@ -150,12 +154,10 @@ class MinimalSubcategoriesSection extends StatelessWidget {
                         ),
                         SizedBox(height: 4.h),
                         SizedBox(
-                          width: 50.w,
+                          // width: 50.w,
                           child: Text(
                             subcategory.title,
                             textAlign: TextAlign.center,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
                             style: getTextStyle(
                               font: CustomFonts.inter,
                               fontSize: 12.sp,

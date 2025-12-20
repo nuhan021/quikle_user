@@ -75,7 +75,7 @@ class BriefOrderCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      '\$${order.total.toStringAsFixed(2)}',
+                      '₹${order.total.toStringAsFixed(2)}',
                       style: getTextStyle(
                         font: CustomFonts.obviously,
                         fontSize: 14.sp,

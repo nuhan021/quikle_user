@@ -11,8 +11,6 @@ class OrderService {
 
       final orders = await _apiService.getOrders(skip: 0, limit: 50);
 
-      AppLoggerHelper.debug('Successfully fetched ${orders.length} orders');
-
       return orders;
     } catch (e) {
       AppLoggerHelper.error('❌ Error fetching orders', e);

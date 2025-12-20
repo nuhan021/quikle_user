@@ -7,9 +7,9 @@ enum DeliveryType {
   String toApiValue() {
     switch (this) {
       case DeliveryType.combined:
-        return 'standard';
+        return 'combined';
       case DeliveryType.split:
-        return 'express';
+        return 'split';
       case DeliveryType.urgent:
         return 'urgent';
     }

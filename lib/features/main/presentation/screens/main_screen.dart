@@ -104,22 +104,19 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
               Positioned(
                 left: 0,
                 right: 0,
-                bottom: 0,
+                // keep the nav bar above any system bottom inset (navigation bar / gesture area)
+                bottom: MediaQuery.of(context).viewPadding.bottom,
                 child: AnimatedSlide(
                   duration: const Duration(milliseconds: 180),
                   offset: const Offset(0, 0),
                   child: SizeTransition(
                     axisAlignment: 1.0,
                     sizeFactor: _navController,
-                    child: SafeArea(
-                      top: false,
-                      bottom: true,
-                      child: KeyedSubtree(
-                        key: _navKey,
-                        child: CustomNavBar(
-                          currentIndex: _currentIndex,
-                          onTap: _onNavItemTapped,
-                        ),
+                    child: KeyedSubtree(
+                      key: _navKey,
+                      child: CustomNavBar(
+                        currentIndex: _currentIndex,
+                        onTap: _onNavItemTapped,
                       ),
                     ),
                   ),
@@ -130,7 +127,18 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                 animation: _navController,
                 builder: (context, _) {
                   final inset = (_navController.value * _navBarHeight);
-                  return FloatingCartButton(bottomInset: inset);
+                  // account for system bottom areas (navigation bar, gesture area) and keyboard
+                  final systemInset = MediaQuery.of(context).viewPadding.bottom;
+                  final keyboardInset = MediaQuery.of(
+                    context,
+                  ).viewInsets.bottom;
+                  // take the larger of system inset and keyboard inset so we don't double-count
+                  final bottomInset =
+                      inset +
+                      (systemInset > keyboardInset
+                          ? systemInset
+                          : keyboardInset);
+                  return FloatingCartButton(bottomInset: bottomInset);
                 },
               ),
 
@@ -138,7 +146,16 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                 animation: _navController,
                 builder: (context, _) {
                   final inset = (_navController.value * _navBarHeight);
-                  return LiveOrderIndicator(bottomInset: inset);
+                  final systemInset = MediaQuery.of(context).viewPadding.bottom;
+                  final keyboardInset = MediaQuery.of(
+                    context,
+                  ).viewInsets.bottom;
+                  final bottomInset =
+                      inset +
+                      (systemInset > keyboardInset
+                          ? systemInset
+                          : keyboardInset);
+                  return LiveOrderIndicator(bottomInset: bottomInset);
                 },
               ),
             ],

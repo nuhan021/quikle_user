@@ -8,17 +8,14 @@ import 'package:quikle_user/core/common/widgets/custom_navbar.dart';
 import 'package:quikle_user/core/common/widgets/floating_cart_button.dart';
 import 'package:quikle_user/core/common/widgets/unified_product_card.dart';
 import 'package:quikle_user/core/common/widgets/cart_animation_overlay.dart';
+import 'package:quikle_user/core/common/widgets/product_card_shimmer.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 import 'package:quikle_user/core/common/widgets/common_app_bar.dart';
 import 'package:quikle_user/core/utils/navigation/navbar_navigation_helper.dart';
-import 'package:quikle_user/features/cart/controllers/cart_controller.dart';
-import 'package:quikle_user/features/home/data/models/product_model.dart';
 import 'package:quikle_user/features/orders/presentation/widgets/live_order_indicator.dart';
-import 'package:quikle_user/features/profile/controllers/favorites_controller.dart';
-import 'package:quikle_user/features/restaurants/data/models/restaurant_model.dart';
-import 'package:quikle_user/routes/app_routes.dart';
 import 'package:quikle_user/core/common/widgets/slivers/fixed_widget_header_delegate.dart';
+import 'package:quikle_user/features/restaurants/controllers/restaurant_page_controller.dart';
 
 class RestaurantPageScreen extends StatefulWidget {
   const RestaurantPageScreen({super.key});
@@ -34,23 +31,6 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen>
   final GlobalKey _navKey = GlobalKey();
   double _navBarHeight = 0.0;
 
-  List<ProductModel> _restaurantProducts = [];
-  List<ProductModel> _filteredProducts = [];
-  bool _isLoading = true;
-  String _selectedCategory = 'All';
-
-  late RestaurantModel restaurant;
-
-  final List<String> _categories = [
-    'All',
-    'Appetizers',
-    'Biryani',
-    'Main Course',
-    'Breads',
-    'Desserts',
-    'Beverages',
-  ];
-
   @override
   void initState() {
     super.initState();
@@ -61,11 +41,22 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen>
       value: 1,
     );
 
-    _initializeData();
+    // Add scroll listener for pagination
+    _scroll.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    final controller = Get.find<RestaurantPageController>();
+
+    // Trigger load more when 80% scrolled
+    if (_scroll.position.pixels >= _scroll.position.maxScrollExtent * 0.8) {
+      controller.loadMoreProducts();
+    }
   }
 
   @override
   void dispose() {
+    _scroll.removeListener(_onScroll);
     _navController.dispose();
     _scroll.dispose();
     super.dispose();
@@ -84,37 +75,6 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen>
 
   void _onNavItemTapped(int index) {
     NavbarNavigationHelper.navigateToTab(index);
-  }
-
-  void _initializeData() {
-    final args = Get.arguments as Map<String, dynamic>;
-    restaurant = args['restaurant'];
-    _loadProducts();
-  }
-
-  void _loadProducts() {
-    setState(() => _isLoading = true);
-    // Static data removed - restaurant products should come from API
-    _restaurantProducts = [];
-    _filterProducts(_selectedCategory);
-    setState(() => _isLoading = false);
-  }
-
-  void _filterProducts(String category) {
-    setState(() {
-      _selectedCategory = category;
-      if (category == 'All') {
-        _filteredProducts = _restaurantProducts;
-      } else {
-        _filteredProducts = _restaurantProducts
-            .where(
-              (p) =>
-                  p.productType?.toLowerCase() == category.toLowerCase() ||
-                  p.subcategoryId?.toLowerCase() == category.toLowerCase(),
-            )
-            .toList();
-      }
-    });
   }
 
   bool _onScrollNotification(ScrollNotification n) {
@@ -141,38 +101,11 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen>
     return false;
   }
 
-  void _onFavoriteToggle(ProductModel product) {
-    if (FavoritesController.isProductFavorite(product.id)) {
-      FavoritesController.removeFromGlobalFavorites(product.id);
-    } else {
-      FavoritesController.addToGlobalFavorites(product.id);
-    }
-
-    final isFav = FavoritesController.isProductFavorite(product.id);
-    final updated = product.copyWith(isFavorite: isFav);
-
-    final idx = _restaurantProducts.indexWhere((p) => p.id == product.id);
-    if (idx != -1) _restaurantProducts[idx] = updated;
-
-    final fIdx = _filteredProducts.indexWhere((p) => p.id == product.id);
-    if (fIdx != -1) _filteredProducts[fIdx] = updated;
-
-    setState(() {});
-  }
-
-  void _onAddToCart(ProductModel product) {
-    try {
-      Get.find<CartController>().addToCart(product);
-    } catch (_) {}
-  }
-
-  void _onProductTap(ProductModel product) {
-    Get.toNamed(AppRoute.getProductDetails(), arguments: product);
-  }
-
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) => _measureNavBarHeight());
+
+    final controller = Get.put(RestaurantPageController());
     final keyboardInset = MediaQuery.of(context).viewInsets.bottom;
     final isKeyboardOpen = keyboardInset > 0;
     const double cartMargin = 16.0;
@@ -201,16 +134,21 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen>
                     parent: ClampingScrollPhysics(),
                   ),
                   slivers: [
+                    // App Bar
                     SliverToBoxAdapter(
                       child: CommonAppBar(
-                        title: restaurant.name,
-                        subtitle: restaurant.address,
+                        title: controller.restaurant.name,
+                        subtitle: controller.restaurant.cuisines
+                            .map((c) => c.name)
+                            .join(', '),
                         showBackButton: true,
                         showNotification: false,
                         showProfile: false,
                         onBackTap: () => Get.back(),
                       ),
                     ),
+
+                    // Pinned Header with Search and Categories
                     SliverPersistentHeader(
                       pinned: true,
                       delegate: FixedWidgetHeaderDelegate(
@@ -224,6 +162,7 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen>
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
+                                // Search Bar
                                 Padding(
                                   padding: EdgeInsets.symmetric(
                                     horizontal: 16.w,
@@ -269,56 +208,62 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen>
                                     ),
                                   ),
                                 ),
-                                SizedBox(
-                                  height: 30.h,
-                                  child: ListView.builder(
-                                    scrollDirection: Axis.horizontal,
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 16.w,
-                                    ),
-                                    itemCount: _categories.length,
-                                    itemBuilder: (_, idx) {
-                                      final cat = _categories[idx];
-                                      final sel = cat == _selectedCategory;
-                                      return GestureDetector(
-                                        onTap: () => _filterProducts(cat),
-                                        child: Container(
-                                          margin: EdgeInsets.only(right: 8.w),
-                                          padding: EdgeInsets.symmetric(
-                                            horizontal: 12.w,
-                                            vertical: 8.h,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: sel
-                                                ? AppColors.beakYellow
-                                                : Colors.white,
-                                            borderRadius: BorderRadius.circular(
-                                              4.r,
+
+                                // Categories
+                                Obx(() {
+                                  final selectedCat =
+                                      controller.selectedCategory.value;
+                                  return SizedBox(
+                                    height: 30.h,
+                                    child: ListView.builder(
+                                      scrollDirection: Axis.horizontal,
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 16.w,
+                                      ),
+                                      itemCount: controller.categories.length,
+                                      itemBuilder: (_, idx) {
+                                        final cat = controller.categories[idx];
+                                        final sel = cat == selectedCat;
+                                        return GestureDetector(
+                                          onTap: () =>
+                                              controller.filterProducts(cat),
+                                          child: Container(
+                                            margin: EdgeInsets.only(right: 8.w),
+                                            padding: EdgeInsets.symmetric(
+                                              horizontal: 12.w,
+                                              vertical: 8.h,
                                             ),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: Colors.grey.withValues(
-                                                  alpha: .1,
+                                            decoration: BoxDecoration(
+                                              color: sel
+                                                  ? AppColors.beakYellow
+                                                  : Colors.white,
+                                              borderRadius:
+                                                  BorderRadius.circular(4.r),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.grey.withValues(
+                                                    alpha: .1,
+                                                  ),
+                                                  blurRadius: 8,
+                                                  offset: const Offset(0, 2),
                                                 ),
-                                                blurRadius: 8,
-                                                offset: const Offset(0, 2),
+                                              ],
+                                            ),
+                                            child: Text(
+                                              cat,
+                                              style: getTextStyle(
+                                                font: CustomFonts.inter,
+                                                fontSize: 12.sp,
+                                                fontWeight: FontWeight.w500,
+                                                color: Colors.black,
                                               ),
-                                            ],
-                                          ),
-                                          child: Text(
-                                            cat,
-                                            style: getTextStyle(
-                                              font: CustomFonts.inter,
-                                              fontSize: 12.sp,
-                                              fontWeight: FontWeight.w500,
-                                              color: Colors.black,
                                             ),
                                           ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
+                                        );
+                                      },
+                                    ),
+                                  );
+                                }),
                                 SizedBox(height: 4.h),
                               ],
                             ),
@@ -326,19 +271,38 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen>
                         },
                       ),
                     ),
+
                     SliverToBoxAdapter(child: 16.verticalSpace),
-                    if (_isLoading)
-                      const SliverFillRemaining(
-                        hasScrollBody: false,
-                        child: Center(child: CircularProgressIndicator()),
-                      )
-                    else if (_filteredProducts.isEmpty)
-                      SliverFillRemaining(
-                        hasScrollBody: false,
-                        child: _emptyState(),
-                      )
-                    else
-                      SliverPadding(
+
+                    // Products Grid
+                    Obx(() {
+                      if (controller.isLoading.value) {
+                        return SliverPadding(
+                          padding: EdgeInsets.symmetric(horizontal: 16.w),
+                          sliver: SliverGrid(
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 3,
+                                  crossAxisSpacing: 8.w,
+                                  mainAxisSpacing: 8.h,
+                                  childAspectRatio: 0.70,
+                                ),
+                            delegate: SliverChildBuilderDelegate(
+                              (context, idx) => const ProductCardShimmer(),
+                              childCount: 9,
+                            ),
+                          ),
+                        );
+                      }
+
+                      if (controller.filteredProducts.isEmpty) {
+                        return SliverFillRemaining(
+                          hasScrollBody: false,
+                          child: _emptyState(),
+                        );
+                      }
+
+                      return SliverPadding(
                         padding: EdgeInsets.only(
                           left: 16.w,
                           right: 16.w,
@@ -352,24 +316,38 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen>
                                 mainAxisSpacing: 8.h,
                                 childAspectRatio: 0.70,
                               ),
-                          delegate: SliverChildBuilderDelegate((context, idx) {
-                            final prod = _filteredProducts[idx];
-                            return UnifiedProductCard(
-                              product: prod,
-                              onTap: () => _onProductTap(prod),
-                              onAddToCart: () => _onAddToCart(prod),
-                              onFavoriteToggle: () => _onFavoriteToggle(prod),
-                              variant: ProductCardVariant.category,
-                              isGroceryCategory: false,
-                            );
-                          }, childCount: _filteredProducts.length),
+                          delegate: SliverChildBuilderDelegate(
+                            (context, idx) {
+                              if (idx == controller.filteredProducts.length) {
+                                // Loading indicator for pagination
+                                return controller.isLoadingMore.value
+                                    ? const ProductCardShimmer()
+                                    : const SizedBox.shrink();
+                              }
+
+                              final prod = controller.filteredProducts[idx];
+                              return UnifiedProductCard(
+                                product: prod,
+                                onTap: () => controller.onProductTap(prod),
+                                onAddToCart: () => controller.onAddToCart(prod),
+                                onFavoriteToggle: () =>
+                                    controller.onFavoriteToggle(prod),
+                                variant: ProductCardVariant.category,
+                                isGroceryCategory: false,
+                              );
+                            },
+                            childCount:
+                                controller.filteredProducts.length +
+                                (controller.isLoadingMore.value ? 1 : 0),
+                          ),
                         ),
-                      ),
+                      );
+                    }),
                   ],
                 ),
               ),
 
-              // ✅ Navbar (category-style)
+              // Navbar
               Positioned(
                 left: 0,
                 right: 0,
@@ -397,6 +375,7 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen>
                 ),
               ),
 
+              // Floating Cart Button
               AnimatedBuilder(
                 animation: _navController,
                 builder: (_, __) {
@@ -409,6 +388,7 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen>
                 },
               ),
 
+              // Live Order Indicator
               AnimatedBuilder(
                 animation: _navController,
                 builder: (_, __) {

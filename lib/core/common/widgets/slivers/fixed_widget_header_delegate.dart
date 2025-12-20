@@ -1,10 +1,12 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 
-typedef HeaderBuilder = Widget Function(
-  BuildContext context,
-  double shrinkOffset,
-  bool overlapsContent,
-);
+typedef HeaderBuilder =
+    Widget Function(
+      BuildContext context,
+      double shrinkOffset,
+      bool overlapsContent,
+    );
 
 class FixedWidgetHeaderDelegate extends SliverPersistentHeaderDelegate {
   FixedWidgetHeaderDelegate({
@@ -13,14 +15,18 @@ class FixedWidgetHeaderDelegate extends SliverPersistentHeaderDelegate {
     required this.builder,
     this.backgroundColor,
     this.shouldAddElevation = false,
-  })  : _minExtent = minExtent,
-        _maxExtent = maxExtent ?? minExtent;
+    this.enableGlassEffect = false,
+    this.blurSigma = 10.0,
+  }) : _minExtent = minExtent,
+       _maxExtent = maxExtent ?? minExtent;
 
   final double _minExtent;
   final double _maxExtent;
   final HeaderBuilder builder;
   final Color? backgroundColor;
   final bool shouldAddElevation;
+  final bool enableGlassEffect;
+  final double blurSigma;
 
   @override
   double get minExtent => _minExtent;
@@ -38,16 +44,41 @@ class FixedWidgetHeaderDelegate extends SliverPersistentHeaderDelegate {
     final bool showElevation =
         shouldAddElevation && (shrinkOffset > 0 || overlapsContent);
 
-    if (!showElevation && backgroundColor == null) {
+    if (!showElevation && backgroundColor == null && !enableGlassEffect) {
       return child;
     }
 
-    return Material(
-      color: backgroundColor ?? Colors.transparent,
-      elevation: showElevation ? 4 : 0,
-      shadowColor: Colors.black.withValues(alpha: 0.08),
-      child: child,
-    );
+    Widget content = child;
+
+    // Add glass effect if enabled
+    if (enableGlassEffect) {
+      content = ClipRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: blurSigma, sigmaY: blurSigma),
+          child: Container(
+            decoration: BoxDecoration(
+              color: (backgroundColor ?? Colors.white).withValues(alpha: 0.7),
+              border: Border(
+                bottom: BorderSide(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  width: 1,
+                ),
+              ),
+            ),
+            child: child,
+          ),
+        ),
+      );
+    } else {
+      content = Material(
+        color: backgroundColor ?? Colors.transparent,
+        elevation: showElevation ? 4 : 0,
+        shadowColor: Colors.black.withValues(alpha: 0.08),
+        child: child,
+      );
+    }
+
+    return content;
   }
 
   @override
@@ -56,6 +87,8 @@ class FixedWidgetHeaderDelegate extends SliverPersistentHeaderDelegate {
         _maxExtent != oldDelegate._maxExtent ||
         shouldAddElevation != oldDelegate.shouldAddElevation ||
         backgroundColor != oldDelegate.backgroundColor ||
+        enableGlassEffect != oldDelegate.enableGlassEffect ||
+        blurSigma != oldDelegate.blurSigma ||
         builder != oldDelegate.builder;
   }
 }

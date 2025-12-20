@@ -116,11 +116,13 @@ class VerificationScreen extends StatelessWidget {
                         appContext: context,
                         length: 6,
                         controller: controller.otpController,
+                        errorAnimationController: controller.errorController,
                         keyboardType: TextInputType.number,
                         animationType: AnimationType.slide,
                         autoDisposeControllers: false,
                         animationDuration: const Duration(milliseconds: 300),
                         enableActiveFill: true,
+
                         textStyle: TextStyle(
                           color: AppColors.eggshellWhite,
                           fontSize: 18.sp,
@@ -139,6 +141,7 @@ class VerificationScreen extends StatelessWidget {
                           activeColor: const Color(0xFFFFC200),
                           inactiveColor: const Color(0xFF7C7C7C),
                           selectedColor: const Color(0xFFFFC200),
+                          errorBorderColor: AppColors.error,
                         ),
                         onChanged: (value) {
                           controller.onOtpChanged(value);
@@ -147,6 +150,24 @@ class VerificationScreen extends StatelessWidget {
                           controller.onTapVerify();
                         },
                       ),
+                      SizedBox(height: 8.h),
+                      Obx(() {
+                        if (controller.errorMessage.value.isEmpty)
+                          return SizedBox.shrink();
+                        return Padding(
+                          padding: EdgeInsets.only(bottom: 8.h),
+                          child: Text(
+                            controller.errorMessage.value,
+                            style: getTextStyle(
+                              font: CustomFonts.inter,
+                              color: AppColors.error,
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        );
+                      }),
                       SizedBox(height: 16.h),
                       GestureDetector(
                         onTap: controller.onTapVerify,

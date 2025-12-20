@@ -26,36 +26,42 @@ class LoginScreen extends StatelessWidget {
       child: Scaffold(
         resizeToAvoidBottomInset: true,
         backgroundColor: Colors.black,
-        body: SafeArea(
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              return SingleChildScrollView(
-                physics: const ClampingScrollPhysics(),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      _buildTopSection(context),
-                      _buildContentSection(controller),
-                    ],
+        body: GestureDetector(
+          behavior: HitTestBehavior.translucent,
+          onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+          child: SafeArea(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  keyboardDismissBehavior:
+                      ScrollViewKeyboardDismissBehavior.onDrag,
+                  physics: const ClampingScrollPhysics(),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        _buildTopSection(context),
+                        _buildContentSection(controller),
+                      ],
+                    ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
         ),
       ),
     );
   }
 
-  // ------------------ TOP SECTION ------------------
   Widget _buildTopSection(BuildContext context) {
     final base = ProductIcons.asProviders();
     final maxRows = _calculateCarouselRows(context);
     final rowSpacing = 12.h;
     final gradientHeight = MediaQuery.of(context).size.height * 0.4;
-
     final totalRowSpacing = rowSpacing * (maxRows - 1);
     final rowHeight = (gradientHeight - totalRowSpacing) / maxRows;
 
@@ -147,7 +153,6 @@ class LoginScreen extends StatelessWidget {
     return 0.15;
   }
 
-  // ------------------ CONTENT SECTION ------------------
   Widget _buildContentSection(LoginController controller) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16.w),
@@ -158,17 +163,15 @@ class LoginScreen extends StatelessWidget {
           Obx(() {
             return Column(
               children: [
-                SizedBox(
-                  child: Text(
-                    'We deliver quickly',
-                    style: getTextStyle(
-                      font: CustomFonts.obviously,
-                      color: AppColors.eggshellWhite,
-                      fontSize: 28.sp,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    textAlign: TextAlign.center,
+                Text(
+                  'We deliver quickly',
+                  style: getTextStyle(
+                    font: CustomFonts.obviously,
+                    color: AppColors.eggshellWhite,
+                    fontSize: 28.sp,
+                    fontWeight: FontWeight.w600,
                   ),
+                  textAlign: TextAlign.center,
                 ),
                 SizedBox(height: 8.h),
                 SizedBox(
@@ -181,7 +184,6 @@ class LoginScreen extends StatelessWidget {
                       font: CustomFonts.inter,
                       color: const Color(0xFF9B9B9B),
                       fontSize: 16.sp,
-                      fontWeight: FontWeight.w400,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -202,47 +204,77 @@ class LoginScreen extends StatelessWidget {
             ),
           ),
           SizedBox(height: 10.h),
-          _styledTextField(
-            controller: controller.phoneController,
-            hintText: 'Enter mobile number',
-            keyboardType: TextInputType.phone,
-          ),
-          Obx(() {
-            return AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              height: controller.showNameField.value ? null : 0,
-              child: controller.showNameField.value
-                  ? Column(
-                      children: [
-                        SizedBox(height: 16.h),
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            'Full Name',
-                            style: getTextStyle(
-                              font: CustomFonts.inter,
-                              color: AppColors.eggshellWhite,
-                              fontSize: 16.sp,
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 10.h),
-                        _styledTextField(
-                          controller: controller.nameController,
-                          hintText: 'Enter your full name',
-                        ),
+          Container(
+            width: double.infinity,
+            height: 52.h,
+            decoration: ShapeDecoration(
+              shape: RoundedRectangleBorder(
+                side: const BorderSide(width: 1, color: Color(0xFF7C7C7C)),
+                borderRadius: BorderRadius.circular(8.r),
+              ),
+            ),
+            child: Row(
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 12.w),
+                  child: Text(
+                    '+91',
+                    style: getTextStyle(
+                      font: CustomFonts.inter,
+                      color: AppColors.eggshellWhite,
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12.w),
+                    child: TextField(
+                      controller: controller.phoneController,
+                      keyboardType: TextInputType.number,
+                      textInputAction: TextInputAction.done,
+                      onSubmitted: (_) =>
+                          FocusManager.instance.primaryFocus?.unfocus(),
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        LengthLimitingTextInputFormatter(10),
                       ],
-                    )
-                  : const SizedBox.shrink(),
-            );
-          }),
+                      enableSuggestions: false,
+                      autocorrect: false,
+                      style: getTextStyle(
+                        font: CustomFonts.inter,
+                        color: AppColors.eggshellWhite,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      cursorColor: const Color(0xFFF8F8F8),
+                      decoration: InputDecoration(
+                        isCollapsed: true,
+                        border: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        hintText: 'Enter mobile number',
+                        hintStyle: getTextStyle(
+                          font: CustomFonts.inter,
+                          color: AppColors.featherGrey,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
           SizedBox(height: 24.h),
           Obx(() {
             return CommonWidgets.primaryButton(
               text: controller.isLoading.value ? 'Please wait...' : 'Continue',
               onTap: controller.isLoading.value
                   ? () {}
-                  : () => controller.onTapContinue(),
+                  : () {
+                      FocusManager.instance.primaryFocus?.unfocus();
+                      controller.onTapContinue();
+                    },
             );
           }),
           SizedBox(height: 16.h),
@@ -299,12 +331,11 @@ class LoginScreen extends StatelessWidget {
   Widget _styledTextField({
     required TextEditingController controller,
     required String hintText,
-    TextInputType keyboardType = TextInputType.text,
   }) {
     return Container(
       width: double.infinity,
       height: 52.h,
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+      padding: EdgeInsets.symmetric(horizontal: 16.w),
       decoration: ShapeDecoration(
         shape: RoundedRectangleBorder(
           side: const BorderSide(width: 1, color: Color(0xFF7C7C7C)),
@@ -314,7 +345,8 @@ class LoginScreen extends StatelessWidget {
       alignment: Alignment.centerLeft,
       child: TextField(
         controller: controller,
-        keyboardType: keyboardType,
+        textInputAction: TextInputAction.done,
+        onSubmitted: (_) => FocusManager.instance.primaryFocus?.unfocus(),
         enableSuggestions: false,
         autocorrect: false,
         style: getTextStyle(
@@ -325,15 +357,11 @@ class LoginScreen extends StatelessWidget {
         decoration: InputDecoration(
           isCollapsed: true,
           border: InputBorder.none,
-          enabledBorder: InputBorder.none,
-          focusedBorder: InputBorder.none,
           hintText: hintText,
           hintStyle: getTextStyle(
             font: CustomFonts.inter,
             color: AppColors.featherGrey,
           ),
-          counterText: "",
-          contentPadding: EdgeInsets.zero,
         ),
       ),
     );

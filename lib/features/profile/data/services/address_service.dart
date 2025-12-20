@@ -282,12 +282,22 @@ class AddressService extends GetxService {
         'phone_number': address.phoneNumber,
         'email': address.email ?? '',
         'addressType': addressTypeValue,
-        'make_default': address.isDefault,
+        'make_default': true,
       };
 
       // Add optional fields only if they have values
       if (address.landmark != null && address.landmark!.isNotEmpty) {
         body['address_line2'] = address.landmark;
+        body['nearby_landmark'] = address.landmark;
+      }
+
+      if (address.flatHouseBuilding != null &&
+          address.flatHouseBuilding!.isNotEmpty) {
+        body['flat_house_building'] = address.flatHouseBuilding;
+      }
+
+      if (address.floorNumber != null && address.floorNumber!.isNotEmpty) {
+        body['floor_number'] = address.floorNumber;
       }
 
       if (address.email != null && address.email!.isNotEmpty) {
@@ -374,6 +384,16 @@ class AddressService extends GetxService {
       // Add optional fields only if they have values
       if (address.landmark != null && address.landmark!.isNotEmpty) {
         body['address_line2'] = address.landmark;
+        body['nearby_landmark'] = address.landmark;
+      }
+
+      if (address.flatHouseBuilding != null &&
+          address.flatHouseBuilding!.isNotEmpty) {
+        body['flat_house_building'] = address.flatHouseBuilding;
+      }
+
+      if (address.floorNumber != null && address.floorNumber!.isNotEmpty) {
+        body['floor_number'] = address.floorNumber;
       }
 
       if (address.email != null && address.email!.isNotEmpty) {

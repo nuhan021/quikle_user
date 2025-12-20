@@ -57,10 +57,11 @@ class CartService {
   }
 
   void addToCart(ProductModel product, {bool isUrgent = false}) async {
+    // Check if there are already urgent items in the cart
+    final hasExistingUrgentItems = hasUrgentItems;
+
     final existingItemIndex = _cartItems.indexWhere(
-      (item) =>
-          item.product.title == product.title &&
-          item.product.categoryId == product.categoryId,
+      (item) => item.product.id == product.id,
     );
 
     if (existingItemIndex != -1) {
@@ -71,8 +72,10 @@ class CartService {
             existingItem.isUrgent || isUrgent, // Keep urgent if already urgent
       );
     } else {
+      // If there are already urgent items, make new items urgent automatically
+      final shouldBeUrgent = isUrgent || hasExistingUrgentItems;
       _cartItems.add(
-        CartItemModel(product: product, quantity: 1, isUrgent: isUrgent),
+        CartItemModel(product: product, quantity: 1, isUrgent: shouldBeUrgent),
       );
     }
 
@@ -80,11 +83,7 @@ class CartService {
   }
 
   void removeFromCart(CartItemModel cartItem) async {
-    _cartItems.removeWhere(
-      (item) =>
-          item.product.title == cartItem.product.title &&
-          item.product.categoryId == cartItem.product.categoryId,
-    );
+    _cartItems.removeWhere((item) => item.product.id == cartItem.product.id);
 
     await _saveCartToCache();
   }
@@ -96,9 +95,7 @@ class CartService {
     }
 
     final itemIndex = _cartItems.indexWhere(
-      (item) =>
-          item.product.title == cartItem.product.title &&
-          item.product.categoryId == cartItem.product.categoryId,
+      (item) => item.product.id == cartItem.product.id,
     );
 
     if (itemIndex != -1) {
@@ -116,9 +113,7 @@ class CartService {
   // Get the quantity of a specific product in the cart
   int getProductQuantity(ProductModel product) {
     final item = _cartItems.firstWhere(
-      (item) =>
-          item.product.title == product.title &&
-          item.product.categoryId == product.categoryId,
+      (item) => item.product.id == product.id,
       orElse: () => CartItemModel(product: product, quantity: 0),
     );
     return item.quantity;
@@ -126,21 +121,13 @@ class CartService {
 
   // Check if a product is in the cart
   bool isProductInCart(ProductModel product) {
-    return _cartItems.any(
-      (item) =>
-          item.product.title == product.title &&
-          item.product.categoryId == product.categoryId,
-    );
+    return _cartItems.any((item) => item.product.id == product.id);
   }
 
   // Get a cart item for a specific product
   CartItemModel? getCartItemForProduct(ProductModel product) {
     try {
-      return _cartItems.firstWhere(
-        (item) =>
-            item.product.title == product.title &&
-            item.product.categoryId == product.categoryId,
-      );
+      return _cartItems.firstWhere((item) => item.product.id == product.id);
     } catch (e) {
       return null;
     }
@@ -149,9 +136,7 @@ class CartService {
   // Toggle urgent status for a specific product
   void toggleProductUrgentStatus(ProductModel product) async {
     final itemIndex = _cartItems.indexWhere(
-      (item) =>
-          item.product.title == product.title &&
-          item.product.categoryId == product.categoryId,
+      (item) => item.product.id == product.id,
     );
 
     if (itemIndex != -1) {

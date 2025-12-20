@@ -239,7 +239,7 @@ class _VendorResponseCardState extends State<VendorResponseCard>
                         Column(
                           children: [
                             Text(
-                              '\$${widget.response.totalAmount.toStringAsFixed(2)}',
+                              '₹${widget.response.totalAmount.toStringAsFixed(2)}',
                               style: _labelStyle(
                                 size: 18.sp,
                                 weight: FontWeight.w700,
@@ -435,7 +435,7 @@ class _VendorResponseCardState extends State<VendorResponseCard>
                                           ),
                                           if (medicine.medicinePrice > 0)
                                             _modernChip(
-                                              '\$${medicine.medicinePrice.toStringAsFixed(2)}',
+                                              '₹${medicine.medicinePrice.toStringAsFixed(2)}',
                                               bg: Colors.green.shade50,
                                               fg: Colors.green.shade700,
                                               icon: Icons.attach_money_rounded,

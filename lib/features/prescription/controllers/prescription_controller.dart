@@ -9,6 +9,7 @@ import 'package:quikle_user/features/prescription/data/services/prescription_ser
 import 'package:quikle_user/features/home/data/models/product_model.dart';
 import 'package:quikle_user/features/cart/controllers/cart_controller.dart';
 import 'package:quikle_user/core/services/prescription_notification_service.dart';
+import 'package:quikle_user/core/services/storage_service.dart';
 
 class PrescriptionController extends GetxController {
   final PrescriptionService _prescriptionService = PrescriptionService();
@@ -42,13 +43,29 @@ class PrescriptionController extends GetxController {
     loadPrescriptionMedicines();
     loadRecentPrescriptionMedicines();
     loadPrescriptionStats();
-    _startAutoUpdate();
+    // _startAutoUpdate();
   }
 
   @override
   void onClose() {
     _stopAutoUpdate();
     super.onClose();
+  }
+
+  /// Clear all prescription data (call on logout)
+  void clearData() {
+    prescriptions.clear();
+    prescriptionMedicines.clear();
+    recentPrescriptionMedicines.clear();
+    selectedPrescription.value = null;
+    prescriptionStats.clear();
+    uploadNotes.value = '';
+    uploadProgress.value = 0.0;
+    isUploading.value = false;
+    isLoading.value = false;
+    isRefreshing.value = false;
+    lastUpdateTime.value = null;
+    _stopAutoUpdate();
   }
 
   /// Start automatic updates for active prescriptions
@@ -202,8 +219,10 @@ class PrescriptionController extends GetxController {
         await Future.delayed(const Duration(milliseconds: 100));
       }
 
+      final userId = StorageService.userId?.toString() ?? '0';
+
       final prescription = await _prescriptionService.uploadPrescription(
-        userId: 'current_user_id',
+        userId: userId,
         imageFile: imageFile, // supports image or PDF
         notes: uploadNotes.value.isEmpty ? null : uploadNotes.value,
       );
@@ -211,10 +230,21 @@ class PrescriptionController extends GetxController {
       prescriptions.insert(0, prescription);
       uploadNotes.value = '';
 
+      // Refresh all prescription data after upload
       await Future.wait([
+        loadUserPrescriptions(),
         loadPrescriptionStats(),
         loadRecentPrescriptionMedicines(),
       ]);
+
+      Get.snackbar(
+        'Success',
+        'Prescription uploaded successfully',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.green.withValues(alpha: 0.8),
+        colorText: Colors.white,
+        duration: const Duration(seconds: 2),
+      );
     } catch (e) {
       Get.snackbar(
         'Error',
@@ -234,8 +264,11 @@ class PrescriptionController extends GetxController {
       // Store previous prescriptions for status change detection
       final previousPrescriptions = List<PrescriptionModel>.from(prescriptions);
 
+      // Get actual user ID from storage
+      final userId = StorageService.userId?.toString() ?? 'current_user_id';
+
       final userPrescriptions = await _prescriptionService.getUserPrescriptions(
-        'current_user_id',
+        userId,
       );
       prescriptions.value = userPrescriptions;
 
@@ -257,8 +290,9 @@ class PrescriptionController extends GetxController {
 
   Future<void> loadPrescriptionMedicines({bool silent = false}) async {
     try {
+      final userId = StorageService.userId?.toString() ?? '0';
       final medicines = await _prescriptionService
-          .getPendingPrescriptionMedicines('current_user_id');
+          .getPendingPrescriptionMedicines(userId);
       prescriptionMedicines.value = medicines;
     } catch (e) {
       // ignore for mock
@@ -267,8 +301,9 @@ class PrescriptionController extends GetxController {
 
   Future<void> loadRecentPrescriptionMedicines({bool silent = false}) async {
     try {
+      final userId = StorageService.userId?.toString() ?? '0';
       final medicines = await _prescriptionService
-          .getRecentPrescriptionMedicines('current_user_id');
+          .getRecentPrescriptionMedicines(userId);
       recentPrescriptionMedicines.value = medicines;
     } catch (e) {
       // ignore for mock
@@ -277,9 +312,8 @@ class PrescriptionController extends GetxController {
 
   Future<void> loadPrescriptionStats({bool silent = false}) async {
     try {
-      final stats = await _prescriptionService.getPrescriptionStats(
-        'current_user_id',
-      );
+      final userId = StorageService.userId?.toString() ?? '0';
+      final stats = await _prescriptionService.getPrescriptionStats(userId);
       prescriptionStats.value = stats;
     } catch (e) {
       // ignore for mock
@@ -289,6 +323,34 @@ class PrescriptionController extends GetxController {
   void viewPrescriptionDetails(PrescriptionModel prescription) {
     selectedPrescription.value = prescription;
     Get.toNamed('/prescription-details', arguments: prescription);
+  }
+
+  Future<PrescriptionModel?> getPrescriptionDetailsById(
+    String prescriptionId,
+  ) async {
+    try {
+      final prescription = await _prescriptionService.getPrescriptionById(
+        prescriptionId,
+      );
+
+      if (prescription != null) {
+        // Update in the list if found
+        final index = prescriptions.indexWhere((p) => p.id == prescriptionId);
+        if (index != -1) {
+          prescriptions[index] = prescription;
+        }
+        selectedPrescription.value = prescription;
+      }
+
+      return prescription;
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to load prescription details: $e',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return null;
+    }
   }
 
   Future<void> deletePrescription(String prescriptionId) async {

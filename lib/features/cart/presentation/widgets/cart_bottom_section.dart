@@ -9,6 +9,7 @@ import 'package:quikle_user/core/utils/constants/enums/address_type_enums.dart';
 import '../../../profile/controllers/address_controller.dart';
 import '../../../profile/controllers/payment_method_controller.dart';
 import '../../../home/presentation/widgets/address/adress_sheet_widget.dart';
+import '../../../cart/controllers/cart_controller.dart';
 
 class CartBottomSection extends StatelessWidget {
   final VoidCallback onPlaceOrder;
@@ -63,6 +64,14 @@ class CartBottomSection extends StatelessWidget {
     _selectedAddressIdForCart = null;
   }
 
+  static void setSelectedAddressId(String? id) {
+    _selectedAddressIdForCart = id;
+  }
+
+  static String? getSelectedAddressId() {
+    return _selectedAddressIdForCart;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -71,195 +80,147 @@ class CartBottomSection extends StatelessWidget {
       child: Column(
         children: [
           // Address row
-          GetBuilder<AddressController>(
-            init: AddressController(),
-            builder: (controller) {
-              final selectedAddress = _selectedAddressIdForCart != null
-                  ? controller.addresses.firstWhereOrNull(
-                      (addr) => addr.id == _selectedAddressIdForCart,
-                    )
-                  : controller.defaultAddress;
-
-              final addressTypeText = selectedAddress != null
-                  ? _getAddressTypeText(selectedAddress.type)
-                  : 'Home';
-              final addressDetails =
-                  selectedAddress?.address ?? 'No address selected';
-
-              return Row(
-                children: [
-                  Container(
-                    padding: EdgeInsets.only(right: 8.w),
-                    child: Image.asset(
-                      ImagePath.homeIcon,
-                      width: 40.w,
-                      height: 40.h,
-                    ),
-                  ),
-                  SizedBox(width: 8.w),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '$addressTypeText',
-                          style: getTextStyle(
-                            font: CustomFonts.inter,
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.ebonyBlack,
-                          ),
-                        ),
-                        Text(
-                          addressDetails,
-                          style: getTextStyle(
-                            font: CustomFonts.inter,
-                            fontSize: 14.sp,
-                            color: Colors.grey[600]!,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () => _showAddressSelection(context),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.keyboard_arrow_down,
-                          size: 25.sp,
-                          color: Colors.grey[600],
-                        ),
-                        SizedBox(width: 4.w),
-                        Text(
-                          'Change',
-                          style: getTextStyle(
-                            font: CustomFonts.inter,
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.beakYellow,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              );
-            },
-          ),
-
-          SizedBox(height: 16.h),
-
-          // ======== COMPACT PAY USING + EXPANDED PLACE ORDER ========
           Row(
             children: [
-              // Compact Pay Using button (intrinsic width)
-              Obx(() {
-                final paymentController = Get.find<PaymentMethodController>();
-                final selectedMethod = paymentController.selectedPaymentMethod;
+              // Payment method box (takes remaining space)
+              Expanded(
+                child: Obx(() {
+                  final paymentController = Get.find<PaymentMethodController>();
+                  final selectedMethod =
+                      paymentController.selectedPaymentMethod;
 
-                return GestureDetector(
-                  onTap: onPaymentMethodTap,
-                  child: Container(
-                    padding: EdgeInsets.symmetric(
-                      vertical: 12.h,
-                      horizontal: 10.w,
-                    ),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: AppColors.ebonyBlack),
-                      borderRadius: BorderRadius.circular(8.r),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (selectedMethod != null &&
-                            selectedMethod.type.iconPath != null) ...[
-                          Image.asset(
-                            selectedMethod.type.iconPath!,
-                            width: 16.w,
-                            height: 16.h,
+                  return GestureDetector(
+                    onTap: onPaymentMethodTap,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        vertical: 12.h,
+                        horizontal: 10.w,
+                      ),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: AppColors.ebonyBlack),
+                        borderRadius: BorderRadius.circular(8.r),
+                      ),
+                      child: Row(
+                        children: [
+                          if (selectedMethod != null &&
+                              selectedMethod.type.iconPath != null) ...[
+                            Image.asset(
+                              selectedMethod.type.iconPath!,
+                              width: 16.w,
+                              height: 16.h,
+                            ),
+                            SizedBox(width: 4.w),
+                          ],
+                          Expanded(
+                            child: Text(
+                              selectedMethod?.type.displayName ?? 'Pay Using',
+                              style: getTextStyle(
+                                font: CustomFonts.inter,
+                                fontSize: (selectedMethod != null)
+                                    ? 11.sp
+                                    : 13.sp,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
-                          SizedBox(width: 4.w),
-                        ],
-                        Text(
-                          selectedMethod?.type.displayName ?? 'Pay Using',
-                          style: getTextStyle(
-                            font: CustomFonts.inter,
-                            fontSize: 13.sp,
-                            fontWeight: FontWeight.w600,
+                          SizedBox(width: 2.w),
+                          Icon(
+                            Icons.keyboard_arrow_down,
+                            size: 16.sp,
                             color: Colors.black,
                           ),
-                        ),
-                        SizedBox(width: 2.w),
-                        Icon(
-                          Icons.keyboard_arrow_down,
-                          size: 16.sp,
-                          color: Colors.black,
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                );
-              }),
+                  );
+                }),
+              ),
 
               SizedBox(width: 12.w),
 
-              // Expanded Place Order button with total (takes remaining space)
-              Expanded(
-                child: GestureDetector(
-                  onTap: onPlaceOrder,
-                  child: Container(
-                    padding: EdgeInsets.symmetric(
-                      vertical: 12.h,
-                      horizontal: 12.w,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.black,
-                      borderRadius: BorderRadius.circular(8.r),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        // Total price (left)
-                        Flexible(
-                          child: Text(
-                            '\$ ${totalAmount.toStringAsFixed(2)}',
-                            style: getTextStyle(
-                              font: CustomFonts.inter,
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.white,
+              // Place Order button sized to its intrinsic content so the
+              // total price and 'Place order' text are always visible.
+              IntrinsicWidth(
+                child: Obx(() {
+                  final cartController = Get.find<CartController>();
+                  final isPlacingOrder = cartController.isPlacingOrder;
+
+                  return GestureDetector(
+                    onTap: isPlacingOrder ? null : onPlaceOrder,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        vertical: 12.h,
+                        horizontal: 12.w,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isPlacingOrder ? Colors.grey : Colors.black,
+                        borderRadius: BorderRadius.circular(8.r),
+                      ),
+                      child: isPlacingOrder
+                          ? Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SizedBox(
+                                  width: 16.w,
+                                  height: 16.h,
+                                  child: const CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
+                                  ),
+                                ),
+                                SizedBox(width: 8.w),
+                                Text(
+                                  'Processing...',
+                                  style: getTextStyle(
+                                    font: CustomFonts.inter,
+                                    fontSize: 14.sp,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            )
+                          : Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                // Total price (left) - keep full content visible
+                                Text(
+                                  '₹ ${totalAmount.toStringAsFixed(2)}',
+                                  style: getTextStyle(
+                                    font: CustomFonts.inter,
+                                    fontSize: 14.sp,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.white,
+                                  ),
+                                ),
+
+                                // Thin divider
+                                SizedBox(width: 8.w),
+                                Container(
+                                  width: 1.w,
+                                  height: 20.h,
+                                  color: Colors.white.withValues(alpha: .25),
+                                ),
+                                SizedBox(width: 8.w),
+
+                                // Place order (right)
+                                Text(
+                                  'Place order',
+                                  style: getTextStyle(
+                                    font: CustomFonts.inter,
+                                    fontSize: 14.sp,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.beakYellow,
+                                  ),
+                                ),
+                              ],
                             ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-
-                        // Thin divider
-                        SizedBox(width: 8.w),
-                        Container(
-                          width: 1.w,
-                          height: 20.h,
-                          color: Colors.white.withValues(alpha: .25),
-                        ),
-                        SizedBox(width: 8.w),
-
-                        // Place order (right)
-                        Text(
-                          'Place order',
-                          style: getTextStyle(
-                            font: CustomFonts.inter,
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.beakYellow,
-                          ),
-                        ),
-                      ],
                     ),
-                  ),
-                ),
+                  );
+                }),
               ),
             ],
           ),

@@ -15,7 +15,7 @@ class CategoryShimmer extends StatelessWidget {
       width: double.infinity,
       padding: EdgeInsets.symmetric(vertical: 16.h),
       child: SizedBox(
-        height: 70.h,
+        height: 62.h,
         child: ListView.builder(
           scrollDirection: Axis.horizontal,
           physics: const ClampingScrollPhysics(),

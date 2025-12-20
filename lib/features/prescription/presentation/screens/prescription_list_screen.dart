@@ -21,6 +21,21 @@ class _PrescriptionListScreenState extends State<PrescriptionListScreen> {
   final GlobalKey _cartFabKey = GlobalKey(); // for locating the button
 
   @override
+  void initState() {
+    super.initState();
+    // Fetch prescriptions when screen loads
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      try {
+        final controller = Get.find<PrescriptionController>();
+        // Always load to ensure fresh data from API
+        controller.loadUserPrescriptions();
+      } catch (e) {
+        print('Error loading prescriptions: $e');
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final controller = Get.find<PrescriptionController>();
 
@@ -77,7 +92,9 @@ class _PrescriptionListScreenState extends State<PrescriptionListScreen> {
                         ),
                         SizedBox(height: 24.h),
                         ElevatedButton.icon(
-                          onPressed: () => Get.toNamed('/prescription-upload'),
+                          onPressed: controller.isUploading.value
+                              ? null
+                              : controller.showUploadOptions,
                           icon: const Icon(Icons.add),
                           label: const Text('Upload Prescription'),
                           style: ElevatedButton.styleFrom(
@@ -159,22 +176,10 @@ class _PrescriptionListScreenState extends State<PrescriptionListScreen> {
           ],
         ),
 
-        // ✅ This replaces the old hard-coded Positioned(...)
-        floatingActionButton: SafeArea(
-          // SafeArea ensures it clears system gesture/nav bars
-          child: Padding(
-            // Optional: add consistent spacing from edges
-            padding: EdgeInsets.only(right: 16.w, bottom: 16.h),
-            child: Container(
-              key: _cartFabKey, // so we can compute the target position
-              child: const FloatingCartButton(),
-            ),
-          ),
+        floatingActionButton: Container(
+          key: _cartFabKey,
+          child: const FloatingCartButton(),
         ),
-
-        // Optional: If this screen has its own bottomNavigationBar,
-        // the FAB will automatically float above it.
-        // bottomNavigationBar: YourBottomNavBar(),
         floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       ),
     );

@@ -59,8 +59,6 @@ class _LiveOrderIndicatorState extends State<LiveOrderIndicator>
 
   @override
   Widget build(BuildContext context) {
-    final double systemBottomInset = MediaQuery.of(context).viewPadding.bottom;
-
     return GetBuilder<LiveOrderController>(
       init: LiveOrderController(),
       builder: (controller) {
@@ -73,7 +71,7 @@ class _LiveOrderIndicatorState extends State<LiveOrderIndicator>
 
           return Positioned(
             left: _boundaryPadding,
-            bottom: widget.bottomInset + systemBottomInset + 4.h,
+            bottom: widget.bottomInset + 4.h,
             child: AnimatedBuilder(
               animation: Listenable.merge([_scaleAnimation, _pulseAnimation]),
               builder: (context, _) {

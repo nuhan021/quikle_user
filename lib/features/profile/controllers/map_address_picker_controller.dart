@@ -7,6 +7,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:http/http.dart' as http;
 import 'package:quikle_user/features/profile/controllers/add_address_controller.dart';
+import 'package:quikle_user/features/profile/presentation/screens/add_address_screen.dart';
 
 class MapAddressPickerController extends GetxController {
   // Google Maps API Key
@@ -467,6 +468,7 @@ class MapAddressPickerController extends GetxController {
     addAddressController.addressController.text = fullAddress.value.isNotEmpty
         ? fullAddress.value
         : streetAddress;
+    addAddressController.isAddressFromMap.value = true; // Mark as from map
 
     // Set country first
     if (country.isNotEmpty) {
@@ -592,22 +594,34 @@ class MapAddressPickerController extends GetxController {
       print('✅ Set zip code: $zipCode');
     }
 
-    // Go back to the add address screen first
+    // Go back to close the map screen
     Get.back();
 
-    // Show success message after a small delay (after navigation completes)
-    Future.delayed(const Duration(milliseconds: 300), () {
-      Get.snackbar(
-        'Success',
-        'Address selected from map',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.green[600],
-        colorText: Colors.white,
-        duration: const Duration(seconds: 2),
-        margin: const EdgeInsets.all(12),
-        borderRadius: 8,
-        icon: const Icon(Icons.check_circle, color: Colors.white),
-      );
+    // Show the address details sheet after a small delay (after navigation completes)
+    Future.delayed(const Duration(milliseconds: 10), () {
+      // Import is needed at top: import 'package:quikle_user/features/profile/presentation/screens/add_address_screen.dart';
+      // Show the address details bottom sheet
+      if (Get.context != null) {
+        showModalBottomSheet(
+          context: Get.context!,
+          isScrollControlled: true,
+          backgroundColor: Colors.transparent,
+          builder: (context) => const AddressDetailsScreen(addressToEdit: null),
+        );
+      }
+
+      // // Show success message
+      // Get.snackbar(
+      //   'Success',
+      //   'Address selected from map',
+      //   snackPosition: SnackPosition.BOTTOM,
+      //   backgroundColor: Colors.green[600],
+      //   colorText: Colors.white,
+      //   duration: const Duration(seconds: 2),
+      //   margin: const EdgeInsets.all(12),
+      //   borderRadius: 8,
+      //   icon: const Icon(Icons.check_circle, color: Colors.white),
+      // );
     });
   }
 }

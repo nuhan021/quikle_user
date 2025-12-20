@@ -7,6 +7,7 @@ import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 import 'package:quikle_user/core/utils/constants/image_path.dart';
 import '../../controllers/payout_controller.dart';
 import '../../data/models/delivery_option_model.dart';
+import '../../../cart/controllers/cart_controller.dart';
 
 class DeliveryOptionsSection extends StatelessWidget {
   const DeliveryOptionsSection({super.key});
@@ -14,37 +15,18 @@ class DeliveryOptionsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final payoutController = Get.find<PayoutController>();
+    final cartController = Get.find<CartController>();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Choose Delivery Options',
-          style: getTextStyle(
-            font: CustomFonts.obviously,
-            fontSize: 16.sp,
-            fontWeight: FontWeight.w600,
-            color: Colors.black,
-          ),
-        ),
-        SizedBox(height: 16.h),
         Obx(() {
-          return Column(
-            children: [
-              ExpansionTile(
-                initiallyExpanded: true,
-                title: Text('Delivery types'),
-                children: [
-                  ...payoutController.deliveryOptions.map(
-                    (option) => _buildDeliveryOption(option, payoutController),
-                  ),
-                ],
-              ),
-              SizedBox(height: 8.h),
-
-              // Delivery preference selector
-              Container(
-                padding: EdgeInsets.all(12.w),
+          return Opacity(
+            opacity: payoutController.isUrgentDelivery ? 0.5 : 1.0,
+            child: IgnorePointer(
+              ignoring: payoutController.isUrgentDelivery,
+              child: Container(
+                padding: EdgeInsets.all(16.w),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(8.r),
@@ -56,134 +38,175 @@ class DeliveryOptionsSection extends StatelessWidget {
                     ),
                   ],
                 ),
-                child: Row(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
-                      child: Text(
-                        'Delivery Preference',
-                        style: getTextStyle(
-                          font: CustomFonts.inter,
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.w500,
-                          color: const Color(0xFF484848),
-                        ),
+                    Text(
+                      'Choose Delivery Options',
+                      style: getTextStyle(
+                        font: CustomFonts.obviously,
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black,
                       ),
                     ),
-                    SizedBox(
-                      width: 200.w,
-                      child: TextField(
-                        controller:
-                            payoutController.deliveryPreferenceController,
-                        decoration: InputDecoration(
-                          hintText: 'e.g. Don\'t call',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.r),
+                    SizedBox(height: 16.h),
+                    Obx(() {
+                      return Column(
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.black),
+                              borderRadius: BorderRadius.circular(6.r),
+                            ),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: _buildTableCell(
+                                    option: payoutController.deliveryOptions[0],
+                                    controller: payoutController,
+                                    showRightBorder: true,
+                                  ),
+                                ),
+                                Expanded(
+                                  child: _buildTableCell(
+                                    option: payoutController.deliveryOptions[1],
+                                    controller: payoutController,
+                                    showRightBorder: false,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                          isDense: true,
-                          contentPadding: EdgeInsets.symmetric(
-                            horizontal: 12.w,
-                            vertical: 10.h,
-                          ),
-                        ),
-                      ),
-                    ),
+                          SizedBox(height: 12.h),
+                          Obx(() {
+                            final selected = payoutController.deliveryOptions
+                                .firstWhereOrNull((o) => o.isSelected);
+                            return Text(
+                              selected?.description ?? '',
+                              style: getTextStyle(
+                                font: CustomFonts.manrope,
+                                fontSize: 14.sp,
+                                color: const Color(0xFF7C7C7C),
+                              ),
+                              textAlign: TextAlign.center,
+                            );
+                          }),
+                        ],
+                      );
+                    }),
                   ],
                 ),
               ),
-
-              SizedBox(height: 8.h),
-              _buildUrgentDeliveryOption(payoutController),
-            ],
+            ),
           );
+        }),
+        SizedBox(height: 8.h),
+        Container(
+          padding: EdgeInsets.all(12.w),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8.r),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withValues(alpha: 0.04),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'Delivery Preference',
+                  style: getTextStyle(
+                    font: CustomFonts.inter,
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w500,
+                    color: const Color(0xFF484848),
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 200.w,
+                child: TextField(
+                  controller: payoutController.deliveryPreferenceController,
+                  decoration: InputDecoration(
+                    hintText: 'e.g. Don\'t call',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.r),
+                    ),
+                    isDense: true,
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 12.w,
+                      vertical: 10.h,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        SizedBox(height: 8.h),
+        Obx(() {
+          if (cartController.hasMedicineItems) {
+            return _buildUrgentDeliveryOption(payoutController);
+          } else {
+            return const SizedBox.shrink();
+          }
         }),
       ],
     );
   }
 
-  Widget _buildDeliveryOption(
-    DeliveryOptionModel option,
-    PayoutController controller,
-  ) {
+  Widget _buildTableCell({
+    required DeliveryOptionModel option,
+    required PayoutController controller,
+    required bool showRightBorder,
+  }) {
     return GestureDetector(
       onTap: () => controller.selectDeliveryOption(option),
       child: Container(
-        margin: EdgeInsets.only(bottom: 8.h),
-        padding: EdgeInsets.all(12.w),
+        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 16.h),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(8.r),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withValues(alpha: 0.04),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
+          color: option.isSelected ? AppColors.beakYellow : Colors.transparent,
+          border: Border(
+            right: showRightBorder
+                ? const BorderSide(color: Colors.black)
+                : BorderSide.none,
+          ),
         ),
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              width: 20.w,
-              height: 20.h,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: option.isSelected
-                      ? Colors.black
-                      : Colors.grey.withValues(alpha: 0.5),
-                  width: 2,
-                ),
-              ),
-              child: option.isSelected
-                  ? Container(
-                      margin: EdgeInsets.all(4.w),
-                      decoration: const BoxDecoration(
-                        color: Colors.black,
-                        shape: BoxShape.circle,
-                      ),
-                    )
-                  : null,
-            ),
-            SizedBox(width: 12.w),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    option.title,
-                    style: getTextStyle(
-                      font: CustomFonts.inter,
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.w500,
-                      color: const Color(0xFF484848),
-                    ),
-                  ),
-                  SizedBox(height: 4.h),
-                  Text(
-                    option.description,
-                    style: getTextStyle(
-                      font: CustomFonts.manrope,
-                      fontSize: 14.sp,
-                      color: const Color(0xFF7C7C7C),
-                    ),
-                  ),
-                ],
-              ),
-            ),
             Text(
-              '\$${option.price.toStringAsFixed(2)}',
+              option.title,
               style: getTextStyle(
-                font: CustomFonts.manrope,
-                fontSize: 16.sp,
-                fontWeight: FontWeight.w600,
-                color: Colors.black,
+                font: CustomFonts.inter,
+                fontSize: 12.sp,
+                fontWeight: option.isSelected
+                    ? FontWeight.w600
+                    : FontWeight.w500,
+                color: option.isSelected
+                    ? Colors.black
+                    : const Color(0xFF484848),
               ),
             ),
-            SizedBox(width: 8.w),
-            Icon(
-              Icons.info_outline,
-              size: 16.sp,
-              color: const Color(0xFFE03E1A),
+            SizedBox(width: 6.w),
+            Text(
+              '₹${option.price.toStringAsFixed(2)}',
+              style: getTextStyle(
+                font: CustomFonts.inter,
+                fontSize: 12.sp,
+                fontWeight: option.isSelected
+                    ? FontWeight.w600
+                    : FontWeight.w500,
+                color: option.isSelected
+                    ? Colors.black
+                    : const Color(0xFF484848),
+              ),
             ),
           ],
         ),
@@ -241,14 +264,13 @@ class DeliveryOptionsSection extends StatelessWidget {
           Obx(() {
             return Switch(
               value: controller.isUrgentDelivery,
-              onChanged: (value) => controller.toggleUrgentDelivery(),
+              onChanged: (_) => controller.toggleUrgentDelivery(),
               activeThumbColor: Colors.white,
-              activeTrackColor: AppColors.beakYellow, // active: red track
+              activeTrackColor: AppColors.beakYellow,
               inactiveThumbColor: Colors.white,
-              inactiveTrackColor: AppColors.ebonyBlack, // inactive: grey track
+              inactiveTrackColor: AppColors.ebonyBlack,
             );
           }),
-
           SizedBox(width: 8.w),
           Icon(Icons.info_outline, size: 16.sp, color: Colors.red),
         ],
