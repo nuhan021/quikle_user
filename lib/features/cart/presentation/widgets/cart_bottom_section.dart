@@ -76,9 +76,97 @@ class CartBottomSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       color: Colors.white,
-      padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 16.h),
+      padding: EdgeInsets.fromLTRB(16.w, 4.h, 16.w, 4.h),
       child: Column(
         children: [
+          GetBuilder<AddressController>(
+            init: AddressController(),
+            builder: (controller) {
+              // Auto-select default address if none selected
+              if (_selectedAddressIdForCart == null) {
+                final defaultAddr = controller.defaultAddress;
+                if (defaultAddr != null) {
+                  _selectedAddressIdForCart = defaultAddr.id;
+                }
+              }
+
+              final selectedAddress = _selectedAddressIdForCart != null
+                  ? controller.addresses.firstWhereOrNull(
+                      (addr) => addr.id == _selectedAddressIdForCart,
+                    )
+                  : controller.defaultAddress;
+
+              final addressTypeText = selectedAddress != null
+                  ? _getAddressTypeText(selectedAddress.type)
+                  : 'Home';
+              final addressDetails =
+                  selectedAddress?.address ?? 'No address selected';
+
+              return GestureDetector(
+                onTap: () => _showAddressSelection(context),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.only(right: 8.w),
+                      child: Image.asset(
+                        ImagePath.homeIcon,
+                        width: 24.w,
+                        height: 24.h,
+                      ),
+                    ),
+                    SizedBox(width: 8.w),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '$addressTypeText',
+                            style: getTextStyle(
+                              font: CustomFonts.inter,
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.ebonyBlack,
+                            ),
+                          ),
+                          Text(
+                            addressDetails,
+                            style: getTextStyle(
+                              font: CustomFonts.inter,
+                              fontSize: 12.sp,
+                              color: Colors.grey[600]!,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.keyboard_arrow_down,
+                          size: 25.sp,
+                          color: Colors.grey[600],
+                        ),
+                        SizedBox(width: 4.w),
+                        Text(
+                          'Change',
+                          style: getTextStyle(
+                            font: CustomFonts.inter,
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.beakYellow,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+          SizedBox(height: 16.h),
           // Address row
           Row(
             children: [

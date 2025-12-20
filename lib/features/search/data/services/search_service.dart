@@ -30,12 +30,18 @@ class SearchService {
           final List<dynamic> data = responseMap['data'] ?? [];
           final products = data
               .map((json) => ProductModel.fromJson(json))
+              .toList()
+              // Filter out medicines that are not OTC and not prescription-approved
+              .where(
+                (p) => !(p.isMedicine && !p.isOTC && !p.isPrescriptionMedicine),
+              )
               .toList();
 
           return {
             'products': products,
             'total': responseMap['total'] ?? 0,
-            'count': responseMap['count'] ?? 0,
+            // update count to reflect filtered products visible in-app
+            'count': products.length,
             'offset': responseMap['offset'] ?? 0,
             'limit': responseMap['limit'] ?? limit,
           };

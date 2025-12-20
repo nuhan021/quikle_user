@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'package:get/get.dart';
 import 'package:quikle_user/core/models/response_data.dart';
+import 'package:quikle_user/core/notification/controllers/notification_controller.dart';
 import 'package:quikle_user/core/services/network_caller.dart';
 import 'package:quikle_user/core/utils/constants/api_constants.dart';
 import 'package:quikle_user/core/utils/constants/image_path.dart';
@@ -12,6 +14,22 @@ class HomeService {
   final ProductDataService _productService = ProductDataService();
   final NetworkCaller _networkCaller = NetworkCaller();
   final CategoryCacheService _cacheService = CategoryCacheService();
+
+  /// Fetches the FCM token from [NotificationController] and saves it to the
+  /// backend/DB if available.
+  Future<void> saveFCMToken() async {
+    try {
+      final notificationController = Get.find<NotificationController>();
+      final token = await notificationController.getFCMToken();
+      if (token != null && token.isNotEmpty) {
+        await notificationController.saveFCMToken(token);
+      }
+    } catch (e) {
+      // Avoid crashing the flow if token saving fails. Keep logging for
+      // basic diagnostics.
+      print('Could not save FCM token on welcome screen: $e');
+    }
+  }
 
   Future<List<CategoryModel>> fetchCategories() async {
     final ResponseData response = await _networkCaller.getRequest(

@@ -271,8 +271,8 @@ class DeliveryOptionsSection extends StatelessWidget {
               inactiveTrackColor: AppColors.ebonyBlack,
             );
           }),
-          SizedBox(width: 8.w),
-          Icon(Icons.info_outline, size: 16.sp, color: Colors.red),
+          // SizedBox(width: 8.w),
+          // Icon(Icons.info_outline, size: 16.sp, color: Colors.red),
         ],
       ),
     );

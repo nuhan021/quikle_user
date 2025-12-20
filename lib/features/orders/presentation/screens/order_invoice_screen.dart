@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:quikle_user/core/common/styles/global_text_style.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
+import 'package:quikle_user/core/utils/constants/image_path.dart';
 import 'package:quikle_user/features/orders/data/models/order_model.dart';
 import 'package:quikle_user/features/orders/presentation/widgets/order_status_helpers.dart';
 import 'package:quikle_user/features/profile/presentation/widgets/unified_profile_app_bar.dart';
@@ -299,10 +300,10 @@ class OrderInvoiceScreen extends StatelessWidget {
                         errorBuilder: (context, error, stackTrace) {
                           return Container(
                             color: const Color(0xFFF5F5F5),
-                            child: Icon(
-                              Icons.shopping_bag_outlined,
-                              size: 24.sp,
-                              color: const Color(0xFF7C7C7C),
+                            child: Image.asset(
+                              ImagePath.logo,
+                              fit: BoxFit.contain,
+                              // color: Colors.grey,
                             ),
                           );
                         },

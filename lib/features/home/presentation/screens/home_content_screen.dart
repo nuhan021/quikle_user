@@ -45,6 +45,7 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
 
   @override
   Widget build(BuildContext context) {
+    controller.saveFCMToken();
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
@@ -143,8 +144,8 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                             12.verticalSpace,
                             // Show shimmer for 6 product sections
                             const ProductSectionShimmer(isMedicine: false),
-                            const ProductSectionShimmer(isMedicine: true),
                             const ProductSectionShimmer(isMedicine: false),
+                            const ProductSectionShimmer(isMedicine: true),
                             const ProductSectionShimmer(isMedicine: false),
                             const ProductSectionShimmer(isMedicine: false),
                             const ProductSectionShimmer(isMedicine: false),

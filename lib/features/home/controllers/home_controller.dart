@@ -48,6 +48,15 @@ class HomeController extends GetxController with VoiceSearchMixin {
     _loadInitialData();
   }
 
+  //Call the saveFCMToken from HomeService here when needed
+  Future<void> saveFCMToken() async {
+    try {
+      await _homeService.saveFCMToken();
+    } catch (e) {
+      print('Error saving FCM Token: $e');
+    }
+  }
+
   Future<void> _loadInitialData() async {
     _isLoading.value = true;
     try {
