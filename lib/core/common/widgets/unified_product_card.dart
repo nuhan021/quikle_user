@@ -193,11 +193,7 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
                     },
                     errorBuilder: (context, error, stackTrace) {
                       return Center(
-                        child: Icon(
-                          Icons.broken_image,
-                          size: 28.sp,
-                          color: AppColors.featherGrey,
-                        ),
+                        child: Image.asset(ImagePath.logo, fit: BoxFit.contain),
                       );
                     },
                   )

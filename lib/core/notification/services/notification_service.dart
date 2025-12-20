@@ -31,9 +31,6 @@ class NotificationService {
         headers: {'Authorization': 'Bearer $authToken'},
         body: {'user_id': userId, 'token': fcmToken, 'platform': platform},
       );
-
-      AppLoggerHelper.debug('saveFCMToken response: ${response.responseData}');
-      AppLoggerHelper.debug('saveFCMToken statusCode: ${response.statusCode}');
       return response;
     } catch (e) {
       rethrow;

@@ -520,7 +520,7 @@ class PrescriptionController extends GetxController {
 
         // Check if status has changed
         if (previousPrescription.status != currentPrescription.status) {
-          _sendStatusChangeNotification(currentPrescription);
+          // _sendStatusChangeNotification(currentPrescription);
         }
       } catch (e) {
         // Prescription not found in previous list (new prescription)
@@ -529,39 +529,39 @@ class PrescriptionController extends GetxController {
             currentPrescription.status == PrescriptionStatus.valid ||
             currentPrescription.status == PrescriptionStatus.invalid ||
             currentPrescription.status == PrescriptionStatus.medicinesReady) {
-          _sendStatusChangeNotification(currentPrescription);
+          // _sendStatusChangeNotification(currentPrescription);
         }
       }
     }
   }
 
   /// Send notification for prescription status change
-  void _sendStatusChangeNotification(PrescriptionModel prescription) {
-    // Only send notifications for meaningful status changes
-    switch (prescription.status) {
-      case PrescriptionStatus.underReview:
-        PrescriptionNotificationService.showPrescriptionStatusNotification(
-          prescription: prescription,
-        );
-        break;
-      case PrescriptionStatus.valid:
-        PrescriptionNotificationService.showPrescriptionStatusNotification(
-          prescription: prescription,
-        );
-        break;
-      case PrescriptionStatus.invalid:
-        PrescriptionNotificationService.showPrescriptionStatusNotification(
-          prescription: prescription,
-        );
-        break;
-      case PrescriptionStatus.medicinesReady:
-        PrescriptionNotificationService.showPrescriptionStatusNotification(
-          prescription: prescription,
-        );
-        break;
-      case PrescriptionStatus.uploaded:
-        // Don't send notifications for these statuses
-        break;
-    }
-  }
+  // void _sendStatusChangeNotification(PrescriptionModel prescription) {
+  //   // Only send notifications for meaningful status changes
+  //   switch (prescription.status) {
+  //     case PrescriptionStatus.underReview:
+  //       PrescriptionNotificationService.showPrescriptionStatusNotification(
+  //         prescription: prescription,
+  //       );
+  //       break;
+  //     case PrescriptionStatus.valid:
+  //       PrescriptionNotificationService.showPrescriptionStatusNotification(
+  //         prescription: prescription,
+  //       );
+  //       break;
+  //     case PrescriptionStatus.invalid:
+  //       PrescriptionNotificationService.showPrescriptionStatusNotification(
+  //         prescription: prescription,
+  //       );
+  //       break;
+  //     case PrescriptionStatus.medicinesReady:
+  //       PrescriptionNotificationService.showPrescriptionStatusNotification(
+  //         prescription: prescription,
+  //       );
+  //       break;
+  //     case PrescriptionStatus.uploaded:
+  //       // Don't send notifications for these statuses
+  //       break;
+  //   }
+  // }
 }

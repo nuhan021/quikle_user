@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:quikle_user/core/common/styles/global_text_style.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
+import 'package:quikle_user/core/utils/constants/image_path.dart';
 
 import '../../controllers/cart_controller.dart';
 
@@ -65,17 +66,35 @@ class CartItemsSection extends StatelessWidget {
                           borderRadius: BorderRadius.circular(8.r),
                         ),
                         child: Center(
-                          child: Image.asset(
-                            cartItem.product.imagePath,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Icon(
-                                Icons.shopping_basket,
-                                color: Colors.grey[400],
-                                size: 30.sp,
-                              );
-                            },
-                          ),
+                          child:
+                              (cartItem.product.imagePath != null &&
+                                  cartItem.product.imagePath.isNotEmpty &&
+                                  (cartItem.product.imagePath.startsWith(
+                                        'http',
+                                      ) ||
+                                      cartItem.product.imagePath.startsWith(
+                                        'https',
+                                      )))
+                              ? ClipRRect(
+                                  borderRadius: BorderRadius.circular(8.r),
+                                  child: Image.network(
+                                    cartItem.product.imagePath,
+                                    fit: BoxFit.contain,
+                                    width: 70.w,
+                                    height: 70.h,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Image.asset(
+                                        ImagePath.logo,
+                                        fit: BoxFit.contain,
+                                        // color: Colors.grey,
+                                      );
+                                    },
+                                  ),
+                                )
+                              : Image.asset(
+                                  ImagePath.logo,
+                                  fit: BoxFit.contain,
+                                ),
                         ),
                       ),
                       // SizedBox(width: 4.w),

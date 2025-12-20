@@ -15,7 +15,7 @@ class CategoryShimmer extends StatelessWidget {
       width: double.infinity,
       padding: EdgeInsets.symmetric(vertical: 16.h),
       child: SizedBox(
-        height: 62.h,
+        height: 56.h,
         child: ListView.builder(
           scrollDirection: Axis.horizontal,
           physics: const ClampingScrollPhysics(),
@@ -48,17 +48,17 @@ class _CategoryItemShimmer extends StatelessWidget {
         children: [
           // Icon shimmer
           Container(
-            width: 44.w,
-            height: 44.h,
+            width: 40.w,
+            height: 40.h,
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(8.r),
             ),
           ),
-          SizedBox(height: 6.h),
+          SizedBox(height: 4.h),
           // Title shimmer
           Container(
-            width: 50.w,
+            width: 40.w,
             height: 12.h,
             decoration: BoxDecoration(
               color: Colors.white,

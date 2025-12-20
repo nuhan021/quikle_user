@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:quikle_user/core/common/styles/global_text_style.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
+import 'package:quikle_user/core/utils/constants/image_path.dart';
 import 'package:quikle_user/features/categories/data/models/subcategory_model.dart';
 
 class MinimalSubcategoriesSection extends StatelessWidget {
@@ -208,10 +209,10 @@ class MinimalSubcategoriesSection extends StatelessWidget {
           // Fallback to a placeholder icon
           return Container(
             color: Colors.grey[200],
-            child: Icon(
-              Icons.shopping_bag,
-              size: 20.sp,
-              color: AppColors.beakYellow,
+            child: Image.asset(
+              ImagePath.logo,
+              fit: BoxFit.contain,
+              // color: Colors.grey,
             ),
           );
         },

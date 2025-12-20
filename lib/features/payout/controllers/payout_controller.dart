@@ -4,6 +4,7 @@ import 'package:quikle_user/features/orders/data/models/order_model.dart';
 import 'package:quikle_user/features/orders/data/services/order_api_service.dart';
 import 'package:quikle_user/features/payment/data/models/order_creation_response.dart';
 import 'package:quikle_user/features/payment/services/cashfree_payment_service.dart';
+import 'package:quikle_user/features/payout/presentation/widgets/order_failure_dialog.dart';
 import 'package:quikle_user/features/payout/presentation/widgets/order_success_dialog.dart';
 import 'package:quikle_user/features/payout/presentation/widgets/payment_failure_dialog.dart';
 import '../data/models/delivery_option_model.dart';
@@ -475,10 +476,9 @@ class PayoutController extends GetxController {
       }
 
       Get.dialog(
-        PaymentFailureDialog(
+        OrderFailureDialog(
           errorMessage: errorMessage,
           onRetry: () {
-            // Retry the payment by calling placeOrder again
             placeOrder();
           },
         ),
