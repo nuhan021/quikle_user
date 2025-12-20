@@ -112,10 +112,44 @@ class ProgressSection extends StatelessWidget {
   }
 
   Widget _buildProgressSteps() {
+    // Recompute isCompleted/isCurrent here based on controller.order.status
+    // to avoid any mismatch between service-provided flags and the current
+    // controller state.
     return Column(
-      children: controller.deliverySteps
-          .map((step) => ProgressStep(step: step))
-          .toList(),
+      children: controller.deliverySteps.map((step) {
+        final status = step['status'];
+        // default to false if no status available
+        bool isCompleted = false;
+        bool isCurrent = false;
+
+        try {
+          final orderStatus = controller.order.status;
+          if (status != null) {
+            // Compare based on index if it's an enum
+            // If status is an enum value from OrderStatus, it will have index
+            final stepIndex = (status as dynamic).index as int?;
+            final orderIndex = (orderStatus as dynamic).index as int?;
+            if (stepIndex != null && orderIndex != null) {
+              isCompleted = orderIndex > stepIndex;
+              isCurrent = orderIndex == stepIndex;
+            } else {
+              // Fallback: direct equality
+              isCurrent = orderStatus == status;
+              isCompleted = false;
+            }
+          }
+        } catch (_) {
+          // ignore and fallback to service-provided values
+          isCompleted = step['isCompleted'] ?? false;
+          isCurrent = step['isCurrent'] ?? false;
+        }
+
+        final merged = Map<String, dynamic>.from(step)
+          ..['isCompleted'] = isCompleted
+          ..['isCurrent'] = isCurrent;
+
+        return ProgressStep(step: merged);
+      }).toList(),
     );
   }
 }
