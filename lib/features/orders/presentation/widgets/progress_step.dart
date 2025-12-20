@@ -115,7 +115,9 @@ class ProgressStep extends StatelessWidget {
       width: 8.w,
       height: 8.h,
       decoration: const BoxDecoration(
-        color: Color(0xFF06BD4C),
+        // Use yellow for the current (ongoing) indicator to match the
+        // yellow ring used for the current step icon.
+        color: Color(0xFFFFC200),
         shape: BoxShape.circle,
       ),
     );

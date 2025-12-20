@@ -28,22 +28,22 @@ class OrderTrackingService {
 
     return [
       {
-        'status': OrderStatus.confirmed,
-        'title': 'Order Placed',
-        'description': 'Your order has been confirmed',
-        'time': orderTime,
-        'isCompleted': _isStepCompleted(OrderStatus.confirmed, order.status),
-        'isCurrent': _isCurrentStep(OrderStatus.confirmed, order.status),
-      },
-      {
         'status': OrderStatus.processing,
-        'title': 'Preparing',
-        'description': 'Restaurant is preparing your order',
-        'time': order.status.index >= OrderStatus.processing.index
-            ? orderTime.add(const Duration(minutes: 10))
-            : null,
+        'title': 'Order Placed',
+        'description': 'Your order has been placed',
+        'time': orderTime,
         'isCompleted': _isStepCompleted(OrderStatus.processing, order.status),
         'isCurrent': _isCurrentStep(OrderStatus.processing, order.status),
+      },
+      {
+        'status': OrderStatus.confirmed,
+        'title': 'Preparing',
+        'description': 'Restaurant is preparing your order',
+        'time': order.status.index >= OrderStatus.confirmed.index
+            ? orderTime.add(const Duration(minutes: 10))
+            : null,
+        'isCompleted': _isStepCompleted(OrderStatus.confirmed, order.status),
+        'isCurrent': _isCurrentStep(OrderStatus.confirmed, order.status),
       },
       {
         'status': OrderStatus.shipped,
@@ -88,7 +88,7 @@ class OrderTrackingService {
       'lat': 23.8103 + (DateTime.now().millisecond % 100) * 0.001,
       'lng': 90.4125 + (DateTime.now().millisecond % 100) * 0.001,
       'heading': 45.0,
-      'speed': 25.0, 
+      'speed': 25.0,
       'lastUpdated': DateTime.now(),
     };
   }
