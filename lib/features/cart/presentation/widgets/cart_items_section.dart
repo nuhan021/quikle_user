@@ -23,21 +23,21 @@ class CartItemsSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: EdgeInsets.all(16.w),
-            child: Text(
-              'Delivery in 16 minutes',
-              style: getTextStyle(
-                font: CustomFonts.obviously,
-                fontSize: 16.sp,
-                fontWeight: FontWeight.w500,
-                color: AppColors.ebonyBlack,
-              ),
-            ),
-          ),
+          // Padding(
+          //   padding: EdgeInsets.all(16.w),
+          //   child: Text(
+          //     'Delivery in 16 minutes',
+          //     style: getTextStyle(
+          //       font: CustomFonts.obviously,
+          //       fontSize: 16.sp,
+          //       fontWeight: FontWeight.w500,
+          //       color: AppColors.ebonyBlack,
+          //     ),
+          //   ),
+          // ),
           Obx(() {
             return ListView.builder(
-              padding: EdgeInsets.only(bottom: 8.h),
+              padding: EdgeInsets.only(top: 8.h, bottom: 8.h),
               primary: false,
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
@@ -80,8 +80,8 @@ class CartItemsSection extends StatelessWidget {
                                   child: Image.network(
                                     cartItem.product.imagePath,
                                     fit: BoxFit.contain,
-                                    width: 70.w,
-                                    height: 70.h,
+                                    width: 65.w,
+                                    height: 65.h,
                                     errorBuilder: (context, error, stackTrace) {
                                       return Image.asset(
                                         ImagePath.logo,
