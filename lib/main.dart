@@ -41,8 +41,8 @@ Future<void> main() async {
   String? apnsToken = await FirebaseMessaging.instance.getAPNSToken();
   print("🍏 APNS Token: $apnsToken");
 
-  String? token = await _getFCMToken();
-  print("📱 FCM Token: $token");
+  // String? token = await _getFCMToken();
+  // print("📱 FCM Token: $token");
 
   await StorageService.init();
   await FCMNotificationHandler.initialize();

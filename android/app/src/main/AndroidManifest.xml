@@ -28,7 +28,7 @@
 
     <application
         android:name="${applicationName}"
-        android:label="quikle_user"
+        android:label="Quikle: One-stop Delivery App"
         android:icon="@mipmap/ic_launcher">
 
         <!-- Main Activity -->
