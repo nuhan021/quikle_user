@@ -23,7 +23,6 @@ import 'package:quikle_user/features/categories/presentation/widgets/category_pr
 import 'package:quikle_user/features/orders/presentation/widgets/live_order_indicator.dart';
 import 'package:quikle_user/features/restaurants/presentation/widgets/top_restaurants_section.dart';
 import 'package:quikle_user/features/prescription/presentation/widgets/prescription_upload_section.dart';
-import 'package:quikle_user/features/categories/presentation/widgets/filter_sort_button.dart';
 
 class UnifiedCategoryScreen extends StatefulWidget {
   const UnifiedCategoryScreen({super.key});
@@ -153,11 +152,7 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
 
                     final totalHeaderHeight =
                         SearchAndFiltersSection.kPreferredHeight +
-                        47.h +
-                        (hasPopular
-                            ? PopularItemsSection.kPreferredHeight
-                            : 0) +
-                        16.h;
+                        (hasPopular ? PopularItemsSection.kPreferredHeight : 0);
 
                     final selectedMainCategoryId =
                         controller.selectedMainCategory.value?.id ?? 'none';
@@ -184,19 +179,13 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
                           pinned: true,
                           delegate: _UnifiedHeaderDelegate(
                             searchSection: Padding(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 16.w,
-                                vertical: 8.h,
-                              ),
+                              padding: EdgeInsets.symmetric(horizontal: 16.w),
                               child: SearchAndFiltersSection(
                                 searchController: searchController,
                                 onSearchChanged: controller.onSearchChanged,
                                 onVoiceTap: controller.onVoiceSearchPressed,
                                 dynamicHint: controller.currentPlaceholder,
                               ),
-                            ),
-                            filterSortSection: FilterSortButton(
-                              controller: controller,
                             ),
                             popularSection: hasPopular
                                 ? (controller.isLoading.value
@@ -238,6 +227,7 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
                                                       .value,
                                             category:
                                                 controller.currentCategory,
+                                            controller: controller,
                                           ),
                                         ))
                                 : const SizedBox.shrink(),
@@ -361,7 +351,7 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
                                 Padding(
                                   padding: EdgeInsets.symmetric(
                                     horizontal: 16.w,
-                                    vertical: 12.h,
+                                    vertical: 4.h,
                                   ),
                                   child: _buildContent(
                                     controller,
@@ -546,7 +536,7 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
         children: [
           Container(
             width: double.infinity,
-            padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 12.w),
+            padding: EdgeInsets.symmetric(vertical: 4.h, horizontal: 12.w),
             decoration: const BoxDecoration(
               border: Border(
                 bottom: BorderSide(width: 3, color: Color(0xFFEDEDED)),
@@ -660,14 +650,12 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
 
 class _UnifiedHeaderDelegate extends SliverPersistentHeaderDelegate {
   final Widget searchSection;
-  final Widget filterSortSection;
   final Widget popularSection;
   final double totalHeight;
   final Object? rebuildToken;
 
   _UnifiedHeaderDelegate({
     required this.searchSection,
-    required this.filterSortSection,
     required this.popularSection,
     required this.totalHeight,
     this.rebuildToken,
@@ -692,7 +680,7 @@ class _UnifiedHeaderDelegate extends SliverPersistentHeaderDelegate {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [searchSection, filterSortSection, popularSection],
+          children: [searchSection, popularSection],
         ),
       ),
     );

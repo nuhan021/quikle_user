@@ -20,7 +20,8 @@ class CustomNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final media = MediaQuery.of(context);
-    final bottomInset = media.padding.bottom;
+    // viewPadding.bottom gives the gesture area height (0 for 3-button navigation)
+    final bottomInset = media.viewPadding.bottom;
 
     return ClipRRect(
       borderRadius: BorderRadius.only(
@@ -30,7 +31,12 @@ class CustomNavBar extends StatelessWidget {
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
         child: Container(
-          padding: EdgeInsets.only(top: 8.h, left: 8.w, right: 8.w, bottom: 0),
+          padding: EdgeInsets.only(
+            top: 8.h,
+            left: 8.w,
+            right: 8.w,
+            bottom: bottomInset > 0 ? bottomInset : 0,
+          ),
           decoration: BoxDecoration(
             color: Colors.black.withValues(alpha: 0.7),
             borderRadius: BorderRadius.only(

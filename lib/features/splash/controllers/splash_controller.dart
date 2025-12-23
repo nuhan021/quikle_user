@@ -4,7 +4,6 @@ import 'package:quikle_user/core/common/widgets/no_internet_screen.dart';
 import 'package:quikle_user/core/services/storage_service.dart';
 import 'package:quikle_user/core/utils/logging/logger.dart';
 import 'package:quikle_user/features/auth/presentation/screens/splash_wrapper.dart';
-import 'package:quikle_user/routes/app_routes.dart';
 import 'package:video_player/video_player.dart';
 import '../../../core/services/network_controller.dart';
 import '../../auth/presentation/screens/login_screen.dart';
@@ -15,7 +14,7 @@ class SplashController extends GetxController {
   final RxBool isReady = false.obs;
   final RxBool shouldShrink = false.obs;
 
-  static const double _ellipseTopFinal = 666.0;
+  static const double _ellipseTopFinal = 730.0;
   final RxDouble ellipseTop = _ellipseTopFinal.obs;
 
   final RxBool showEllipse = false.obs;

@@ -24,7 +24,7 @@ class SearchBar extends StatelessWidget {
     return SizedBox(
       height: kPreferredHeight,
       child: Padding(
-        padding: EdgeInsets.only(top: 12.h, left: 16.w, right: 16.w),
+        padding: EdgeInsets.only(left: 16.w, right: 16.w, bottom: 4.h),
         child: GestureDetector(
           onTap: onTap,
           child: Container(
@@ -68,27 +68,39 @@ class SearchBar extends StatelessWidget {
                     ],
                   );
                 }),
-                Obx(() {
-                  final isListening = controller.isListening;
-                  return GestureDetector(
-                    onTap: onVoiceTap ?? controller.toggleVoiceRecognition,
-                    child: Container(
-                      padding: EdgeInsets.all(8.w),
-                      decoration: BoxDecoration(
-                        color: isListening
-                            ? AppColors.primary.withValues(alpha: 0.10)
-                            : Colors.transparent,
-                        borderRadius: BorderRadius.circular(6.r),
-                      ),
-                      child: Image.asset(
-                        ImagePath.voiceIcon,
-                        height: 16.w,
-                        width: 16.w,
-                        color: isListening ? AppColors.primary : Colors.grey,
-                      ),
+                Row(
+                  children: [
+                    Container(
+                      width: 1.w,
+                      height: 24.h,
+                      color: Colors.grey.withValues(alpha: 0.3),
+                      margin: EdgeInsets.symmetric(horizontal: 8.w),
                     ),
-                  );
-                }),
+                    Obx(() {
+                      final isListening = controller.isListening;
+                      return GestureDetector(
+                        onTap: onVoiceTap ?? controller.toggleVoiceRecognition,
+                        child: Container(
+                          padding: EdgeInsets.all(8.w),
+                          decoration: BoxDecoration(
+                            color: isListening
+                                ? AppColors.primary.withValues(alpha: 0.10)
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(6.r),
+                          ),
+                          child: Image.asset(
+                            ImagePath.voiceIcon,
+                            height: 16.w,
+                            width: 16.w,
+                            color: isListening
+                                ? AppColors.primary
+                                : Colors.grey,
+                          ),
+                        ),
+                      );
+                    }),
+                  ],
+                ),
               ],
             ),
           ),

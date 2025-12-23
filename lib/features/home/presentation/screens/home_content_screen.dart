@@ -72,7 +72,7 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                   parent: ClampingScrollPhysics(),
                 ),
                 slivers: [
-                  const SliverToBoxAdapter(child: HomeAppBar()),
+                  SliverToBoxAdapter(child: const HomeAppBar()),
                   Obx(() {
                     final bool hasIndicator =
                         PrescriptionStatusIndicator.hasVisibleStatus(

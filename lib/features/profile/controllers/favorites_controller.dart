@@ -112,17 +112,53 @@ class FavoritesController extends GetxController {
   }
 
   void _showFavoritePopup(String message, {required bool isAdded}) {
+    // Styled floating snackbar with rounded corners and a small icon pill
+    // Use original green/red translucent background that was used previously
+    final bgColor = isAdded ? Colors.green.shade100 : Colors.red.shade100;
+    final iconColor = isAdded ? Colors.green : Colors.red;
+
     Get.rawSnackbar(
-      messageText: Text(
-        message,
-        style: getTextStyle(color: Colors.black, font: CustomFonts.obviously),
-      ),
+      snackStyle: SnackStyle.FLOATING,
+      borderRadius: 12.0,
+      margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      backgroundColor: bgColor,
       snackPosition: SnackPosition.TOP,
-      backgroundColor: isAdded ? Colors.green.shade100 : Colors.red.shade100,
-      icon: Icon(Icons.favorite, color: isAdded ? Colors.green : Colors.red),
       duration: const Duration(seconds: 2),
-      margin: const EdgeInsets.all(12),
       shouldIconPulse: false,
+      // Custom message row: white circular icon pill + text
+      messageText: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: .95),
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: Colors.white.withValues(alpha: .6),
+                width: 0.5,
+              ),
+            ),
+            child: Center(
+              child: Icon(Icons.favorite, size: 20, color: iconColor),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              message,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: getTextStyle(
+                font: CustomFonts.obviously,
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: Colors.black87,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 

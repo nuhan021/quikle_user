@@ -5,6 +5,7 @@ import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums/address_type_enums.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 import 'package:quikle_user/features/home/presentation/widgets/address/adress_sheet_widget.dart';
+import 'package:quikle_user/core/utils/constants/image_path.dart';
 import 'package:quikle_user/features/profile/controllers/address_controller.dart';
 import 'package:quikle_user/features/profile/presentation/screens/add_address_screen.dart';
 
@@ -40,49 +41,45 @@ class AddressWidget extends StatelessWidget {
           },
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 4.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                const SizedBox(height: 6.0),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      defaultAddress != null
-                          ? '${_getAddressTypeLabel(defaultAddress.type)} - ${defaultAddress.name}'
-                          : 'No Address',
-                      style: getTextStyle(
-                        font: CustomFonts.inter,
-                        color: defaultAddress != null
-                            ? AppColors.ebonyBlack
-                            : AppColors.featherGrey,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    Icon(
-                      Icons.keyboard_arrow_down,
-                      size: 18,
-                      color: AppColors.featherGrey,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 2.0),
+                // Small icon for address type (use asset icons)
+                if (defaultAddress != null) ...[
+                  Image.asset(
+                    defaultAddress.type == AddressType.home
+                        ? ImagePath.homeAddressIcon
+                        : defaultAddress.type == AddressType.office
+                        ? ImagePath.officeAddressIcon
+                        : ImagePath.addressIcon,
+                    width: 18,
+                    height: 18,
+                  ),
+                  const SizedBox(width: 6),
+                ],
+
+                // Type label + name (compact)
                 Text(
                   defaultAddress != null
-                      ? _formatAddress(
-                          defaultAddress.address,
-                          defaultAddress.city,
-                        )
-                      : 'Tap to add delivery address',
+                      ? '${_getAddressTypeLabel(defaultAddress.type)} - ${defaultAddress.name}'
+                      : 'No Address',
                   style: getTextStyle(
                     font: CustomFonts.inter,
-                    color: AppColors.featherGrey,
-                    fontSize: 12,
+                    color: defaultAddress != null
+                        ? AppColors.ebonyBlack
+                        : AppColors.featherGrey,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
+                ),
+
+                const SizedBox(width: 4),
+                Icon(
+                  Icons.keyboard_arrow_down,
+                  size: 18,
+                  color: AppColors.featherGrey,
                 ),
               ],
             ),
@@ -101,16 +98,5 @@ class AddressWidget extends StatelessWidget {
       case AddressType.other:
         return 'Other';
     }
-  }
-
-  String _formatAddress(String address, String city) {
-    final parts = address.split(',');
-
-    // Take the first two comma-separated parts
-    final usefulParts = parts.take(2).map((e) => e.trim()).toList();
-
-    final shortAddress = usefulParts.join(', ');
-
-    return '$shortAddress, $city';
   }
 }

@@ -47,6 +47,7 @@ class OrderTrackingScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       body: SafeArea(
+        bottom: false,
         child: Stack(
           children: [
             Column(

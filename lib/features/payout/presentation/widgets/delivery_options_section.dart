@@ -59,23 +59,31 @@ class DeliveryOptionsSection extends StatelessWidget {
                               border: Border.all(color: Colors.black),
                               borderRadius: BorderRadius.circular(6.r),
                             ),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: _buildTableCell(
-                                    option: payoutController.deliveryOptions[0],
-                                    controller: payoutController,
-                                    showRightBorder: true,
+                            // Clip the inner row to the same radius so any selected
+                            // background (yellow) cannot overflow the rounded
+                            // border of the container.
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(6.r),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: _buildTableCell(
+                                      option:
+                                          payoutController.deliveryOptions[0],
+                                      controller: payoutController,
+                                      showRightBorder: true,
+                                    ),
                                   ),
-                                ),
-                                Expanded(
-                                  child: _buildTableCell(
-                                    option: payoutController.deliveryOptions[1],
-                                    controller: payoutController,
-                                    showRightBorder: false,
+                                  Expanded(
+                                    child: _buildTableCell(
+                                      option:
+                                          payoutController.deliveryOptions[1],
+                                      controller: payoutController,
+                                      showRightBorder: false,
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                           SizedBox(height: 12.h),
@@ -177,6 +185,17 @@ class DeliveryOptionsSection extends StatelessWidget {
                 ? const BorderSide(color: Colors.black)
                 : BorderSide.none,
           ),
+          // Round only the outer corners of each cell so the selected
+          // background color is clipped inside the parent's rounded box.
+          borderRadius: showRightBorder
+              ? BorderRadius.only(
+                  topLeft: Radius.circular(6.r),
+                  bottomLeft: Radius.circular(6.r),
+                )
+              : BorderRadius.only(
+                  topRight: Radius.circular(6.r),
+                  bottomRight: Radius.circular(6.r),
+                ),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,

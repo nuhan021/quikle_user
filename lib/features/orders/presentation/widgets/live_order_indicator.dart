@@ -14,7 +14,7 @@ class LiveOrderIndicator extends StatefulWidget {
 
 class _LiveOrderIndicatorState extends State<LiveOrderIndicator>
     with TickerProviderStateMixin {
-  static const double _boundaryPadding = 16.0;
+  static const double _boundaryPadding = 8.0;
   final double _outerSize = 80.w;
 
   late AnimationController _scaleController;
@@ -71,7 +71,7 @@ class _LiveOrderIndicatorState extends State<LiveOrderIndicator>
 
           return Positioned(
             left: _boundaryPadding,
-            bottom: widget.bottomInset + 4.h,
+            bottom: widget.bottomInset + _boundaryPadding,
             child: AnimatedBuilder(
               animation: Listenable.merge([_scaleAnimation, _pulseAnimation]),
               builder: (context, _) {

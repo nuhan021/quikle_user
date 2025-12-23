@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:quikle_user/core/common/styles/global_text_style.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 import 'package:quikle_user/features/categories/data/models/subcategory_model.dart';
 import 'package:quikle_user/features/home/data/models/category_model.dart';
+import 'package:quikle_user/features/categories/presentation/widgets/filter_bottom_sheet_enhanced.dart';
 
 class PopularItemsSection extends StatelessWidget {
   /// Fixed height for header delegate: title + horizontal list
@@ -15,6 +17,7 @@ class PopularItemsSection extends StatelessWidget {
   final String title;
   final CategoryModel? category;
   final SubcategoryModel? selectedSubcategory;
+  final dynamic controller; // Controller for filter functionality (optional)
 
   const PopularItemsSection({
     super.key,
@@ -23,6 +26,7 @@ class PopularItemsSection extends StatelessWidget {
     this.title = 'Popular Items',
     this.category,
     this.selectedSubcategory,
+    this.controller, // Make it optional
   });
 
   @override
@@ -39,20 +43,26 @@ class PopularItemsSection extends StatelessWidget {
         children: [
           Container(
             width: double.infinity,
-            padding: EdgeInsets.symmetric(vertical: 8.h),
+            padding: EdgeInsets.symmetric(vertical: 4.h),
             decoration: const BoxDecoration(
               border: Border(
                 bottom: BorderSide(width: 3, color: Color(0xFFEDEDED)),
               ),
             ),
-            child: Text(
-              title,
-              style: getTextStyle(
-                font: CustomFonts.obviously,
-                fontSize: 14.sp,
-                fontWeight: FontWeight.w500,
-                color: AppColors.ebonyBlack,
-              ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  title,
+                  style: getTextStyle(
+                    font: CustomFonts.obviously,
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.ebonyBlack,
+                  ),
+                ),
+                if (controller != null) _buildFilterButton(),
+              ],
             ),
           ),
           SizedBox(height: 8.h),
@@ -186,6 +196,88 @@ class PopularItemsSection extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildFilterButton() {
+    // Return empty widget if controller is not provided
+    if (controller == null) {
+      return const SizedBox.shrink();
+    }
+
+    final hasActiveFilters =
+        controller.selectedFilters.isNotEmpty ||
+        controller.selectedSortOption.value != 'relevance';
+    final activeCount = controller.selectedFilters.length;
+
+    return GestureDetector(
+      onTap: () => _showFilterSheet(),
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+        decoration: BoxDecoration(
+          color: hasActiveFilters
+              ? AppColors.beakYellow.withOpacity(0.1)
+              : Colors.white,
+          borderRadius: BorderRadius.circular(8.r),
+          border: Border.all(
+            color: hasActiveFilters
+                ? AppColors.beakYellow
+                : const Color(0xFFE0E0E0),
+            width: 1.5,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.filter_list_rounded,
+              size: 18.sp,
+              color: hasActiveFilters
+                  ? AppColors.ebonyBlack
+                  : const Color(0xFF666666),
+            ),
+            SizedBox(width: 4.w),
+            Text(
+              'Filter',
+              style: getTextStyle(
+                font: CustomFonts.inter,
+                fontSize: 13.sp,
+                fontWeight: FontWeight.w500,
+                color: hasActiveFilters
+                    ? AppColors.ebonyBlack
+                    : const Color(0xFF666666),
+              ),
+            ),
+            if (activeCount > 0) ...[
+              SizedBox(width: 4.w),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+                decoration: BoxDecoration(
+                  color: AppColors.beakYellow,
+                  borderRadius: BorderRadius.circular(10.r),
+                ),
+                child: Text(
+                  activeCount.toString(),
+                  style: getTextStyle(
+                    font: CustomFonts.inter,
+                    fontSize: 10.sp,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showFilterSheet() {
+    Get.bottomSheet(
+      FilterBottomSheetEnhanced(controller: controller),
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
     );
   }
 }

@@ -19,6 +19,82 @@ class BriefOrderCard extends StatelessWidget {
     this.onTrack,
   });
 
+  /// (removed) previously generated combined name helper
+
+  String _buildMainTitle() {
+    if (order.items.isEmpty) return order.orderId;
+    final t = order.items.first.product.title.trim();
+    return t.isNotEmpty ? t : order.orderId;
+  }
+
+  String _buildSubtitle() {
+    if (order.items.isEmpty) return '';
+    final first = order.items.first;
+    final qty = first.quantityDisplay;
+    if (order.items.length == 1) {
+      final price = first.product.price;
+      return '$qty • ${price.isNotEmpty ? price : ''}'.trim();
+    }
+    return '$qty • +${order.items.length - 1} more';
+  }
+
+  Widget _buildThumbnail() {
+    if (order.items.isEmpty) {
+      return Container(
+        width: 60.w,
+        height: 60.w,
+        decoration: BoxDecoration(
+          color: Colors.grey.shade200,
+          borderRadius: BorderRadius.circular(8.r),
+        ),
+        child: Icon(
+          Icons.shopping_bag_outlined,
+          color: Colors.grey.shade500,
+          size: 28.sp,
+        ),
+      );
+    }
+
+    final path = order.items.first.product.imagePath;
+    if (path.isEmpty) {
+      return Container(
+        width: 60.w,
+        height: 60.w,
+        decoration: BoxDecoration(
+          color: Colors.grey.shade100,
+          borderRadius: BorderRadius.circular(8.r),
+        ),
+        child: Icon(
+          Icons.image_outlined,
+          color: Colors.grey.shade400,
+          size: 26.sp,
+        ),
+      );
+    }
+
+    final widget = path.startsWith('http')
+        ? Image.network(
+            path,
+            width: 60.w,
+            height: 60.w,
+            fit: BoxFit.cover,
+            errorBuilder: (c, e, s) => Container(
+              color: Colors.grey.shade100,
+              child: Icon(
+                Icons.broken_image,
+                color: Colors.grey.shade400,
+                size: 26.sp,
+              ),
+            ),
+          )
+        : Image.asset(path, width: 60.w, height: 60.w, fit: BoxFit.cover);
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(8.r),
+      child: SizedBox(width: 60.w, height: 60.w, child: widget),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -43,24 +119,77 @@ class BriefOrderCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                // Left: thumbnail + main item info
                 Expanded(
+                  child: Row(
+                    children: [
+                      _buildThumbnail(),
+                      SizedBox(width: 12.w),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              _buildMainTitle(),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: getTextStyle(
+                                font: CustomFonts.obviously,
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.ebonyBlack,
+                              ),
+                            ),
+                            SizedBox(height: 6.h),
+                            Text(
+                              _buildSubtitle(),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: getTextStyle(
+                                font: CustomFonts.inter,
+                                fontSize: 11.sp,
+                                fontWeight: FontWeight.w400,
+                                color: const Color(0xFF7C7C7C),
+                              ),
+                            ),
+                            SizedBox(height: 4.h),
+                            Text(
+                              DateFormat(
+                                "MMM d, yyyy 'at' h:mm a",
+                              ).format(order.orderDate),
+                              style: getTextStyle(
+                                font: CustomFonts.inter,
+                                fontSize: 10.sp,
+                                fontWeight: FontWeight.w400,
+                                color: const Color(0xFF9A9A9A),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(width: 8.w),
+                // Right: price and item count with fixed width to avoid overlap
+                SizedBox(
+                  width: 96.w,
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
-                        '${order.orderId}',
+                        '₹${order.total.toStringAsFixed(2)}',
                         style: getTextStyle(
                           font: CustomFonts.obviously,
                           fontSize: 14.sp,
-                          fontWeight: FontWeight.w500,
+                          fontWeight: FontWeight.w600,
                           color: AppColors.ebonyBlack,
                         ),
                       ),
                       SizedBox(height: 4.h),
                       Text(
-                        DateFormat(
-                          'MMM d, yyyy • h:mm a',
-                        ).format(order.orderDate),
+                        '${order.items.length} item${order.items.length != 1 ? 's' : ''}',
                         style: getTextStyle(
                           font: CustomFonts.inter,
                           fontSize: 10.sp,
@@ -71,30 +200,7 @@ class BriefOrderCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      '₹${order.total.toStringAsFixed(2)}',
-                      style: getTextStyle(
-                        font: CustomFonts.obviously,
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.ebonyBlack,
-                      ),
-                    ),
-                    SizedBox(height: 4.h),
-                    Text(
-                      '${order.items.length} item${order.items.length != 1 ? 's' : ''}',
-                      style: getTextStyle(
-                        font: CustomFonts.inter,
-                        fontSize: 10.sp,
-                        fontWeight: FontWeight.w400,
-                        color: const Color(0xFF7C7C7C),
-                      ),
-                    ),
-                  ],
-                ),
+                // (removed duplicate price column)
               ],
             ),
             SizedBox(height: 8.h),
