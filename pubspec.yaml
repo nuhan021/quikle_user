@@ -39,6 +39,7 @@ dependencies:
   logger: ^2.6.1
   url_launcher: ^6.3.2
   flutter_screenutil: ^5.9.3
+  keyboard_actions: ^4.2.1
   flutter_easyloading: ^3.0.5
   google_fonts: ^6.3.1
   shared_preferences: ^2.5.3

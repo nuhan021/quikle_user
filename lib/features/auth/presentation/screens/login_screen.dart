@@ -215,21 +215,30 @@ class LoginScreen extends StatelessWidget {
             ),
             child: Row(
               children: [
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 12.w),
+                Container(
+                  width: 45.w,
+                  padding: EdgeInsets.only(left: 8.w),
+                  alignment: Alignment.centerLeft,
                   child: Text(
                     '+91',
                     style: getTextStyle(
                       font: CustomFonts.inter,
                       color: AppColors.eggshellWhite,
-                      fontSize: 16.sp,
+                      fontSize: 14.sp,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
                 ),
+
+                Container(
+                  width: 1,
+                  height: 28.h,
+                  color: const Color(0xFF7C7C7C),
+                ),
+
                 Expanded(
                   child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 12.w),
+                    padding: EdgeInsets.only(left: 8.w),
                     child: TextField(
                       controller: controller.phoneController,
                       keyboardType: TextInputType.number,
@@ -245,6 +254,7 @@ class LoginScreen extends StatelessWidget {
                       style: getTextStyle(
                         font: CustomFonts.inter,
                         color: AppColors.eggshellWhite,
+                        fontSize: 14.sp,
                         fontWeight: FontWeight.w500,
                       ),
                       cursorColor: const Color(0xFFF8F8F8),
@@ -257,7 +267,9 @@ class LoginScreen extends StatelessWidget {
                         hintStyle: getTextStyle(
                           font: CustomFonts.inter,
                           color: AppColors.featherGrey,
+                          fontSize: 14.sp,
                         ),
+                        contentPadding: EdgeInsets.symmetric(vertical: 14.h),
                       ),
                     ),
                   ),
@@ -324,45 +336,6 @@ class LoginScreen extends StatelessWidget {
           ),
           SizedBox(height: 20.h),
         ],
-      ),
-    );
-  }
-
-  Widget _styledTextField({
-    required TextEditingController controller,
-    required String hintText,
-  }) {
-    return Container(
-      width: double.infinity,
-      height: 52.h,
-      padding: EdgeInsets.symmetric(horizontal: 16.w),
-      decoration: ShapeDecoration(
-        shape: RoundedRectangleBorder(
-          side: const BorderSide(width: 1, color: Color(0xFF7C7C7C)),
-          borderRadius: BorderRadius.circular(8.r),
-        ),
-      ),
-      alignment: Alignment.centerLeft,
-      child: TextField(
-        controller: controller,
-        textInputAction: TextInputAction.done,
-        onSubmitted: (_) => FocusManager.instance.primaryFocus?.unfocus(),
-        enableSuggestions: false,
-        autocorrect: false,
-        style: getTextStyle(
-          font: CustomFonts.inter,
-          color: AppColors.eggshellWhite,
-        ),
-        cursorColor: const Color(0xFFF8F8F8),
-        decoration: InputDecoration(
-          isCollapsed: true,
-          border: InputBorder.none,
-          hintText: hintText,
-          hintStyle: getTextStyle(
-            font: CustomFonts.inter,
-            color: AppColors.featherGrey,
-          ),
-        ),
       ),
     );
   }

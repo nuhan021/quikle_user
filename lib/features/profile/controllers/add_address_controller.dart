@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:quikle_user/features/profile/data/services/address_service.dart';
 import 'package:quikle_user/features/profile/data/models/shipping_address_model.dart';
 import 'package:quikle_user/features/profile/controllers/address_controller.dart';
@@ -149,11 +148,23 @@ class AddAddressController extends GetxController {
     try {
       isLoading.value = true;
 
-      // Check and request location permission
-      var permission = await Permission.location.status;
-      if (permission.isDenied) {
-        permission = await Permission.location.request();
-        if (permission.isDenied) {
+      // Check if location services are enabled first
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        Get.snackbar(
+          'Location Service Disabled',
+          'Please enable location services to continue',
+          snackPosition: SnackPosition.BOTTOM,
+        );
+        return false;
+      }
+
+      // Check and request location permission using Geolocator
+      LocationPermission permission = await Geolocator.checkPermission();
+
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
           Get.snackbar(
             'Permission Denied',
             'Location permission is required to use current location',
@@ -163,26 +174,15 @@ class AddAddressController extends GetxController {
         }
       }
 
-      if (permission.isPermanentlyDenied) {
+      if (permission == LocationPermission.deniedForever) {
         Get.snackbar(
           'Permission Required',
           'Please enable location permission in app settings',
           snackPosition: SnackPosition.BOTTOM,
           mainButton: TextButton(
-            onPressed: () => openAppSettings(),
+            onPressed: () => Geolocator.openLocationSettings(),
             child: const Text('Settings'),
           ),
-        );
-        return false;
-      }
-
-      // Check if location services are enabled
-      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) {
-        Get.snackbar(
-          'Location Service Disabled',
-          'Please enable location services to continue',
-          snackPosition: SnackPosition.BOTTOM,
         );
         return false;
       }
@@ -245,13 +245,6 @@ class AddAddressController extends GetxController {
         if (place.postalCode != null && place.postalCode!.isNotEmpty) {
           zipCodeController.text = place.postalCode!;
         }
-
-        Get.snackbar(
-          'Success',
-          'Location detected successfully',
-          snackPosition: SnackPosition.BOTTOM,
-          duration: const Duration(seconds: 2),
-        );
 
         return true;
       } else {

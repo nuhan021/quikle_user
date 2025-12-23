@@ -19,11 +19,13 @@ class FilterBottomSheetEnhanced extends StatefulWidget {
 
 class _FilterBottomSheetEnhancedState extends State<FilterBottomSheetEnhanced> {
   late List<String> tempSelectedFilters;
+  late String tempSelectedSort;
 
   @override
   void initState() {
     super.initState();
     tempSelectedFilters = List.from(widget.controller.selectedFilters);
+    tempSelectedSort = widget.controller.selectedSortOption.value;
   }
 
   @override
@@ -97,9 +99,33 @@ class _FilterBottomSheetEnhancedState extends State<FilterBottomSheetEnhanced> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Quick Filters (price ranges)
-                    _buildQuickFilters(),
+                    // Sort Section
+                    Text(
+                      'Sort By',
+                      style: getTextStyle(
+                        font: CustomFonts.inter,
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.ebonyBlack,
+                      ),
+                    ),
+                    SizedBox(height: 12.h),
+                    _buildSortOptions(),
+                    SizedBox(height: 24.h),
+                    Divider(height: 1.h, color: const Color(0xFFE0E0E0)),
                     SizedBox(height: 16.h),
+                    // Price Range Section
+                    Text(
+                      'Price Range',
+                      style: getTextStyle(
+                        font: CustomFonts.inter,
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.ebonyBlack,
+                      ),
+                    ),
+                    SizedBox(height: 12.h),
+                    _buildQuickFilters(),
                   ],
                 ),
               ),
@@ -174,6 +200,60 @@ class _FilterBottomSheetEnhancedState extends State<FilterBottomSheetEnhanced> {
   }
 
   // Section titles removed per UX request (no visible "Price Range" header)
+
+  Widget _buildSortOptions() {
+    return Wrap(
+      spacing: 8.w,
+      runSpacing: 8.h,
+      children: SortOption.options.map((option) {
+        final isSelected = tempSelectedSort == option.id;
+        return GestureDetector(
+          onTap: () {
+            setState(() {
+              tempSelectedSort = option.id;
+            });
+          },
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
+            decoration: BoxDecoration(
+              color: isSelected
+                  ? AppColors.beakYellow.withOpacity(0.2)
+                  : const Color(0xFFF5F5F5),
+              borderRadius: BorderRadius.circular(12.r),
+              border: Border.all(
+                color: isSelected ? AppColors.beakYellow : Colors.transparent,
+                width: 1.5,
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  option.label,
+                  style: getTextStyle(
+                    font: CustomFonts.inter,
+                    fontSize: 14.sp,
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                    color: isSelected
+                        ? AppColors.ebonyBlack
+                        : const Color(0xFF666666),
+                  ),
+                ),
+                if (isSelected) ...[
+                  SizedBox(width: 4.w),
+                  Icon(
+                    Icons.check_circle,
+                    size: 16.sp,
+                    color: AppColors.beakYellow,
+                  ),
+                ],
+              ],
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
 
   Widget _buildQuickFilters() {
     // Render each quick filter on its own full-width row (one per row)
@@ -257,12 +337,15 @@ class _FilterBottomSheetEnhancedState extends State<FilterBottomSheetEnhanced> {
   void _resetFilters() {
     setState(() {
       tempSelectedFilters.clear();
+      tempSelectedSort = 'relevance';
     });
-    widget.controller.onFilterChanged([]);
   }
 
   void _applyFilters() {
     widget.controller.onFilterChanged(tempSelectedFilters);
+    if (tempSelectedSort != widget.controller.selectedSortOption.value) {
+      widget.controller.onSortChanged(tempSelectedSort);
+    }
     Get.back();
   }
 }

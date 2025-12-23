@@ -42,7 +42,7 @@ class OrderInvoiceScreen extends StatelessWidget {
                       left: 16.w,
                       right: 16.w,
                       top: 16.h,
-                      bottom: MediaQuery.of(context).padding.bottom,
+                      bottom: 0,
                     ),
                     child: SingleChildScrollView(
                       // physics: const ClampingScrollPhysics(),

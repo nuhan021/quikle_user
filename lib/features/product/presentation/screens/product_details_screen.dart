@@ -9,7 +9,6 @@ import 'package:quikle_user/core/common/widgets/custom_navbar.dart';
 import 'package:quikle_user/core/common/widgets/floating_cart_button.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/navigation/navbar_navigation_helper.dart';
-import 'package:quikle_user/features/cart/presentation/widgets/you_may_like_section.dart';
 import 'package:quikle_user/features/home/data/models/product_model.dart';
 import '../../controllers/product_controller.dart';
 import '../widgets/product_image_widget.dart';
@@ -31,6 +30,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen>
     with TickerProviderStateMixin {
   late AnimationController _navController;
   final GlobalKey _navKey = GlobalKey();
+  final GlobalKey _imageKey = GlobalKey();
+  final GlobalKey _addToCartKey = GlobalKey();
   double _navBarHeight = 0.0;
   late final ProductController controller;
 
@@ -143,14 +144,21 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen>
                                             CrossAxisAlignment.start,
                                         children: [
                                           if (controller.product != null)
-                                            ProductImageWidget(
-                                              imagePath:
-                                                  controller.product!.imagePath,
-                                              isFavorite: controller
-                                                  .product!
-                                                  .isFavorite,
-                                              onFavoriteToggle:
-                                                  controller.onFavoriteToggle,
+                                            // wrap image with a key so we can
+                                            // calculate its position for the
+                                            // cart animation
+                                            Container(
+                                              key: _imageKey,
+                                              child: ProductImageWidget(
+                                                imagePath: controller
+                                                    .product!
+                                                    .imagePath,
+                                                isFavorite: controller
+                                                    .product!
+                                                    .isFavorite,
+                                                onFavoriteToggle:
+                                                    controller.onFavoriteToggle,
+                                              ),
                                             ),
                                           SizedBox(height: 24.h),
                                           if (controller.product != null)
@@ -267,6 +275,12 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen>
                       ? (keyboardInset + systemNavHeight)
                       : (_navController.value *
                             (_navBarHeight + systemNavHeight));
+                  // Hide the floating cart while the keyboard is open on
+                  // this page to avoid it jumping up and breaking the UI.
+                  if (isKeyboardOpen) {
+                    return const SizedBox.shrink();
+                  }
+
                   return FloatingCartButton(bottomInset: inset);
                 },
               ),
@@ -284,7 +298,44 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen>
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton.icon(
-        onPressed: enabled ? onPressed : null,
+        key: _addToCartKey,
+        onPressed: enabled
+            ? () {
+                // trigger cart animation from the Add To Cart button on this
+                // page (product details should originate from the button)
+                try {
+                  final sourceBox =
+                      _addToCartKey.currentContext?.findRenderObject()
+                          as RenderBox?;
+                  if (sourceBox != null && controller.product != null) {
+                    final topLeft = sourceBox.localToGlobal(Offset.zero);
+                    final center = Offset(
+                      topLeft.dx + sourceBox.size.width / 2,
+                      topLeft.dy + sourceBox.size.height / 2,
+                    );
+                    final startSize = sourceBox.size.shortestSide.clamp(
+                      28.0,
+                      80.0,
+                    );
+                    try {
+                      final animController =
+                          Get.find<CartAnimationController>();
+                      animController.addCartAnimation(
+                        imagePath: controller.product!.imagePath,
+                        startPosition: center,
+                        startSize: startSize,
+                        fallbackTarget: Offset(
+                          MediaQuery.of(context).size.width - 48.w,
+                          MediaQuery.of(context).size.height - 120.h,
+                        ),
+                      );
+                    } catch (e) {}
+                  }
+                } catch (e) {}
+
+                if (onPressed != null) onPressed();
+              }
+            : null,
         icon: Icon(
           Icons.shopping_bag_outlined,
           color: Colors.white,

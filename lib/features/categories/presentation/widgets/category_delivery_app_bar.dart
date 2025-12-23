@@ -38,17 +38,6 @@ class CategoryDeliveryAppBar extends StatelessWidget
     }
   }
 
-  String _formatAddress(String address, String city) {
-    final parts = address.split(',');
-
-    // Take the first two comma-separated parts
-    final usefulParts = parts.take(2).map((e) => e.trim()).toList();
-
-    final shortAddress = usefulParts.join(', ');
-
-    return '$shortAddress, $city';
-  }
-
   @override
   Widget build(BuildContext context) {
     final String displayTitle = title ?? (reactiveTitle?.value ?? '');
@@ -167,21 +156,11 @@ class CategoryDeliveryAppBar extends StatelessWidget
                                   ),
                                 ],
                               ),
-                              Text(
-                                defaultAddress != null
-                                    ? _formatAddress(
-                                        defaultAddress.address,
-                                        defaultAddress.city,
-                                      )
-                                    : 'Tap to select delivery address',
-                                style: getTextStyle(
-                                  font: CustomFonts.inter,
-                                  color: AppColors.featherGrey,
-                                  fontSize: 10.sp,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
+                              // Only show the address type and name here to avoid
+                              // taking too much horizontal space which can
+                              // truncate the category title. The full address
+                              // is not necessary in the category header.
+                              // (Previously a second line showed formatted address.)
                             ],
                           ),
                         ),

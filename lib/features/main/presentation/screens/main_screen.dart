@@ -99,13 +99,10 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
           child: Stack(
             children: [
               IndexedStack(index: _currentIndex, children: _screens),
-
-              // ✅ Fixed Bottom Navbar
               Positioned(
                 left: 0,
                 right: 0,
-                // keep the nav bar above any system bottom inset (navigation bar / gesture area)
-                bottom: MediaQuery.of(context).viewPadding.bottom,
+                bottom: 0,
                 child: AnimatedSlide(
                   duration: const Duration(milliseconds: 180),
                   offset: const Offset(0, 0),
@@ -127,17 +124,12 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                 animation: _navController,
                 builder: (context, _) {
                   final inset = (_navController.value * _navBarHeight);
-                  // account for system bottom areas (navigation bar, gesture area) and keyboard
                   final systemInset = MediaQuery.of(context).viewPadding.bottom;
-                  final keyboardInset = MediaQuery.of(
-                    context,
-                  ).viewInsets.bottom;
-                  // take the larger of system inset and keyboard inset so we don't double-count
+
+                  // When navbar is fully visible (navController.value == 1), use only navbar height
+                  // When navbar is hidden (navController.value == 0), add system inset
                   final bottomInset =
-                      inset +
-                      (systemInset > keyboardInset
-                          ? systemInset
-                          : keyboardInset);
+                      inset + (systemInset * (1 - _navController.value));
                   return FloatingCartButton(bottomInset: bottomInset);
                 },
               ),
@@ -147,14 +139,11 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                 builder: (context, _) {
                   final inset = (_navController.value * _navBarHeight);
                   final systemInset = MediaQuery.of(context).viewPadding.bottom;
-                  final keyboardInset = MediaQuery.of(
-                    context,
-                  ).viewInsets.bottom;
+
+                  // When navbar is fully visible (navController.value == 1), use only navbar height
+                  // When navbar is hidden (navController.value == 0), add system inset
                   final bottomInset =
-                      inset +
-                      (systemInset > keyboardInset
-                          ? systemInset
-                          : keyboardInset);
+                      inset + (systemInset * (1 - _navController.value));
                   return LiveOrderIndicator(bottomInset: bottomInset);
                 },
               ),
