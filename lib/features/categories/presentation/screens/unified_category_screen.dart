@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -662,10 +663,10 @@ class _UnifiedHeaderDelegate extends SliverPersistentHeaderDelegate {
   });
 
   @override
-  double get minExtent => totalHeight;
+  double get minExtent => totalHeight + 1.0;
 
   @override
-  double get maxExtent => totalHeight;
+  double get maxExtent => totalHeight + 1.0;
 
   @override
   Widget build(
@@ -673,14 +674,42 @@ class _UnifiedHeaderDelegate extends SliverPersistentHeaderDelegate {
     double shrinkOffset,
     bool overlapsContent,
   ) {
-    return SizedBox(
-      height: totalHeight,
-      child: Container(
-        color: AppColors.homeGrey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [searchSection, popularSection],
+    // Base child (the actual header content)
+    final Widget child = SizedBox(
+      height: totalHeight + 1.0,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [searchSection, popularSection],
+      ),
+    );
+
+    // Determine whether to show elevation when content is scrolled under
+    final bool showElevation = shrinkOffset > 0 || overlapsContent;
+
+    // Apply a glassy backdrop with blur + translucent background
+    return ClipRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+        child: Container(
+          color: AppColors.homeGrey.withValues(alpha: .6),
+          child: Material(
+            color: Colors.transparent,
+            elevation: showElevation ? 4.0 : 0.0,
+            shadowColor: Colors.black.withValues(alpha: .08),
+            child: Container(
+              decoration: BoxDecoration(
+                color: AppColors.homeGrey.withValues(alpha: .6),
+                border: Border(
+                  bottom: BorderSide(
+                    color: Colors.white.withValues(alpha: .12),
+                    width: 1,
+                  ),
+                ),
+              ),
+              child: child,
+            ),
+          ),
         ),
       ),
     );

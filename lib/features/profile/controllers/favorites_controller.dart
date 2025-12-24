@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:quikle_user/core/common/styles/global_text_style.dart';
@@ -112,8 +113,6 @@ class FavoritesController extends GetxController {
   }
 
   void _showFavoritePopup(String message, {required bool isAdded}) {
-    // Styled floating snackbar with rounded corners and a small icon pill
-    // Use original green/red translucent background that was used previously
     final bgColor = isAdded ? Colors.green.shade100 : Colors.red.shade100;
     final iconColor = isAdded ? Colors.green : Colors.red;
 
@@ -121,43 +120,60 @@ class FavoritesController extends GetxController {
       snackStyle: SnackStyle.FLOATING,
       borderRadius: 12.0,
       margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      backgroundColor: bgColor,
+      backgroundColor: Colors.transparent,
       snackPosition: SnackPosition.TOP,
       duration: const Duration(seconds: 2),
       shouldIconPulse: false,
-      // Custom message row: white circular icon pill + text
-      messageText: Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
+      // messageText contains a glassy BackdropFilter container
+      messageText: ClipRRect(
+        borderRadius: BorderRadius.circular(12.0),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: .95),
-              shape: BoxShape.circle,
+              color: bgColor.withOpacity(0.85),
+              borderRadius: BorderRadius.circular(12.0),
               border: Border.all(
-                color: Colors.white.withValues(alpha: .6),
+                color: Colors.white.withOpacity(0.6),
                 width: 0.5,
               ),
             ),
-            child: Center(
-              child: Icon(Icons.favorite, size: 20, color: iconColor),
+            child: Row(
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(.95),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.white.withOpacity(.6),
+                      width: 0.5,
+                    ),
+                  ),
+                  child: Center(
+                    child: Icon(Icons.favorite, size: 20, color: iconColor),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    message,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: getTextStyle(
+                      font: CustomFonts.obviously,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              message,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: getTextStyle(
-                font: CustomFonts.obviously,
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: Colors.black87,
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
