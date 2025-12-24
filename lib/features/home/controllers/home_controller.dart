@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:quikle_user/core/services/suggested_products_service.dart';
 import 'package:quikle_user/features/home/data/services/home_services.dart';
 import 'package:quikle_user/features/cart/controllers/cart_controller.dart';
 import 'package:quikle_user/features/profile/controllers/favorites_controller.dart';
@@ -48,7 +49,6 @@ class HomeController extends GetxController with VoiceSearchMixin {
     _loadInitialData();
   }
 
-  //Call the saveFCMToken from HomeService here when needed
   Future<void> saveFCMToken() async {
     try {
       await _homeService.saveFCMToken();
@@ -61,6 +61,9 @@ class HomeController extends GetxController with VoiceSearchMixin {
     _isLoading.value = true;
     try {
       _categories.value = await _homeService.fetchCategories();
+      // Preload suggested products
+      final suggestedProductsService = Get.put(SuggestedProductsService());
+      await suggestedProductsService.preloadSuggestedProducts();
       // Sort categories to ensure All, Food, Groceries, Medicine are first
       List<CategoryModel> sortedCategories = [];
       sortedCategories.addAll(_categories.where((c) => c.title == 'All'));

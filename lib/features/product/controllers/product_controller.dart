@@ -11,6 +11,7 @@ import '../data/models/review_model.dart';
 import '../data/models/question_model.dart';
 import '../data/services/product_service.dart';
 import '../data/repositories/review_repository.dart';
+import 'package:quikle_user/features/search/controllers/search_controller.dart';
 
 class ProductController extends GetxController {
   final ProductService _productService = ProductService();
@@ -61,6 +62,12 @@ class ProductController extends GetxController {
 
     try {
       _product.value = productModel;
+
+      // Save search tags from product name when viewing details
+      final searchController = ProductSearchController.currentInstance;
+      if (searchController != null) {
+        searchController.saveTagsFromProduct(productModel.title);
+      }
 
       // Load questions and shop info from service (mock data)
       _questions.clear();

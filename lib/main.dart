@@ -7,6 +7,7 @@ import 'package:quikle_user/core/services/network_controller.dart';
 import 'package:quikle_user/core/services/storage_service.dart';
 import 'package:quikle_user/core/services/freshchat_service.dart';
 import 'package:quikle_user/core/services/firebase/fcm_notification_handler.dart';
+import 'package:quikle_user/core/services/suggested_products_service.dart';
 import 'core/common/widgets/no_internet_screen.dart';
 import 'firebase_options.dart';
 
@@ -46,6 +47,7 @@ Future<void> main() async {
 
   await StorageService.init();
   await FCMNotificationHandler.initialize();
+
   final networkController = Get.put(NetworkController());
   Get.put(FreshchatService());
 
@@ -70,13 +72,4 @@ Future<void> main() async {
   });
 
   runApp(const MyApp());
-}
-
-Future<String?> _getFCMToken() async {
-  String? token;
-  while (token == null) {
-    token = await FirebaseMessaging.instance.getToken();
-    if (token == null) await Future.delayed(const Duration(seconds: 1));
-  }
-  return token;
 }

@@ -5,6 +5,8 @@ import 'package:quikle_user/core/common/styles/global_text_style.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 import 'package:quikle_user/core/utils/constants/image_path.dart';
+import 'package:quikle_user/features/cart/presentation/widgets/you_may_like_section.dart';
+import 'package:quikle_user/features/home/controllers/home_controller.dart';
 import '../../controllers/payout_controller.dart';
 import '../../data/models/delivery_option_model.dart';
 import '../../../cart/controllers/cart_controller.dart';
@@ -16,6 +18,7 @@ class DeliveryOptionsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final payoutController = Get.find<PayoutController>();
     final cartController = Get.find<CartController>();
+    final homeController = Get.find<HomeController>();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -113,7 +116,7 @@ class DeliveryOptionsSection extends StatelessWidget {
         Container(
           padding: EdgeInsets.all(12.w),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.homeGrey,
             borderRadius: BorderRadius.circular(8.r),
             boxShadow: [
               BoxShadow(
@@ -123,41 +126,13 @@ class DeliveryOptionsSection extends StatelessWidget {
               ),
             ],
           ),
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  'Delivery Preference',
-                  style: getTextStyle(
-                    font: CustomFonts.inter,
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.w500,
-                    color: const Color(0xFF484848),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 200.w,
-                child: TextField(
-                  controller: payoutController.deliveryPreferenceController,
-                  decoration: InputDecoration(
-                    hintText: 'e.g. Don\'t call',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.r),
-                    ),
-                    isDense: true,
-                    contentPadding: EdgeInsets.symmetric(
-                      horizontal: 12.w,
-                      vertical: 10.h,
-                    ),
-                  ),
-                ),
-              ),
-            ],
+          child: YouMayLikeSection(
+            onAddToCart: cartController.addToCart,
+            onFavoriteToggle: homeController.onFavoriteToggle,
+            onProductTap: (p) => Get.toNamed('/product-details', arguments: p),
           ),
         ),
 
-        SizedBox(height: 8.h),
         Obx(() {
           if (cartController.hasMedicineItems) {
             return _buildUrgentDeliveryOption(payoutController);

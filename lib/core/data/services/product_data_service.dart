@@ -525,4 +525,52 @@ class ProductDataService {
       return null;
     }
   }
+
+  /// Fetch products by tags for suggestions, or general products if no tags
+  Future<List<ProductModel>> getProductsByTags({
+    List<String>? tags,
+    int offset = 0,
+    int limit = 7,
+  }) async {
+    try {
+      final queryParams = <String, dynamic>{
+        'offset': offset.toString(),
+        'limit': limit.toString(),
+      };
+
+      if (tags != null && tags.isNotEmpty) {
+        final tagsString = tags.join(',');
+        queryParams['tags'] = tagsString;
+        AppLoggerHelper.debug('Fetching products by tags: $tagsString');
+      } else {
+        AppLoggerHelper.debug('No tags provided, fetching general products');
+      }
+
+      final response = await _networkCaller.getRequest(
+        ApiConstants.searchItems,
+        queryParams: queryParams,
+      );
+
+      if (response.isSuccess && response.responseData != null) {
+        final responseMap = response.responseData as Map<String, dynamic>;
+        final List data = responseMap['data'] as List;
+
+        AppLoggerHelper.debug(
+          'Fetched ${data.length} products. Total: ${responseMap['total']}',
+        );
+
+        final products = data
+            .map((json) => ProductModel.fromJson(json as Map<String, dynamic>))
+            .toList();
+
+        return products;
+      }
+
+      AppLoggerHelper.warning('No products found or API call failed');
+      return [];
+    } catch (e) {
+      AppLoggerHelper.error('Error fetching products by tags', e);
+      return [];
+    }
+  }
 }

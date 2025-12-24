@@ -85,13 +85,8 @@ class CartScreen extends StatelessWidget {
                     SizedBox(height: 8.h),
                     const OrderSummarySection(),
                     SizedBox(height: 19.h),
-                    // YouMayLikeSection(
-                    //   onAddToCart: cartController.addToCart,
-                    //   onFavoriteToggle: homeController.onFavoriteToggle,
-                    //   onProductTap: (p) =>
-                    //       Get.toNamed('/product-details', arguments: p),
-                    // ),
-                    // SizedBox(height: 19.h),
+
+                    SizedBox(height: 19.h),
                   ],
                 ),
               ),
