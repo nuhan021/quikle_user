@@ -174,60 +174,72 @@ class DeliveryOptionsSection extends StatelessWidget {
     required PayoutController controller,
     required bool showRightBorder,
   }) {
+    final cartController = Get.find<CartController>();
+    final hasMultipleCategories = cartController.hasMultipleCategories;
+
+    // Disable split delivery if all items are from same category
+    final bool isDisabled =
+        option.type.name == 'split' && !hasMultipleCategories;
+
     return GestureDetector(
-      onTap: () => controller.selectDeliveryOption(option),
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 16.h),
-        decoration: BoxDecoration(
-          color: option.isSelected ? AppColors.beakYellow : Colors.transparent,
-          border: Border(
-            right: showRightBorder
-                ? const BorderSide(color: Colors.black)
-                : BorderSide.none,
+      onTap: isDisabled ? null : () => controller.selectDeliveryOption(option),
+      child: Opacity(
+        opacity: isDisabled ? 0.5 : 1.0,
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 16.h),
+          decoration: BoxDecoration(
+            color: option.isSelected
+                ? AppColors.beakYellow
+                : Colors.transparent,
+            border: Border(
+              right: showRightBorder
+                  ? const BorderSide(color: Colors.black)
+                  : BorderSide.none,
+            ),
+            // Round only the outer corners of each cell so the selected
+            // background color is clipped inside the parent's rounded box.
+            borderRadius: showRightBorder
+                ? BorderRadius.only(
+                    topLeft: Radius.circular(6.r),
+                    bottomLeft: Radius.circular(6.r),
+                  )
+                : BorderRadius.only(
+                    topRight: Radius.circular(6.r),
+                    bottomRight: Radius.circular(6.r),
+                  ),
           ),
-          // Round only the outer corners of each cell so the selected
-          // background color is clipped inside the parent's rounded box.
-          borderRadius: showRightBorder
-              ? BorderRadius.only(
-                  topLeft: Radius.circular(6.r),
-                  bottomLeft: Radius.circular(6.r),
-                )
-              : BorderRadius.only(
-                  topRight: Radius.circular(6.r),
-                  bottomRight: Radius.circular(6.r),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                option.title,
+                style: getTextStyle(
+                  font: CustomFonts.inter,
+                  fontSize: 12.sp,
+                  fontWeight: option.isSelected
+                      ? FontWeight.w600
+                      : FontWeight.w500,
+                  color: option.isSelected
+                      ? Colors.black
+                      : const Color(0xFF484848),
                 ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              option.title,
-              style: getTextStyle(
-                font: CustomFonts.inter,
-                fontSize: 12.sp,
-                fontWeight: option.isSelected
-                    ? FontWeight.w600
-                    : FontWeight.w500,
-                color: option.isSelected
-                    ? Colors.black
-                    : const Color(0xFF484848),
               ),
-            ),
-            SizedBox(width: 6.w),
-            Text(
-              '₹${option.price.toStringAsFixed(2)}',
-              style: getTextStyle(
-                font: CustomFonts.inter,
-                fontSize: 12.sp,
-                fontWeight: option.isSelected
-                    ? FontWeight.w600
-                    : FontWeight.w500,
-                color: option.isSelected
-                    ? Colors.black
-                    : const Color(0xFF484848),
+              SizedBox(width: 6.w),
+              Text(
+                '₹${option.price.toStringAsFixed(2)}',
+                style: getTextStyle(
+                  font: CustomFonts.inter,
+                  fontSize: 12.sp,
+                  fontWeight: option.isSelected
+                      ? FontWeight.w600
+                      : FontWeight.w500,
+                  color: option.isSelected
+                      ? Colors.black
+                      : const Color(0xFF484848),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
