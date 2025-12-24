@@ -57,9 +57,6 @@ class CartService {
   }
 
   void addToCart(ProductModel product, {bool isUrgent = false}) async {
-    // Check if there are already urgent items in the cart
-    final hasExistingUrgentItems = hasUrgentItems;
-
     final existingItemIndex = _cartItems.indexWhere(
       (item) => item.product.id == product.id,
     );
@@ -72,8 +69,9 @@ class CartService {
             existingItem.isUrgent || isUrgent, // Keep urgent if already urgent
       );
     } else {
-      // If there are already urgent items, make new items urgent automatically
-      final shouldBeUrgent = isUrgent || hasExistingUrgentItems;
+      // Only mark medicine items as urgent automatically
+      final isMedicineProduct = product.isPrescriptionMedicine || product.isOTC;
+      final shouldBeUrgent = isUrgent || (isMedicineProduct && hasUrgentItems);
       _cartItems.add(
         CartItemModel(product: product, quantity: 1, isUrgent: shouldBeUrgent),
       );

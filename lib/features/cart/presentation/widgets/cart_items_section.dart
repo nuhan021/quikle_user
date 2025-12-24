@@ -45,7 +45,10 @@ class CartItemsSection extends StatelessWidget {
               itemBuilder: (context, index) {
                 final cartItem = cartController.cartItems[index];
                 final isLast = index == cartController.cartItems.length - 1;
-                bool isMedicine = cartItem.isUrgent;
+                bool isMedicine =
+                    cartItem.product.isPrescriptionMedicine ||
+                    cartItem.product.isOTC;
+                bool showUrgent = isMedicine && cartItem.isUrgent;
                 return Container(
                   margin: EdgeInsets.only(
                     left: 8.w,
@@ -67,8 +70,7 @@ class CartItemsSection extends StatelessWidget {
                         ),
                         child: Center(
                           child:
-                              (cartItem.product.imagePath != null &&
-                                  cartItem.product.imagePath.isNotEmpty &&
+                              (cartItem.product.imagePath.isNotEmpty &&
                                   (cartItem.product.imagePath.startsWith(
                                         'http',
                                       ) ||
@@ -124,7 +126,7 @@ class CartItemsSection extends StatelessWidget {
                                   ),
                                 ),
 
-                                if (isMedicine)
+                                if (showUrgent)
                                   Container(
                                     padding: EdgeInsets.symmetric(
                                       horizontal: 6.w,

@@ -96,15 +96,12 @@ class CartScreen extends StatelessWidget {
                 ),
               ),
             ),
-            SafeArea(
-              top: false,
-              child: CartBottomSection(
-                onPlaceOrder: () {
-                  _handlePlaceOrder(cartController, payoutController);
-                },
-                onPaymentMethodTap: _showPaymentMethods,
-                totalAmount: payoutController.totalAmount,
-              ),
+            CartBottomSection(
+              onPlaceOrder: () {
+                _handlePlaceOrder(cartController, payoutController);
+              },
+              onPaymentMethodTap: _showPaymentMethods,
+              totalAmount: payoutController.totalAmount,
             ),
           ],
         );

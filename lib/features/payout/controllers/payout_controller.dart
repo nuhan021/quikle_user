@@ -312,17 +312,23 @@ class PayoutController extends GetxController {
   }
 
   void _updateDeliveryOptions() {
+    // Check if all items are from the same category
+    final hasMultipleCategories = _cartController.hasMultipleCategories;
+
     // Check if we should use split delivery
-    final shouldUseSplit = _isUrgentDelivery.value;
+    final shouldUseSplit = _isUrgentDelivery.value && hasMultipleCategories;
 
     if (shouldUseSplit) {
-      // When urgent delivery is needed, prefer split delivery for speed
+      // When urgent delivery is needed AND items are from different categories,
+      // prefer split delivery for speed
       final splitOption = _deliveryOptions.firstWhereOrNull(
         (o) => o.type.name == 'split' || o.type == DeliveryType.split,
       );
       if (splitOption != null) selectDeliveryOption(splitOption);
     } else {
-      // Use combined delivery (cheaper) when no urgent items
+      // Use combined delivery when:
+      // 1. No urgent items, OR
+      // 2. All items are from the same category (split not available)
       final combinedOption = _deliveryOptions.firstWhereOrNull(
         (o) => o.type.name == 'combined' || o.type == DeliveryType.combined,
       );
