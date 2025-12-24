@@ -11,6 +11,7 @@ import 'package:quikle_user/features/cart/controllers/cart_controller.dart';
 import 'package:quikle_user/features/profile/controllers/favorites_controller.dart';
 import 'package:quikle_user/routes/app_routes.dart';
 import 'package:quikle_user/core/services/whatsapp_service.dart';
+import 'package:quikle_user/core/services/storage_service.dart';
 
 class ProductSearchController extends GetxController {
   final SearchService _searchService = SearchService();
@@ -33,6 +34,7 @@ class ProductSearchController extends GetxController {
   final _searchQuery = ''.obs;
   final _searchResults = <ProductModel>[].obs;
   final _recentSearches = <String>[].obs;
+  final _searchTags = <String>[].obs;
   final _isLoading = false.obs;
   final _isLoadingMore = false.obs;
   final _hasSearched = false.obs; // Track if user has performed a search
@@ -96,6 +98,7 @@ class ProductSearchController extends GetxController {
   String get searchQuery => _searchQuery.value;
   List<ProductModel> get searchResults => _searchResults;
   List<String> get recentSearches => _recentSearches;
+  List<String> get searchTags => _searchTags;
   bool get isLoading => _isLoading.value;
   bool get isLoadingMore => _isLoadingMore.value;
   bool get hasMoreResults => _hasMoreResults.value;
@@ -106,6 +109,7 @@ class ProductSearchController extends GetxController {
     super.onInit();
     _cartController = Get.find<CartController>();
     _loadRecentSearches();
+    _loadSearchTags();
     _startPlaceholderRotation();
 
     // IMPORTANT: do NOT ask for mic here (lazy on first tap)
@@ -270,6 +274,89 @@ class ProductSearchController extends GetxController {
     }
   }
 
+  Future<void> _loadSearchTags() async {
+    try {
+      _searchTags.value = StorageService.searchTags;
+    } catch (e) {
+      debugPrint('Error loading search tags: $e');
+    }
+  }
+
+  List<String> _extractKeywords(String text) {
+    if (text.isEmpty) return [];
+
+    // Split by spaces and filter out empty strings
+    final words = text
+        .toLowerCase()
+        .split(RegExp(r'\s+'))
+        .where((word) => word.isNotEmpty)
+        .toList();
+
+    // Remove common stop words
+    const stopWords = {
+      'a',
+      'an',
+      'the',
+      'and',
+      'or',
+      'but',
+      'in',
+      'on',
+      'at',
+      'to',
+      'for',
+      'of',
+      'with',
+      'by',
+      'is',
+      'are',
+      'was',
+      'were',
+      'be',
+      'been',
+      'being',
+      'have',
+      'has',
+      'had',
+      'do',
+      'does',
+      'did',
+      'will',
+      'would',
+      'could',
+      'should',
+      'may',
+      'might',
+      'must',
+      'can',
+    };
+    final filteredWords = words
+        .where((word) => !stopWords.contains(word) && word.length > 2)
+        .toList();
+
+    // Take up to 3 keywords
+    return filteredWords.take(3).toList();
+  }
+
+  Future<void> _saveSearchTags() async {
+    try {
+      await StorageService.saveSearchTags(_searchTags);
+    } catch (e) {
+      debugPrint('Error saving search tags: $e');
+    }
+  }
+
+  // Public method to save tags from product
+  void saveTagsFromProduct(String productName) {
+    final keywords = _extractKeywords(productName);
+    for (final keyword in keywords) {
+      if (!_searchTags.contains(keyword)) {
+        _searchTags.add(keyword);
+      }
+    }
+    _saveSearchTags();
+  }
+
   Future<void> _saveRecentSearches() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -294,6 +381,15 @@ class ProductSearchController extends GetxController {
       _hasSearched.value = true; // Mark that user has searched
       _searchVersion++; // Increment version for new search
       _performSearch(query);
+
+      // Save search tags
+      final keywords = _extractKeywords(query);
+      for (final keyword in keywords) {
+        if (!_searchTags.contains(keyword)) {
+          _searchTags.add(keyword);
+        }
+      }
+      _saveSearchTags();
     }
   }
 
@@ -393,6 +489,9 @@ class ProductSearchController extends GetxController {
   }
 
   void onProductPressed(ProductModel product) {
+    // Save search tags from product name
+    saveTagsFromProduct(product.title);
+
     Get.toNamed(AppRoute.getProductDetails(), arguments: product);
   }
 

@@ -6,6 +6,7 @@ class StorageService {
   static const String _refreshTokenKey = 'refreshToken';
   static const String _idKey = 'userId';
   static const String _freshchatRestoreIdKey = 'freshchatRestoreId';
+  static const String _searchTagsKey = 'search_tags';
 
   // SharedPreferences instance
   static SharedPreferences? _preferences;
@@ -70,4 +71,15 @@ class StorageService {
     await _preferences?.remove(_idKey);
     await _preferences?.remove(_freshchatRestoreIdKey);
   }
+
+  // =======================
+  // SEARCH TAGS
+  // =======================
+
+  static Future<void> saveSearchTags(List<String> tags) async {
+    await _preferences?.setStringList(_searchTagsKey, tags);
+  }
+
+  static List<String> get searchTags =>
+      _preferences?.getStringList(_searchTagsKey) ?? [];
 }
