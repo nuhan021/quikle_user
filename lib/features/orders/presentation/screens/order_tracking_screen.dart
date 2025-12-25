@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:quikle_user/core/common/widgets/customer_support_fab.dart';
 import 'package:quikle_user/core/utils/logging/logger.dart';
+import 'package:quikle_user/core/services/freshchat_service.dart';
 import 'package:quikle_user/features/orders/controllers/order_tracking_controller.dart';
 import 'package:quikle_user/features/orders/data/models/order_model.dart';
 import 'package:quikle_user/features/orders/presentation/widgets/order_tracking_app_bar.dart';
@@ -84,11 +86,34 @@ class OrderTrackingScreen extends StatelessWidget {
                 ),
               ],
             ),
-            // Customer Support FAB
-            const CustomerSupportFAB(),
+            // Customer Support FAB with order context for real-time delivery support
+            CustomerSupportFAB(orderContext: _createOrderContext()),
           ],
         ),
       ),
+    );
+  }
+
+  /// Helper method to create order context for Freshchat support
+  Map<String, dynamic> _createOrderContext() {
+    return FreshchatService.createOrderContext(
+      orderId: order.orderId,
+      orderStatus: order.statusDisplayName,
+      restaurantName: order.vendorInfo?.storeName,
+      restaurantPhone: order.vendorInfo?.vendorPhone,
+      deliveryPersonName: order.riderInfo?.riderName,
+      deliveryPersonPhone: order.riderInfo?.riderPhone,
+      deliveryPersonLocation: order.riderInfo != null
+          ? 'Live Tracking Active'
+          : 'Not Assigned',
+      orderDate: DateFormat('dd MMM yyyy, hh:mm a').format(order.orderDate),
+      estimatedDelivery: order.estimatedDelivery != null
+          ? DateFormat('dd MMM yyyy, hh:mm a').format(order.estimatedDelivery!)
+          : null,
+      orderTotal: '₹${order.total.toStringAsFixed(2)}',
+      items: order.items
+          .map((item) => '${item.product.title} x${item.quantity}')
+          .toList(),
     );
   }
 }

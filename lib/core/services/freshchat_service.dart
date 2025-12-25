@@ -48,9 +48,40 @@ class FreshchatService extends GetxController {
   Future<void> _initializeFreshchat() async {
     try {
       Freshchat.init(_appId, _appKey, _domain);
+
+      // Configure notifications for Android
+      await _configureNotifications();
+
       _setupEventListeners();
     } catch (e) {
       print('Freshchat initialization error: $e');
+    }
+  }
+
+  /// Configure Freshchat notifications
+  Future<void> _configureNotifications() async {
+    try {
+      // Set notification config for Android
+      Freshchat.setNotificationConfig(
+        priority: Priority.PRIORITY_HIGH,
+        importance: Importance.IMPORTANCE_HIGH,
+        notificationSoundEnabled: true,
+        notificationInterceptionEnabled: false,
+      );
+
+      print('✅ Freshchat notification config set');
+    } catch (e) {
+      print('❌ Error configuring Freshchat notifications: $e');
+    }
+  }
+
+  /// Set FCM token for Freshchat (call this when FCM token is available)
+  Future<void> setFCMToken(String fcmToken) async {
+    try {
+      Freshchat.setPushRegistrationToken(fcmToken);
+      print('✅ FCM token registered with Freshchat: $fcmToken');
+    } catch (e) {
+      print('❌ Error setting FCM token in Freshchat: $e');
     }
   }
 
@@ -213,7 +244,7 @@ class FreshchatService extends GetxController {
 
   /// Open Freshchat conversation screen
   /// This method will identify the user before opening chat if not already identified
-  Future<void> openChat() async {
+  Future<void> openChat({Map<String, dynamic>? orderContext}) async {
     try {
       print('🚀 Opening Freshchat...');
 
@@ -254,8 +285,17 @@ class FreshchatService extends GetxController {
       // Identify user with Freshchat
       await identifyUser(externalId: userId.toString());
 
+      // Open Freshchat conversations
       print('✅ User identified, opening Freshchat conversations');
       Freshchat.showConversations();
+
+      // If order context is provided, send order details as a message
+      // Small delay to ensure chat is opened before sending message
+      if (orderContext != null) {
+        print('📦 Order context provided, sending order details as message');
+        await Future.delayed(const Duration(milliseconds: 500));
+        await sendOrderDetailsMessage(orderContext);
+      }
     } catch (e) {
       print('❌ Error opening Freshchat: $e');
       // Still try to open chat even if identification fails
@@ -264,11 +304,109 @@ class FreshchatService extends GetxController {
   }
 
   /// Track custom event to Freshchat
-  Future<void> trackEvent(String eventName) async {
+  Future<void> trackEvent(
+    String eventName, {
+    Map<String, dynamic>? properties,
+  }) async {
     try {
-      Freshchat.trackEvent(eventName);
+      if (properties != null) {
+        Freshchat.trackEvent(eventName, properties: properties);
+      } else {
+        Freshchat.trackEvent(eventName);
+      }
     } catch (e) {
       print('Error tracking event: $e');
+    }
+  }
+
+  /// Send order details as a message to the support team
+  /// This sends a formatted message with all order information directly in the chat
+  /// Only sends once per order ID to avoid duplicate messages
+  Future<void> sendOrderDetailsMessage(
+    Map<String, dynamic> orderContext,
+  ) async {
+    try {
+      final orderId = orderContext['Order ID']?.toString();
+
+      // Check if we've already sent details for this order
+      if (orderId == null || orderId.isEmpty) {
+        print('⚠️ No Order ID provided, skipping message send');
+        return;
+      }
+
+      // Check persistent storage to see if we've already sent this order
+      if (StorageService.sentOrderIds.contains(orderId)) {
+        print('ℹ️ Order details already sent for Order ID: $orderId, skipping');
+        return;
+      }
+
+      // Format order details into a readable message
+      final StringBuffer message = StringBuffer();
+      message.writeln('📦 ORDER DETAILS');
+      message.writeln('━━━━━━━━━━━━━━━━━━━━');
+
+      message.writeln('🔖 Order ID: $orderId');
+
+      if (orderContext['Order Status'] != null) {
+        message.writeln('📊 Status: ${orderContext['Order Status']}');
+      }
+      if (orderContext['Order Date'] != null) {
+        message.writeln('📅 Order Date: ${orderContext['Order Date']}');
+      }
+      if (orderContext['Order Amount'] != null) {
+        message.writeln('💰 Amount: ${orderContext['Order Amount']}');
+      }
+      if (orderContext['Estimated Delivery'] != null) {
+        message.writeln(
+          '⏰ Estimated Delivery: ${orderContext['Estimated Delivery']}',
+        );
+      }
+
+      message.writeln('\n🍽️ RESTAURANT INFO');
+      message.writeln('━━━━━━━━━━━━━━━━━━━━');
+      if (orderContext['Restaurant Name'] != null) {
+        message.writeln('📍 Name: ${orderContext['Restaurant Name']}');
+      }
+      if (orderContext['Restaurant Phone'] != null) {
+        message.writeln('📞 Phone: ${orderContext['Restaurant Phone']}');
+      }
+
+      if (orderContext['Delivery Person'] != null ||
+          orderContext['Delivery Contact'] != null) {
+        message.writeln('\n🛵 DELIVERY INFO');
+        message.writeln('━━━━━━━━━━━━━━━━━━━━');
+        if (orderContext['Delivery Person'] != null) {
+          message.writeln('👤 Rider: ${orderContext['Delivery Person']}');
+        }
+        if (orderContext['Delivery Contact'] != null) {
+          message.writeln('📱 Contact: ${orderContext['Delivery Contact']}');
+        }
+        if (orderContext['Rider Location'] != null) {
+          message.writeln('� Location: ${orderContext['Rider Location']}');
+        }
+      }
+
+      if (orderContext['Items'] != null) {
+        message.writeln('\n🛒 ITEMS');
+        message.writeln('━━━━━━━━━━━━━━━━━━━━');
+        message.writeln('${orderContext['Items']}');
+      }
+
+      final messageText = message.toString();
+
+      print('💬 Sending order details message to support team');
+      print('Message preview:\n$messageText');
+
+      // Send message to general support tag
+      // The tag should match your Freshchat channel configuration
+      Freshchat.sendMessage('general', messageText);
+
+      // Mark this order as sent in persistent storage
+      await StorageService.addSentOrderId(orderId);
+      print('✅ Order details message sent successfully for Order ID: $orderId');
+    } catch (e) {
+      print('❌ Error sending order details message: $e');
+      AppLoggerHelper.error('Error sending order details message', e);
     }
   }
 
@@ -413,6 +551,7 @@ class FreshchatService extends GetxController {
       Freshchat.resetUser();
       unreadMessageCount.value = 0;
       restoreId.value = '';
+      await StorageService.clearSentOrderIds(); // Clear sent order IDs on reset
       print('✅ Freshchat user reset successfully');
     } catch (e) {
       print('❌ Error resetting Freshchat user: $e');
@@ -425,5 +564,55 @@ class FreshchatService extends GetxController {
     _restoreIdSubscription?.cancel();
     _unreadCountSubscription?.cancel();
     super.onClose();
+  }
+
+  /// Create order context map from order details
+  /// This is a helper method to format order information for Freshchat
+  static Map<String, dynamic> createOrderContext({
+    required String orderId,
+    required String orderStatus,
+    String? restaurantName,
+    String? restaurantPhone,
+    String? deliveryPersonName,
+    String? deliveryPersonPhone,
+    String? deliveryPersonLocation,
+    String? orderDate,
+    String? estimatedDelivery,
+    String? orderTotal,
+    List<String>? items,
+  }) {
+    final Map<String, dynamic> context = {
+      'Order ID': orderId,
+      'Order Status': orderStatus,
+    };
+
+    if (orderDate != null) context['Order Date'] = orderDate;
+    if (orderTotal != null) context['Order Amount'] = orderTotal;
+    if (estimatedDelivery != null) {
+      context['Estimated Delivery'] = estimatedDelivery;
+    }
+
+    if (restaurantName != null) {
+      context['Restaurant Name'] = restaurantName;
+    }
+    if (restaurantPhone != null) {
+      context['Restaurant Phone'] = restaurantPhone;
+    }
+
+    if (deliveryPersonName != null) {
+      context['Delivery Person'] = deliveryPersonName;
+    }
+    if (deliveryPersonPhone != null) {
+      context['Delivery Contact'] = deliveryPersonPhone;
+    }
+    if (deliveryPersonLocation != null) {
+      context['Rider Location'] = deliveryPersonLocation;
+    }
+
+    if (items != null && items.isNotEmpty) {
+      context['Items'] = items.join(', ');
+    }
+
+    return context;
   }
 }

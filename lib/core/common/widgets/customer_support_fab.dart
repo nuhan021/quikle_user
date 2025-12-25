@@ -8,16 +8,20 @@ import 'package:quikle_user/core/utils/constants/colors.dart';
 ///
 /// This widget provides a consistent customer support button across the app
 /// Shows unread message count badge if there are unread messages
+///
+/// Can optionally pass order context to provide support agents with order details
 class CustomerSupportFAB extends StatelessWidget {
   final double? bottom;
   final double? right;
   final VoidCallback? onPressed;
+  final Map<String, dynamic>? orderContext;
 
   const CustomerSupportFAB({
     super.key,
     this.bottom,
     this.right,
     this.onPressed,
+    this.orderContext,
   });
 
   @override
@@ -94,7 +98,7 @@ class CustomerSupportFAB extends StatelessWidget {
     // Track event
     service.trackEvent('support_opened');
 
-    // Open Freshchat
-    service.openChat();
+    // Open Freshchat with optional order context
+    service.openChat(orderContext: orderContext);
   }
 }
