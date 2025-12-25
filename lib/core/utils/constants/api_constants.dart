@@ -1,5 +1,5 @@
 class ApiConstants {
-  static const String baseUrl = "https://quikle-u4dv.onrender.com";
+  static const String baseUrl = "https://caditya619-backend-ng0e.onrender.com";
 
   //For auth api's
   static const String authApi = "$baseUrl/auth";

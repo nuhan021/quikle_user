@@ -7,6 +7,7 @@ class StorageService {
   static const String _idKey = 'userId';
   static const String _freshchatRestoreIdKey = 'freshchatRestoreId';
   static const String _searchTagsKey = 'search_tags';
+  static const String _sentOrderIdsKey = 'freshchat_sent_order_ids';
 
   // SharedPreferences instance
   static SharedPreferences? _preferences;
@@ -70,6 +71,9 @@ class StorageService {
     await _preferences?.remove(_refreshTokenKey);
     await _preferences?.remove(_idKey);
     await _preferences?.remove(_freshchatRestoreIdKey);
+    await _preferences?.remove(
+      _sentOrderIdsKey,
+    ); // Clear sent order IDs on logout
   }
 
   // =======================
@@ -82,4 +86,25 @@ class StorageService {
 
   static List<String> get searchTags =>
       _preferences?.getStringList(_searchTagsKey) ?? [];
+
+  // =======================
+  // FRESHCHAT SENT ORDER IDS
+  // =======================
+
+  static Future<void> saveSentOrderIds(Set<String> orderIds) async {
+    await _preferences?.setStringList(_sentOrderIdsKey, orderIds.toList());
+  }
+
+  static Set<String> get sentOrderIds =>
+      _preferences?.getStringList(_sentOrderIdsKey)?.toSet() ?? {};
+
+  static Future<void> addSentOrderId(String orderId) async {
+    final current = sentOrderIds;
+    current.add(orderId);
+    await saveSentOrderIds(current);
+  }
+
+  static Future<void> clearSentOrderIds() async {
+    await _preferences?.remove(_sentOrderIdsKey);
+  }
 }
