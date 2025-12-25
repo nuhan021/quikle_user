@@ -1,9 +1,12 @@
+import 'dart:developer';
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:quikle_user/core/utils/logging/logger.dart';
 import 'package:quikle_user/features/orders/controllers/order_tracking_controller.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:quikle_user/features/profile/data/models/shipping_address_model.dart';
@@ -100,8 +103,11 @@ class _OrderTrackingMapSectionState extends State<OrderTrackingMapSection> {
     try {
       if (widget.shippingAddress != null) {
         final addr = widget.shippingAddress!.fullAddress;
+        log('Attempting to geocode address: $addr');
         if (addr.isNotEmpty) {
+          log('Geocoding address: $addr');
           final locations = await locationFromAddress(addr);
+          log('Geocoded $addr to $locations');
           if (locations.isNotEmpty) {
             final loc = locations.first;
             if (mounted) {
@@ -238,6 +244,11 @@ class _OrderTrackingMapSectionState extends State<OrderTrackingMapSection> {
           ClipRRect(
             borderRadius: BorderRadius.circular(12.r),
             child: GoogleMap(
+              gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{
+                Factory<OneSequenceGestureRecognizer>(
+                  () => EagerGestureRecognizer(),
+                ),
+              },
               initialCameraPosition: _initialPosition,
               onMapCreated: (GoogleMapController mapController) {
                 _mapController = mapController;

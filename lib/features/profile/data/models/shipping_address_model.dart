@@ -84,7 +84,7 @@ class ShippingAddressModel {
   }
 
   String get fullAddress {
-    final parts = [address, city, state, zipCode];
+    final parts = [address];
     return parts.where((part) => part.isNotEmpty).join(', ');
   }
 
