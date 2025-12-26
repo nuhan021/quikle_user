@@ -29,6 +29,11 @@
     <key>LSApplicationQueriesSchemes</key>
     <array>
         <string>tel</string>
+        <string>tez</string>
+        <string>paytmmp</string>
+        <string>bhim</string>
+        <string>amazonpay</string>
+        <string>credpay</string>
     </array>
     <key>LSRequiresIPhoneOS</key>
     <true/>

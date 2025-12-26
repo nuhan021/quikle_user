@@ -49,20 +49,48 @@ class CashfreePaymentService {
     // Notify that payment is being processed
     _onPaymentProcessing?.call();
 
-    // Call backend API to confirm payment
+    // Call backend API to confirm payment and check Cashfree status
     if (_parentOrderId != null) {
       try {
         AppLoggerHelper.debug(
           'Confirming payment with backend for parent order: $_parentOrderId',
         );
-        await _paymentApiService.confirmPayment(parentOrderId: _parentOrderId!);
-        AppLoggerHelper.debug('✅ Payment confirmed with backend');
+
+        final confirmResponse = await _paymentApiService.confirmPayment(
+          parentOrderId: _parentOrderId!,
+        );
+
+        AppLoggerHelper.debug(
+          'Confirm payment response: ${confirmResponse.message}',
+        );
+
+        final cashfreeStatus = confirmResponse.cashfreeStatus?.toUpperCase();
+
+        // If Cashfree reports PAID, treat as success; otherwise treat as failure
+        if (cashfreeStatus == 'PAID') {
+          AppLoggerHelper.debug(
+            '✅ Payment status PAID — calling success callback',
+          );
+          _onPaymentSuccess?.call(orderId);
+          return;
+        }
+
+        // For ACTIVE or any non-PAID status, treat as payment not completed
+        final msg =
+            confirmResponse.message ??
+            'Payment not completed. Status: ${confirmResponse.cashfreeStatus}';
+        AppLoggerHelper.error('❌ Payment not completed: $msg');
+        _onPaymentError?.call(orderId, msg);
+        return;
       } catch (e) {
         AppLoggerHelper.error('❌ Failed to confirm payment with backend', e);
-        // Continue anyway, the payment was successful on Cashfree
+        // If we cannot confirm with backend, report processing state or error
+        _onPaymentError?.call(orderId, 'Failed to verify payment status');
+        return;
       }
     }
 
+    // If there is no parent order id, fallback to success callback
     _onPaymentSuccess?.call(orderId);
   }
 
