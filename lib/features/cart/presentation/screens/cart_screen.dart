@@ -29,9 +29,20 @@ class CartScreen extends StatelessWidget {
         onClearAll: () => _showClearCartDialog(cartController),
       ),
       body: Obx(() {
-        // Only auto-close if not currently placing an order
+        // Auto-close cart when it's empty and not placing an order, but
+        // avoid closing if there's an open dialog (for example the
+        // OrderSuccessDialog shown after payment). Closing immediately
+        // would dismiss the dialog instead of the route, so check
+        // `Get.isDialogOpen` first and postpone closing in that case.
         if (!cartController.hasItems && !cartController.isPlacingOrder) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
+            // If a Get dialog is currently open, don't pop the route now.
+            // The dialog (OrderSuccessDialog) will handle navigation when
+            // it completes. Otherwise, close the cart route normally.
+            if ((Get.isDialogOpen ?? false)) {
+              return;
+            }
+
             // Use a case-insensitive containment check so this works whether
             // the route name is '/cart', '/CartScreen', or similar.
             final currentRoute = Get.currentRoute.toLowerCase();
