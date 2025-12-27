@@ -61,9 +61,7 @@ class HomeController extends GetxController with VoiceSearchMixin {
     _isLoading.value = true;
     try {
       _categories.value = await _homeService.fetchCategories();
-      // Preload suggested products
-      final suggestedProductsService = Get.put(SuggestedProductsService());
-      await suggestedProductsService.preloadSuggestedProducts();
+
       // Sort categories to ensure All, Food, Groceries, Medicine are first
       List<CategoryModel> sortedCategories = [];
       sortedCategories.addAll(_categories.where((c) => c.title == 'All'));
@@ -88,6 +86,9 @@ class HomeController extends GetxController with VoiceSearchMixin {
   }
 
   Future<void> _loadContent() async {
+    // Preload suggested products
+    final suggestedProductsService = Get.put(SuggestedProductsService());
+    await suggestedProductsService.preloadSuggestedProducts();
     if (_selectedCategoryId.value == '0') {
       _productSections.value = await _homeService.fetchProductSections();
       // Sort product sections by category order

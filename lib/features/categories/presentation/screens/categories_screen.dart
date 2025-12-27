@@ -29,13 +29,6 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
-        statusBarColor: Colors.black,
-        statusBarIconBrightness: Brightness.dark,
-      ),
-    );
-
     return Scaffold(
       backgroundColor: AppColors.homeGrey,
       body: SafeArea(
