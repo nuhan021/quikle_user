@@ -67,7 +67,6 @@ class LiveOrderController extends GetxController {
       final trackableOrders = orders.where((order) {
         return [
           OrderStatus.confirmed,
-          OrderStatus.processing,
           OrderStatus.shipped,
           OrderStatus.outForDelivery,
         ].contains(order.status);

@@ -20,6 +20,7 @@ class OrdersScreen extends StatelessWidget {
     final OrdersController controller = Get.put(OrdersController());
 
     return Scaffold(
+      backgroundColor: AppColors.homeGrey,
       body: SafeArea(
         child: Column(
           children: [

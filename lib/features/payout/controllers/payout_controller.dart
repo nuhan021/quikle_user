@@ -3,28 +3,77 @@ import 'package:get/get.dart';
 import 'package:quikle_user/features/orders/data/models/order_model.dart';
 import 'package:quikle_user/features/orders/data/services/order_api_service.dart';
 import 'package:quikle_user/features/payment/data/models/order_creation_response.dart';
-import 'package:quikle_user/features/payment/services/cashfree_payment_service.dart';
 import 'package:quikle_user/features/payout/presentation/widgets/order_failure_dialog.dart';
 import 'package:quikle_user/features/payout/presentation/widgets/order_success_dialog.dart';
 import 'package:quikle_user/features/payout/presentation/widgets/payment_failure_dialog.dart';
-import '../data/models/delivery_option_model.dart';
 import '../data/models/payment_method_model.dart';
 import '../../profile/data/models/shipping_address_model.dart';
 import '../../profile/controllers/address_controller.dart';
 import '../data/services/payout_service.dart';
-import '../presentation/pages/coupons_page.dart';
 import '../../cart/controllers/cart_controller.dart';
 import '../../user/controllers/user_controller.dart';
 import '../../../core/utils/constants/enums/order_enums.dart';
-import '../../../core/utils/constants/enums/delivery_enums.dart';
 import '../../../core/utils/logging/logger.dart';
+import 'delivery_controller.dart';
+import 'coupon_controller.dart';
+import 'payment_controller.dart';
+import 'receiver_controller.dart';
+import '../data/models/delivery_option_model.dart';
+import '../presentation/pages/coupons_page.dart';
 
 class PayoutController extends GetxController {
   final PayoutService _payoutService = PayoutService();
   final OrderApiService _orderApiService = OrderApiService();
-  final CashfreePaymentService _cashfreeService = CashfreePaymentService();
   final _cartController = Get.find<CartController>();
   final _userController = Get.find<UserController>();
+
+  // Child controllers
+  DeliveryController get deliveryController {
+    try {
+      return Get.find<DeliveryController>();
+    } catch (e) {
+      return Get.put(DeliveryController());
+    }
+  }
+
+  // Backwards-compatibility: expose the TextEditingController and coupon helpers
+  // so existing UI that referenced payoutController.couponController, appliedCoupon, etc.
+  CouponController get _couponCtrl {
+    try {
+      return Get.find<CouponController>();
+    } catch (e) {
+      return Get.put(CouponController());
+    }
+  }
+
+  TextEditingController get couponController => _couponCtrl.couponController;
+  Map<String, dynamic>? get appliedCoupon => _couponCtrl.appliedCoupon;
+  List<Map<String, dynamic>> get availableCoupons =>
+      _couponCtrl.availableCoupons;
+  Future<void> fetchAndApplyBestCoupon() =>
+      _couponCtrl.fetchAndApplyBestCoupon();
+  void applyCouponLocally(Map<String, dynamic> c) =>
+      _couponCtrl.applyCouponLocally(c);
+  bool isCouponApplicable(Map<String, dynamic> c) =>
+      _couponCtrl.isCouponApplicable(c);
+  double estimateSavings(Map<String, dynamic> c) =>
+      _couponCtrl.estimateSavings(c);
+
+  PaymentController get paymentController {
+    try {
+      return Get.find<PaymentController>();
+    } catch (e) {
+      return Get.put(PaymentController());
+    }
+  }
+
+  ReceiverController get receiverController {
+    try {
+      return Get.find<ReceiverController>();
+    } catch (e) {
+      return Get.put(ReceiverController());
+    }
+  }
 
   // Get AddressController - create if not exists
   AddressController get _addressController {
@@ -35,381 +84,87 @@ class PayoutController extends GetxController {
     }
   }
 
-  final _deliveryOptions = <DeliveryOptionModel>[].obs;
-  final _deliveryPreferenceController = TextEditingController();
-  final _selectedDeliveryPreference = Rxn<String?>(null);
   final _paymentMethods = <PaymentMethodModel>[].obs;
-  final _isUrgentDelivery = false.obs;
-  final _userToggledUrgent = false.obs; // Track if user manually toggled
-  final _couponCode = ''.obs;
-  final _appliedCoupon = Rxn<Map<String, dynamic>>();
-  final _availableCoupons = <Map<String, dynamic>>[].obs;
   final _isProcessingPayment = false.obs;
-  final _couponController = TextEditingController();
-  // Receiver details (for ordering to same address but different receiver)
-  final _isDifferentReceiver = false.obs;
-  final _receiverNameController = TextEditingController();
-  final _receiverPhoneController = TextEditingController();
-
-  List<DeliveryOptionModel> get deliveryOptions => _deliveryOptions;
-  TextEditingController get deliveryPreferenceController =>
-      _deliveryPreferenceController;
-  String? get selectedDeliveryPreference {
-    final explicit = _selectedDeliveryPreference.value;
-    if (explicit != null && explicit.trim().isNotEmpty) return explicit;
-    final typed = _deliveryPreferenceController.text.trim();
-    return typed.isNotEmpty ? typed : null;
-  }
 
   List<PaymentMethodModel> get paymentMethods => _paymentMethods;
-
-  // Get shipping addresses from AddressController (real API data)
-  List<ShippingAddressModel> get shippingAddresses =>
-      _addressController.addresses;
-  bool get isUrgentDelivery => _isUrgentDelivery.value;
-  String get couponCode => _couponCode.value;
-  Map<String, dynamic>? get appliedCoupon => _appliedCoupon.value;
-  List<Map<String, dynamic>> get availableCoupons => _availableCoupons;
   bool get isProcessingPayment => _isProcessingPayment.value;
-  TextEditingController get couponController => _couponController;
-
-  bool get canApplyCoupon => _couponCode.value.trim().isNotEmpty;
-
-  // Receiver getters
-  bool get isDifferentReceiver => _isDifferentReceiver.value;
-  TextEditingController get receiverNameController => _receiverNameController;
-  TextEditingController get receiverPhoneController => _receiverPhoneController;
-  String get receiverName => _receiverNameController.text.trim();
-  String get receiverPhone => _receiverPhoneController.text.trim();
-
-  DeliveryOptionModel? get selectedDeliveryOption =>
-      _deliveryOptions.firstWhereOrNull((option) => option.isSelected);
 
   PaymentMethodModel? get selectedPaymentMethod =>
       _paymentMethods.firstWhereOrNull((method) => method.isSelected);
 
-  // Get selected shipping address from AddressController
-  ShippingAddressModel? get selectedShippingAddress {
-    final addresses = _addressController.addresses;
-    return addresses.firstWhereOrNull((address) => address.isSelected);
-  }
+  // Delivery forwards (backwards compatibility)
+  List<DeliveryOptionModel> get deliveryOptions =>
+      deliveryController.deliveryOptions;
+  TextEditingController get deliveryPreferenceController =>
+      deliveryController.deliveryPreferenceController;
+  String? get selectedDeliveryPreference =>
+      deliveryController.selectedDeliveryPreference;
+  bool get isUrgentDelivery => deliveryController.isUrgentDelivery;
+  DeliveryOptionModel? get selectedDeliveryOption =>
+      deliveryController.selectedDeliveryOption;
+  void selectDeliveryOption(DeliveryOptionModel option) =>
+      deliveryController.selectDeliveryOption(option);
+  void toggleUrgentDelivery() => deliveryController.toggleUrgentDelivery();
 
+  // Forwarded getters
   double get subtotal => _cartController.totalAmount;
-  double get _couponBaseSubtotal => subtotal;
-
-  double get deliveryFee {
-    double baseFee = selectedDeliveryOption?.price ?? 0.0;
-    if (isUrgentDelivery) {
-      baseFee += 2.0;
-    }
-    return baseFee;
-  }
-
-  double get discountAmount {
-    final coupon = appliedCoupon;
-    if (coupon == null || coupon['isValid'] != true) return 0.0;
-
-    final base = _couponBaseSubtotal;
-    if (base <= 0) return 0.0;
-
-    // Defensive handling for multiple coupon payload shapes
-    try {
-      // Preferred shape: discountType + discountValue
-      if (coupon.containsKey('discountType') &&
-          coupon.containsKey('discountValue')) {
-        final String discountType = coupon['discountType']?.toString() ?? '';
-        final double discountValue = _toDouble(coupon['discountValue']);
-
-        double discount = 0.0;
-        switch (discountType) {
-          case 'percentage':
-            discount = base * (discountValue / 100.0);
-            break;
-          case 'fixed':
-            discount = discountValue;
-            break;
-          default:
-            discount = 0.0;
-        }
-        if (discount > base) discount = base;
-        return discount;
-      }
-
-      // Fallback: API example uses 'discount' as percentage and caps via 'max_value' or 'up_to'
-      if (coupon.containsKey('discount')) {
-        final double discountPercent = _toDouble(coupon['discount']);
-        double discount = base * (discountPercent / 100.0);
-        final cap = coupon['max_value'] ?? coupon['up_to'];
-        if (cap != null) {
-          final capVal = _toDouble(cap);
-          if (discount > capVal) discount = capVal;
-        }
-        if (discount > base) discount = base;
-        return discount;
-      }
-
-      // Another fallback: discountValue present and treated as fixed amount
-      if (coupon.containsKey('discountValue')) {
-        final double val = _toDouble(coupon['discountValue']);
-        return val > base ? base : val;
-      }
-    } catch (e) {
-      // ignore and return 0
-    }
-
-    return 0.0;
-  }
-
-  double _toDouble(dynamic v) {
-    if (v == null) return 0.0;
-    if (v is num) return v.toDouble();
-    if (v is String) return double.tryParse(v) ?? 0.0;
-    return 0.0;
-  }
-
-  /// Open coupons page (simple view all method)
-  void viewAllCoupons() {
-    // Navigate to coupons page UI
-    try {
-      Get.to(() => const CouponsPage());
-    } catch (e) {
-      // no-op on navigation failure
-    }
-  }
-
+  double get deliveryFee => deliveryController.deliveryFee;
+  double get discountAmount => _couponCtrl.discountAmount;
   double get totalAmount => (subtotal - discountAmount) + deliveryFee;
-  double get payableAmount {
-    final total = totalAmount;
-    return total < 0 ? 0 : total;
-  }
+  double get payableAmount => totalAmount < 0 ? 0 : totalAmount;
 
   @override
   void onInit() {
     super.onInit();
     _loadInitialData();
-    _updateDeliveryBasedOnUrgency(); // Set initial delivery type based on cart
 
-    // Initialize Cashfree payment service with callbacks
-    _cashfreeService.initialize(
+    // Initialize PaymentController with callbacks
+    paymentController.initialize(
       onPaymentSuccess: _handleCashfreePaymentSuccess,
       onPaymentError: _handleCashfreePaymentError,
       onPaymentProcessing: _handlePaymentProcessing,
     );
-
-    _couponController.addListener(_syncCouponText);
-    _deliveryPreferenceController.addListener(() {
-      _selectedDeliveryPreference.value =
-          _deliveryPreferenceController.text.trim().isNotEmpty
-          ? _deliveryPreferenceController.text.trim()
-          : null;
-    });
-
-    // Listen to cart changes to update delivery options automatically
-    ever(
-      _cartController.cartItemsObservable,
-      (_) => _updateDeliveryBasedOnUrgency(),
-    );
   }
 
-  @override
-  void onClose() {
-    _couponController.removeListener(_syncCouponText);
-    _couponController.dispose();
-    _deliveryPreferenceController.dispose();
-    _receiverNameController.dispose();
-    _receiverPhoneController.dispose();
-    super.onClose();
-  }
+  // Shipping address helpers (compat)
+  List<ShippingAddressModel> get shippingAddresses =>
+      _addressController.addresses;
+  ShippingAddressModel? get selectedShippingAddress =>
+      _addressController.addresses.firstWhereOrNull((a) => a.isSelected);
 
-  void _syncCouponText() {
-    _couponCode.value = _couponController.text;
-  }
+  // Receiver compatibility
+  bool get isDifferentReceiver => receiverController.isDifferentReceiver;
+  TextEditingController get receiverNameController =>
+      receiverController.receiverNameController;
+  TextEditingController get receiverPhoneController =>
+      receiverController.receiverPhoneController;
+  String get receiverName => receiverController.receiverName;
+  String get receiverPhone => receiverController.receiverPhone;
+  void toggleDifferentReceiver() =>
+      receiverController.toggleDifferentReceiver();
+  void setReceiverDetails(String name, String phone) =>
+      receiverController.setReceiverDetails(name, phone);
+  void clearReceiverDetails() => receiverController.clearReceiverDetails();
+  String? getReceiverValidationError() =>
+      receiverController.getReceiverValidationError();
+  String getCurrentReceiverName() =>
+      receiverController.getCurrentReceiverName(selectedShippingAddress);
+  String getCurrentReceiverPhone() =>
+      receiverController.getCurrentReceiverPhone(selectedShippingAddress);
 
-  // Receiver helpers
-  void toggleDifferentReceiver() {
-    _isDifferentReceiver.value = !_isDifferentReceiver.value;
-    if (!_isDifferentReceiver.value) {
-      _receiverNameController.clear();
-      _receiverPhoneController.clear();
+  // View coupons (compat)
+  void viewAllCoupons() {
+    try {
+      Get.to(() => const CouponsPage());
+    } catch (e) {
+      // no-op
     }
-  }
-
-  void setReceiverDetails(String name, String phone) {
-    _receiverNameController.text = name;
-    _receiverPhoneController.text = phone;
-  }
-
-  void clearReceiverDetails() {
-    _isDifferentReceiver.value = false;
-    _receiverNameController.clear();
-    _receiverPhoneController.clear();
-  }
-
-  String? getReceiverValidationError() {
-    if (!_isDifferentReceiver.value) return null;
-    if (receiverName.isEmpty) return 'Please enter receiver name';
-    if (receiverPhone.isEmpty) return 'Please enter receiver phone number';
-    if (receiverPhone.length < 10) return 'Please enter a valid phone number';
-    return null;
-  }
-
-  String getCurrentReceiverName() {
-    if (isDifferentReceiver && receiverName.isNotEmpty) return receiverName;
-    final selected = selectedShippingAddress;
-    if (selected != null) return selected.name;
-    return 'You';
-  }
-
-  String getCurrentReceiverPhone() {
-    if (isDifferentReceiver && receiverPhone.isNotEmpty) return receiverPhone;
-    final selected = selectedShippingAddress;
-    if (selected != null) return selected.phoneNumber;
-    return '';
   }
 
   void _loadInitialData() {
-    _deliveryOptions.value = _payoutService.getDeliveryOptions();
     _paymentMethods.value = _payoutService.getPaymentMethods();
-
-    // Load addresses from AddressController (which gets them from API)
-    // AddressController loads addresses in its onInit, so they should be available
-    // Fetch coupons and auto-apply the best one
-    fetchAndApplyBestCoupon();
-  }
-
-  /// Fetch coupons from backend and auto-apply the best coupon based on current subtotal
-  Future<void> fetchAndApplyBestCoupon() async {
-    try {
-      final coupons = await _payoutService.fetchCoupons();
-      _availableCoupons.value = coupons;
-
-      if (coupons.isEmpty) return;
-
-      // Evaluate best coupon based on estimated savings
-      double bestSavings = 0.0;
-      Map<String, dynamic>? bestCoupon;
-
-      for (final c in coupons) {
-        // Only consider coupon if subtotal meets the minimum threshold (up_to)
-        final base = _couponBaseSubtotal;
-        final minRequired = c.containsKey('up_to')
-            ? _toDouble(c['up_to'])
-            : 0.0;
-        if (minRequired > 0 && base < minRequired) {
-          continue; // coupon not applicable due to min cart amount
-        }
-
-        final savings = _calculateCouponSavings(c, base);
-        if (savings > bestSavings) {
-          bestSavings = savings;
-          bestCoupon = c;
-        }
-      }
-
-      if (bestCoupon != null && bestSavings > 0) {
-        // Mark applied coupon
-        _appliedCoupon.value = {
-          ...bestCoupon,
-          'isValid': true,
-          'calculatedSavings': bestSavings,
-          'message': bestCoupon['description'] ?? 'Coupon applied',
-        };
-        // set coupon controller text to the coupon code field in backend (cupon)
-        final code = bestCoupon['cupon'] ?? bestCoupon['coupon'] ?? '';
-        _couponController.text = code;
-        _couponCode.value = code;
-      }
-    } catch (e) {
-      // ignore failures silently for now
-    }
-  }
-
-  /// Apply a coupon locally (used by coupons page when user manually selects a coupon)
-  void applyCouponLocally(Map<String, dynamic> coupon) {
-    _appliedCoupon.value = {
-      ...coupon,
-      'isValid': true,
-      'message': coupon['description'] ?? 'Coupon applied',
-    };
-    final code = coupon['cupon'] ?? coupon['coupon'] ?? '';
-    _couponController.text = code;
-    _couponCode.value = code;
-  }
-
-  /// Returns true if coupon is applicable for current subtotal based on `up_to` minimum
-  bool isCouponApplicable(Map<String, dynamic> coupon) {
-    final base = _couponBaseSubtotal;
-    if (coupon.containsKey('up_to')) {
-      final minRequired = _toDouble(coupon['up_to']);
-      if (minRequired > 0 && base < minRequired) return false;
-    }
-    return true;
-  }
-
-  /// Estimate savings for UI (returns 0 if not applicable)
-  double estimateSavings(Map<String, dynamic> coupon) {
-    if (!isCouponApplicable(coupon)) return 0.0;
-    return _calculateCouponSavings(coupon, _couponBaseSubtotal);
-  }
-
-  /// Estimate coupon savings for a given subtotal. Heuristic to handle both percentage and fixed coupons.
-  double _calculateCouponSavings(Map<String, dynamic> coupon, double base) {
-    try {
-      if (base <= 0) return 0.0;
-
-      // If the coupon explicitly provides discountType/discountValue, prefer that
-      if (coupon.containsKey('discountType') &&
-          coupon.containsKey('discountValue')) {
-        final String type = coupon['discountType']?.toString() ?? '';
-        final double value = (coupon['discountValue'] is num)
-            ? (coupon['discountValue'] as num).toDouble()
-            : double.tryParse(coupon['discountValue']?.toString() ?? '') ?? 0.0;
-
-        if (type == 'percentage') {
-          double raw = base * (value / 100.0);
-          final cap = coupon['max_value'] ?? coupon['max'] ?? coupon['cap'];
-          if (cap != null) {
-            final double capVal = _toDouble(cap);
-            return raw > capVal ? capVal : raw;
-          }
-          return raw;
-        } else if (type == 'fixed') {
-          // fixed amount - cap does not usually apply
-          final double fixed = value;
-          return fixed > base ? base : fixed;
-        }
-      }
-
-      // Fallback heuristics for the API shape provided in example:
-      // Example has fields: discount (likely percentage), up_to, max_value
-      if (coupon.containsKey('discount')) {
-        final double discount = _toDouble(coupon['discount']);
-        double raw = base * (discount / 100.0);
-        // 'max_value' is the cap on discount amount
-        final cap = coupon['max_value'] ?? coupon['max'] ?? coupon['cap'];
-        if (cap != null) {
-          final double capVal = _toDouble(cap);
-          return raw > capVal ? capVal : raw;
-        }
-        return raw;
-      }
-
-      // If everything else fails, return 0
-      return 0.0;
-    } catch (e) {
-      return 0.0;
-    }
-  }
-
-  void selectDeliveryOption(DeliveryOptionModel option) {
-    _deliveryOptions.value = _deliveryOptions.map((item) {
-      return item.copyWith(isSelected: item.type == option.type);
-    }).toList();
-  }
-
-  void selectDeliveryPreference(String? pref) {
-    _selectedDeliveryPreference.value = pref;
-    if (pref != null) _deliveryPreferenceController.text = pref;
+    // CouponController.fetchAndApplyBestCoupon runs in its onInit
   }
 
   void selectPaymentMethod(PaymentMethodModel method) {
@@ -419,100 +174,11 @@ class PayoutController extends GetxController {
   }
 
   void selectShippingAddress(ShippingAddressModel address) {
-    // Update the address selection in AddressController
     _addressController.selectAddress(address);
   }
 
-  void toggleUrgentDelivery() {
-    _userToggledUrgent.value = true; // Mark as manually toggled
-    _isUrgentDelivery.value = !_isUrgentDelivery.value;
-
-    // If turning off urgent delivery, remove urgent status from all items
-    if (!_isUrgentDelivery.value) {
-      _clearAllUrgentItems();
-    } else {
-      // If turning on urgent delivery, restore urgent status to medicine items
-      _restoreUrgentItemsForMedicines();
-    }
-
-    // Update delivery options
-    _updateDeliveryManually();
-  }
-
-  void _clearAllUrgentItems() {
-    // Remove urgent status from all cart items
-    for (final item in _cartController.cartItems) {
-      if (_cartController.isProductUrgent(item.product)) {
-        _cartController.toggleProductUrgentStatus(item.product);
-      }
-    }
-    // Reset user toggle flag since we've manually cleared all urgent items
-    _userToggledUrgent.value = false;
-  }
-
-  void _restoreUrgentItemsForMedicines() {
-    // Restore urgent status to medicine items when urgent delivery is turned on
-    for (final item in _cartController.cartItems) {
-      final isMedicine =
-          item.product.isPrescriptionMedicine || item.product.isOTC;
-      if (isMedicine && !_cartController.isProductUrgent(item.product)) {
-        _cartController.toggleProductUrgentStatus(item.product);
-      }
-    }
-  }
-
-  void _updateDeliveryBasedOnUrgency() {
-    // Check if there are urgent items in cart
-    final hasUrgentItems = _cartController.hasUrgentItems;
-
-    // Only auto-enable urgent delivery if user hasn't manually toggled it
-    if (hasUrgentItems &&
-        !_isUrgentDelivery.value &&
-        !_userToggledUrgent.value) {
-      _isUrgentDelivery.value = true;
-    }
-    // Auto-disable urgent delivery toggle only if no urgent items and user hasn't manually set it
-    else if (!hasUrgentItems &&
-        _isUrgentDelivery.value &&
-        !_userToggledUrgent.value) {
-      _isUrgentDelivery.value = false;
-    }
-
-    _updateDeliveryOptions();
-  }
-
-  void _updateDeliveryManually() {
-    // This is called when user manually toggles, don't auto-adjust the toggle
-    _updateDeliveryOptions();
-  }
-
-  void _updateDeliveryOptions() {
-    // Check if all items are from the same category
-    final hasMultipleCategories = _cartController.hasMultipleCategories;
-
-    // Check if we should use split delivery
-    final shouldUseSplit = _isUrgentDelivery.value && hasMultipleCategories;
-
-    if (shouldUseSplit) {
-      // When urgent delivery is needed AND items are from different categories,
-      // prefer split delivery for speed
-      final splitOption = _deliveryOptions.firstWhereOrNull(
-        (o) => o.type.name == 'split' || o.type == DeliveryType.split,
-      );
-      if (splitOption != null) selectDeliveryOption(splitOption);
-    } else {
-      // Use combined delivery when:
-      // 1. No urgent items, OR
-      // 2. All items are from the same category (split not available)
-      final combinedOption = _deliveryOptions.firstWhereOrNull(
-        (o) => o.type.name == 'combined' || o.type == DeliveryType.combined,
-      );
-      if (combinedOption != null) selectDeliveryOption(combinedOption);
-    }
-  }
-
   Future<void> applyCoupon() async {
-    final code = _couponController.text.trim();
+    final code = _couponCtrl.couponController.text.trim();
     if (code.isEmpty) {
       Get.snackbar('Error', 'Please enter a coupon code');
       return;
@@ -520,9 +186,7 @@ class PayoutController extends GetxController {
 
     try {
       final result = await _payoutService.validateCoupon(code);
-      _appliedCoupon.value = result;
-      _couponCode.value = code;
-
+      _couponCtrl.applyCouponLocally(result);
       if (result['isValid'] == true) {
         Get.snackbar('Success', result['message']);
       } else {
@@ -533,16 +197,13 @@ class PayoutController extends GetxController {
     }
   }
 
-  void removeCoupon() {
-    _appliedCoupon.value = null;
-    _couponCode.value = '';
-    _couponController.clear();
-  }
-
   Future<void> placeOrder() async {
-    // Auto-select sensible defaults if the user hasn't made explicit choices
-    if (selectedDeliveryOption == null && _deliveryOptions.isNotEmpty) {
-      selectDeliveryOption(_deliveryOptions.first);
+    // Ensure delivery option selected
+    if (deliveryController.selectedDeliveryOption == null &&
+        deliveryController.deliveryOptions.isNotEmpty) {
+      deliveryController.selectDeliveryOption(
+        deliveryController.deliveryOptions.first,
+      );
     }
 
     if (selectedPaymentMethod == null && _paymentMethods.isNotEmpty) {
@@ -550,7 +211,8 @@ class PayoutController extends GetxController {
     }
 
     // Auto-select default address if none selected and addresses available
-    if (selectedShippingAddress == null &&
+    if (_addressController.addresses.firstWhereOrNull((a) => a.isSelected) ==
+            null &&
         _addressController.addresses.isNotEmpty) {
       final defaultAddr = _addressController.defaultAddress;
       if (defaultAddr != null) {
@@ -560,9 +222,14 @@ class PayoutController extends GetxController {
       }
     }
 
-    if (selectedDeliveryOption == null ||
+    final selectedDelivery = deliveryController.selectedDeliveryOption;
+    final selectedAddress = _addressController.addresses.firstWhereOrNull(
+      (a) => a.isSelected,
+    );
+
+    if (selectedDelivery == null ||
         selectedPaymentMethod == null ||
-        selectedShippingAddress == null) {
+        selectedAddress == null) {
       Get.snackbar('Error', 'Please complete all selections');
       return;
     }
@@ -570,31 +237,26 @@ class PayoutController extends GetxController {
     _isProcessingPayment.value = true;
 
     try {
-      // Determine final shipping address to attach to order.
-      // If user provided a different receiver, copy the selected address but
-      // replace name and phone number.
-      ShippingAddressModel finalShippingAddress = selectedShippingAddress!;
-      if (isDifferentReceiver && receiverName.isNotEmpty) {
-        finalShippingAddress = selectedShippingAddress!.copyWith(
-          name: receiverName,
-          phoneNumber: receiverPhone.isNotEmpty
-              ? receiverPhone
-              : selectedShippingAddress!.phoneNumber,
+      // Build final shipping address (respect receiver override)
+      var finalShippingAddress = selectedAddress;
+      if (receiverController.isDifferentReceiver &&
+          receiverController.receiverName.isNotEmpty) {
+        finalShippingAddress = selectedAddress.copyWith(
+          name: receiverController.receiverName,
+          phoneNumber: receiverController.receiverPhone.isNotEmpty
+              ? receiverController.receiverPhone
+              : selectedAddress.phoneNumber,
         );
       }
 
-      // Set loading state
-      _isProcessingPayment.value = true;
-
-      // Step 1: Create order with backend API
       AppLoggerHelper.debug('Creating order with backend API...');
       final orderCreationResponse = await _orderApiService.createOrder(
         items: _cartController.cartItems,
         shippingAddress: finalShippingAddress,
-        deliveryOption: selectedDeliveryOption!,
+        deliveryOption: selectedDelivery,
         paymentMethod: selectedPaymentMethod!,
-        couponCode: appliedCoupon?['isValid'] == true
-            ? _couponController.text
+        couponCode: _couponCtrl.appliedCoupon?['isValid'] == true
+            ? _couponCtrl.couponController.text
             : null,
       );
 
@@ -604,17 +266,14 @@ class PayoutController extends GetxController {
 
       final orderData = orderCreationResponse.data;
       AppLoggerHelper.debug(
-        '✅ Orders created: ${orderData.orders.length} order(s), Parent Order ID: ${orderData.parentOrderId}',
-      );
-      AppLoggerHelper.debug(
-        'Requires Payment: ${orderData.requiresPayment}, Total Amount: ${orderData.totalAmount}',
+        'Orders created: parent id ${orderData.parentOrderId}',
       );
 
-      // If a coupon was applied locally by the user, attempt to apply it on server now
+      // Attempt to apply coupon on server if present
       try {
-        final applied = appliedCoupon;
+        final applied = _couponCtrl.appliedCoupon;
         if (applied != null && applied['isValid'] == true) {
-          final code = _couponController.text.trim();
+          final code = _couponCtrl.couponController.text.trim();
           if (code.isNotEmpty) {
             AppLoggerHelper.debug('Applying coupon on server: $code');
             final resp = await _payoutService.applyCoupon(
@@ -627,7 +286,6 @@ class PayoutController extends GetxController {
               AppLoggerHelper.debug(
                 'Coupon apply failed: ${resp.errorMessage}',
               );
-              // Do not block the order flow; just inform user
               Get.snackbar(
                 'Coupon',
                 resp.errorMessage,
@@ -638,77 +296,60 @@ class PayoutController extends GetxController {
         }
       } catch (e) {
         AppLoggerHelper.error('Error applying coupon on server', e);
-        // continue without blocking
       }
 
-      // Step 2: If payment is required, use Cashfree SDK
+      // If payment is required, start payment via PaymentController
       if (orderData.requiresPayment) {
         AppLoggerHelper.debug(
-          'Initiating Cashfree payment for CF Order ID: ${orderData.cfOrderId}',
+          'Initiating payment for cfOrderId: ${orderData.cfOrderId}',
         );
-        AppLoggerHelper.debug(
-          'Payment Session ID: ${orderData.paymentSessionId}',
-        );
-
-        // Store order data for later use in callbacks
         _pendingOrderData = orderData;
         _pendingShippingAddress = finalShippingAddress;
 
-        // Start Cashfree payment
         _isProcessingPayment.value = false;
 
-        await _cashfreeService.startPayment(
+        await paymentController.startPayment(
           cfOrderId: orderData.cfOrderId,
           paymentSessionId: orderData.paymentSessionId,
           parentOrderId: orderData.parentOrderId,
         );
       } else {
-        // Payment not required (e.g., COD)
         _handlePaymentSuccess(orderData, finalShippingAddress);
       }
     } catch (e) {
-      AppLoggerHelper.error('❌ Error placing order', e);
+      AppLoggerHelper.error('Error placing order', e);
       _isProcessingPayment.value = false;
 
-      // Show payment failure dialog for any payment-related errors
       String errorMessage = 'Something went wrong. Please try again.';
-
-      // Extract meaningful error message
       if (e.toString().contains('Cashfree') ||
           e.toString().contains('payment') ||
           e.toString().contains('session')) {
         errorMessage =
             'Payment initialization failed. Please check your connection and try again.';
       } else if (e.toString().contains('Exception:')) {
-        // Extract the actual error message
         final match = RegExp(r'Exception:\s*(.+)').firstMatch(e.toString());
-        if (match != null && match.group(1) != null) {
+        if (match != null && match.group(1) != null)
           errorMessage = match.group(1)!;
-        }
       }
 
       Get.dialog(
         OrderFailureDialog(
           errorMessage: errorMessage,
-          onRetry: () {
-            placeOrder();
-          },
+          onRetry: () => placeOrder(),
         ),
         barrierDismissible: true,
       );
     }
   }
 
-  // Store pending order data for callback processing
+  // pending order data for payment callbacks
   OrderCreationData? _pendingOrderData;
   ShippingAddressModel? _pendingShippingAddress;
 
-  /// Handle payment processing (called before confirmation API)
   void _handlePaymentProcessing() {
-    AppLoggerHelper.debug('⏳ Processing payment confirmation...');
+    AppLoggerHelper.debug('Processing payment confirmation...');
     _isProcessingPayment.value = true;
 
-    // Show loading dialog
     Get.dialog(
       PopScope(
         canPop: false,
@@ -757,17 +398,12 @@ class PayoutController extends GetxController {
     );
   }
 
-  /// Handle successful payment from Cashfree SDK
   void _handleCashfreePaymentSuccess(String orderId) {
-    AppLoggerHelper.debug('✅ Cashfree payment successful for order: $orderId');
-
-    // Close the processing dialog if it's open
-    if (Get.isDialogOpen ?? false) {
-      Get.back();
-    }
+    AppLoggerHelper.debug('Cashfree payment successful for order: $orderId');
+    if (Get.isDialogOpen ?? false) Get.back();
 
     if (_pendingOrderData == null || _pendingShippingAddress == null) {
-      AppLoggerHelper.error('❌ No pending order data found');
+      AppLoggerHelper.error('No pending order data found');
       Get.snackbar(
         'Error',
         'Payment completed but order data is missing. Please contact support.',
@@ -777,41 +413,26 @@ class PayoutController extends GetxController {
     }
 
     _handlePaymentSuccess(_pendingOrderData!, _pendingShippingAddress!);
-
-    // Clear pending data
     _pendingOrderData = null;
     _pendingShippingAddress = null;
   }
 
-  /// Handle payment error from Cashfree SDK
   void _handleCashfreePaymentError(String orderId, String errorMessage) {
     AppLoggerHelper.error(
-      '❌ Cashfree payment error for order $orderId: $errorMessage',
+      'Cashfree payment error for order $orderId: $errorMessage',
     );
-
-    // Close the processing dialog if it's open
-    if (Get.isDialogOpen ?? false) {
-      Get.back();
-    }
-
+    if (Get.isDialogOpen ?? false) Get.back();
     _isProcessingPayment.value = false;
 
-    // Show payment failure dialog instead of snackbar
     Get.dialog(
       PaymentFailureDialog(
         errorMessage: errorMessage.isEmpty
             ? 'Something went wrong with your payment'
             : errorMessage,
-        onRetry: () {
-          // Retry the payment by calling placeOrder again
-          placeOrder();
-        },
+        onRetry: () => placeOrder(),
       ),
       barrierDismissible: true,
     );
-
-    // Don't clear pending data yet - user might retry
-    // Only clear if they cancel
   }
 
   void _handlePaymentSuccess(
@@ -819,10 +440,9 @@ class PayoutController extends GetxController {
     ShippingAddressModel finalShippingAddress,
   ) {
     AppLoggerHelper.debug(
-      '✅ Payment successful for parent order: ${orderData.parentOrderId}',
+      'Payment successful for parent order: ${orderData.parentOrderId}',
     );
 
-    // Create local order model for display (using first order for UI)
     final firstOrder = orderData.orders.isNotEmpty
         ? orderData.orders.first
         : null;
@@ -832,21 +452,21 @@ class PayoutController extends GetxController {
       userId: _userController.currentUserId ?? 'unknown_user',
       items: _cartController.cartItems,
       shippingAddress: finalShippingAddress,
-      deliveryOption: selectedDeliveryOption!,
+      deliveryOption: deliveryController.selectedDeliveryOption!,
       paymentMethod: selectedPaymentMethod!,
       subtotal: subtotal,
       deliveryFee: deliveryFee,
       total: orderData.totalAmount,
-      couponCode: appliedCoupon?['isValid'] == true
-          ? _couponController.text
+      couponCode: _couponCtrl.appliedCoupon?['isValid'] == true
+          ? _couponCtrl.couponController.text
           : null,
       discount: discountAmount > 0 ? discountAmount : null,
       orderDate: DateTime.now(),
       status: OrderStatus.pending,
       trackingNumber: firstOrder?.trackingNumber ?? '',
       metadata: {
-        'deliveryPreference': selectedDeliveryPreference,
-        'isUrgent': isUrgentDelivery,
+        'deliveryPreference': deliveryController.selectedDeliveryPreference,
+        'isUrgent': deliveryController.isUrgentDelivery,
         'cfOrderId': orderData.cfOrderId,
         'childOrders': orderData.orders
             .map(
@@ -861,11 +481,9 @@ class PayoutController extends GetxController {
       },
     );
 
-    // Clear cart
     _cartController.clearCart();
     _isProcessingPayment.value = false;
 
-    // Show success dialog
     Get.dialog(
       OrderSuccessDialog(
         order: order,
