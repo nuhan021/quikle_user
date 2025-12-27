@@ -14,8 +14,8 @@ class SplashController extends GetxController {
   final RxBool isReady = false.obs;
   final RxBool shouldShrink = false.obs;
 
-  static const double _ellipseTopFinal = 730.0;
-  final RxDouble ellipseTop = _ellipseTopFinal.obs;
+  // Ellipse top will be provided by the view after layout is available.
+  final RxDouble ellipseTop = 0.0.obs;
 
   final RxBool showEllipse = false.obs;
   final RxBool showLogin = false.obs;
@@ -29,7 +29,17 @@ class SplashController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    // Do NOT access Get.height here — GetMaterialApp / window may not be
+    // available yet which causes a null-check crash. The view will compute
+    // and pass a proper value after first layout.
     _initVideo();
+  }
+
+  /// Set the final top position for the ellipse. This should be called by
+  /// the view after layout (for example from a post-frame callback) so
+  /// we don't access window dimensions too early.
+  void setEllipseTop(double value) {
+    ellipseTop.value = value;
   }
 
   Future<void> _initVideo() async {
