@@ -140,7 +140,7 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                         padding: EdgeInsets.only(top: 12.h, bottom: 24.h),
                         sliver: SliverList(
                           delegate: SliverChildListDelegate([
-                            Center(child: OfferBanner()),
+                            Center(child: OfferBanner(isLoading: true)),
                             12.verticalSpace,
                             // Show shimmer for 6 product sections
                             const ProductSectionShimmer(isMedicine: false),
@@ -159,7 +159,16 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                       padding: EdgeInsets.only(top: 12.h, bottom: 24.h),
                       sliver: SliverList(
                         delegate: SliverChildListDelegate([
-                          Center(child: OfferBanner()),
+                          Center(
+                            child: Obx(
+                              () => OfferBanner(
+                                images: controller.bannerController.banners
+                                    .toList(),
+                                isLoading:
+                                    controller.bannerController.isLoading.value,
+                              ),
+                            ),
+                          ),
                           12.verticalSpace,
                           if (controller.isShowingAllCategories)
                             ...controller.productSections.map(
