@@ -4,6 +4,10 @@ import 'package:quikle_user/core/utils/constants/enums/payment_enums.dart';
 import 'package:quikle_user/features/payout/data/models/delivery_option_model.dart';
 import 'package:quikle_user/features/payout/data/models/payment_method_model.dart';
 import 'package:quikle_user/features/profile/data/models/shipping_address_model.dart';
+import 'package:quikle_user/core/services/network_caller.dart';
+import 'package:quikle_user/core/services/storage_service.dart';
+import 'package:quikle_user/core/utils/constants/api_constants.dart';
+import 'package:quikle_user/core/models/response_data.dart';
 
 class PayoutService {
   List<DeliveryOptionModel> getDeliveryOptions() {
@@ -96,6 +100,58 @@ class PayoutService {
         'transactionId': 'TXN_${DateTime.now().millisecondsSinceEpoch}',
         'message': 'Payment successful!',
       };
+    }
+  }
+
+  /// Fetch coupons for current user from backend
+  Future<List<Map<String, dynamic>>> fetchCoupons() async {
+    try {
+      final NetworkCaller caller = NetworkCaller();
+      final token = StorageService.token;
+      final ResponseData response = await caller.getRequest(
+        ApiConstants.getCoupons,
+        token: token != null ? 'Bearer $token' : null,
+      );
+
+      if (response.statusCode == 200 && response.responseData is List) {
+        final List raw = response.responseData as List;
+        return raw.map((e) {
+          if (e is Map<String, dynamic>) return e;
+          if (e is Map) {
+            return e.map((k, v) => MapEntry(k.toString(), v));
+          }
+          return <String, dynamic>{};
+        }).toList();
+      }
+      return [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  /// Apply a coupon on server (form-urlencoded body: cupon_code)
+  Future<ResponseData> applyCoupon(String couponCode, {String? orderId}) async {
+    try {
+      final NetworkCaller caller = NetworkCaller();
+      final token = StorageService.token;
+      final Map<String, dynamic> body = {'cupon_code': couponCode};
+      if (orderId != null) body['order_id'] = orderId;
+
+      final ResponseData response = await caller.postRequest(
+        ApiConstants.applyCoupon,
+        body: body,
+        token: token != null ? 'Bearer $token' : null,
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+      );
+
+      return response;
+    } catch (e) {
+      return ResponseData(
+        isSuccess: false,
+        statusCode: 500,
+        responseData: '',
+        errorMessage: e.toString(),
+      );
     }
   }
 }

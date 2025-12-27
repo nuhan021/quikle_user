@@ -77,4 +77,7 @@ class ApiConstants {
   //Restaurant api's
   static const String getRestaurants = "$authApi/restaurant/restaurants";
   static const String getRestaurantProducts = "$baseUrl/items/food/";
+  // Promo / Coupons
+  static const String getCoupons = "$baseUrl/promo/cupons/";
+  static const String applyCoupon = "$baseUrl/promo/cupons/apply";
 }

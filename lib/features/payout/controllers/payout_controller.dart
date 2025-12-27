@@ -12,6 +12,7 @@ import '../data/models/payment_method_model.dart';
 import '../../profile/data/models/shipping_address_model.dart';
 import '../../profile/controllers/address_controller.dart';
 import '../data/services/payout_service.dart';
+import '../presentation/pages/coupons_page.dart';
 import '../../cart/controllers/cart_controller.dart';
 import '../../user/controllers/user_controller.dart';
 import '../../../core/utils/constants/enums/order_enums.dart';
@@ -42,6 +43,7 @@ class PayoutController extends GetxController {
   final _userToggledUrgent = false.obs; // Track if user manually toggled
   final _couponCode = ''.obs;
   final _appliedCoupon = Rxn<Map<String, dynamic>>();
+  final _availableCoupons = <Map<String, dynamic>>[].obs;
   final _isProcessingPayment = false.obs;
   final _couponController = TextEditingController();
   // Receiver details (for ordering to same address but different receiver)
@@ -67,6 +69,7 @@ class PayoutController extends GetxController {
   bool get isUrgentDelivery => _isUrgentDelivery.value;
   String get couponCode => _couponCode.value;
   Map<String, dynamic>? get appliedCoupon => _appliedCoupon.value;
+  List<Map<String, dynamic>> get availableCoupons => _availableCoupons;
   bool get isProcessingPayment => _isProcessingPayment.value;
   TextEditingController get couponController => _couponController;
 
@@ -109,23 +112,69 @@ class PayoutController extends GetxController {
     final base = _couponBaseSubtotal;
     if (base <= 0) return 0.0;
 
-    final String discountType = coupon['discountType'] as String;
-    final double discountValue = (coupon['discountValue'] as num).toDouble();
+    // Defensive handling for multiple coupon payload shapes
+    try {
+      // Preferred shape: discountType + discountValue
+      if (coupon.containsKey('discountType') &&
+          coupon.containsKey('discountValue')) {
+        final String discountType = coupon['discountType']?.toString() ?? '';
+        final double discountValue = _toDouble(coupon['discountValue']);
 
-    double discount = 0.0;
-    switch (discountType) {
-      case 'percentage':
-        discount = base * (discountValue / 100.0);
-        break;
-      case 'fixed':
-        discount = discountValue;
-        break;
-      default:
-        discount = 0.0;
+        double discount = 0.0;
+        switch (discountType) {
+          case 'percentage':
+            discount = base * (discountValue / 100.0);
+            break;
+          case 'fixed':
+            discount = discountValue;
+            break;
+          default:
+            discount = 0.0;
+        }
+        if (discount > base) discount = base;
+        return discount;
+      }
+
+      // Fallback: API example uses 'discount' as percentage and caps via 'max_value' or 'up_to'
+      if (coupon.containsKey('discount')) {
+        final double discountPercent = _toDouble(coupon['discount']);
+        double discount = base * (discountPercent / 100.0);
+        final cap = coupon['max_value'] ?? coupon['up_to'];
+        if (cap != null) {
+          final capVal = _toDouble(cap);
+          if (discount > capVal) discount = capVal;
+        }
+        if (discount > base) discount = base;
+        return discount;
+      }
+
+      // Another fallback: discountValue present and treated as fixed amount
+      if (coupon.containsKey('discountValue')) {
+        final double val = _toDouble(coupon['discountValue']);
+        return val > base ? base : val;
+      }
+    } catch (e) {
+      // ignore and return 0
     }
-    if (discount > base) discount = base;
 
-    return discount;
+    return 0.0;
+  }
+
+  double _toDouble(dynamic v) {
+    if (v == null) return 0.0;
+    if (v is num) return v.toDouble();
+    if (v is String) return double.tryParse(v) ?? 0.0;
+    return 0.0;
+  }
+
+  /// Open coupons page (simple view all method)
+  void viewAllCoupons() {
+    // Navigate to coupons page UI
+    try {
+      Get.to(() => const CouponsPage());
+    } catch (e) {
+      // no-op on navigation failure
+    }
   }
 
   double get totalAmount => (subtotal - discountAmount) + deliveryFee;
@@ -224,6 +273,132 @@ class PayoutController extends GetxController {
 
     // Load addresses from AddressController (which gets them from API)
     // AddressController loads addresses in its onInit, so they should be available
+    // Fetch coupons and auto-apply the best one
+    fetchAndApplyBestCoupon();
+  }
+
+  /// Fetch coupons from backend and auto-apply the best coupon based on current subtotal
+  Future<void> fetchAndApplyBestCoupon() async {
+    try {
+      final coupons = await _payoutService.fetchCoupons();
+      _availableCoupons.value = coupons;
+
+      if (coupons.isEmpty) return;
+
+      // Evaluate best coupon based on estimated savings
+      double bestSavings = 0.0;
+      Map<String, dynamic>? bestCoupon;
+
+      for (final c in coupons) {
+        // Only consider coupon if subtotal meets the minimum threshold (up_to)
+        final base = _couponBaseSubtotal;
+        final minRequired = c.containsKey('up_to')
+            ? _toDouble(c['up_to'])
+            : 0.0;
+        if (minRequired > 0 && base < minRequired) {
+          continue; // coupon not applicable due to min cart amount
+        }
+
+        final savings = _calculateCouponSavings(c, base);
+        if (savings > bestSavings) {
+          bestSavings = savings;
+          bestCoupon = c;
+        }
+      }
+
+      if (bestCoupon != null && bestSavings > 0) {
+        // Mark applied coupon
+        _appliedCoupon.value = {
+          ...bestCoupon,
+          'isValid': true,
+          'calculatedSavings': bestSavings,
+          'message': bestCoupon['description'] ?? 'Coupon applied',
+        };
+        // set coupon controller text to the coupon code field in backend (cupon)
+        final code = bestCoupon['cupon'] ?? bestCoupon['coupon'] ?? '';
+        _couponController.text = code;
+        _couponCode.value = code;
+      }
+    } catch (e) {
+      // ignore failures silently for now
+    }
+  }
+
+  /// Apply a coupon locally (used by coupons page when user manually selects a coupon)
+  void applyCouponLocally(Map<String, dynamic> coupon) {
+    _appliedCoupon.value = {
+      ...coupon,
+      'isValid': true,
+      'message': coupon['description'] ?? 'Coupon applied',
+    };
+    final code = coupon['cupon'] ?? coupon['coupon'] ?? '';
+    _couponController.text = code;
+    _couponCode.value = code;
+  }
+
+  /// Returns true if coupon is applicable for current subtotal based on `up_to` minimum
+  bool isCouponApplicable(Map<String, dynamic> coupon) {
+    final base = _couponBaseSubtotal;
+    if (coupon.containsKey('up_to')) {
+      final minRequired = _toDouble(coupon['up_to']);
+      if (minRequired > 0 && base < minRequired) return false;
+    }
+    return true;
+  }
+
+  /// Estimate savings for UI (returns 0 if not applicable)
+  double estimateSavings(Map<String, dynamic> coupon) {
+    if (!isCouponApplicable(coupon)) return 0.0;
+    return _calculateCouponSavings(coupon, _couponBaseSubtotal);
+  }
+
+  /// Estimate coupon savings for a given subtotal. Heuristic to handle both percentage and fixed coupons.
+  double _calculateCouponSavings(Map<String, dynamic> coupon, double base) {
+    try {
+      if (base <= 0) return 0.0;
+
+      // If the coupon explicitly provides discountType/discountValue, prefer that
+      if (coupon.containsKey('discountType') &&
+          coupon.containsKey('discountValue')) {
+        final String type = coupon['discountType']?.toString() ?? '';
+        final double value = (coupon['discountValue'] is num)
+            ? (coupon['discountValue'] as num).toDouble()
+            : double.tryParse(coupon['discountValue']?.toString() ?? '') ?? 0.0;
+
+        if (type == 'percentage') {
+          double raw = base * (value / 100.0);
+          final cap = coupon['max_value'] ?? coupon['max'] ?? coupon['cap'];
+          if (cap != null) {
+            final double capVal = _toDouble(cap);
+            return raw > capVal ? capVal : raw;
+          }
+          return raw;
+        } else if (type == 'fixed') {
+          // fixed amount - cap does not usually apply
+          final double fixed = value;
+          return fixed > base ? base : fixed;
+        }
+      }
+
+      // Fallback heuristics for the API shape provided in example:
+      // Example has fields: discount (likely percentage), up_to, max_value
+      if (coupon.containsKey('discount')) {
+        final double discount = _toDouble(coupon['discount']);
+        double raw = base * (discount / 100.0);
+        // 'max_value' is the cap on discount amount
+        final cap = coupon['max_value'] ?? coupon['max'] ?? coupon['cap'];
+        if (cap != null) {
+          final double capVal = _toDouble(cap);
+          return raw > capVal ? capVal : raw;
+        }
+        return raw;
+      }
+
+      // If everything else fails, return 0
+      return 0.0;
+    } catch (e) {
+      return 0.0;
+    }
   }
 
   void selectDeliveryOption(DeliveryOptionModel option) {
@@ -434,6 +609,37 @@ class PayoutController extends GetxController {
       AppLoggerHelper.debug(
         'Requires Payment: ${orderData.requiresPayment}, Total Amount: ${orderData.totalAmount}',
       );
+
+      // If a coupon was applied locally by the user, attempt to apply it on server now
+      try {
+        final applied = appliedCoupon;
+        if (applied != null && applied['isValid'] == true) {
+          final code = _couponController.text.trim();
+          if (code.isNotEmpty) {
+            AppLoggerHelper.debug('Applying coupon on server: $code');
+            final resp = await _payoutService.applyCoupon(
+              code,
+              orderId: orderData.parentOrderId.toString(),
+            );
+            if (resp.statusCode == 200) {
+              AppLoggerHelper.debug('Coupon applied on server successfully');
+            } else {
+              AppLoggerHelper.debug(
+                'Coupon apply failed: ${resp.errorMessage}',
+              );
+              // Do not block the order flow; just inform user
+              Get.snackbar(
+                'Coupon',
+                resp.errorMessage,
+                snackPosition: SnackPosition.BOTTOM,
+              );
+            }
+          }
+        }
+      } catch (e) {
+        AppLoggerHelper.error('Error applying coupon on server', e);
+        // continue without blocking
+      }
 
       // Step 2: If payment is required, use Cashfree SDK
       if (orderData.requiresPayment) {
