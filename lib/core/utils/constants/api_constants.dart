@@ -1,6 +1,9 @@
 class ApiConstants {
   static const String baseUrl = "https://caditya619-backend-ng0e.onrender.com";
 
+  //Get banner images
+  static const String getBannerImages = "$baseUrl/banner/pictures/";
+
   //For auth api's
   static const String authApi = "$baseUrl/auth";
   static const String sendOtp = "$authApi/send_otp/";

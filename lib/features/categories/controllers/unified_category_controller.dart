@@ -14,6 +14,8 @@ import 'package:quikle_user/features/cart/controllers/cart_controller.dart';
 import 'package:quikle_user/features/profile/controllers/favorites_controller.dart';
 import 'package:quikle_user/routes/app_routes.dart';
 import 'package:quikle_user/core/mixins/voice_search_mixin.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:quikle_user/core/services/global_prefetch_service.dart';
 
 class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
   final CategoryService _categoryService = CategoryService();
@@ -117,7 +119,7 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
   }
 
   @override
-  void onInit() {
+  Future<void> onInit() async {
     super.onInit();
 
     final args = Get.arguments as Map<String, dynamic>?;
@@ -126,22 +128,31 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
       categoryTitle.value = currentCategory.title;
       _startPlaceholderRotation();
 
-      // Check if subcategories are preloaded from categories screen
       if (args.containsKey('preloadedSubcategories')) {
         final preloadedSubs =
             args['preloadedSubcategories'] as List<SubcategoryModel>;
-        print(
-          '✅ Using preloaded subcategories (${preloadedSubs.length} items) - skipping API call',
-        );
-        _loadCategoryDataWithPreloadedSubcategories(preloadedSubs);
+        await _loadCategoryDataWithPreloadedSubcategories(preloadedSubs);
       } else {
-        _loadCategoryData();
+        await _loadCategoryData();
       }
 
-      // Check if we should auto-select a subcategory
+      // Start background prefetch while this controller/screen is active.
+      // Prefetch will continue until the controller is closed (onClose).
+      _startAutoFetchingPages();
+
+      // Enqueue this category for global prefetch. If the device is on Wi-Fi
+      // we'll allow full prefetch (fetch until server reports no more pages).
+      try {
+        final conn = await Connectivity().checkConnectivity();
+        final onWifi = conn == ConnectivityResult.wifi;
+        GlobalPrefetchService.instance.enqueueCategory(
+          currentCategory.id,
+          full: onWifi,
+        );
+      } catch (_) {}
+
       if (args.containsKey('autoSelectSubcategory')) {
         final autoSelectSub = args['autoSelectSubcategory'] as SubcategoryModel;
-        // Delay the selection until after data is loaded
         Future.delayed(const Duration(milliseconds: 500), () {
           onSubcategoryTap(autoSelectSub);
         });
@@ -152,6 +163,7 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
   @override
   void onClose() {
     _placeholderTimer?.cancel();
+    _stopAutoFetchingPages();
     super.onClose();
   }
 
@@ -207,9 +219,7 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
         address: '789 Health Ave, City',
         isOpen: true,
       );
-    } catch (e) {
-      print('Error loading shop data: $e');
-    }
+    } catch (_) {}
   }
 
   Future<void> _loadCategoryData() async {
@@ -225,14 +235,12 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
       } else {
         await _loadCategorySubcategories();
       }
-    } catch (e) {
-      print('Error loading category data: $e');
+    } catch (_) {
     } finally {
       isLoading.value = false;
     }
   }
 
-  /// Load category data using preloaded subcategories (skip subcategory API call)
   Future<void> _loadCategoryDataWithPreloadedSubcategories(
     List<SubcategoryModel> preloadedSubcategories,
   ) async {
@@ -242,45 +250,36 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
       await _loadShopData();
 
       if (isGroceryCategory) {
-        // For grocery, use preloaded main categories
         allCategories.value = preloadedSubcategories;
         availableSubcategories.value = preloadedSubcategories;
         sectionTitle.value = 'Select Category';
         selectedMainCategory.value = null;
         filterSubcategories.clear();
 
-        // Still need to fetch products
         await _fetchProductsForGrocery();
       } else if (isFoodCategory) {
-        // For food, use preloaded subcategories
         allCategories.value = preloadedSubcategories;
         availableSubcategories.value = preloadedSubcategories;
         sectionTitle.value = 'Popular Items';
         selectedSubcategory.value = null;
 
-        // Fetch products and restaurants
         await Future.wait([_fetchProductsForCategory(), _loadRestaurants()]);
       } else {
-        // For other categories, use preloaded subcategories
         allCategories.value = preloadedSubcategories;
         availableSubcategories.value = preloadedSubcategories;
         sectionTitle.value = 'Popular Items';
         selectedSubcategory.value = null;
 
-        // Fetch products
         await _fetchProductsForCategory();
       }
-    } catch (e) {
-      print('Error loading category data with preloaded subcategories: $e');
+    } catch (_) {
     } finally {
       isLoading.value = false;
     }
   }
 
-  /// Helper: Fetch products for grocery category
   Future<void> _fetchProductsForGrocery() async {
     try {
-      // Try cache first
       final cachedProducts = await _cacheService.getCachedProducts(
         categoryId: currentCategory.id,
       );
@@ -292,12 +291,10 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
         currentOffset.value = 0;
         hasMore.value = true;
 
-        // Refresh in background
         _refreshProductsInBackground();
         return;
       }
 
-      // Fetch from API
       final products = await _categoryService.fetchAllProductsByCategory(
         currentCategory.id,
         limit: 9,
@@ -309,20 +306,15 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
       currentOffset.value = 0;
       hasMore.value = true;
 
-      // Cache products
       await _cacheService.cacheProducts(
         categoryId: currentCategory.id,
         products: products,
       );
-    } catch (e) {
-      print('Error fetching products for grocery: $e');
-    }
+    } catch (_) {}
   }
 
-  /// Helper: Fetch products for regular category
   Future<void> _fetchProductsForCategory() async {
     try {
-      // Try cache first
       final cachedProducts = await _cacheService.getCachedProducts(
         categoryId: currentCategory.id,
       );
@@ -334,12 +326,10 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
         currentOffset.value = 0;
         hasMore.value = true;
 
-        // Refresh in background
         _refreshProductsInBackground();
         return;
       }
 
-      // Fetch from API
       final products = await _categoryService.fetchAllProductsByCategory(
         currentCategory.id,
         limit: 9,
@@ -351,28 +341,21 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
       currentOffset.value = 0;
       hasMore.value = true;
 
-      // Cache products
       await _cacheService.cacheProducts(
         categoryId: currentCategory.id,
         products: products,
       );
-    } catch (e) {
-      print('Error fetching products for category: $e');
-    }
+    } catch (_) {}
   }
 
-  /// Helper: Load restaurants for food category
   Future<void> _loadRestaurants() async {
     try {
       final restaurants = await _restaurantService.getTopRestaurants(limit: 25);
       topRestaurants.value = restaurants;
       showRestaurants.value = true;
-    } catch (e) {
-      print('Error loading restaurants: $e');
-    }
+    } catch (_) {}
   }
 
-  /// Helper: Refresh products in background
   Future<void> _refreshProductsInBackground() async {
     try {
       final products = await _categoryService.fetchAllProductsByCategory(
@@ -380,20 +363,16 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
         limit: 9,
       );
 
-      // Only update if data changed
       if (products.length != allProducts.length) {
         allProducts.value = products;
         displayProducts.value = products;
 
-        // Update cache
         await _cacheService.cacheProducts(
           categoryId: currentCategory.id,
           products: products,
         );
       }
-    } catch (e) {
-      print('Error refreshing products in background: $e');
-    }
+    } catch (_) {}
   }
 
   Future<void> _loadFoodCategoryData() async {
@@ -405,7 +384,6 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
   }
 
   Future<void> _loadGroceryMainCategories() async {
-    // Try to get cached data in parallel
     final results = await Future.wait([
       _cacheService.getCachedSubcategories(categoryId: currentCategory.id),
       _cacheService.getCachedProducts(categoryId: currentCategory.id),
@@ -414,9 +392,7 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
     final cachedSubcategories = results[0] as List<SubcategoryModel>?;
     final cachedProducts = results[1] as List<ProductModel>?;
 
-    // If we have both cached data, use it immediately
     if (cachedSubcategories != null && cachedProducts != null) {
-      print('✅ Using cached data for category: ${currentCategory.id}');
       allCategories.value = cachedSubcategories;
       availableSubcategories.value = cachedSubcategories;
       sectionTitle.value = 'Select Category';
@@ -430,17 +406,10 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
       currentOffset.value = 0;
       hasMore.value = true;
 
-      // Fetch fresh data in background to update cache
       _refreshGroceryDataInBackground();
       return;
     }
 
-    // If no cache, fetch from API in parallel
-    print(
-      '🌐 No cache found, fetching from API for category: ${currentCategory.id}',
-    );
-
-    // Fetch BOTH subcategories and products concurrently using Future.wait
     final apiResults = await Future.wait([
       _categoryService.fetchSubcategories(currentCategory.id),
       _categoryService.fetchAllProductsByCategory(currentCategory.id, limit: 9),
@@ -449,7 +418,6 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
     final mainCategories = apiResults[0] as List<SubcategoryModel>;
     final products = apiResults[1] as List<ProductModel>;
 
-    // Update all data at once
     allCategories.value = mainCategories;
     availableSubcategories.value = mainCategories;
     sectionTitle.value = 'Select Category';
@@ -462,7 +430,6 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
     displayProducts.value = products;
     productsTitle.value = 'All ${currentCategory.title}';
 
-    // Cache both in parallel
     await Future.wait([
       _cacheService.cacheSubcategories(
         categoryId: currentCategory.id,
@@ -475,10 +442,8 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
     ]);
   }
 
-  /// Refresh grocery data in background (after showing cached data)
   Future<void> _refreshGroceryDataInBackground() async {
     try {
-      // Fetch both subcategories and products in parallel
       final results = await Future.wait([
         _categoryService.fetchSubcategories(currentCategory.id),
         _categoryService.fetchAllProductsByCategory(
@@ -490,7 +455,6 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
       final mainCategories = results[0] as List<SubcategoryModel>;
       final products = results[1] as List<ProductModel>;
 
-      // Update cache with fresh data in parallel
       await Future.wait([
         _cacheService.cacheSubcategories(
           categoryId: currentCategory.id,
@@ -502,7 +466,6 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
         ),
       ]);
 
-      // Only update UI if data has changed
       if (mainCategories.length != allCategories.length ||
           products.length != allProducts.length) {
         allCategories.value = mainCategories;
@@ -510,13 +473,10 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
         allProducts.value = products;
         displayProducts.value = products;
       }
-    } catch (e) {
-      print('Error refreshing grocery data in background: $e');
-    }
+    } catch (_) {}
   }
 
   Future<void> _loadCategorySubcategories() async {
-    // Try to get cached data in parallel
     final results = await Future.wait([
       _cacheService.getCachedSubcategories(categoryId: currentCategory.id),
       _cacheService.getCachedProducts(categoryId: currentCategory.id),
@@ -525,9 +485,7 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
     final cachedSubcategories = results[0] as List<SubcategoryModel>?;
     final cachedProducts = results[1] as List<ProductModel>?;
 
-    // If we have both cached data, use it immediately
     if (cachedSubcategories != null && cachedProducts != null) {
-      print('✅ Using cached data for category: ${currentCategory.id}');
       allCategories.value = cachedSubcategories;
       availableSubcategories.value = cachedSubcategories;
       sectionTitle.value = 'Popular Items';
@@ -540,17 +498,10 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
       currentOffset.value = 0;
       hasMore.value = true;
 
-      // Fetch fresh data in background to update cache
       _refreshCategoryDataInBackground();
       return;
     }
 
-    // If no cache, fetch from API
-    print(
-      '🌐 No cache found, fetching from API for category: ${currentCategory.id}',
-    );
-
-    // Fetch BOTH subcategories and products concurrently using Future.wait
     final apiResults = await Future.wait([
       _categoryService.fetchSubcategories(currentCategory.id),
       _categoryService.fetchAllProductsByCategory(currentCategory.id, limit: 9),
@@ -559,7 +510,6 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
     final subcategories = apiResults[0] as List<SubcategoryModel>;
     final products = apiResults[1] as List<ProductModel>;
 
-    // Update all data at once
     allCategories.value = subcategories;
     availableSubcategories.value = subcategories;
     sectionTitle.value = 'Popular Items';
@@ -571,7 +521,6 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
     displayProducts.value = products;
     productsTitle.value = 'All ${currentCategory.title}';
 
-    // Cache both in parallel
     await Future.wait([
       _cacheService.cacheSubcategories(
         categoryId: currentCategory.id,
@@ -582,17 +531,10 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
         products: products,
       ),
     ]);
-
-    // TODO: Recommended products will come from API later
-    // if (!isGroceryCategory) {
-    //   await _loadRecommendedProducts();
-    // }
   }
 
-  /// Refresh category data in background (after showing cached data)
   Future<void> _refreshCategoryDataInBackground() async {
     try {
-      // Fetch both subcategories and products in parallel
       final results = await Future.wait([
         _categoryService.fetchSubcategories(currentCategory.id),
         _categoryService.fetchAllProductsByCategory(
@@ -604,7 +546,6 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
       final subcategories = results[0] as List<SubcategoryModel>;
       final products = results[1] as List<ProductModel>;
 
-      // Update cache with fresh data in parallel
       await Future.wait([
         _cacheService.cacheSubcategories(
           categoryId: currentCategory.id,
@@ -616,7 +557,6 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
         ),
       ]);
 
-      // Only update UI if data has changed
       if (subcategories.length != allCategories.length ||
           products.length != allProducts.length) {
         allCategories.value = subcategories;
@@ -624,27 +564,11 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
         allProducts.value = products;
         displayProducts.value = products;
       }
-    } catch (e) {
-      print('Error refreshing category data in background: $e');
-    }
+    } catch (_) {}
   }
-
-  // TODO: Re-enable when recommended products API is ready
-  // Future<void> _loadRecommendedProducts() async {
-  //   try {
-  //     final products = await _categoryService.fetchRecommendedProducts(
-  //       currentCategory.id,
-  //       limit: 8, // Only load 8 recommended products
-  //     );
-  //     recommendedProducts.value = products;
-  //   } catch (e) {
-  //     print('Error loading recommended products: $e');
-  //   }
-  // }
 
   void onSubcategoryTap(SubcategoryModel? subcategory) async {
     try {
-      // Handle "All" option
       if (subcategory == null) {
         selectedSubcategory.value = null;
         showingAllProducts.value = false;
@@ -671,16 +595,11 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
         }
       }
 
-      // Check if we already have products for this subcategory
       final existingProducts = allProducts
           .where((p) => p.subcategoryId == subcategory.id)
           .toList();
 
       if (existingProducts.isNotEmpty) {
-        // We already have products for this subcategory, just filter them
-        print(
-          '✅ Filtering existing products for subcategory: ${subcategory.id}',
-        );
         selectedSubcategory.value = subcategory;
         showingAllProducts.value = false;
         currentOffset.value = 0;
@@ -690,20 +609,17 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
         return;
       }
 
-      // Try to get cached products for this subcategory
       final cachedProducts = await _cacheService.getCachedProducts(
         categoryId: currentCategory.id,
         subcategoryId: subcategory.id,
       );
 
       if (cachedProducts != null) {
-        print('✅ Using cached products for subcategory: ${subcategory.id}');
         selectedSubcategory.value = subcategory;
         showingAllProducts.value = false;
         currentOffset.value = 0;
         hasMore.value = true;
 
-        // Add to allProducts if not already there
         for (var product in cachedProducts) {
           if (!allProducts.any((p) => p.id == product.id)) {
             allProducts.add(product);
@@ -712,17 +628,13 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
         displayProducts.value = cachedProducts;
         productsTitle.value = '${subcategory.title} Items';
 
-        // Fetch fresh data in background
         _refreshSubcategoryDataInBackground(subcategory);
         return;
       }
 
-      // If we don't have cached products, fetch from API
-      print('🌐 Fetching products from API for subcategory: ${subcategory.id}');
       isLoadingProducts.value = true;
 
       if (isFoodCategory) {
-        // For food category, fetch only 9 products for the subcategory
         selectedSubcategory.value = subcategory;
         showingAllProducts.value = false;
         currentOffset.value = 0;
@@ -731,9 +643,8 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
         final products = await _productDataService.getProductsBySubcategory(
           subcategory.id,
           limit: 9,
-          categoryId: currentCategory.id, // Pass category ID
+          categoryId: currentCategory.id,
         );
-        // Add to allProducts if not already there
         for (var product in products) {
           if (!allProducts.any((p) => p.id == product.id)) {
             allProducts.add(product);
@@ -742,14 +653,12 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
         displayProducts.value = products;
         productsTitle.value = '${subcategory.title} Items';
 
-        // Cache the fetched products
         await _cacheService.cacheProducts(
           categoryId: currentCategory.id,
           subcategoryId: subcategory.id,
           products: products,
         );
       } else if (isMedicineCategory) {
-        // For medicine category, fetch only 9 products for the subcategory
         selectedSubcategory.value = subcategory;
         showingAllProducts.value = false;
         currentOffset.value = 0;
@@ -758,9 +667,8 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
         final products = await _productDataService.getProductsBySubcategory(
           subcategory.id,
           limit: 9,
-          categoryId: currentCategory.id, // Pass category ID
+          categoryId: currentCategory.id,
         );
-        // Add to allProducts if not already there
         for (var product in products) {
           if (!allProducts.any((p) => p.id == product.id)) {
             allProducts.add(product);
@@ -769,7 +677,6 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
         displayProducts.value = products;
         productsTitle.value = '${subcategory.title} Items';
 
-        // Cache the fetched products
         await _cacheService.cacheProducts(
           categoryId: currentCategory.id,
           subcategoryId: subcategory.id,
@@ -779,7 +686,6 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
           currentCategory.id == '3' ||
           currentCategory.id == '4' ||
           currentCategory.id == '5') {
-        // For groceries/cleaning/personal/pet categories, fetch from API
         selectedSubcategory.value = subcategory;
         showingAllProducts.value = false;
         currentOffset.value = 0;
@@ -788,9 +694,8 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
         final products = await _productDataService.getProductsBySubcategory(
           subcategory.id,
           limit: 9,
-          categoryId: currentCategory.id, // Pass category ID
+          categoryId: currentCategory.id,
         );
-        // Add to allProducts if not already there
         for (var product in products) {
           if (!allProducts.any((p) => p.id == product.id)) {
             allProducts.add(product);
@@ -799,7 +704,6 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
         displayProducts.value = products;
         productsTitle.value = '${subcategory.title} Items';
 
-        // Cache the fetched products
         await _cacheService.cacheProducts(
           categoryId: currentCategory.id,
           subcategoryId: subcategory.id,
@@ -819,14 +723,12 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
         displayProducts.value = filteredProducts;
         productsTitle.value = '${subcategory.title} Items ';
       }
-    } catch (e) {
-      print('Error loading subcategory: $e');
+    } catch (_) {
     } finally {
       isLoadingProducts.value = false;
     }
   }
 
-  /// Refresh subcategory data in background (after showing cached data)
   Future<void> _refreshSubcategoryDataInBackground(
     SubcategoryModel subcategory,
   ) async {
@@ -837,17 +739,14 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
         categoryId: currentCategory.id,
       );
 
-      // Update cache with fresh data
       await _cacheService.cacheProducts(
         categoryId: currentCategory.id,
         subcategoryId: subcategory.id,
         products: products,
       );
 
-      // Only update UI if we're still on the same subcategory and data has changed
       if (selectedSubcategory.value?.id == subcategory.id &&
           products.length != displayProducts.length) {
-        // Add to allProducts if not already there
         for (var product in products) {
           if (!allProducts.any((p) => p.id == product.id)) {
             allProducts.add(product);
@@ -855,9 +754,7 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
         }
         displayProducts.value = products;
       }
-    } catch (e) {
-      print('Error refreshing subcategory data in background: $e');
-    }
+    } catch (_) {}
   }
 
   void applyFilter(String? subcategoryId) {
@@ -900,8 +797,7 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
       filterSubcategories.clear();
 
       await _loadGroceryMainCategories();
-    } catch (e) {
-      print('Error resetting to main categories: $e');
+    } catch (_) {
     } finally {
       isLoading.value = false;
     }
@@ -921,13 +817,6 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
     final isFavorite = FavoritesController.isProductFavorite(product.id);
     final updatedProduct = product.copyWith(isFavorite: isFavorite);
     _updateProductInLists(updatedProduct);
-
-    // Get.snackbar(
-    //   isFavorite ? 'Added to Favorites' : 'Removed from Favorites',
-    //   '${updatedProduct.title} ${isFavorite ? 'added to' : 'removed from'} favorites',
-    //   snackPosition: SnackPosition.BOTTOM,
-    //   duration: const Duration(seconds: 2),
-    // );
   }
 
   void _updateProductInLists(ProductModel updatedProduct) {
@@ -970,37 +859,28 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
   }
 
   Future<void> showAllProducts() async {
-    print(
-      '🎬 showAllProducts called - current state: ${showingAllProducts.value}',
-    );
     showingAllProducts.value = !showingAllProducts.value;
 
     if (showingAllProducts.value) {
-      print('📖 Showing ALL products mode');
-      // Load more products when showing all
       currentOffset.value = 0;
       hasMore.value = true;
 
-      // For API-driven categories (food, medicine, groceries, cleaning, personal, pet)
-      // we already have the initial products loaded, just set the flag to enable pagination
       if (isFoodCategory ||
           isMedicineCategory ||
           currentCategory.id == '2' ||
           currentCategory.id == '3' ||
           currentCategory.id == '4' ||
           currentCategory.id == '5') {
-        print('✅ API-driven category - pagination enabled');
-        // Keep current displayProducts, pagination will add more on scroll
         if (selectedSubcategory.value != null) {
           productsTitle.value =
               '${selectedSubcategory.value!.title} - All Items';
         } else {
           productsTitle.value = '${currentCategory.title} - All Items';
         }
+        // _startAutoFetchingPages(); // Removed to prevent duplicate calls
         return;
       }
 
-      // For static categories, show all loaded products
       if (isGroceryCategory) {
         if (selectedSubcategory.value != null) {
           final filteredProducts = allProducts
@@ -1039,8 +919,7 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
         }
       }
     } else {
-      print('📕 Hiding ALL products mode - back to 9 items');
-      // Reset to initial 9 products
+      _stopAutoFetchingPages();
       if (isGroceryCategory) {
         if (selectedSubcategory.value != null) {
           final filteredProducts = allProducts
@@ -1080,11 +959,39 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
     }
   }
 
+  bool _autoFetching = false;
+
+  void _startAutoFetchingPages() {
+    if (_autoFetching) return;
+    _autoFetching = true;
+    Future(() async {
+      while (_autoFetching && hasMore.value) {
+        try {
+          // Only trigger a load when the controller is not already loading more
+          if (!isLoadingMore.value) {
+            await loadMoreProducts();
+          }
+        } catch (_) {}
+        await Future.delayed(
+          showingAllProducts.value
+              ? const Duration(milliseconds: 300)
+              : const Duration(seconds: 2),
+        );
+      }
+      _autoFetching = false;
+    });
+  }
+
+  void _stopAutoFetchingPages() {
+    _autoFetching = false;
+  }
+
   void clearSubcategorySelection() {
     selectedSubcategory.value = null;
     showingAllProducts.value = false;
 
-    // Reset pagination state for API-driven categories
+    // _stopAutoFetchingPages(); // Removed to allow continuous fetching
+
     if (isFoodCategory ||
         isMedicineCategory ||
         currentCategory.id == '2' ||
@@ -1110,7 +1017,6 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
     showingAllProducts.value = false;
     filterSubcategories.clear();
 
-    // Reset pagination state for API-driven categories
     if (isFoodCategory ||
         isMedicineCategory ||
         currentCategory.id == '2' ||
@@ -1287,7 +1193,6 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
     priceRange.value = [0.0, 100.0];
     showOnlyInStock.value = false;
 
-    // For API-driven categories, refetch with proper pagination reset
     if (isFoodCategory ||
         isMedicineCategory ||
         currentCategory.id == '2' ||
@@ -1298,13 +1203,11 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
       hasMore.value = true;
 
       if (selectedSubcategory.value != null) {
-        // Keep the first 9 items of the current subcategory
         displayProducts.value = allProducts.take(9).toList();
       } else {
         displayProducts.value = allProducts.take(9).toList();
       }
     } else {
-      // For static categories, filter from allProducts
       if (selectedSubcategory.value != null) {
         final filteredProducts = allProducts
             .where(
@@ -1336,18 +1239,15 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
     await startVoiceSearch(navigateToSearch: true);
   }
 
-  /// Force refresh data and update cache
   Future<void> refreshData() async {
     try {
       isLoading.value = true;
 
-      // Clear cache for current category
       await _cacheService.clearCache(
         categoryId: currentCategory.id,
         subcategoryId: selectedSubcategory.value?.id,
       );
 
-      // Reload data
       if (isGroceryCategory) {
         await _loadGroceryMainCategories();
       } else if (isFoodCategory) {
@@ -1355,23 +1255,14 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
       } else {
         await _loadCategorySubcategories();
       }
-    } catch (e) {
-      print('Error refreshing data: $e');
+    } catch (_) {
     } finally {
       isLoading.value = false;
     }
   }
 
-  /// Load more products with pagination (for infinite scroll)
   Future<void> loadMoreProducts() async {
-    print(
-      '🔄 loadMoreProducts called - isLoadingMore: ${isLoadingMore.value}, hasMore: ${hasMore.value}',
-    );
-
     if (isLoadingMore.value || !hasMore.value) {
-      print(
-        '❌ Skipping loadMoreProducts - isLoadingMore: ${isLoadingMore.value}, hasMore: ${hasMore.value}',
-      );
       return;
     }
 
@@ -1379,10 +1270,27 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
       isLoadingMore.value = true;
 
       final nextOffset = displayProducts.length;
-      print(
-        '📊 Fetching more products - Category: ${currentCategory.id}, Subcategory: ${selectedSubcategory.value?.id}, Offset: $nextOffset, Limit: 20',
+      // Prefer cached prefetched products if available to avoid network calls
+      final cachedProducts = await _cacheService.getCachedProducts(
+        categoryId: currentCategory.id,
+        subcategoryId: selectedSubcategory.value?.id,
       );
 
+      if (cachedProducts != null && cachedProducts.length > nextOffset) {
+        final take = min(cachedProducts.length - nextOffset, 20);
+        final slice = cachedProducts.sublist(nextOffset, nextOffset + take);
+
+        if (slice.isNotEmpty) {
+          allProducts.addAll(slice);
+          _applyFiltersAndSearch();
+        }
+
+        // If cache still has more items beyond what we just consumed, indicate hasMore
+        hasMore.value = cachedProducts.length > nextOffset + slice.length;
+        return;
+      }
+
+      // No cached items to serve for this offset, fall back to network
       final result = await _productDataService.fetchMoreProducts(
         categoryId: currentCategory.id,
         subcategoryId: selectedSubcategory.value?.id,
@@ -1393,25 +1301,13 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
       final newProducts = result['products'] as List<ProductModel>;
       hasMore.value = result['hasMore'] as bool;
 
-      print(
-        '✅ Received ${newProducts.length} products, hasMore: ${hasMore.value}',
-      );
-
       if (newProducts.isNotEmpty) {
         allProducts.addAll(newProducts);
-        // Apply current filters and sorting to new products
         _applyFiltersAndSearch();
-        print('📦 Total products now: ${displayProducts.length}');
-      } else {
-        print('⚠️ No new products received');
       }
-    } catch (e) {
-      print('❌ Error loading more products: $e');
+    } catch (_) {
     } finally {
       isLoadingMore.value = false;
-      print(
-        '🏁 loadMoreProducts completed - isLoadingMore: ${isLoadingMore.value}',
-      );
     }
   }
 }
