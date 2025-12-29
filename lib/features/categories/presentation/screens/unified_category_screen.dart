@@ -67,7 +67,7 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
     );
 
     // Trigger load more when 80% scrolled and showing all products
-    if (_scroll.position.pixels >= _scroll.position.maxScrollExtent * 0.8) {
+    if (_scroll.position.pixels >= _scroll.position.maxScrollExtent * 0.4) {
       print('🎯 Reached 80% threshold');
       if (controller.showingAllProducts.value) {
         print('✅ Calling loadMoreProducts()');
