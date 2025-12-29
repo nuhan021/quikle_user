@@ -78,10 +78,10 @@ class SplashController extends GetxController {
         'Checking network status from SplashController: ${networkController.hasConnection.value}',
       );
 
-      if (!networkController.hasConnection.value) {
-        Get.off(() => const NoInternetScreen());
-        return;
-      }
+      // if (!networkController.hasConnection.value) {
+      //   Get.off(() => const NoInternetScreen());
+      //   return;
+      // }
 
       try {
         final homeService = HomeService();

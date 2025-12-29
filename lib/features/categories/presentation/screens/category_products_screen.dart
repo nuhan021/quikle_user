@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -18,7 +19,6 @@ import 'package:quikle_user/features/categories/presentation/widgets/category_pr
 import 'package:quikle_user/features/categories/presentation/widgets/minimal_subcategories_section.dart';
 import 'package:quikle_user/features/categories/presentation/widgets/minimal_subcategories_shimmer.dart';
 import 'package:quikle_user/features/categories/presentation/widgets/load_more_products_shimmer.dart';
-import 'package:quikle_user/features/categories/presentation/widgets/filter_sort_button.dart';
 import 'package:quikle_user/features/orders/presentation/widgets/live_order_indicator.dart';
 
 class CategoryProductsScreen extends StatefulWidget {
@@ -142,12 +142,8 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
                     final subcategoriesHeight = hasSubcategories
                         ? MinimalSubcategoriesSection.kPreferredHeight
                         : 0.0;
-                    final filterSortHeight =
-                        60.h; // Height for filter/sort button
                     final totalHeaderHeight =
-                        searchBlockHeight +
-                        subcategoriesHeight +
-                        filterSortHeight;
+                        searchBlockHeight + subcategoriesHeight;
                     final selectedSubcategoryId =
                         controller.selectedSubcategory.value?.id ?? 'none';
 
@@ -182,13 +178,6 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
                                 ),
                               ),
                             ),
-                            filterSortSection: SizedBox(
-                              height: filterSortHeight,
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 16.w),
-                                child: FilterSortButton(controller: controller),
-                              ),
-                            ),
                             subcategoriesSection:
                                 hasSubcategories ||
                                     controller.isLoadingSubcategories.value
@@ -212,9 +201,9 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
                                               selectedSubcategory: controller
                                                   .selectedSubcategory
                                                   .value,
-
                                               onSubcategoryTap:
                                                   controller.onSubcategoryTap,
+                                              controller: controller,
                                             ),
                                     ),
                                   )
@@ -360,24 +349,22 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
 
 class _CategoryHeaderDelegate extends SliverPersistentHeaderDelegate {
   final Widget searchSection;
-  final Widget filterSortSection;
   final Widget subcategoriesSection;
   final double totalHeight;
   final Object? rebuildToken;
 
   _CategoryHeaderDelegate({
     required this.searchSection,
-    required this.filterSortSection,
     required this.subcategoriesSection,
     required this.totalHeight,
     this.rebuildToken,
   });
 
   @override
-  double get minExtent => totalHeight;
+  double get minExtent => totalHeight + 1.0;
 
   @override
-  double get maxExtent => totalHeight;
+  double get maxExtent => totalHeight + 1.0;
 
   @override
   Widget build(
@@ -385,14 +372,42 @@ class _CategoryHeaderDelegate extends SliverPersistentHeaderDelegate {
     double shrinkOffset,
     bool overlapsContent,
   ) {
-    return SizedBox(
-      height: totalHeight,
-      child: Container(
-        color: AppColors.homeGrey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [searchSection, filterSortSection, subcategoriesSection],
+    // Base child (the actual header content)
+    final Widget child = SizedBox(
+      height: totalHeight + 1.0,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [searchSection, subcategoriesSection],
+      ),
+    );
+
+    // Determine whether to show elevation when content is scrolled under
+    final bool showElevation = shrinkOffset > 0 || overlapsContent;
+
+    // Apply a glassy backdrop with blur + translucent background
+    return ClipRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+        child: Container(
+          color: AppColors.homeGrey.withValues(alpha: .6),
+          child: Material(
+            color: Colors.transparent,
+            elevation: showElevation ? 4.0 : 0.0,
+            shadowColor: Colors.black.withValues(alpha: .08),
+            child: Container(
+              decoration: BoxDecoration(
+                color: AppColors.homeGrey.withValues(alpha: .6),
+                border: Border(
+                  bottom: BorderSide(
+                    color: Colors.white.withValues(alpha: .12),
+                    width: 1,
+                  ),
+                ),
+              ),
+              child: child,
+            ),
+          ),
         ),
       ),
     );
