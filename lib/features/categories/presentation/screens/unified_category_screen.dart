@@ -66,9 +66,9 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
       '📊 showingAllProducts: ${controller.showingAllProducts.value}, isLoadingMore: ${controller.isLoadingMore.value}, hasMore: ${controller.hasMore.value}',
     );
 
-    // Trigger load more when 80% scrolled and showing all products
-    if (_scroll.position.pixels >= _scroll.position.maxScrollExtent * 0.4) {
-      print('🎯 Reached 80% threshold');
+    // Trigger load more when 10% scrolled and showing all products
+    if (_scroll.position.pixels >= _scroll.position.maxScrollExtent * 0.8) {
+      print('🎯 Reached 10% threshold');
       if (controller.showingAllProducts.value) {
         print('✅ Calling loadMoreProducts()');
         controller.loadMoreProducts();
