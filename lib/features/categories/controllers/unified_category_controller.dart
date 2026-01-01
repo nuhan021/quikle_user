@@ -14,8 +14,6 @@ import 'package:quikle_user/features/cart/controllers/cart_controller.dart';
 import 'package:quikle_user/features/profile/controllers/favorites_controller.dart';
 import 'package:quikle_user/routes/app_routes.dart';
 import 'package:quikle_user/core/mixins/voice_search_mixin.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:quikle_user/core/services/global_prefetch_service.dart';
 
 class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
   final CategoryService _categoryService = CategoryService();
@@ -139,17 +137,6 @@ class UnifiedCategoryController extends GetxController with VoiceSearchMixin {
       // Start background prefetch while this controller/screen is active.
       // Prefetch will continue until the controller is closed (onClose).
       _startAutoFetchingPages();
-
-      // Enqueue this category for global prefetch. If the device is on Wi-Fi
-      // we'll allow full prefetch (fetch until server reports no more pages).
-      try {
-        final conn = await Connectivity().checkConnectivity();
-        final onWifi = conn == ConnectivityResult.wifi;
-        GlobalPrefetchService.instance.enqueueCategory(
-          currentCategory.id,
-          full: onWifi,
-        );
-      } catch (_) {}
 
       if (args.containsKey('autoSelectSubcategory')) {
         final autoSelectSub = args['autoSelectSubcategory'] as SubcategoryModel;
