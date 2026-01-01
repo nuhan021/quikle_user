@@ -23,6 +23,27 @@ class PaymentMethodScreen extends StatelessWidget {
               title: 'Payment Method',
               showActionButton: false,
             ),
+
+            /// Supported payment info text
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 12.h),
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 6.h),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: .1),
+                  borderRadius: BorderRadius.circular(20.r),
+                ),
+                child: Text(
+                  'Payment methods we support',
+                  style: TextStyle(
+                    fontSize: 13.sp,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.primary,
+                  ),
+                ),
+              ),
+            ),
+
             Expanded(
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.w),
@@ -47,20 +68,14 @@ class PaymentMethodScreen extends StatelessWidget {
                         );
                       }),
                     ),
-                    Padding(
-                      padding: EdgeInsets.only(bottom: 24.h),
-                      child: AddPaymentMethodButton(
-                        onTap: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                'Add new payment method functionality coming soon!',
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
+
+                    // Uncomment when add-payment is ready
+                    // Padding(
+                    //   padding: EdgeInsets.only(bottom: 24.h),
+                    //   child: AddPaymentMethodButton(
+                    //     onTap: () {},
+                    //   ),
+                    // ),
                   ],
                 ),
               ),
