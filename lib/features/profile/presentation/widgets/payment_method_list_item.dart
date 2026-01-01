@@ -34,7 +34,6 @@ class PaymentMethodListItem extends StatelessWidget {
       ),
       child: Row(
         children: [
-          
           if (paymentMethod.type.iconPath != null)
             Image.asset(paymentMethod.type.iconPath!, width: 24.w, height: 24.w)
           else
@@ -54,7 +53,6 @@ class PaymentMethodListItem extends StatelessWidget {
 
           SizedBox(width: 12.w),
 
-          
           Expanded(
             child: Text(
               paymentMethod.type.displayName,
@@ -67,20 +65,19 @@ class PaymentMethodListItem extends StatelessWidget {
             ),
           ),
 
-          
-          if (paymentMethod.isRemovable && onRemove != null)
-            GestureDetector(
-              onTap: onRemove,
-              child: SizedBox(
-                width: 18.w,
-                height: 18.w,
-                child: Icon(
-                  Iconsax.close_circle,
-                  size: 18.sp,
-                  color: const Color(0xFFE03E1A),
-                ),
-              ),
-            ),
+          // if (paymentMethod.isRemovable && onRemove != null)
+          //   GestureDetector(
+          //     onTap: onRemove,
+          //     child: SizedBox(
+          //       width: 18.w,
+          //       height: 18.w,
+          //       child: Icon(
+          //         Iconsax.close_circle,
+          //         size: 18.sp,
+          //         color: const Color(0xFFE03E1A),
+          //       ),
+          //     ),
+          //   ),
         ],
       ),
     );

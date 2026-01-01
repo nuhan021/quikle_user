@@ -16,18 +16,17 @@ class PaymentMethodController extends GetxController {
   }
 
   void _loadPaymentMethods() {
-    
     _paymentMethods.value = [
-      const PaymentMethodModel(
-        id: '1',
-        type: PaymentMethodType.paytm,
-        isRemovable: true,
-      ),
-      const PaymentMethodModel(
-        id: '2',
-        type: PaymentMethodType.googlePay,
-        isRemovable: true,
-      ),
+      // const PaymentMethodModel(
+      //   id: '1',
+      //   type: PaymentMethodType.paytm,
+      //   isRemovable: true,
+      // ),
+      // const PaymentMethodModel(
+      //   id: '2',
+      //   type: PaymentMethodType.googlePay,
+      //   isRemovable: true,
+      // ),
       const PaymentMethodModel(
         id: '3',
         type: PaymentMethodType.phonePe,
@@ -38,11 +37,11 @@ class PaymentMethodController extends GetxController {
         type: PaymentMethodType.cashfree,
         isRemovable: true,
       ),
-      const PaymentMethodModel(
-        id: '5',
-        type: PaymentMethodType.razorpay,
-        isRemovable: true,
-      ),
+      // const PaymentMethodModel(
+      //   id: '5',
+      //   type: PaymentMethodType.razorpay,
+      //   isRemovable: true,
+      // ),
       const PaymentMethodModel(
         id: '6',
         type: PaymentMethodType.cashOnDelivery,
@@ -58,7 +57,6 @@ class PaymentMethodController extends GetxController {
   void removePaymentMethod(String id) {
     _paymentMethods.removeWhere((method) => method.id == id);
 
-    
     if (_selectedPaymentMethod.value?.id == id) {
       _selectedPaymentMethod.value = null;
     }
