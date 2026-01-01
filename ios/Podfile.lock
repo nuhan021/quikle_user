@@ -152,6 +152,10 @@ PODS:
     - FlutterMacOS
   - permission_handler_apple (9.3.0):
     - Flutter
+  - phonepe_payment_sdk (3.0.2):
+    - Flutter
+    - PhonePePayment (= 4.0.0)
+  - PhonePePayment (4.0.0)
   - PromisesObjC (2.4.0)
   - SDWebImage (5.21.5):
     - SDWebImage/Core (= 5.21.5)
@@ -192,6 +196,7 @@ DEPENDENCIES:
   - package_info_plus (from `.symlinks/plugins/package_info_plus/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
+  - phonepe_payment_sdk (from `.symlinks/plugins/phonepe_payment_sdk/ios`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
   - speech_to_text (from `.symlinks/plugins/speech_to_text/darwin`)
   - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
@@ -220,6 +225,7 @@ SPEC REPOS:
     - GoogleMaps
     - GoogleUtilities
     - nanopb
+    - PhonePePayment
     - PromisesObjC
     - SDWebImage
     - SwiftyGif
@@ -261,6 +267,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/path_provider_foundation/darwin"
   permission_handler_apple:
     :path: ".symlinks/plugins/permission_handler_apple/ios"
+  phonepe_payment_sdk:
+    :path: ".symlinks/plugins/phonepe_payment_sdk/ios"
   shared_preferences_foundation:
     :path: ".symlinks/plugins/shared_preferences_foundation/darwin"
   speech_to_text:
@@ -311,6 +319,8 @@ SPEC CHECKSUMS:
   package_info_plus: af8e2ca6888548050f16fa2f1938db7b5a5df499
   path_provider_foundation: 080d55be775b7414fd5a5ef3ac137b97b097e564
   permission_handler_apple: 4ed2196e43d0651e8ff7ca3483a069d469701f2d
+  phonepe_payment_sdk: cac980d0deb0d024b091e207207fea9418b2a391
+  PhonePePayment: c720ada91c0976d6888a44571ced348ed8cd7d83
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   SDWebImage: e9c98383c7572d713c1a0d7dd2783b10599b9838
   shared_preferences_foundation: 9e1978ff2562383bd5676f64ec4e9aa8fa06a6f7

@@ -260,6 +260,10 @@ class PayoutController extends GetxController {
             : null,
       );
 
+      AppLoggerHelper.debug(
+        'Order creation response data: $orderCreationResponse',
+      );
+
       if (!orderCreationResponse.success) {
         throw Exception(orderCreationResponse.message);
       }
@@ -268,6 +272,8 @@ class PayoutController extends GetxController {
       AppLoggerHelper.debug(
         'Orders created: parent id ${orderData.parentOrderId}',
       );
+
+      AppLoggerHelper.debug('Order creation response data: $orderData');
 
       // Attempt to apply coupon on server if present
       try {
@@ -300,19 +306,45 @@ class PayoutController extends GetxController {
 
       // If payment is required, start payment via PaymentController
       if (orderData.requiresPayment) {
-        AppLoggerHelper.debug(
-          'Initiating payment for cfOrderId: ${orderData.cfOrderId}',
-        );
         _pendingOrderData = orderData;
         _pendingShippingAddress = finalShippingAddress;
 
         _isProcessingPayment.value = false;
 
-        await paymentController.startPayment(
-          cfOrderId: orderData.cfOrderId,
-          paymentSessionId: orderData.paymentSessionId,
-          parentOrderId: orderData.parentOrderId,
+        // Log payment data for debugging
+        AppLoggerHelper.debug('=== Payment Detection ===');
+        AppLoggerHelper.debug('PhonePe Order ID: ${orderData.phonePeOrderId}');
+        AppLoggerHelper.debug('PhonePe Token: ${orderData.phonePeToken}');
+        AppLoggerHelper.debug('Merchant ID: ${orderData.merchantId}');
+        AppLoggerHelper.debug('Cashfree Order ID: ${orderData.cfOrderId}');
+        AppLoggerHelper.debug(
+          'Payment Session ID: ${orderData.paymentSessionId}',
         );
+        AppLoggerHelper.debug('========================');
+
+        // Check if it's PhonePe or Cashfree payment
+        if (orderData.phonePeOrderId != null &&
+            orderData.phonePeToken != null &&
+            orderData.merchantId != null) {
+          AppLoggerHelper.debug(
+            'Initiating PhonePe payment for order: ${orderData.phonePeOrderId}',
+          );
+          await paymentController.startPhonePePayment(
+            phonePeOrderId: orderData.phonePeOrderId!,
+            token: orderData.phonePeToken!,
+            parentOrderId: orderData.parentOrderId,
+            merchantId: orderData.merchantId!,
+          );
+        } else {
+          AppLoggerHelper.debug(
+            'Initiating Cashfree payment for cfOrderId: ${orderData.cfOrderId}',
+          );
+          await paymentController.startCashfreePayment(
+            cfOrderId: orderData.cfOrderId,
+            paymentSessionId: orderData.paymentSessionId,
+            parentOrderId: orderData.parentOrderId,
+          );
+        }
       } else {
         _handlePaymentSuccess(orderData, finalShippingAddress);
       }
