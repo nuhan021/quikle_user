@@ -71,7 +71,7 @@ class OrderApiService {
       if (response.isSuccess && response.responseData != null) {
         // API returns a MAP with orders list
         final data = response.responseData as Map<String, dynamic>;
-        final ordersList = data['orders'] as List<dynamic>;
+        final ordersList = (data['data'] as List<dynamic>?) ?? [];
 
         final allOrders = ordersList
             .map((json) => OrderModel.fromJson(json as Map<String, dynamic>))
@@ -170,6 +170,27 @@ class OrderApiService {
         AppLoggerHelper.debug('Order created successfully');
         AppLoggerHelper.debug('Order response: ${response.responseData}');
 
+        // Log response structure for debugging
+        final responseMap = response.responseData as Map<String, dynamic>;
+        AppLoggerHelper.debug('Response keys: ${responseMap.keys.toList()}');
+
+        // Check if it's PhonePe or Cashfree response
+        final bool isPhonePeResponse = responseMap.containsKey(
+          'phonePE_orderId',
+        );
+        AppLoggerHelper.debug(
+          'Response type: ${isPhonePeResponse ? 'PhonePe' : 'Cashfree'}',
+        );
+
+        if (isPhonePeResponse) {
+          // PhonePe response - data is at root level
+          AppLoggerHelper.debug('Parsing PhonePe response...');
+        } else if (responseMap.containsKey('data')) {
+          // Cashfree response - data is nested
+          final dataMap = responseMap['data'] as Map<String, dynamic>;
+          AppLoggerHelper.debug('Data keys: ${dataMap.keys.toList()}');
+        }
+
         final orderResponse = OrderCreationResponse.fromJson(
           response.responseData as Map<String, dynamic>,
         );
@@ -178,9 +199,16 @@ class OrderApiService {
           'Order ID: ${orderResponse.data.orderId}, Requires Payment: ${orderResponse.data.requiresPayment}',
         );
 
-        AppLoggerHelper.debug(
-          'Payment Link: ${orderResponse.data.paymentLink}',
-        );
+        // Log payment method detected
+        if (orderResponse.data.phonePeOrderId != null) {
+          AppLoggerHelper.debug(
+            'PhonePe Payment - Order: ${orderResponse.data.phonePeOrderId}, Token: ${orderResponse.data.phonePeToken}, Merchant: ${orderResponse.data.merchantId}',
+          );
+        } else if (orderResponse.data.cfOrderId.isNotEmpty) {
+          AppLoggerHelper.debug(
+            'Cashfree Payment - Order: ${orderResponse.data.cfOrderId}, Session: ${orderResponse.data.paymentSessionId}',
+          );
+        }
 
         return orderResponse;
       }

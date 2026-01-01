@@ -5,10 +5,11 @@ import 'package:quikle_user/core/utils/constants/api_constants.dart';
 import 'package:quikle_user/core/utils/logging/logger.dart';
 import 'package:quikle_user/features/payment/data/models/payment_initiation_response.dart';
 import 'package:quikle_user/features/payment/data/models/confirm_payment_response.dart';
+import 'package:quikle_user/features/payment/data/models/phonepe_verify_response.dart';
 
 /// Payment API Service
 ///
-/// Handles Cashfree payment initiation with the backend API.
+/// Handles Cashfree and PhonePe payment operations with the backend API.
 class PaymentApiService {
   final NetworkCaller _networkCaller = NetworkCaller();
 
@@ -115,6 +116,60 @@ class PaymentApiService {
     } catch (e) {
       AppLoggerHelper.error('❌ Error confirming payment', e);
       throw Exception('Failed to confirm payment: $e');
+    }
+  }
+
+  /// Verify PhonePe payment status
+  ///
+  /// Returns a [PhonePeVerifyResponse] with STATE field indicating payment status.
+  /// STATE = "COMPLETED" means payment was successful.
+  Future<PhonePeVerifyResponse> verifyPhonePePayment({
+    required String merchantOrderId,
+    required String token,
+  }) async {
+    try {
+      final authToken = StorageService.token;
+      final refreshToken = StorageService.refreshToken;
+
+      if (authToken == null || authToken.isEmpty) {
+        throw Exception('User not authenticated');
+      }
+
+      final Map<String, dynamic> requestBody = {
+        'merchantOrderId': merchantOrderId,
+        'token': token,
+      };
+
+      AppLoggerHelper.debug(
+        'Verifying PhonePe payment for order: $merchantOrderId',
+      );
+
+      final ResponseData response = await _networkCaller.postRequest(
+        ApiConstants.verifyPhonePePayment,
+        body: requestBody,
+        headers: {
+          'Authorization': 'Bearer $authToken',
+          'refresh-token': '$refreshToken',
+        },
+      );
+
+      if (response.responseData != null &&
+          response.responseData is Map<String, dynamic>) {
+        AppLoggerHelper.debug(
+          'PhonePe verify response: ${response.responseData}',
+        );
+        return PhonePeVerifyResponse.fromJson(
+          response.responseData as Map<String, dynamic>,
+        );
+      }
+
+      AppLoggerHelper.error(
+        '❌ Empty or invalid response verifying PhonePe payment',
+      );
+      throw Exception('Failed to verify PhonePe payment: empty response');
+    } catch (e) {
+      AppLoggerHelper.error('❌ Error verifying PhonePe payment', e);
+      throw Exception('Failed to verify PhonePe payment: $e');
     }
   }
 }

@@ -257,11 +257,12 @@ class OrderModel {
     final pm = json['payment_method'] as Map<String, dynamic>? ?? {};
     PaymentMethodType pType = PaymentMethodType.cashfree;
     if (pm['type'] == "cod") pType = PaymentMethodType.cashOnDelivery;
+    if (pm['type'] == "phonepe") pType = PaymentMethodType.phonePe;
 
     final paymentMethod = PaymentMethodModel(type: pType, isSelected: true);
 
     return OrderModel(
-      orderId: json['id'] ?? "",
+      orderId: json['order_id'] ?? "",
       userId: json['user_id']?.toString() ?? "",
       items: items,
       shippingAddress: shippingAddress,

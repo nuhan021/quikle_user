@@ -22,6 +22,7 @@ enum PaymentMethodType {
       case PaymentMethodType.paytm:
       case PaymentMethodType.googlePay:
       case PaymentMethodType.phonePe:
+        return 'phonepe';
       case PaymentMethodType.cashfree:
         return 'cashfree';
     }

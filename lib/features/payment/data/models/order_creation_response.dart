@@ -10,11 +10,25 @@ class OrderCreationResponse {
   });
 
   factory OrderCreationResponse.fromJson(Map<String, dynamic> json) {
-    return OrderCreationResponse(
-      success: json['success'] ?? false,
-      message: json['message'] ?? '',
-      data: OrderCreationData.fromJson(json['data'] ?? {}),
-    );
+    // Check if this is a PhonePe response (no nested 'data' object)
+    final bool isPhonePeResponse =
+        json.containsKey('phonePE_orderId') && json.containsKey('merchantId');
+
+    if (isPhonePeResponse) {
+      // PhonePe response structure - data is at root level
+      return OrderCreationResponse(
+        success: true, // PhonePe returns success implicitly
+        message: 'Order created successfully',
+        data: OrderCreationData.fromJson(json),
+      );
+    } else {
+      // Cashfree response structure - data is nested
+      return OrderCreationResponse(
+        success: json['success'] ?? false,
+        message: json['message'] ?? '',
+        data: OrderCreationData.fromJson(json['data'] ?? {}),
+      );
+    }
   }
 }
 
@@ -27,6 +41,11 @@ class OrderCreationData {
   final String cfOrderId;
   final String parentOrderId;
 
+  // PhonePe specific fields
+  final String? phonePeOrderId;
+  final String? phonePeToken;
+  final String? merchantId;
+
   OrderCreationData({
     required this.orders,
     required this.totalAmount,
@@ -35,6 +54,9 @@ class OrderCreationData {
     required this.paymentSessionId,
     required this.cfOrderId,
     required this.parentOrderId,
+    this.phonePeOrderId,
+    this.phonePeToken,
+    this.merchantId,
   });
 
   // Convenience getters for backward compatibility
@@ -51,15 +73,40 @@ class OrderCreationData {
             .toList() ??
         [];
 
-    return OrderCreationData(
-      orders: ordersList,
-      totalAmount: (json['total_amount'] ?? 0).toDouble(),
-      paymentStatus: json['payment_status'] ?? '',
-      requiresPayment: json['requires_payment'] ?? false,
-      paymentSessionId: json['payment_session_id'] ?? '',
-      cfOrderId: json['cf_order_id'] ?? '',
-      parentOrderId: json['parent_order_id'] ?? '',
-    );
+    // Check if this is a PhonePe response
+    final bool isPhonePeResponse = json.containsKey('phonePE_orderId');
+
+    if (isPhonePeResponse) {
+      // PhonePe response - different structure
+      return OrderCreationData(
+        orders: ordersList,
+        totalAmount: ordersList.isNotEmpty ? ordersList.first.total : 0.0,
+        paymentStatus: 'pending',
+        requiresPayment: true, // PhonePe always requires payment
+        paymentSessionId: '', // Not used in PhonePe
+        cfOrderId: '', // Not used in PhonePe
+        parentOrderId: json['parent_order_id'] ?? '',
+        // PhonePe specific fields
+        phonePeOrderId: json['phonePE_orderId'] as String?,
+        phonePeToken: json['token'] as String?,
+        merchantId: json['merchantId'] as String?,
+      );
+    } else {
+      // Cashfree response - original structure
+      return OrderCreationData(
+        orders: ordersList,
+        totalAmount: (json['total_amount'] ?? 0).toDouble(),
+        paymentStatus: json['payment_status'] ?? '',
+        requiresPayment: json['requires_payment'] ?? false,
+        paymentSessionId: json['payment_session_id'] ?? '',
+        cfOrderId: json['cf_order_id'] ?? '',
+        parentOrderId: json['parent_order_id'] ?? '',
+        // PhonePe fields will be null for Cashfree
+        phonePeOrderId: null,
+        phonePeToken: null,
+        merchantId: null,
+      );
+    }
   }
 }
 

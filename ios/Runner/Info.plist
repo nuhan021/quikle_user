@@ -34,6 +34,11 @@
         <string>bhim</string>
         <string>amazonpay</string>
         <string>credpay</string>
+        <string>ppemerchantsdkv1</string>  
+        <string>ppemerchantsdkv2</string> 
+        <string>ppemerchantsdkv3</string>
+        <string>paytmmp</string>
+        <string>gpay</string> 
     </array>
     <key>LSRequiresIPhoneOS</key>
     <true/>
