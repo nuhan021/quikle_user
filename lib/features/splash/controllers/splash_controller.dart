@@ -1,9 +1,6 @@
 import 'dart:async';
 import 'package:get/get.dart';
-import 'package:quikle_user/core/common/widgets/no_internet_screen.dart';
 import 'package:quikle_user/core/services/storage_service.dart';
-import 'package:quikle_user/features/home/data/services/home_services.dart';
-import 'package:quikle_user/core/services/global_prefetch_service.dart';
 import 'package:quikle_user/core/utils/logging/logger.dart';
 import 'package:quikle_user/features/auth/presentation/screens/splash_wrapper.dart';
 import 'package:video_player/video_player.dart';
@@ -82,17 +79,6 @@ class SplashController extends GetxController {
       //   Get.off(() => const NoInternetScreen());
       //   return;
       // }
-
-      try {
-        final homeService = HomeService();
-        final categories = await homeService.fetchCategories();
-        for (final cat in categories) {
-          // skip 'All' pseudo-category
-          if (cat.id == '0') continue;
-          // Enqueue full prefetch regardless of network type per user request
-          GlobalPrefetchService.instance.enqueueCategory(cat.id, full: true);
-        }
-      } catch (_) {}
 
       // Check if user is already logged in
       final bool hasToken = StorageService.hasToken();
