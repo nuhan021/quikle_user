@@ -66,7 +66,7 @@ class RestaurantPageController extends GetxController {
       }
 
       AppLoggerHelper.debug(
-        '📥 Loading products for restaurant ${restaurant.vendorId} (offset: $_currentOffset)',
+        '📥 Loading products for restaurant ${restaurant.vendorId} (offset: $_currentOffset) Vendor ID:${restaurant.vendorId}',
       );
 
       final products = await _productsService.getRestaurantProducts(

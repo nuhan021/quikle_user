@@ -17,6 +17,8 @@ class ProfileController extends GetxController {
 
   final isEditing = false.obs;
   final isSaving = false.obs;
+  final isDeleting = false.obs;
+  final deleteError = ''.obs;
 
   final UserService userService = Get.find<UserService>();
 
@@ -127,6 +129,27 @@ class ProfileController extends GetxController {
 
   Future<void> logout() async {
     await userService.logoutUser();
+  }
+
+  Future<void> deleteAccount() async {
+    isDeleting.value = true;
+    deleteError.value = '';
+
+    try {
+      final success = await userService.deleteAccount();
+
+      isDeleting.value = false;
+
+      if (success) {
+        await userService.logoutUser();
+      } else {
+        deleteError.value = 'Failed to delete account. Please try again.';
+      }
+    } catch (e) {
+      isDeleting.value = false;
+      deleteError.value = 'Failed to delete account. Please try again.';
+      AppLoggerHelper.debug('Error deleting account: $e');
+    }
   }
 
   @override

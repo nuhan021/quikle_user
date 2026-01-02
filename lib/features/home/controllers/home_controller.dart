@@ -69,9 +69,9 @@ class HomeController extends GetxController with VoiceSearchMixin {
       final categoriesFuture = _homeService.fetchCategories();
       final productsFuture = _homeService.fetchAllProducts();
       final productSectionsFuture = _homeService.fetchProductSections();
+      final bannerFuture = bannerController.fetchBanners();
       final suggestedFuture = suggestedProductsService
           .preloadSuggestedProducts();
-      final bannerFuture = bannerController.fetchBanners();
 
       final categories = await categoriesFuture;
 

@@ -21,10 +21,23 @@ class LoginController extends GetxController {
     super.onInit();
     _auth = Get.find<AuthService>();
     phoneController.addListener(() {
+      // If user starts editing phone input, revert any temporary signup state
       if (showNameField.value || !isExistingUser.value) {
         showNameField.value = false;
         isExistingUser.value = true;
         nameController.text = '';
+      }
+
+      // Clear any inline error once user edits the input
+      if (errorMessage.value.isNotEmpty) {
+        errorMessage.value = '';
+      }
+    });
+
+    // Clear inline errors when user edits name as well
+    nameController.addListener(() {
+      if (errorMessage.value.isNotEmpty) {
+        errorMessage.value = '';
       }
     });
   }
@@ -126,6 +139,12 @@ class LoginController extends GetxController {
             );
             return;
           }
+          // If resend failed, surface the appropriate error inline
+          errorMessage.value = resend.errorMessage.isNotEmpty
+              ? resend.errorMessage
+              : response.errorMessage.isNotEmpty
+              ? response.errorMessage
+              : 'Something went wrong. Please try again.';
           return;
         }
 
