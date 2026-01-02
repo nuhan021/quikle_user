@@ -132,9 +132,9 @@ class OrderTrackingController extends GetxController {
     if (_order == null) return 0.0;
 
     switch (order.status) {
-      case OrderStatus.confirmed:
-        return 0.2;
       case OrderStatus.processing:
+        return 0.2;
+      case OrderStatus.confirmed:
         return 0.4;
       case OrderStatus.shipped:
         return 0.6;
@@ -151,9 +151,9 @@ class OrderTrackingController extends GetxController {
     if (_order == null) return 'Processing';
 
     switch (order.status) {
-      case OrderStatus.confirmed:
-        return 'Order Confirmed';
       case OrderStatus.processing:
+        return 'Order Placed';
+      case OrderStatus.confirmed:
         return 'Preparing';
       case OrderStatus.shipped:
         return 'Ready for Pickup';
@@ -195,9 +195,10 @@ class OrderTrackingController extends GetxController {
     if (_order == null) return null;
 
     final currentIndex = order.status.index;
+    // Keep statuses in the correct chronological order
     final nextStatuses = [
-      OrderStatus.confirmed,
       OrderStatus.processing,
+      OrderStatus.confirmed,
       OrderStatus.shipped,
       OrderStatus.outForDelivery,
       OrderStatus.delivered,
@@ -227,7 +228,7 @@ class OrderTrackingController extends GetxController {
         phoneNumber ?? trackingData.value?['deliveryPerson']?['phone'];
     if (phone != null) {
       AppLoggerHelper.debug('Initiating call to delivery person at $phone');
-      bool? res = await FlutterPhoneDirectCaller.callNumber(phone);
+      await FlutterPhoneDirectCaller.callNumber(phone);
     } else {
       Get.snackbar(
         'Error',

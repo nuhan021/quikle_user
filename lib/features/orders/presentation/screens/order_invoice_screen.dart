@@ -5,11 +5,13 @@ import 'package:intl/intl.dart';
 import 'package:quikle_user/core/common/styles/global_text_style.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
+import 'package:quikle_user/core/utils/constants/image_path.dart';
 import 'package:quikle_user/features/orders/data/models/order_model.dart';
 import 'package:quikle_user/features/orders/presentation/widgets/order_status_helpers.dart';
 import 'package:quikle_user/features/profile/presentation/widgets/unified_profile_app_bar.dart';
 import 'package:quikle_user/features/orders/presentation/screens/order_tracking_screen.dart';
 import 'package:quikle_user/core/common/widgets/customer_support_fab.dart';
+import 'package:quikle_user/core/services/freshchat_service.dart';
 
 class OrderInvoiceScreen extends StatelessWidget {
   final OrderModel order;
@@ -41,7 +43,7 @@ class OrderInvoiceScreen extends StatelessWidget {
                       left: 16.w,
                       right: 16.w,
                       top: 16.h,
-                      bottom: MediaQuery.of(context).padding.bottom,
+                      bottom: 0,
                     ),
                     child: SingleChildScrollView(
                       // physics: const ClampingScrollPhysics(),
@@ -68,10 +70,39 @@ class OrderInvoiceScreen extends StatelessWidget {
                 ),
               ],
             ),
-            const CustomerSupportFAB(),
+            // Support FAB with order context for better customer support
+            CustomerSupportFAB(orderContext: _createOrderContext()),
           ],
         ),
       ),
+    );
+  }
+
+  /// Helper method to get delivery location string
+  String _getDeliveryLocation() {
+    if (order.riderInfo == null) return 'Not Assigned';
+    // You could enhance this to show actual lat/long if available
+    return 'Tracking Available';
+  }
+
+  /// Helper method to create order context for Freshchat support
+  Map<String, dynamic> _createOrderContext() {
+    return FreshchatService.createOrderContext(
+      orderId: order.orderId,
+      orderStatus: order.statusDisplayName,
+      restaurantName: order.vendorInfo?.storeName,
+      restaurantPhone: order.vendorInfo?.vendorPhone,
+      deliveryPersonName: order.riderInfo?.riderName,
+      deliveryPersonPhone: order.riderInfo?.riderPhone,
+      deliveryPersonLocation: _getDeliveryLocation(),
+      orderDate: DateFormat('dd MMM yyyy, hh:mm a').format(order.orderDate),
+      estimatedDelivery: order.estimatedDelivery != null
+          ? DateFormat('dd MMM yyyy, hh:mm a').format(order.estimatedDelivery!)
+          : null,
+      orderTotal: '₹${order.total.toStringAsFixed(2)}',
+      items: order.items
+          .map((item) => '${item.product.title} x${item.quantity}')
+          .toList(),
     );
   }
 
@@ -299,10 +330,10 @@ class OrderInvoiceScreen extends StatelessWidget {
                         errorBuilder: (context, error, stackTrace) {
                           return Container(
                             color: const Color(0xFFF5F5F5),
-                            child: Icon(
-                              Icons.shopping_bag_outlined,
-                              size: 24.sp,
-                              color: const Color(0xFF7C7C7C),
+                            child: Image.asset(
+                              ImagePath.logo,
+                              fit: BoxFit.contain,
+                              // color: Colors.grey,
                             ),
                           );
                         },

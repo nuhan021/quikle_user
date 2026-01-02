@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:quikle_user/core/services/cart_position_service.dart';
+import 'package:quikle_user/core/utils/constants/image_path.dart';
 
 /// Custom Tween that gets the real-time cart position during animation
 class _DynamicPositionTween extends Tween<Offset> {
@@ -283,12 +284,40 @@ class _AnimatedCartImageState extends State<AnimatedCartImage>
             child: Stack(
               children: [
                 // Product image
-                Image.asset(
+                Image.network(
                   widget.animation.imagePath,
                   fit: BoxFit.cover,
                   filterQuality: FilterQuality.high,
                   width: s,
                   height: s,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Center(
+                      child: SizedBox(
+                        width: s * 0.3,
+                        height: s * 0.3,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.r,
+                          value: loadingProgress.expectedTotalBytes != null
+                              ? loadingProgress.cumulativeBytesLoaded /
+                                    (loadingProgress.expectedTotalBytes ?? 1)
+                              : null,
+                        ),
+                      ),
+                    );
+                  },
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      width: s,
+                      height: s,
+                      color: Colors.grey.shade200,
+                      child: Image.asset(
+                        ImagePath.logo,
+                        fit: BoxFit.contain,
+                        // color: Colors.grey,
+                      ),
+                    );
+                  },
                 ),
                 // Subtle overlay for better visibility during animation
                 Container(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:quikle_user/core/utils/constants/image_path.dart';
 
 class ProductImageWidget extends StatelessWidget {
   final String imagePath;
@@ -48,10 +49,10 @@ class ProductImageWidget extends StatelessWidget {
                 },
                 errorBuilder: (context, error, stackTrace) => Container(
                   color: Colors.grey[200],
-                  child: Icon(
-                    Icons.broken_image,
-                    size: 48.sp,
-                    color: Colors.grey,
+                  child: Image.asset(
+                    ImagePath.logo,
+                    fit: BoxFit.contain,
+                    // color: Colors.grey,
                   ),
                 ),
               ),

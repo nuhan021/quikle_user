@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
+import 'package:quikle_user/core/utils/constants/image_path.dart';
 import 'package:quikle_user/features/categories/data/models/subcategory_model.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -65,10 +66,10 @@ class SubcategoryGridSection extends StatelessWidget {
                             );
                           },
                           errorBuilder: (context, error, stackTrace) {
-                            return Icon(
-                              Icons.broken_image,
-                              size: 20.w,
-                              color: AppColors.primary,
+                            return Image.asset(
+                              ImagePath.logo,
+                              fit: BoxFit.contain,
+                              // color: Colors.grey,
                             );
                           },
                         )

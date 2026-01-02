@@ -7,7 +7,7 @@
     <key>CFBundleDevelopmentRegion</key>
     <string>$(DEVELOPMENT_LANGUAGE)</string>
     <key>CFBundleDisplayName</key>
-    <string>Quikle User</string>
+    <string>Quikle: One-stop Delivery App</string>
     <key>CFBundleExecutable</key>
     <string>$(EXECUTABLE_NAME)</string>
     <key>CFBundleIdentifier</key>
@@ -29,6 +29,16 @@
     <key>LSApplicationQueriesSchemes</key>
     <array>
         <string>tel</string>
+        <string>tez</string>
+        <string>paytmmp</string>
+        <string>bhim</string>
+        <string>amazonpay</string>
+        <string>credpay</string>
+        <string>ppemerchantsdkv1</string>  
+        <string>ppemerchantsdkv2</string> 
+        <string>ppemerchantsdkv3</string>
+        <string>paytmmp</string>
+        <string>gpay</string> 
     </array>
     <key>LSRequiresIPhoneOS</key>
     <true/>

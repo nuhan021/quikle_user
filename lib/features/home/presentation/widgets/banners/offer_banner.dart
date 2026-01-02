@@ -1,19 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:shimmer/shimmer.dart';
+import '../../../data/models/banner_image.dart';
 
 class OfferBanner extends StatelessWidget {
-  final List<String> imagePaths = [
-    'assets/images/offer1.png',
-    'assets/images/offer2.png',
-    'assets/images/offer3.png',
-    'assets/images/offer4.png',
-  ];
+  final List<BannerImage>? images;
+  final bool isLoading;
+
+  const OfferBanner({super.key, this.images, this.isLoading = false});
+
+  Widget _buildShimmer(double height) {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey.shade300,
+      highlightColor: Colors.grey.shade100,
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 18.w),
+        child: Container(
+          width: double.infinity,
+          height: height,
+          decoration: BoxDecoration(
+            color: Colors.grey[300],
+            borderRadius: BorderRadius.circular(12.r),
+          ),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final double bannerHeight = 200.h;
-
+    if (isLoading || images == null) {
+      return _buildShimmer(bannerHeight);
+    }
+    if (images!.isEmpty) {
+      return SizedBox(
+        height: bannerHeight,
+        child: const Center(child: Text('No banners available')),
+      );
+    }
     return CarouselSlider(
       options: CarouselOptions(
         height: bannerHeight,
@@ -22,9 +48,8 @@ class OfferBanner extends StatelessWidget {
         autoPlayAnimationDuration: const Duration(milliseconds: 800),
         enlargeCenterPage: true,
         viewportFraction: 1.0,
-        //aspectRatio: aspectRatio,
       ),
-      items: imagePaths.map((path) {
+      items: images!.map((banner) {
         return Builder(
           builder: (BuildContext context) {
             return Padding(
@@ -35,7 +60,16 @@ class OfferBanner extends StatelessWidget {
                   width: double.infinity,
                   height: bannerHeight,
                   color: Colors.grey[200],
-                  child: Image.asset(path, fit: BoxFit.cover),
+                  child: Image.network(
+                    banner.imageUrl,
+                    fit: BoxFit.cover,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return _buildShimmer(bannerHeight);
+                    },
+                    errorBuilder: (context, error, stackTrace) =>
+                        const Center(child: Icon(Icons.error)),
+                  ),
                 ),
               ),
             );

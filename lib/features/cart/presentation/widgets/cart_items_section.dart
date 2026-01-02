@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:quikle_user/core/common/styles/global_text_style.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
+import 'package:quikle_user/core/utils/constants/image_path.dart';
 
 import '../../controllers/cart_controller.dart';
 
@@ -22,21 +23,21 @@ class CartItemsSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: EdgeInsets.all(16.w),
-            child: Text(
-              'Delivery in 16 minutes',
-              style: getTextStyle(
-                font: CustomFonts.obviously,
-                fontSize: 16.sp,
-                fontWeight: FontWeight.w500,
-                color: AppColors.ebonyBlack,
-              ),
-            ),
-          ),
+          // Padding(
+          //   padding: EdgeInsets.all(16.w),
+          //   child: Text(
+          //     'Delivery in 16 minutes',
+          //     style: getTextStyle(
+          //       font: CustomFonts.obviously,
+          //       fontSize: 16.sp,
+          //       fontWeight: FontWeight.w500,
+          //       color: AppColors.ebonyBlack,
+          //     ),
+          //   ),
+          // ),
           Obx(() {
             return ListView.builder(
-              padding: EdgeInsets.only(bottom: 8.h),
+              padding: EdgeInsets.only(top: 8.h, bottom: 8.h),
               primary: false,
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
@@ -44,7 +45,10 @@ class CartItemsSection extends StatelessWidget {
               itemBuilder: (context, index) {
                 final cartItem = cartController.cartItems[index];
                 final isLast = index == cartController.cartItems.length - 1;
-                bool isMedicine = cartItem.isUrgent;
+                bool isMedicine =
+                    cartItem.product.isPrescriptionMedicine ||
+                    cartItem.product.isOTC;
+                bool showUrgent = isMedicine && cartItem.isUrgent;
                 return Container(
                   margin: EdgeInsets.only(
                     left: 8.w,
@@ -65,17 +69,34 @@ class CartItemsSection extends StatelessWidget {
                           borderRadius: BorderRadius.circular(8.r),
                         ),
                         child: Center(
-                          child: Image.asset(
-                            cartItem.product.imagePath,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Icon(
-                                Icons.shopping_basket,
-                                color: Colors.grey[400],
-                                size: 30.sp,
-                              );
-                            },
-                          ),
+                          child:
+                              (cartItem.product.imagePath.isNotEmpty &&
+                                  (cartItem.product.imagePath.startsWith(
+                                        'http',
+                                      ) ||
+                                      cartItem.product.imagePath.startsWith(
+                                        'https',
+                                      )))
+                              ? ClipRRect(
+                                  borderRadius: BorderRadius.circular(8.r),
+                                  child: Image.network(
+                                    cartItem.product.imagePath,
+                                    fit: BoxFit.contain,
+                                    width: 65.w,
+                                    height: 65.h,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Image.asset(
+                                        ImagePath.logo,
+                                        fit: BoxFit.contain,
+                                        // color: Colors.grey,
+                                      );
+                                    },
+                                  ),
+                                )
+                              : Image.asset(
+                                  ImagePath.logo,
+                                  fit: BoxFit.contain,
+                                ),
                         ),
                       ),
                       // SizedBox(width: 4.w),
@@ -105,7 +126,7 @@ class CartItemsSection extends StatelessWidget {
                                   ),
                                 ),
 
-                                if (isMedicine)
+                                if (showUrgent)
                                   Container(
                                     padding: EdgeInsets.symmetric(
                                       horizontal: 6.w,

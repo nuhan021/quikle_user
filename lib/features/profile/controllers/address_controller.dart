@@ -176,8 +176,15 @@ class AddressController extends GetxController {
     try {
       await Future.delayed(const Duration(milliseconds: 300));
 
-      _addresses.removeWhere((addr) => addr.id == addressId);
+      // Call API to delete
       await _addressService.deleteAddress(addressId);
+
+      // Remove from local list
+      _addresses.removeWhere((addr) => addr.id == addressId);
+
+      // Notify listeners to update UI
+      update();
+
       Get.snackbar('Success', 'Address deleted successfully');
     } catch (e) {
       Get.snackbar('Error', 'Failed to delete address');

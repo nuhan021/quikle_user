@@ -144,7 +144,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
       overflow: TextOverflow.ellipsis,
       style: getTextStyle(
         font: CustomFonts.obviously,
-        fontSize: 18.sp,
+        fontSize: 16.sp,
         fontWeight: FontWeight.w500,
         color: txtColor,
       ),
@@ -167,6 +167,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
         child: SafeArea(
           bottom: false,
+          top: !isFromHome, // Don't add top safe area if coming from home
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 8.w),
             child: Row(

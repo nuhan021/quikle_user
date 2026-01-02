@@ -1,5 +1,8 @@
 class ApiConstants {
-  static const String baseUrl = "https://quikle-u4dv.onrender.com";
+  static const String baseUrl = "https://caditya619-backend-ng0e.onrender.com";
+
+  //Get banner images
+  static const String getBannerImages = "$baseUrl/banner/pictures/";
 
   //For auth api's
   static const String authApi = "$baseUrl/auth";
@@ -54,6 +57,8 @@ class ApiConstants {
   //Payment api's
   static const String initiatePayment = "$baseUrl/payment/payment/initiate";
   static const String confirmPayment = "$baseUrl/payment/payment/confirm";
+  static const String verifyPhonePePayment =
+      "$baseUrl/payment/payment/phonepe/status";
 
   //Search api's
   static const String searchItems = "$baseUrl/items/items/";
@@ -77,4 +82,7 @@ class ApiConstants {
   //Restaurant api's
   static const String getRestaurants = "$authApi/restaurant/restaurants";
   static const String getRestaurantProducts = "$baseUrl/items/food/";
+  // Promo / Coupons
+  static const String getCoupons = "$baseUrl/promo/cupons/";
+  static const String applyCoupon = "$baseUrl/promo/cupons/apply";
 }

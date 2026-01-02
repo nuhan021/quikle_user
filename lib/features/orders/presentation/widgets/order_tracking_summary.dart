@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:quikle_user/core/common/styles/global_text_style.dart';
+import 'package:intl/intl.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 import 'package:quikle_user/features/orders/controllers/order_tracking_controller.dart';
@@ -54,23 +55,118 @@ class OrderTrackingSummary extends StatelessWidget {
   }
 
   Widget _buildOrderHeader() {
+    // Build a compact header that shows the first item's thumbnail + title
+    Widget _thumbnail() {
+      if (order.items.isEmpty) {
+        return Container(
+          width: 44.w,
+          height: 44.w,
+          decoration: BoxDecoration(
+            color: Colors.grey.shade100,
+            borderRadius: BorderRadius.circular(8.r),
+          ),
+          child: Icon(
+            Icons.shopping_bag_outlined,
+            color: Colors.grey.shade500,
+            size: 20.sp,
+          ),
+        );
+      }
+
+      final path = order.items.first.product.imagePath;
+      final img = path.isNotEmpty
+          ? (path.startsWith('http')
+                ? Image.network(
+                    path,
+                    width: 44.w,
+                    height: 44.w,
+                    fit: BoxFit.cover,
+                    errorBuilder: (c, e, s) =>
+                        Container(color: Colors.grey.shade100),
+                  )
+                : Image.asset(
+                    path,
+                    width: 44.w,
+                    height: 44.w,
+                    fit: BoxFit.cover,
+                  ))
+          : Container(color: Colors.grey.shade100);
+
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(8.r),
+        child: SizedBox(width: 44.w, height: 44.w, child: img),
+      );
+    }
+
+    String _mainTitle() {
+      if (order.items.isEmpty) return order.orderId;
+      final t = order.items.first.product.title.trim();
+      return t.isNotEmpty ? t : order.orderId;
+    }
+
+    String _subtitle() {
+      if (order.items.isEmpty) return '';
+      final first = order.items.first;
+      final qty = first.quantityDisplay;
+      if (order.items.length == 1) return qty;
+      return '$qty • +${order.items.length - 1} more';
+    }
+
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
+        _thumbnail(),
+        SizedBox(width: 12.w),
         Expanded(
-          child: Text(
-            '${order.orderId}',
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis, // 👈 ORDER ID shrinks
-            style: getTextStyle(
-              font: CustomFonts.obviously,
-              fontSize: 14.sp,
-              fontWeight: FontWeight.w600,
-              color: AppColors.ebonyBlack,
-            ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                _mainTitle(),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: getTextStyle(
+                  font: CustomFonts.obviously,
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.ebonyBlack,
+                ),
+              ),
+              SizedBox(height: 4.h),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      _subtitle(),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: getTextStyle(
+                        font: CustomFonts.inter,
+                        fontSize: 11.sp,
+                        fontWeight: FontWeight.w400,
+                        color: const Color(0xFF7C7C7C),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 8.w),
+                  Text(
+                    DateFormat(
+                      "MMM d, yyyy 'at' h:mm a",
+                    ).format(order.orderDate),
+                    style: getTextStyle(
+                      font: CustomFonts.inter,
+                      fontSize: 10.sp,
+                      fontWeight: FontWeight.w400,
+                      color: const Color(0xFF9A9A9A),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
-        SizedBox(width: 12.w),
 
+        SizedBox(width: 12.w),
         // STATUS — takes required space
         Container(
           padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),

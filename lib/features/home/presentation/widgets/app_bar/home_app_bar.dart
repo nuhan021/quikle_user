@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:quikle_user/core/common/widgets/address_widget.dart';
@@ -11,18 +12,25 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CommonAppBar(
-      title: ' ',
-      titleWidget: AddressWidget(),
-      showBackButton: false,
-      showNotification: false,
-      showProfile: false,
-      backgroundColor: AppColors.eggshellWhite,
-      actions: [
-        IconButton(
-          icon: const Icon(Iconsax.empty_wallet, color: Colors.black),
-          onPressed: () => Get.toNamed(AppRoute.getPaymentMethods()),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        CommonAppBar(
+          title: ' ',
+          titleWidget: AddressWidget(),
+          showBackButton: false,
+          showNotification: false,
+          showProfile: false,
+          backgroundColor: AppColors.eggshellWhite,
+          isFromHome: true,
+          actions: [
+            IconButton(
+              icon: const Icon(Iconsax.empty_wallet, color: Colors.black),
+              onPressed: () => Get.toNamed(AppRoute.getPaymentMethods()),
+            ),
+          ],
         ),
+        SizedBox(height: 8.h),
       ],
     );
   }

@@ -38,7 +38,15 @@ class AddAddressScreen extends StatelessWidget {
         backgroundColor: Colors.transparent,
         builder: (context) => const AddAddressScreen(),
       ).whenComplete(() {
-        controller.clearForm();
+        // Only clear the form if the user didn't proceed to select an
+        // address (from map or current location). When using current
+        // location we set flags on the controller (useCurrentLocation /
+        // isAddressFromMap) before popping the initial sheet — in that
+        // case we must not clear the populated address fields here.
+        if (!(controller.useCurrentLocation.value ||
+            controller.isAddressFromMap.value)) {
+          controller.clearForm();
+        }
       });
     }
   }

@@ -4,10 +4,12 @@ import 'package:quikle_user/core/services/storage_service.dart';
 import 'package:quikle_user/core/utils/constants/api_constants.dart';
 import 'package:quikle_user/core/utils/logging/logger.dart';
 import 'package:quikle_user/features/payment/data/models/payment_initiation_response.dart';
+import 'package:quikle_user/features/payment/data/models/confirm_payment_response.dart';
+import 'package:quikle_user/features/payment/data/models/phonepe_verify_response.dart';
 
 /// Payment API Service
 ///
-/// Handles Cashfree payment initiation with the backend API.
+/// Handles Cashfree and PhonePe payment operations with the backend API.
 class PaymentApiService {
   final NetworkCaller _networkCaller = NetworkCaller();
 
@@ -68,7 +70,14 @@ class PaymentApiService {
   }
 
   /// Confirm payment completion for an order
-  Future<void> confirmPayment({required String parentOrderId}) async {
+  ///
+  /// Returns a [ConfirmPaymentResponse] parsed from the backend. The backend
+  /// may return success: false with a cashfree_status (e.g. "ACTIVE") which
+  /// indicates the payment was not completed. The caller should inspect
+  /// `cashfreeStatus` and `message` to determine the next steps.
+  Future<ConfirmPaymentResponse> confirmPayment({
+    required String parentOrderId,
+  }) async {
     try {
       final token = StorageService.token;
       final refreshToken = StorageService.refreshToken;
@@ -92,15 +101,75 @@ class PaymentApiService {
         },
       );
 
-      if (response.isSuccess) {
-        AppLoggerHelper.debug('✅ Payment confirmed successfully');
-      } else {
-        AppLoggerHelper.error('❌ Failed to confirm payment');
-        throw Exception('Failed to confirm payment');
+      if (response.responseData != null &&
+          response.responseData is Map<String, dynamic>) {
+        AppLoggerHelper.debug(
+          'Confirm payment response: ${response.responseData}',
+        );
+        return ConfirmPaymentResponse.fromJson(
+          response.responseData as Map<String, dynamic>,
+        );
       }
+
+      AppLoggerHelper.error('❌ Empty or invalid response confirming payment');
+      throw Exception('Failed to confirm payment: empty response');
     } catch (e) {
       AppLoggerHelper.error('❌ Error confirming payment', e);
       throw Exception('Failed to confirm payment: $e');
+    }
+  }
+
+  /// Verify PhonePe payment status
+  ///
+  /// Returns a [PhonePeVerifyResponse] with STATE field indicating payment status.
+  /// STATE = "COMPLETED" means payment was successful.
+  Future<PhonePeVerifyResponse> verifyPhonePePayment({
+    required String merchantOrderId,
+    required String token,
+  }) async {
+    try {
+      final authToken = StorageService.token;
+      final refreshToken = StorageService.refreshToken;
+
+      if (authToken == null || authToken.isEmpty) {
+        throw Exception('User not authenticated');
+      }
+
+      final Map<String, dynamic> requestBody = {
+        'merchantOrderId': merchantOrderId,
+        'token': token,
+      };
+
+      AppLoggerHelper.debug(
+        'Verifying PhonePe payment for order: $merchantOrderId',
+      );
+
+      final ResponseData response = await _networkCaller.postRequest(
+        ApiConstants.verifyPhonePePayment,
+        body: requestBody,
+        headers: {
+          'Authorization': 'Bearer $authToken',
+          'refresh-token': '$refreshToken',
+        },
+      );
+
+      if (response.responseData != null &&
+          response.responseData is Map<String, dynamic>) {
+        AppLoggerHelper.debug(
+          'PhonePe verify response: ${response.responseData}',
+        );
+        return PhonePeVerifyResponse.fromJson(
+          response.responseData as Map<String, dynamic>,
+        );
+      }
+
+      AppLoggerHelper.error(
+        '❌ Empty or invalid response verifying PhonePe payment',
+      );
+      throw Exception('Failed to verify PhonePe payment: empty response');
+    } catch (e) {
+      AppLoggerHelper.error('❌ Error verifying PhonePe payment', e);
+      throw Exception('Failed to verify PhonePe payment: $e');
     }
   }
 }

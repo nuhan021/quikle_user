@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:quikle_user/core/models/response_data.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
-import 'package:quikle_user/core/notification/controllers/notification_controller.dart';
 import 'package:quikle_user/features/auth/controllers/login_controller.dart';
 import 'package:quikle_user/features/auth/data/services/auth_service.dart';
 import 'package:quikle_user/features/profile/controllers/address_controller.dart';
@@ -112,15 +111,6 @@ class VerificationController extends GetxController {
         }
 
         if (response.isSuccess) {
-          try {
-            final notificationController = Get.find<NotificationController>();
-            final fcmToken = await notificationController.getFCMToken();
-            if (fcmToken != null && fcmToken.isNotEmpty) {
-              await notificationController.saveFCMToken(fcmToken);
-            }
-          } catch (e) {
-            print('Could not save FCM token immediately after login: $e');
-          }
           try {
             final addressController = Get.find<AddressController>();
             await addressController.loadAddresses();

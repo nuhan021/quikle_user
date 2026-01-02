@@ -159,4 +159,13 @@ class CartController extends GetxController {
   bool isProductUrgent(ProductModel product) {
     return _cartService.isProductUrgent(product);
   }
+
+  // Check if all cart items are from the same category
+  bool get hasMultipleCategories {
+    if (_cartItems.isEmpty) return false;
+    if (_cartItems.length == 1) return false;
+
+    final firstCategoryId = _cartItems.first.product.categoryId;
+    return _cartItems.any((item) => item.product.categoryId != firstCategoryId);
+  }
 }

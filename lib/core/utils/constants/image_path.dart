@@ -1,5 +1,5 @@
 class ImagePath {
-  static const String logo = 'assets/images/logo.png';
+  static const String logo = 'assets/images/logo_bg.png';
   static const String verifyIcon = 'assets/icons/verify.png';
   static const String homeNav = 'assets/icons/homeIcon.png';
   static const String homeActiveNav = 'assets/icons/home_active.png';

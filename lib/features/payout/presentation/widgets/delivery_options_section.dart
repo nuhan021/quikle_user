@@ -5,6 +5,8 @@ import 'package:quikle_user/core/common/styles/global_text_style.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 import 'package:quikle_user/core/utils/constants/image_path.dart';
+import 'package:quikle_user/features/cart/presentation/widgets/you_may_like_section.dart';
+import 'package:quikle_user/features/home/controllers/home_controller.dart';
 import '../../controllers/payout_controller.dart';
 import '../../data/models/delivery_option_model.dart';
 import '../../../cart/controllers/cart_controller.dart';
@@ -16,6 +18,7 @@ class DeliveryOptionsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final payoutController = Get.find<PayoutController>();
     final cartController = Get.find<CartController>();
+    final homeController = Get.find<HomeController>();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -59,23 +62,31 @@ class DeliveryOptionsSection extends StatelessWidget {
                               border: Border.all(color: Colors.black),
                               borderRadius: BorderRadius.circular(6.r),
                             ),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: _buildTableCell(
-                                    option: payoutController.deliveryOptions[0],
-                                    controller: payoutController,
-                                    showRightBorder: true,
+                            // Clip the inner row to the same radius so any selected
+                            // background (yellow) cannot overflow the rounded
+                            // border of the container.
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(6.r),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: _buildTableCell(
+                                      option:
+                                          payoutController.deliveryOptions[0],
+                                      controller: payoutController,
+                                      showRightBorder: true,
+                                    ),
                                   ),
-                                ),
-                                Expanded(
-                                  child: _buildTableCell(
-                                    option: payoutController.deliveryOptions[1],
-                                    controller: payoutController,
-                                    showRightBorder: false,
+                                  Expanded(
+                                    child: _buildTableCell(
+                                      option:
+                                          payoutController.deliveryOptions[1],
+                                      controller: payoutController,
+                                      showRightBorder: false,
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                           SizedBox(height: 12.h),
@@ -105,7 +116,7 @@ class DeliveryOptionsSection extends StatelessWidget {
         Container(
           padding: EdgeInsets.all(12.w),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.homeGrey,
             borderRadius: BorderRadius.circular(8.r),
             boxShadow: [
               BoxShadow(
@@ -115,41 +126,13 @@ class DeliveryOptionsSection extends StatelessWidget {
               ),
             ],
           ),
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  'Delivery Preference',
-                  style: getTextStyle(
-                    font: CustomFonts.inter,
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.w500,
-                    color: const Color(0xFF484848),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 200.w,
-                child: TextField(
-                  controller: payoutController.deliveryPreferenceController,
-                  decoration: InputDecoration(
-                    hintText: 'e.g. Don\'t call',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.r),
-                    ),
-                    isDense: true,
-                    contentPadding: EdgeInsets.symmetric(
-                      horizontal: 12.w,
-                      vertical: 10.h,
-                    ),
-                  ),
-                ),
-              ),
-            ],
+          child: YouMayLikeSection(
+            onAddToCart: cartController.addToCart,
+            onFavoriteToggle: homeController.onFavoriteToggle,
+            onProductTap: (p) => Get.toNamed('/product-details', arguments: p),
           ),
         ),
 
-        SizedBox(height: 8.h),
         Obx(() {
           if (cartController.hasMedicineItems) {
             return _buildUrgentDeliveryOption(payoutController);
@@ -166,49 +149,72 @@ class DeliveryOptionsSection extends StatelessWidget {
     required PayoutController controller,
     required bool showRightBorder,
   }) {
+    final cartController = Get.find<CartController>();
+    final hasMultipleCategories = cartController.hasMultipleCategories;
+
+    // Disable split delivery if all items are from same category
+    final bool isDisabled =
+        option.type.name == 'split' && !hasMultipleCategories;
+
     return GestureDetector(
-      onTap: () => controller.selectDeliveryOption(option),
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 16.h),
-        decoration: BoxDecoration(
-          color: option.isSelected ? AppColors.beakYellow : Colors.transparent,
-          border: Border(
-            right: showRightBorder
-                ? const BorderSide(color: Colors.black)
-                : BorderSide.none,
+      onTap: isDisabled ? null : () => controller.selectDeliveryOption(option),
+      child: Opacity(
+        opacity: isDisabled ? 0.5 : 1.0,
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 16.h),
+          decoration: BoxDecoration(
+            color: option.isSelected
+                ? AppColors.beakYellow
+                : Colors.transparent,
+            border: Border(
+              right: showRightBorder
+                  ? const BorderSide(color: Colors.black)
+                  : BorderSide.none,
+            ),
+            // Round only the outer corners of each cell so the selected
+            // background color is clipped inside the parent's rounded box.
+            borderRadius: showRightBorder
+                ? BorderRadius.only(
+                    topLeft: Radius.circular(6.r),
+                    bottomLeft: Radius.circular(6.r),
+                  )
+                : BorderRadius.only(
+                    topRight: Radius.circular(6.r),
+                    bottomRight: Radius.circular(6.r),
+                  ),
           ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              option.title,
-              style: getTextStyle(
-                font: CustomFonts.inter,
-                fontSize: 12.sp,
-                fontWeight: option.isSelected
-                    ? FontWeight.w600
-                    : FontWeight.w500,
-                color: option.isSelected
-                    ? Colors.black
-                    : const Color(0xFF484848),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                option.title,
+                style: getTextStyle(
+                  font: CustomFonts.inter,
+                  fontSize: 12.sp,
+                  fontWeight: option.isSelected
+                      ? FontWeight.w600
+                      : FontWeight.w500,
+                  color: option.isSelected
+                      ? Colors.black
+                      : const Color(0xFF484848),
+                ),
               ),
-            ),
-            SizedBox(width: 6.w),
-            Text(
-              '₹${option.price.toStringAsFixed(2)}',
-              style: getTextStyle(
-                font: CustomFonts.inter,
-                fontSize: 12.sp,
-                fontWeight: option.isSelected
-                    ? FontWeight.w600
-                    : FontWeight.w500,
-                color: option.isSelected
-                    ? Colors.black
-                    : const Color(0xFF484848),
+              SizedBox(width: 6.w),
+              Text(
+                '₹${option.price.toStringAsFixed(2)}',
+                style: getTextStyle(
+                  font: CustomFonts.inter,
+                  fontSize: 12.sp,
+                  fontWeight: option.isSelected
+                      ? FontWeight.w600
+                      : FontWeight.w500,
+                  color: option.isSelected
+                      ? Colors.black
+                      : const Color(0xFF484848),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -271,8 +277,8 @@ class DeliveryOptionsSection extends StatelessWidget {
               inactiveTrackColor: AppColors.ebonyBlack,
             );
           }),
-          SizedBox(width: 8.w),
-          Icon(Icons.info_outline, size: 16.sp, color: Colors.red),
+          // SizedBox(width: 8.w),
+          // Icon(Icons.info_outline, size: 16.sp, color: Colors.red),
         ],
       ),
     );

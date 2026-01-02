@@ -1,5 +1,6 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:freshchat_sdk/freshchat_sdk.dart' as FreshchatSDK;
 import 'package:get/get.dart';
 
 class FCMNotificationHandler {
@@ -56,12 +57,27 @@ class FCMNotificationHandler {
   /// Handle foreground messages (when app is open)
   static Future<void> _handleForegroundMessage(RemoteMessage message) async {
     print('📬 Foreground notification received: ${message.messageId}');
-    print('Title: ${message.notification?.title}');
-    print('Body: ${message.notification?.body}');
-    print('Data: ${message.data}');
+    print('🔔 Title: ${message.notification?.title}');
+    print('🔔 Body: ${message.notification?.body}');
+    print('📦 Data: ${message.data}');
 
-    // Show local notification
-    await _showLocalNotification(message);
+    // Check if this is a Freshchat notification
+    final isFreshchatNotification =
+        await FreshchatSDK.Freshchat.isFreshchatNotification(message.data);
+
+    print('🔍 Is Freshchat notification: $isFreshchatNotification');
+
+    if (isFreshchatNotification) {
+      print(
+        '💬 This is a Freshchat notification - handling with Freshchat SDK',
+      );
+      // Let Freshchat SDK handle its own notification
+      FreshchatSDK.Freshchat.handlePushNotification(message.data);
+    } else {
+      print('📱 Non-Freshchat notification - showing local notification');
+      // Show local notification for non-Freshchat messages
+      await _showLocalNotification(message);
+    }
   }
 
   /// Show local notification

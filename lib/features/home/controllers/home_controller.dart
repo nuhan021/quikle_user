@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:quikle_user/core/services/suggested_products_service.dart';
 import 'package:quikle_user/features/home/data/services/home_services.dart';
 import 'package:quikle_user/features/cart/controllers/cart_controller.dart';
 import 'package:quikle_user/features/profile/controllers/favorites_controller.dart';
@@ -6,10 +7,14 @@ import 'package:quikle_user/routes/app_routes.dart';
 import 'package:quikle_user/core/mixins/voice_search_mixin.dart';
 import '../data/models/category_model.dart';
 import '../data/models/product_model.dart';
+import '../presentation/controllers/offer_banner_controller.dart';
 
 class HomeController extends GetxController with VoiceSearchMixin {
   final HomeService _homeService = HomeService();
   late final CartController _cartController;
+  final OfferBannerController bannerController = Get.put(
+    OfferBannerController(),
+  );
   final _selectedCategoryId = '0'.obs;
   final _categories = <CategoryModel>[].obs;
   final _products = <ProductModel>[].obs;
@@ -48,25 +53,57 @@ class HomeController extends GetxController with VoiceSearchMixin {
     _loadInitialData();
   }
 
+  Future<void> saveFCMToken() async {
+    try {
+      await _homeService.saveFCMToken();
+    } catch (e) {
+      print('Error saving FCM Token: $e');
+    }
+  }
+
   Future<void> _loadInitialData() async {
     _isLoading.value = true;
     try {
-      _categories.value = await _homeService.fetchCategories();
-      // Sort categories to ensure All, Food, Groceries, Medicine are first
+      final suggestedProductsService = Get.put(SuggestedProductsService());
+
+      final categoriesFuture = _homeService.fetchCategories();
+      final productsFuture = _homeService.fetchAllProducts();
+      final productSectionsFuture = _homeService.fetchProductSections();
+      final suggestedFuture = suggestedProductsService
+          .preloadSuggestedProducts();
+      final bannerFuture = bannerController.fetchBanners();
+
+      final categories = await categoriesFuture;
+
       List<CategoryModel> sortedCategories = [];
-      sortedCategories.addAll(_categories.where((c) => c.title == 'All'));
-      sortedCategories.addAll(_categories.where((c) => c.title == 'Food'));
-      sortedCategories.addAll(_categories.where((c) => c.title == 'Groceries'));
-      sortedCategories.addAll(_categories.where((c) => c.title == 'Medicine'));
+      sortedCategories.addAll(categories.where((c) => c.title == 'All'));
+      sortedCategories.addAll(categories.where((c) => c.title == 'Food'));
+      sortedCategories.addAll(categories.where((c) => c.title == 'Groceries'));
+      sortedCategories.addAll(categories.where((c) => c.title == 'Medicine'));
       sortedCategories.addAll(
-        _categories.where(
+        categories.where(
           (c) => !['All', 'Food', 'Groceries', 'Medicine'].contains(c.title),
         ),
       );
       _categories.value = sortedCategories;
-      _products.value = await _homeService.fetchAllProducts();
-      await _loadContent();
+
+      // Make UI responsive early: stop global loading after categories are ready
+      _isLoading.value = false;
+
+      // Continue loading heavy data in background
+      productsFuture.then((p) => _products.value = p);
+      productSectionsFuture.then((sections) {
+        sections.sort((a, b) {
+          final catA = _categories.indexWhere((c) => c.id == a.categoryId);
+          final catB = _categories.indexWhere((c) => c.id == b.categoryId);
+          return catA.compareTo(catB);
+        });
+        _productSections.value = sections;
+      });
+      suggestedFuture.catchError((_) {});
+      bannerFuture.catchError((_) {});
     } finally {
+      // ensure loading flag is false in case of early return
       _isLoading.value = false;
     }
   }
@@ -76,6 +113,9 @@ class HomeController extends GetxController with VoiceSearchMixin {
   }
 
   Future<void> _loadContent() async {
+    // Preload suggested products
+    final suggestedProductsService = Get.put(SuggestedProductsService());
+    await suggestedProductsService.preloadSuggestedProducts();
     if (_selectedCategoryId.value == '0') {
       _productSections.value = await _homeService.fetchProductSections();
       // Sort product sections by category order

@@ -45,6 +45,7 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
 
   @override
   Widget build(BuildContext context) {
+    controller.saveFCMToken();
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
@@ -71,7 +72,7 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                   parent: ClampingScrollPhysics(),
                 ),
                 slivers: [
-                  const SliverToBoxAdapter(child: HomeAppBar()),
+                  SliverToBoxAdapter(child: const HomeAppBar()),
                   Obx(() {
                     final bool hasIndicator =
                         PrescriptionStatusIndicator.hasVisibleStatus(
@@ -139,12 +140,12 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                         padding: EdgeInsets.only(top: 12.h, bottom: 24.h),
                         sliver: SliverList(
                           delegate: SliverChildListDelegate([
-                            Center(child: OfferBanner()),
+                            Center(child: OfferBanner(isLoading: true)),
                             12.verticalSpace,
                             // Show shimmer for 6 product sections
                             const ProductSectionShimmer(isMedicine: false),
-                            const ProductSectionShimmer(isMedicine: true),
                             const ProductSectionShimmer(isMedicine: false),
+                            const ProductSectionShimmer(isMedicine: true),
                             const ProductSectionShimmer(isMedicine: false),
                             const ProductSectionShimmer(isMedicine: false),
                             const ProductSectionShimmer(isMedicine: false),
@@ -158,7 +159,16 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                       padding: EdgeInsets.only(top: 12.h, bottom: 24.h),
                       sliver: SliverList(
                         delegate: SliverChildListDelegate([
-                          Center(child: OfferBanner()),
+                          Center(
+                            child: Obx(
+                              () => OfferBanner(
+                                images: controller.bannerController.banners
+                                    .toList(),
+                                isLoading:
+                                    controller.bannerController.isLoading.value,
+                              ),
+                            ),
+                          ),
                           12.verticalSpace,
                           if (controller.isShowingAllCategories)
                             ...controller.productSections.map(

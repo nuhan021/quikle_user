@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:quikle_user/core/common/styles/global_text_style.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 import 'package:quikle_user/core/common/widgets/unified_product_card.dart';
-import 'package:quikle_user/features/home/data/services/home_services.dart';
+import 'package:quikle_user/core/services/suggested_products_service.dart';
 import 'package:quikle_user/features/home/data/models/product_model.dart';
 
 class YouMayLikeSection extends StatefulWidget {
@@ -24,83 +25,84 @@ class YouMayLikeSection extends StatefulWidget {
 }
 
 class _YouMayLikeSectionState extends State<YouMayLikeSection> {
-  final HomeService _homeService = HomeService();
-  List<ProductModel> _products = [];
-  bool _isLoading = true;
+  late final SuggestedProductsService _suggestedService;
 
   @override
   void initState() {
     super.initState();
-    _loadProducts();
-  }
-
-  Future<void> _loadProducts() async {
-    try {
-      final allProducts = await _homeService.fetchAllProducts();
-      allProducts.shuffle();
-      final nonMedicineProducts = allProducts
-          .where((p) => !p.isMedicine)
-          .toList();
-      setState(() {
-        _products = nonMedicineProducts.take(6).toList();
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
-    }
+    _suggestedService = SuggestedProductsService.instance;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'You may like',
-          style: getTextStyle(
-            font: CustomFonts.obviously,
-            fontSize: 16.sp,
-            fontWeight: FontWeight.w500,
-            color: AppColors.ebonyBlack,
-          ),
-        ),
+    return Obx(() {
+      final products = _suggestedService.suggestedProducts;
+      final isLoading = _suggestedService.isLoading;
 
-        SizedBox(height: 12.h),
-
-        if (_isLoading)
-          SizedBox(
-            height: 200.h,
-            child: Center(
-              child: CircularProgressIndicator(color: AppColors.ebonyBlack),
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'You may like',
+            style: getTextStyle(
+              font: CustomFonts.obviously,
+              fontSize: 16.sp,
+              fontWeight: FontWeight.w500,
+              color: AppColors.ebonyBlack,
             ),
-          )
-        else
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
-              crossAxisSpacing: 8.w,
-              mainAxisSpacing: 8.h,
-              childAspectRatio: 0.70,
-            ),
-            itemCount: _products.length,
-            itemBuilder: (context, index) {
-              final product = _products[index];
-
-              return UnifiedProductCard(
-                product: product,
-                onTap: () => widget.onProductTap?.call(product),
-                onAddToCart: () => widget.onAddToCart?.call(product),
-                onFavoriteToggle: () => widget.onFavoriteToggle?.call(product),
-                variant: ProductCardVariant.youMayLike,
-                isGroceryCategory: true,
-              );
-            },
           ),
-      ],
-    );
+
+          SizedBox(height: 12.h),
+
+          if (isLoading)
+            SizedBox(
+              height: 200.h,
+              child: Center(
+                child: CircularProgressIndicator(color: AppColors.ebonyBlack),
+              ),
+            )
+          else if (products.isEmpty)
+            SizedBox(
+              height: 200.h,
+              child: Center(
+                child: Text(
+                  'No suggestions available',
+                  style: getTextStyle(
+                    font: CustomFonts.inter,
+                    fontSize: 14.sp,
+                    color: Colors.grey,
+                  ),
+                ),
+              ),
+            )
+          else
+            SizedBox(
+              height: 150.h,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                shrinkWrap: true,
+                itemCount: products.length,
+                itemBuilder: (context, index) {
+                  final product = products[index];
+
+                  return Container(
+                    width: 120.w,
+                    margin: EdgeInsets.only(right: 8.w),
+                    child: UnifiedProductCard(
+                      product: product,
+                      onTap: () => widget.onProductTap?.call(product),
+                      onAddToCart: () => widget.onAddToCart?.call(product),
+                      onFavoriteToggle: () =>
+                          widget.onFavoriteToggle?.call(product),
+                      variant: ProductCardVariant.youMayLike,
+                      isGroceryCategory: true,
+                    ),
+                  );
+                },
+              ),
+            ),
+        ],
+      );
+    });
   }
 }

@@ -10,14 +10,25 @@ import '../../controllers/splash_controller.dart';
 class SplashScreen extends GetView<SplashController> {
   const SplashScreen({super.key});
 
-  static const double _ellipseLeft = -158.0;
-  static const double _textLeft = 59.0;
-  static const double _textWidth = 274.0;
-  static const double _textHeight = 23.0;
-  static const double _textOffsetFromEllipseTop = 63.0;
+  // TWEAK: change these to adjust the text box size over the ellipse
+  static const double _textWidthFraction = 0.8; // wider box so 'Quickly' fits
+  static const double _textHeightFraction = 0.04;
 
   @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (controller.ellipseTop.value == 0) {
+        final double bottomInset = MediaQuery.of(context).padding.bottom;
+        final double ellipseHeight = Get.height * 0.30;
+        final double marginFromNav = 16.0;
+        final double visiblePortion = 0.32;
+        final double visibleHeight = ellipseHeight * visiblePortion;
+        final double desiredTop =
+            Get.height - bottomInset - visibleHeight - marginFromNav;
+        controller.setEllipseTop(desiredTop);
+      }
+    });
+
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
@@ -29,7 +40,6 @@ class SplashScreen extends GetView<SplashController> {
           children: [
             Container(color: Colors.white),
 
-            /// Video animation
             Obx(() {
               final isReady = controller.isReady.value;
               final shouldShrink = controller.shouldShrink.value;
@@ -40,10 +50,10 @@ class SplashScreen extends GetView<SplashController> {
               return AnimatedPositioned(
                 duration: const Duration(milliseconds: 600),
                 curve: Curves.easeInOutCubic,
-                left: shouldShrink ? 81.w : 0,
-                top: shouldShrink ? 295.5.h : 0,
-                width: shouldShrink ? 250.w : 1.sw,
-                height: shouldShrink ? 240.h : 1.sh,
+                left: shouldShrink ? Get.width * 0.21 : 0,
+                top: shouldShrink ? Get.height * 0.35 : 0,
+                width: shouldShrink ? Get.width * 0.64 : Get.width,
+                height: shouldShrink ? Get.height * 0.32 : Get.height,
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 600),
                   curve: Curves.easeInOutCubic,
@@ -70,23 +80,28 @@ class SplashScreen extends GetView<SplashController> {
               );
             }),
 
-            /// Black ellipse animation
             Obx(() {
               final showEllipse = controller.showEllipse.value;
+              // TWEAK: adjust ellipseWidth and ellipseHeight to change how
+              // flat or tall the arc looks
+              final double ellipseWidth = Get.width * 1.4; // width multiplier
+              final double ellipseHeight =
+                  Get.height * 0.30; // height multiplier
+              final double left = (Get.width - ellipseWidth) / 2;
 
               return AnimatedPositioned(
                 duration: const Duration(milliseconds: 450),
                 curve: Curves.easeInOut,
-                left: _ellipseLeft.w,
-                top: controller.ellipseTop.value.h,
+                left: left,
+                top: controller.ellipseTop.value,
                 child: AnimatedOpacity(
                   duration: const Duration(milliseconds: 250),
                   curve: Curves.easeInOut,
                   opacity: showEllipse ? 1 : 0,
                   child: ClipOval(
                     child: SizedBox(
-                      width: 708.w,
-                      height: 431.h,
+                      width: ellipseWidth,
+                      height: ellipseHeight,
                       child: Container(color: Colors.black),
                     ),
                   ),
@@ -94,23 +109,31 @@ class SplashScreen extends GetView<SplashController> {
               );
             }),
 
-            /// Text on ellipse
             Obx(() {
-              final double textTop =
-                  (controller.ellipseTop.value + _textOffsetFromEllipseTop).h;
               final showEllipse = controller.showEllipse.value;
+              final double ellipseWidth = Get.width * 1.4;
+              final double ellipseHeight = Get.height * 0.30;
+              final double ellipseLeft = (Get.width - ellipseWidth) / 2;
+
+              final double textWidth = Get.width * _textWidthFraction;
+              final double textHeight = Get.height * _textHeightFraction;
+              final double textLeft =
+                  ellipseLeft + (ellipseWidth - textWidth) / 2;
+              final double textTop =
+                  controller.ellipseTop.value + (ellipseHeight * 0.22);
+
               return AnimatedPositioned(
                 duration: const Duration(milliseconds: 450),
                 curve: Curves.easeInOut,
-                left: _textLeft.w,
+                left: textLeft,
                 top: textTop,
                 child: AnimatedOpacity(
                   duration: const Duration(milliseconds: 250),
                   curve: Curves.easeInOut,
                   opacity: showEllipse ? 1 : 0,
                   child: SizedBox(
-                    width: _textWidth.w,
-                    height: _textHeight.h,
+                    width: textWidth,
+                    height: textHeight,
                     child: Center(
                       child: RichText(
                         textAlign: TextAlign.center,
@@ -145,15 +168,14 @@ class SplashScreen extends GetView<SplashController> {
               );
             }),
 
-            /// Login slide-up
             Obx(() {
               return AnimatedPositioned(
                 duration: const Duration(milliseconds: 600),
                 curve: Curves.easeOutCubic,
                 left: 0,
                 right: 0,
-                bottom: controller.showLogin.value ? 0 : -1.sh,
-                height: 1.sh,
+                bottom: controller.showLogin.value ? 0 : -Get.height,
+                height: Get.height,
                 child: Container(
                   decoration: BoxDecoration(
                     color: Colors.black,

@@ -29,10 +29,24 @@ class CartScreen extends StatelessWidget {
         onClearAll: () => _showClearCartDialog(cartController),
       ),
       body: Obx(() {
-        // Only auto-close if not currently placing an order
+        // Auto-close cart when it's empty and not placing an order, but
+        // avoid closing if there's an open dialog (for example the
+        // OrderSuccessDialog shown after payment). Closing immediately
+        // would dismiss the dialog instead of the route, so check
+        // `Get.isDialogOpen` first and postpone closing in that case.
         if (!cartController.hasItems && !cartController.isPlacingOrder) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (Get.currentRoute == '/cart') {
+            // If a Get dialog is currently open, don't pop the route now.
+            // The dialog (OrderSuccessDialog) will handle navigation when
+            // it completes. Otherwise, close the cart route normally.
+            if ((Get.isDialogOpen ?? false)) {
+              return;
+            }
+
+            // Use a case-insensitive containment check so this works whether
+            // the route name is '/cart', '/CartScreen', or similar.
+            final currentRoute = Get.currentRoute.toLowerCase();
+            if (currentRoute.contains('cart')) {
               Get.back();
             }
           });
@@ -47,9 +61,33 @@ class CartScreen extends StatelessWidget {
                 padding: EdgeInsets.symmetric(horizontal: 16.w),
                 child: Column(
                   children: [
-                    SizedBox(height: 16.h),
-                    const ReceiverDetails(),
-                    SizedBox(height: 8.h),
+                    // Show receiver details only when there's a selected shipping
+                    // address or when the user provided a different receiver.
+                    Obx(() {
+                      final hasDifferentReceiver =
+                          payoutController.isDifferentReceiver &&
+                          payoutController.receiverName.isNotEmpty;
+                      final selectedAddr =
+                          payoutController.selectedShippingAddress;
+
+                      final hasSelectedAddress =
+                          selectedAddr != null &&
+                          (selectedAddr.name.isNotEmpty ||
+                              selectedAddr.phoneNumber.isNotEmpty);
+
+                      final showReceiver =
+                          hasDifferentReceiver || hasSelectedAddress;
+
+                      if (!showReceiver) return const SizedBox.shrink();
+
+                      return Column(
+                        children: [
+                          SizedBox(height: 16.h),
+                          const ReceiverDetails(),
+                          SizedBox(height: 8.h),
+                        ],
+                      );
+                    }),
                     const CartItemsSection(),
                     SizedBox(height: 8.h),
                     const DeliveryOptionsSection(),
@@ -58,26 +96,18 @@ class CartScreen extends StatelessWidget {
                     SizedBox(height: 8.h),
                     const OrderSummarySection(),
                     SizedBox(height: 19.h),
-                    // YouMayLikeSection(
-                    //   onAddToCart: cartController.addToCart,
-                    //   onFavoriteToggle: homeController.onFavoriteToggle,
-                    //   onProductTap: (p) =>
-                    //       Get.toNamed('/product-details', arguments: p),
-                    // ),
-                    // SizedBox(height: 19.h),
+
+                    SizedBox(height: 19.h),
                   ],
                 ),
               ),
             ),
-            SafeArea(
-              top: false,
-              child: CartBottomSection(
-                onPlaceOrder: () {
-                  _handlePlaceOrder(cartController, payoutController);
-                },
-                onPaymentMethodTap: _showPaymentMethods,
-                totalAmount: payoutController.totalAmount,
-              ),
+            CartBottomSection(
+              onPlaceOrder: () {
+                _handlePlaceOrder(cartController, payoutController);
+              },
+              onPaymentMethodTap: _showPaymentMethods,
+              totalAmount: payoutController.totalAmount,
             ),
           ],
         );
@@ -96,8 +126,10 @@ class CartScreen extends StatelessWidget {
           TextButton(onPressed: () => Get.back(), child: const Text('Cancel')),
           TextButton(
             onPressed: () {
-              cartController.clearCart();
               Get.back();
+              Future.delayed(const Duration(milliseconds: 120), () {
+                cartController.clearCart();
+              });
             },
             child: const Text('Clear', style: TextStyle(color: Colors.red)),
           ),
