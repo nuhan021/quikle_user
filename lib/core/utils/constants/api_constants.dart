@@ -30,6 +30,7 @@ class ApiConstants {
 
   //Profile api's
   static const String getUserProfile = "$baseUrl/customer/profile/";
+  static const String deleteAccount = "$baseUrl/user/users/{user_id}";
 
   //Shipping address api's
   static const String shippingAddresses =

@@ -110,6 +110,13 @@ class ProfileScreen extends StatelessWidget {
                     title: 'Sign Out',
                     onTap: () => _showSignOutDialog(context),
                   ),
+                  SizedBox(height: 8.h),
+
+                  ProfileMenuItem(
+                    assetIcon: ImagePath.deleteAccountIcon,
+                    title: 'Delete Account',
+                    onTap: () => _showDeleteAccountDialog(context),
+                  ),
 
                   SizedBox(height: 100.h),
                 ],
@@ -212,6 +219,116 @@ class ProfileScreen extends StatelessWidget {
               ),
             ),
           ],
+        );
+      },
+    );
+  }
+
+  void _showDeleteAccountDialog(BuildContext context) {
+    // Clear any previous delete error before showing the dialog
+    controller.deleteError.value = '';
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'Delete Account',
+            style: getTextStyle(
+              font: CustomFonts.obviously,
+              fontSize: 18.sp,
+              fontWeight: FontWeight.w500,
+              color: AppColors.error,
+            ),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'This action is permanent.\n\n'
+                'All your data, orders, and profile information will be deleted and cannot be recovered.\n\n'
+                'Are you sure you want to continue?',
+                style: getTextStyle(
+                  font: CustomFonts.inter,
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w400,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+              SizedBox(height: 12.h),
+              Obx(() {
+                if (controller.deleteError.value.isEmpty)
+                  return const SizedBox.shrink();
+                return Text(
+                  controller.deleteError.value,
+                  style: getTextStyle(
+                    font: CustomFonts.inter,
+                    fontSize: 13.sp,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.error,
+                  ),
+                );
+              }),
+            ],
+          ),
+          actions: [
+            Obx(
+              () => TextButton(
+                onPressed: controller.isDeleting.value
+                    ? null
+                    : () {
+                        // Clear any displayed error when user cancels
+                        controller.deleteError.value = '';
+                        Navigator.of(context).pop();
+                      },
+                child: Text(
+                  'Cancel',
+                  style: getTextStyle(
+                    font: CustomFonts.inter,
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ),
+            ),
+
+            Obx(
+              () => TextButton(
+                onPressed: controller.isDeleting.value
+                    ? null
+                    : () {
+                        // Keep the dialog open while deletion is in progress.
+                        controller.deleteAccount();
+                      },
+                child: controller.isDeleting.value
+                    ? SizedBox(
+                        width: 20.w,
+                        height: 20.w,
+                        child: const CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
+                        ),
+                      )
+                    : Text(
+                        'Delete',
+                        style: getTextStyle(
+                          font: CustomFonts.inter,
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.error,
+                        ),
+                      ),
+              ),
+            ),
+          ],
+          // Show inline error inside the dialog when deletion fails
+          contentPadding: EdgeInsets.fromLTRB(24.w, 20.h, 24.w, 8.h),
+          insetPadding: EdgeInsets.symmetric(horizontal: 24.w),
+          // Add a bottom widget to display any delete error
+          actionsPadding: EdgeInsets.only(right: 8.w, bottom: 12.h),
         );
       },
     );

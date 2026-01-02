@@ -71,9 +71,9 @@ class StorageService {
     await _preferences?.remove(_refreshTokenKey);
     await _preferences?.remove(_idKey);
     await _preferences?.remove(_freshchatRestoreIdKey);
-    await _preferences?.remove(
-      _sentOrderIdsKey,
-    ); // Clear sent order IDs on logout
+    await _preferences?.remove(_sentOrderIdsKey);
+    await _preferences?.remove(_searchTagsKey);
+    // Clear sent order IDs on logout
   }
 
   // =======================

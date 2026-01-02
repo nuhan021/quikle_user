@@ -277,7 +277,29 @@ class LoginScreen extends StatelessWidget {
               ],
             ),
           ),
-          SizedBox(height: 24.h),
+
+          // SizedBox(height: 12.h),
+          Obx(() {
+            final msg = controller.errorMessage.value;
+            if (msg.isEmpty) return const SizedBox.shrink();
+            return Padding(
+              padding: EdgeInsets.only(top: 8.h, bottom: 12.h),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  msg,
+                  style: getTextStyle(
+                    font: CustomFonts.inter,
+                    color: Colors.redAccent,
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            );
+          }),
+
+          SizedBox(height: 12.h),
           Obx(() {
             return CommonWidgets.primaryButton(
               text: controller.isLoading.value ? 'Please wait...' : 'Continue',

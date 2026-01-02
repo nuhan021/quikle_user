@@ -125,4 +125,5 @@ class ImagePath {
   static const String privacyIcon = 'assets/icons/privacy.png';
   static const String termsIcon = 'assets/icons/terms.png';
   static const String prescriptionIcon = 'assets/icons/prescription.png';
+  static const String deleteAccountIcon = 'assets/icons/delete-user.png';
 }

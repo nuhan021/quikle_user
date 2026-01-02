@@ -191,4 +191,39 @@ class UserService extends GetxController {
     _isLoggedIn.value = false;
     Get.offAllNamed(AppRoute.getLoginScreen());
   }
+
+  Future<bool> deleteAccount() async {
+    try {
+      final token = StorageService.token;
+      final refreshToken = StorageService.refreshToken;
+      final userId = currentUserId;
+
+      if (token == null || refreshToken == null || userId == null) {
+        AppLoggerHelper.debug(
+          'Cannot delete account: Missing token or user ID',
+        );
+        return false;
+      }
+
+      final String endpoint = ApiConstants.deleteAccount.replaceFirst(
+        '{user_id}',
+        userId,
+      );
+      final response = await _networkCaller.deleteRequest(
+        endpoint,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'refresh-token': '$refreshToken',
+        },
+      );
+
+      AppLoggerHelper.debug(
+        'Delete account response: ${response.statusCode} - ${response.errorMessage}',
+      );
+
+      return response.isSuccess;
+    } catch (e) {
+      return false;
+    }
+  }
 }
