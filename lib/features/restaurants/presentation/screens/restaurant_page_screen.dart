@@ -128,6 +128,7 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen>
           child: Stack(
             children: [
               SafeArea(
+                bottom: false,
                 child: CustomScrollView(
                   controller: _scroll,
                   physics: const AlwaysScrollableScrollPhysics(
@@ -360,15 +361,11 @@ class _RestaurantPageScreenState extends State<RestaurantPageScreen>
                   child: SizeTransition(
                     axisAlignment: 1.0,
                     sizeFactor: _navController,
-                    child: SafeArea(
-                      top: false,
-                      bottom: true,
-                      child: KeyedSubtree(
-                        key: _navKey,
-                        child: CustomNavBar(
-                          currentIndex: -1,
-                          onTap: _onNavItemTapped,
-                        ),
+                    child: KeyedSubtree(
+                      key: _navKey,
+                      child: CustomNavBar(
+                        currentIndex: -1,
+                        onTap: _onNavItemTapped,
                       ),
                     ),
                   ),
