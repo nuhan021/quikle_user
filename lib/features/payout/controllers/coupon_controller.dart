@@ -14,6 +14,9 @@ class CouponController extends GetxController {
 
   String get couponCode => _couponCode.value;
   Map<String, dynamic>? get appliedCoupon => _appliedCoupon.value;
+  // Expose the underlying reactive applied-coupon so UI can observe
+  // changes directly via `Obx(() => ...)` when needed.
+  Rxn<Map<String, dynamic>> get appliedCouponRx => _appliedCoupon;
   List<Map<String, dynamic>> get availableCoupons => _availableCoupons;
   TextEditingController get couponController => _couponController;
 
@@ -24,7 +27,21 @@ class CouponController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    print('🎯 CouponController initialized');
     _couponController.addListener(_syncCouponText);
+
+    // Watch for cart total amount changes and re-evaluate coupons. This ensures an
+    // auto-applied coupon doesn't remain when the cart subtotal drops
+    // below its minimum requirement (the bug you reported).
+    // We listen to totalAmount instead of cartItems because totalAmount is
+    // the actual value we use for validation, and it updates after items change.
+    print('🎯 Setting up cart total amount listener...');
+    ever(_cartController.totalAmountObservable, (amount) {
+      print('🔔 Cart total changed - subtotal: ₹$amount');
+      _onCartChanged();
+    });
+
+    // Try to fetch and auto-apply the best coupon initially.
     fetchAndApplyBestCoupon();
   }
 
@@ -48,10 +65,15 @@ class CouponController extends GetxController {
 
   Future<void> fetchAndApplyBestCoupon() async {
     try {
+      print('📥 Fetching available coupons...');
       final coupons = await _payoutService.fetchCoupons();
       _availableCoupons.value = coupons;
+      print('📥 Fetched ${coupons.length} coupons');
 
-      if (coupons.isEmpty) return;
+      if (coupons.isEmpty) {
+        print('   No coupons available');
+        return;
+      }
 
       double bestSavings = 0.0;
       Map<String, dynamic>? bestCoupon;
@@ -61,9 +83,18 @@ class CouponController extends GetxController {
         final minRequired = c.containsKey('up_to')
             ? _toDouble(c['up_to'])
             : 0.0;
-        if (minRequired > 0 && base < minRequired) continue;
+        final couponCode = c['cupon'] ?? c['coupon'] ?? 'N/A';
+        print(
+          '   Checking coupon "$couponCode": min=₹$minRequired, current=₹$base',
+        );
+
+        if (minRequired > 0 && base < minRequired) {
+          print('     ❌ Not applicable (subtotal < minimum)');
+          continue;
+        }
 
         final savings = _calculateCouponSavings(c, base);
+        print('     Potential savings: ₹${savings.toStringAsFixed(2)}');
         if (savings > bestSavings) {
           bestSavings = savings;
           bestCoupon = c;
@@ -71,6 +102,10 @@ class CouponController extends GetxController {
       }
 
       if (bestCoupon != null && bestSavings > 0) {
+        final bestCode = bestCoupon['cupon'] ?? bestCoupon['coupon'] ?? '';
+        print(
+          '   ✅ Best coupon: "$bestCode" (saves ₹${bestSavings.toStringAsFixed(2)})',
+        );
         _appliedCoupon.value = {
           ...bestCoupon,
           'isValid': true,
@@ -80,8 +115,11 @@ class CouponController extends GetxController {
         final code = bestCoupon['cupon'] ?? bestCoupon['coupon'] ?? '';
         _couponController.text = code;
         _couponCode.value = code;
+      } else {
+        print('   ℹ️  No applicable coupons found');
       }
     } catch (e) {
+      print('   ⚠️  Error fetching coupons: $e');
       // ignore for now
     }
   }
@@ -201,5 +239,95 @@ class CouponController extends GetxController {
     }
 
     return 0.0;
+  }
+
+  // Called whenever the cart changes. If the currently applied coupon is
+  // no longer applicable for the new subtotal, clear it and attempt to
+  // auto-apply the best remaining coupon (if any).
+  void _onCartChanged() async {
+    try {
+      print('🔄 Cart changed - validating coupon eligibility...');
+      print('   Current subtotal: ₹$subtotal');
+
+      final current = appliedCoupon;
+
+      // If no coupon currently applied, attempt to auto-apply best one
+      if (current == null) {
+        print('   No coupon applied - attempting to auto-apply best coupon');
+        // Non-blocking: fetch may call network; keep it async but don't
+        // await here to avoid blocking UI updates frequently.
+        fetchAndApplyBestCoupon();
+        return;
+      }
+
+      print('   Current coupon: ${current['cupon'] ?? current['coupon']}');
+
+      // If the current coupon is no longer applicable, clear it and try
+      // to find another that fits the new subtotal.
+      if (!isCouponApplicable(current)) {
+        final couponCode = current['cupon'] ?? current['coupon'] ?? '';
+        final minRequired = current.containsKey('up_to')
+            ? _toDouble(current['up_to'])
+            : 0.0;
+        print('   ❌ Coupon "$couponCode" no longer applicable');
+        print(
+          '   Minimum required: ₹$minRequired, Current subtotal: ₹$subtotal',
+        );
+
+        _appliedCoupon.value = null;
+        _couponController.text = '';
+        _couponCode.value = '';
+
+        // Search available coupons (already fetched) for a valid one and
+        // apply the best locally without forcing a network call.
+        double bestSavings = 0.0;
+        Map<String, dynamic>? bestCoupon;
+        for (final c in _availableCoupons) {
+          final base = subtotal;
+          final minRequired = c.containsKey('up_to')
+              ? _toDouble(c['up_to'])
+              : 0.0;
+          if (minRequired > 0 && base < minRequired) continue;
+          final savings = _calculateCouponSavings(c, base);
+          if (savings > bestSavings) {
+            bestSavings = savings;
+            bestCoupon = c;
+          }
+        }
+
+        if (bestCoupon != null && bestSavings > 0) {
+          final newCouponCode =
+              bestCoupon['cupon'] ?? bestCoupon['coupon'] ?? '';
+          print(
+            '   ✅ Applying new coupon: "$newCouponCode" (saves ₹${bestSavings.toStringAsFixed(2)})',
+          );
+          applyCouponLocally(bestCoupon);
+        } else {
+          print('   ℹ️  No eligible coupons available for current subtotal');
+        }
+
+        // Notify listeners so UI updates immediately in screens that
+        // observe this controller (e.g., `CouponSection` inside cart).
+        update();
+      } else {
+        // If coupon is still applicable, update calculatedSavings to match
+        // the current subtotal (discount may change with subtotal).
+        final recalculated = _calculateCouponSavings(current, subtotal);
+        print(
+          '   ✅ Coupon still valid - recalculated savings: ₹${recalculated.toStringAsFixed(2)}',
+        );
+        _appliedCoupon.value = {
+          ...current,
+          'isValid': true,
+          'calculatedSavings': recalculated,
+          'message': current['description'] ?? 'Coupon applied',
+        };
+        // Ensure any UI depending on coupon values refreshes.
+        update();
+      }
+    } catch (e) {
+      print('   ⚠️  Error in _onCartChanged: $e');
+      // don't crash on cart change handling
+    }
   }
 }

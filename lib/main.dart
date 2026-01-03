@@ -72,11 +72,11 @@ Future<void> main() async {
   final networkController = Get.put(NetworkController());
   final freshchatService = Get.put(FreshchatService());
 
-  // String? fcmToken = await FirebaseMessaging.instance.getToken();
-  // if (fcmToken != null) {
-  //   print("📱 FCM Token: $fcmToken");
-  //   await freshchatService.setFCMToken(fcmToken);
-  // }
+  String? fcmToken = await FirebaseMessaging.instance.getToken();
+  if (fcmToken != null) {
+    print("📱 FCM Token: $fcmToken");
+    await freshchatService.setFCMToken(fcmToken);
+  }
 
   FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
     print("📱 FCM Token refreshed: $newToken");

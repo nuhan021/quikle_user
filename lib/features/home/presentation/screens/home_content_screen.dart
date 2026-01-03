@@ -63,6 +63,7 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
       body: Stack(
         children: [
           SafeArea(
+            bottom: false,
             child: RefreshIndicator(
               onRefresh: _onRefresh,
               color: AppColors.primary,

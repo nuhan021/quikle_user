@@ -6,6 +6,7 @@ import '../../controllers/cart_controller.dart';
 import '../widgets/cart_app_bar.dart';
 import '../widgets/cart_items_section.dart';
 import '../widgets/cart_bottom_section.dart';
+import '../widgets/disclaimer_section.dart';
 import '../../../payout/presentation/widgets/order_summary_section.dart';
 import '../../../payout/presentation/widgets/delivery_options_section.dart';
 import '../../../payout/presentation/widgets/coupon_section.dart';
@@ -61,33 +62,29 @@ class CartScreen extends StatelessWidget {
                 padding: EdgeInsets.symmetric(horizontal: 16.w),
                 child: Column(
                   children: [
-                    // Show receiver details only when there's a selected shipping
-                    // address or when the user provided a different receiver.
-                    Obx(() {
-                      final hasDifferentReceiver =
-                          payoutController.isDifferentReceiver &&
-                          payoutController.receiverName.isNotEmpty;
-                      final selectedAddr =
-                          payoutController.selectedShippingAddress;
+                    // Show receiver details whenever there is at least one
+                    // saved address OR the user has set a different receiver.
+                    // Use GetBuilder to react to AddressController updates so
+                    // scrolling or transient state won't hide the widget.
+                    GetBuilder<AddressController>(
+                      builder: (addressController) {
+                        // Only check whether there are saved addresses.
+                        // If there is at least one address, always show receiver
+                        // details. Hide it only when there are no addresses.
+                        final hasAnyAddress =
+                            addressController.addresses.isNotEmpty;
 
-                      final hasSelectedAddress =
-                          selectedAddr != null &&
-                          (selectedAddr.name.isNotEmpty ||
-                              selectedAddr.phoneNumber.isNotEmpty);
+                        if (!hasAnyAddress) return const SizedBox.shrink();
 
-                      final showReceiver =
-                          hasDifferentReceiver || hasSelectedAddress;
-
-                      if (!showReceiver) return const SizedBox.shrink();
-
-                      return Column(
-                        children: [
-                          SizedBox(height: 16.h),
-                          const ReceiverDetails(),
-                          SizedBox(height: 8.h),
-                        ],
-                      );
-                    }),
+                        return Column(
+                          children: [
+                            SizedBox(height: 16.h),
+                            const ReceiverDetails(),
+                            SizedBox(height: 8.h),
+                          ],
+                        );
+                      },
+                    ),
                     const CartItemsSection(),
                     SizedBox(height: 8.h),
                     const DeliveryOptionsSection(),
@@ -97,6 +94,11 @@ class CartScreen extends StatelessWidget {
                     const OrderSummarySection(),
                     SizedBox(height: 19.h),
 
+                    // Cart disclaimers: cancellation always shown; medicine
+                    // disclaimer shown when there are medicine items in cart.
+                    DisclaimerSection(
+                      hasMedicine: cartController.hasMedicineItems,
+                    ),
                     SizedBox(height: 19.h),
                   ],
                 ),
@@ -265,52 +267,49 @@ class CartScreen extends StatelessWidget {
     final paymentMethodController = Get.find<PaymentMethodController>();
 
     Get.bottomSheet(
-      SafeArea(
-        top: false, // allow full sheet up to status bar
-        child: Container(
-          padding: EdgeInsets.all(16.w),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),
-          ),
-          child: Obx(() {
-            final paymentMethods = paymentMethodController.paymentMethods;
-
-            return SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'Select Payment Method',
-                    style: TextStyle(
-                      fontSize: 18.sp,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  SizedBox(height: 16.h),
-
-                  ...paymentMethods.map((method) {
-                    return ListTile(
-                      leading: method.type.iconPath != null
-                          ? Image.asset(
-                              method.type.iconPath!,
-                              width: 24,
-                              height: 24,
-                            )
-                          : const Icon(Icons.payment),
-                      title: Text(method.type.displayName),
-                      onTap: () {
-                        paymentMethodController.selectPaymentMethod(method);
-                        Get.back();
-                      },
-                    );
-                  }).toList(),
-                ],
-              ),
-            );
-          }),
+      Container(
+        padding: EdgeInsets.all(16.w),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),
         ),
+        child: Obx(() {
+          final paymentMethods = paymentMethodController.paymentMethods;
+
+          return SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Select Payment Method',
+                  style: TextStyle(
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                SizedBox(height: 16.h),
+
+                ...paymentMethods.map((method) {
+                  return ListTile(
+                    leading: method.type.iconPath != null
+                        ? Image.asset(
+                            method.type.iconPath!,
+                            width: 24,
+                            height: 24,
+                          )
+                        : const Icon(Icons.payment),
+                    title: Text(method.type.displayName),
+                    onTap: () {
+                      paymentMethodController.selectPaymentMethod(method);
+                      Get.back();
+                    },
+                  );
+                }).toList(),
+              ],
+            ),
+          );
+        }),
       ),
       isScrollControlled: true,
       backgroundColor: Colors.transparent,

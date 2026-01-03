@@ -14,6 +14,7 @@ class CartController extends GetxController {
   RxList<CartItemModel> get cartItemsObservable => _cartItems;
   int get totalItems => _totalItems.value;
   double get totalAmount => _totalAmount.value;
+  Rx<double> get totalAmountObservable => _totalAmount;
   bool get hasItems => _cartItems.isNotEmpty;
   bool get isPlacingOrder => _isPlacingOrder.value;
 
@@ -143,6 +144,13 @@ class CartController extends GetxController {
   // Toggle urgent status for a product
   void toggleProductUrgentStatus(ProductModel product) {
     _cartService.toggleProductUrgentStatus(product);
+    _updateCartData();
+    update(); // Notify GetBuilder widgets
+  }
+
+  // Update urgent status for all medicine items
+  void updateAllMedicineItemsUrgentStatus(bool isUrgent) {
+    _cartService.updateAllMedicineItemsUrgentStatus(isUrgent);
     _updateCartData();
     update(); // Notify GetBuilder widgets
   }

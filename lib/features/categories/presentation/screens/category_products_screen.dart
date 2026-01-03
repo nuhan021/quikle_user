@@ -132,6 +132,7 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
           body: Stack(
             children: [
               SafeArea(
+                bottom: false,
                 child: NotificationListener<ScrollNotification>(
                   onNotification: _onScrollNotification,
                   child: Obx(() {
@@ -286,21 +287,19 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
                 ),
               ),
 
-              Positioned(
-                left: 0,
-                right: 0,
-                bottom: 0,
-                child: AnimatedSlide(
-                  duration: const Duration(milliseconds: 180),
-                  offset: isKeyboardOpen
-                      ? const Offset(0, 1)
-                      : const Offset(0, 0),
-                  child: SizeTransition(
-                    axisAlignment: 1.0,
-                    sizeFactor: _navController,
-                    child: SafeArea(
-                      top: false,
-                      bottom: false,
+              if (!isKeyboardOpen)
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: AnimatedSlide(
+                    // When keyboard is open we don't render the navbar at all,
+                    // so offset can be fixed to zero here.
+                    duration: const Duration(milliseconds: 180),
+                    offset: const Offset(0, 0),
+                    child: SizeTransition(
+                      axisAlignment: 1.0,
+                      sizeFactor: _navController,
                       child: KeyedSubtree(
                         key: _navKey,
                         child: CustomNavBar(
@@ -311,18 +310,14 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
                     ),
                   ),
                 ),
-              ),
-
-              AnimatedBuilder(
-                animation: _navController,
-                builder: (context, _) {
-                  final inset = isKeyboardOpen
-                      ? keyboard
-                      : (_navController.value * _navBarHeight);
-                  return FloatingCartButton(bottomInset: inset);
-                },
-              ),
-
+              if (!isKeyboardOpen)
+                AnimatedBuilder(
+                  animation: _navController,
+                  builder: (context, _) {
+                    final inset = (_navController.value * _navBarHeight);
+                    return FloatingCartButton(bottomInset: inset);
+                  },
+                ),
               Obx(() {
                 if (!controller.isListening) return const SizedBox.shrink();
                 return VoiceSearchOverlay(
@@ -330,15 +325,14 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
                   onCancel: controller.stopVoiceSearch,
                 );
               }),
-              AnimatedBuilder(
-                animation: _navController,
-                builder: (_, __) {
-                  final inset = isKeyboardOpen
-                      ? keyboard
-                      : (_navController.value * _navBarHeight);
-                  return LiveOrderIndicator(bottomInset: inset);
-                },
-              ),
+              if (!isKeyboardOpen)
+                AnimatedBuilder(
+                  animation: _navController,
+                  builder: (context, _) {
+                    final inset = (_navController.value * _navBarHeight);
+                    return LiveOrderIndicator(bottomInset: inset);
+                  },
+                ),
             ],
           ),
         ),

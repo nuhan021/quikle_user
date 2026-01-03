@@ -73,6 +73,10 @@ class CouponSection extends StatelessWidget {
         SizedBox(height: 12.h),
 
         Obx(() {
+          // Touch the reactive applied-coupon so Obx subscribes to it and
+          // rebuilds when it changes. Use the public (nullable) getter for
+          // easier value access below.
+          final _ = payoutController.appliedCouponRx.value;
           final applied = payoutController.appliedCoupon;
           return Container(
             padding: EdgeInsets.all(12.w),
@@ -118,6 +122,9 @@ class CouponSection extends StatelessWidget {
                                       ),
 
                                       Text(
+                                        // Use the coupon controller text (kept in sync by the
+                                        // CouponController) which is simpler and avoids
+                                        // null-safety analyzer issues here.
                                         '${payoutController.couponController.text}',
                                         style: getTextStyle(
                                           font: CustomFonts.inter,

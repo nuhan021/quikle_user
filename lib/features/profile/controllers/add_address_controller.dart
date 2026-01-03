@@ -25,6 +25,7 @@ class AddAddressController extends GetxController {
   final isDefault = false.obs;
   final useCurrentLocation = false.obs;
   final isAddressFromMap = false.obs; // Track if address was selected from map
+  final willOpenMap = false.obs; // Track if user is navigating to map picker
 
   final selectedCountry = Rxn<String>();
   final selectedState = Rxn<String>();
@@ -413,6 +414,7 @@ class AddAddressController extends GetxController {
     isDefault.value = false;
     useCurrentLocation.value = false;
     isAddressFromMap.value = false; // Reset map flag
+    willOpenMap.value = false; // Reset navigation-to-map flag
     cities.clear(); // Clear cities when form is cleared
     _clearErrors();
   }

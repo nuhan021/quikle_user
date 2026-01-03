@@ -70,8 +70,13 @@ class _QuantitySelectorState extends State<QuantitySelector> {
   }
 
   void _handleIncrease() {
-    _triggerCartAnimation();
+    // Perform increase first so that any UI (floating cart) updates are applied,
+    // then trigger the animation in a post-frame callback to ensure the
+    // cart position is available.
     widget.onIncrease();
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => _triggerCartAnimation(),
+    );
   }
 
   @override

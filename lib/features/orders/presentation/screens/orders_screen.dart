@@ -22,6 +22,7 @@ class OrdersScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.homeGrey,
       body: SafeArea(
+        bottom: false,
         child: Column(
           children: [
             const UnifiedProfileAppBar(

@@ -53,8 +53,18 @@ class CartBottomSection extends StatelessWidget {
     final pickedId = await showAddressSelectionSheet(addressController);
 
     if (pickedId != null && pickedId.isNotEmpty) {
+      // Optimistically update the UI and mark this address default locally,
+      // then persist to backend. If persistence fails we roll back and show
+      // an error. This keeps Cart and Receiver UI in sync immediately.
       _selectedAddressIdForCart = pickedId;
-      addressController.update();
+      try {
+        await addressController.selectAndPersistDefault(pickedId);
+      } catch (e) {
+        // selectAndPersistDefault shows snackbar on failure; ensure cart local
+        // selection is consistent (fallback to controller state)
+        final defaultAddr = addressController.defaultAddress;
+        _selectedAddressIdForCart = defaultAddr?.id;
+      }
     }
   }
 

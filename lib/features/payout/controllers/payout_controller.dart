@@ -38,16 +38,13 @@ class PayoutController extends GetxController {
 
   // Backwards-compatibility: expose the TextEditingController and coupon helpers
   // so existing UI that referenced payoutController.couponController, appliedCoupon, etc.
-  CouponController get _couponCtrl {
-    try {
-      return Get.find<CouponController>();
-    } catch (e) {
-      return Get.put(CouponController());
-    }
-  }
+  // Initialize CouponController eagerly to ensure its listeners are set up
+  late final CouponController _couponCtrl = Get.put(CouponController());
 
   TextEditingController get couponController => _couponCtrl.couponController;
   Map<String, dynamic>? get appliedCoupon => _couponCtrl.appliedCoupon;
+  // Reactive accessor for widgets that want to observe coupon changes
+  Rxn<Map<String, dynamic>> get appliedCouponRx => _couponCtrl.appliedCouponRx;
   List<Map<String, dynamic>> get availableCoupons =>
       _couponCtrl.availableCoupons;
   Future<void> fetchAndApplyBestCoupon() =>
@@ -148,10 +145,13 @@ class PayoutController extends GetxController {
   void clearReceiverDetails() => receiverController.clearReceiverDetails();
   String? getReceiverValidationError() =>
       receiverController.getReceiverValidationError();
-  String getCurrentReceiverName() =>
-      receiverController.getCurrentReceiverName(selectedShippingAddress);
+  String getCurrentReceiverName() => receiverController.getCurrentReceiverName(
+    selectedShippingAddress ?? _addressController.defaultAddress,
+  );
   String getCurrentReceiverPhone() =>
-      receiverController.getCurrentReceiverPhone(selectedShippingAddress);
+      receiverController.getCurrentReceiverPhone(
+        selectedShippingAddress ?? _addressController.defaultAddress,
+      );
 
   // View coupons (compat)
   void viewAllCoupons() {

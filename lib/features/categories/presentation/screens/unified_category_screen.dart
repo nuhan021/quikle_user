@@ -16,6 +16,7 @@ import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 import 'package:quikle_user/core/utils/navigation/navbar_navigation_helper.dart';
 import 'package:quikle_user/features/categories/controllers/unified_category_controller.dart';
+import 'package:quikle_user/features/categories/presentation/widgets/medicine_disclaimer.dart';
 import 'package:quikle_user/core/common/widgets/common_app_bar.dart';
 import 'package:quikle_user/features/categories/presentation/widgets/search_and_filters_section.dart';
 import 'package:quikle_user/features/categories/presentation/widgets/popular_items_section.dart';
@@ -39,6 +40,7 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
   double _navBarHeight = 0.0;
 
   final ScrollController _scroll = ScrollController();
+  bool _disclaimerChecked = false;
 
   @override
   void initState() {
@@ -127,7 +129,26 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) => _measureNavBarHeight());
 
+    // Put the controller for this screen
     final controller = Get.put(UnifiedCategoryController());
+
+    // After first frame, check and show medicine disclaimer if needed.
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (_disclaimerChecked) return;
+      _disclaimerChecked = true;
+      try {
+        if (controller.isMedicineCategory) {
+          final shouldShow = await shouldShowMedicineDisclaimer();
+          if (shouldShow && mounted) {
+            showDialog(
+              context: context,
+              barrierDismissible: true,
+              builder: (_) => const MedicineDisclaimerDialog(),
+            );
+          }
+        }
+      } catch (_) {}
+    });
     final searchController = TextEditingController();
 
     final keyboard = MediaQuery.of(context).viewInsets.bottom;
@@ -144,6 +165,7 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
           body: Stack(
             children: [
               SafeArea(
+                bottom: false,
                 child: NotificationListener<ScrollNotification>(
                   onNotification: _onScrollNotification,
                   child: Obx(() {
@@ -168,10 +190,14 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
                         SliverToBoxAdapter(
                           child: CommonAppBar(
                             title: controller.categoryTitle.value,
+                            titleFontSize: 20,
                             showNotification: false,
                             showProfile: false,
                             onBackTap: () => Get.back(),
-                            addressWidget: AddressWidget(),
+                            addressWidget: AddressWidget(
+                              nameFontSize: 10,
+                              addressFontSize: 10,
+                            ),
                           ),
                         ),
 
@@ -367,37 +393,37 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
                   }),
                 ),
               ),
-              Positioned(
-                left: 0,
-                right: 0,
-                bottom: 0,
-                child: AnimatedSlide(
-                  duration: const Duration(milliseconds: 180),
-                  offset: isKeyboardOpen
-                      ? const Offset(0, 1)
-                      : const Offset(0, 0),
-                  child: SizeTransition(
-                    axisAlignment: 1.0,
-                    sizeFactor: _navController,
-                    child: KeyedSubtree(
-                      key: _navKey,
-                      child: CustomNavBar(
-                        currentIndex: 2,
-                        onTap: _onNavItemTapped,
+              if (!isKeyboardOpen)
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: AnimatedSlide(
+                    // When keyboard is open we don't render the navbar at all,
+                    // so offset can be fixed to zero here.
+                    duration: const Duration(milliseconds: 180),
+                    offset: const Offset(0, 0),
+                    child: SizeTransition(
+                      axisAlignment: 1.0,
+                      sizeFactor: _navController,
+                      child: KeyedSubtree(
+                        key: _navKey,
+                        child: CustomNavBar(
+                          currentIndex: 2,
+                          onTap: _onNavItemTapped,
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-              AnimatedBuilder(
-                animation: _navController,
-                builder: (context, _) {
-                  final inset = isKeyboardOpen
-                      ? keyboard
-                      : (_navController.value * _navBarHeight);
-                  return FloatingCartButton(bottomInset: inset);
-                },
-              ),
+              if (!isKeyboardOpen)
+                AnimatedBuilder(
+                  animation: _navController,
+                  builder: (context, _) {
+                    final inset = (_navController.value * _navBarHeight);
+                    return FloatingCartButton(bottomInset: inset);
+                  },
+                ),
               Obx(() {
                 if (!controller.isListening) return const SizedBox.shrink();
                 return VoiceSearchOverlay(
@@ -405,15 +431,14 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
                   onCancel: controller.stopVoiceSearch,
                 );
               }),
-              AnimatedBuilder(
-                animation: _navController,
-                builder: (context, _) {
-                  final inset = isKeyboardOpen
-                      ? keyboard
-                      : (_navController.value * _navBarHeight);
-                  return LiveOrderIndicator(bottomInset: inset);
-                },
-              ),
+              if (!isKeyboardOpen)
+                AnimatedBuilder(
+                  animation: _navController,
+                  builder: (context, _) {
+                    final inset = (_navController.value * _navBarHeight);
+                    return LiveOrderIndicator(bottomInset: inset);
+                  },
+                ),
             ],
           ),
         ),

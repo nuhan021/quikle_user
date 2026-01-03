@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:quikle_user/core/services/storage_service.dart';
 import 'package:quikle_user/features/profile/data/models/shipping_address_model.dart';
+import 'package:quikle_user/features/payout/controllers/receiver_controller.dart';
 import 'package:quikle_user/features/profile/data/services/address_service.dart';
 
 class AddressController extends GetxController {
@@ -76,6 +77,18 @@ class AddressController extends GetxController {
         );
       }
       print('============================');
+      // After loading addresses, ensure receiver details reflect the
+      // currently selected address (if any) unless the user has set a
+      // different receiver.
+      try {
+        final receiverCtrl = Get.find<ReceiverController>();
+        final selected = _addresses.firstWhereOrNull((a) => a.isSelected);
+        if (selected != null && !receiverCtrl.isDifferentReceiver) {
+          receiverCtrl.setReceiverDetails(selected.name, selected.phoneNumber);
+        }
+      } catch (_) {
+        // ignore if receiver controller not available
+      }
     } catch (e) {
       print('Error loading addresses: $e');
     } finally {
@@ -275,6 +288,54 @@ class AddressController extends GetxController {
     print('===========================');
 
     update();
+    // Update receiver details in Payout flow to reflect the newly selected
+    // shipping address, but don't override if the user has explicitly set a
+    // different receiver (receiverController.isDifferentReceiver == true).
+    try {
+      final receiverCtrl = Get.find<ReceiverController>();
+      if (!receiverCtrl.isDifferentReceiver) {
+        receiverCtrl.setReceiverDetails(address.name, address.phoneNumber);
+      }
+    } catch (_) {
+      // No-op if ReceiverController isn't available
+    }
+  }
+
+  /// Optimistically set the given address as default (local UI update),
+  /// then persist to backend. If persistence fails, roll back to previous
+  /// state and notify the user.
+  Future<void> selectAndPersistDefault(String addressId) async {
+    // Snapshot previous state for rollback
+    final previous = List<ShippingAddressModel>.from(_addresses);
+
+    // Apply optimistic change: mark the selected address as default & selected
+    final updated = _addresses.map((addr) {
+      final isSelected = addr.id == addressId;
+      final isDefault = addr.id == addressId;
+      return addr.copyWith(isSelected: isSelected, isDefault: isDefault);
+    }).toList();
+
+    _addresses.assignAll(updated);
+    update();
+
+    // Update receiver to reflect optimistic selection
+    try {
+      final receiverCtrl = Get.find<ReceiverController>();
+      final selected = _addresses.firstWhereOrNull((a) => a.isSelected);
+      if (selected != null && !receiverCtrl.isDifferentReceiver) {
+        receiverCtrl.setReceiverDetails(selected.name, selected.phoneNumber);
+      }
+    } catch (_) {}
+
+    // Persist change to backend
+    try {
+      await setAsDefault(addressId);
+    } catch (e) {
+      // Rollback on failure
+      _addresses.assignAll(previous);
+      update();
+      Get.snackbar('Error', 'Failed to set default address');
+    }
   }
 
   void clearAllAddresses() {
