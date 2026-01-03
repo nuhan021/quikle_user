@@ -14,6 +14,7 @@ class CartController extends GetxController {
   RxList<CartItemModel> get cartItemsObservable => _cartItems;
   int get totalItems => _totalItems.value;
   double get totalAmount => _totalAmount.value;
+  Rx<double> get totalAmountObservable => _totalAmount;
   bool get hasItems => _cartItems.isNotEmpty;
   bool get isPlacingOrder => _isPlacingOrder.value;
 

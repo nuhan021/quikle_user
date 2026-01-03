@@ -61,26 +61,29 @@ class CartScreen extends StatelessWidget {
                 padding: EdgeInsets.symmetric(horizontal: 16.w),
                 child: Column(
                   children: [
-                    // Show receiver details only when there is a selected
-                    // shipping address OR when the user has set a different
-                    // receiver. If selectedShippingAddress is null, hide it.
-                    Obx(() {
-                      final selectedAddr =
-                          payoutController.selectedShippingAddress;
-                      final showReceiver =
-                          selectedAddr != null ||
-                          payoutController.isDifferentReceiver;
+                    // Show receiver details whenever there is at least one
+                    // saved address OR the user has set a different receiver.
+                    // Use GetBuilder to react to AddressController updates so
+                    // scrolling or transient state won't hide the widget.
+                    GetBuilder<AddressController>(
+                      builder: (addressController) {
+                        // Only check whether there are saved addresses.
+                        // If there is at least one address, always show receiver
+                        // details. Hide it only when there are no addresses.
+                        final hasAnyAddress =
+                            addressController.addresses.isNotEmpty;
 
-                      if (!showReceiver) return const SizedBox.shrink();
+                        if (!hasAnyAddress) return const SizedBox.shrink();
 
-                      return Column(
-                        children: [
-                          SizedBox(height: 16.h),
-                          const ReceiverDetails(),
-                          SizedBox(height: 8.h),
-                        ],
-                      );
-                    }),
+                        return Column(
+                          children: [
+                            SizedBox(height: 16.h),
+                            const ReceiverDetails(),
+                            SizedBox(height: 8.h),
+                          ],
+                        );
+                      },
+                    ),
                     const CartItemsSection(),
                     SizedBox(height: 8.h),
                     const DeliveryOptionsSection(),
