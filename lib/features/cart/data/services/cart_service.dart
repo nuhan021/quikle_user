@@ -155,4 +155,24 @@ class CartService {
     final item = getCartItemForProduct(product);
     return item?.isUrgent ?? false;
   }
+
+  // Update urgent status for all medicine items
+  void updateAllMedicineItemsUrgentStatus(bool isUrgent) async {
+    bool hasChanges = false;
+
+    for (int i = 0; i < _cartItems.length; i++) {
+      final item = _cartItems[i];
+      final isMedicine =
+          item.product.isPrescriptionMedicine || item.product.isOTC;
+
+      if (isMedicine && item.isUrgent != isUrgent) {
+        _cartItems[i] = item.copyWith(isUrgent: isUrgent);
+        hasChanges = true;
+      }
+    }
+
+    if (hasChanges) {
+      await _saveCartToCache();
+    }
+  }
 }

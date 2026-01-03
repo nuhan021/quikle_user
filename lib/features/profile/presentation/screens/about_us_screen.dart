@@ -22,11 +22,19 @@ class AboutUsScreen extends StatelessWidget {
             const UnifiedProfileAppBar(title: 'About Us', showBackButton: true),
             Expanded(
               child: SingleChildScrollView(
+                physics: const ClampingScrollPhysics(),
                 padding: EdgeInsets.all(16.w),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppColors.eggshellWhite,
                     borderRadius: BorderRadius.circular(12.r),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: .09),
+                        blurRadius: 8.r,
+                        offset: Offset(0, 2.h),
+                      ),
+                    ],
                   ),
                   padding: EdgeInsets.all(16.w),
                   child: Column(

@@ -6,6 +6,7 @@ import '../../controllers/cart_controller.dart';
 import '../widgets/cart_app_bar.dart';
 import '../widgets/cart_items_section.dart';
 import '../widgets/cart_bottom_section.dart';
+import '../widgets/disclaimer_section.dart';
 import '../../../payout/presentation/widgets/order_summary_section.dart';
 import '../../../payout/presentation/widgets/delivery_options_section.dart';
 import '../../../payout/presentation/widgets/coupon_section.dart';
@@ -93,6 +94,11 @@ class CartScreen extends StatelessWidget {
                     const OrderSummarySection(),
                     SizedBox(height: 19.h),
 
+                    // Cart disclaimers: cancellation always shown; medicine
+                    // disclaimer shown when there are medicine items in cart.
+                    DisclaimerSection(
+                      hasMedicine: cartController.hasMedicineItems,
+                    ),
                     SizedBox(height: 19.h),
                   ],
                 ),

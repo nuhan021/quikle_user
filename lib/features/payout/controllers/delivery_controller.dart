@@ -13,7 +13,6 @@ class DeliveryController extends GetxController {
   final _deliveryPreferenceController = TextEditingController();
   final _selectedDeliveryPreference = Rxn<String?>(null);
   final _isUrgentDelivery = false.obs;
-  final _userToggledUrgent = false.obs;
 
   List<DeliveryOptionModel> get deliveryOptions => _deliveryOptions;
   TextEditingController get deliveryPreferenceController =>
@@ -73,22 +72,35 @@ class DeliveryController extends GetxController {
   }
 
   void toggleUrgentDelivery() {
-    _userToggledUrgent.value = true;
+    // Toggle the urgent delivery state
     _isUrgentDelivery.value = !_isUrgentDelivery.value;
+
+    // Update all medicine items' urgent status to match the toggle
+    _cartController.updateAllMedicineItemsUrgentStatus(_isUrgentDelivery.value);
+
     _updateDeliveryOptions();
   }
 
   void _updateDeliveryBasedOnUrgency() {
     final hasUrgentItems = _cartController.hasUrgentItems;
-    if (hasUrgentItems &&
-        !_isUrgentDelivery.value &&
-        !_userToggledUrgent.value) {
-      _isUrgentDelivery.value = true;
-    } else if (!hasUrgentItems &&
-        _isUrgentDelivery.value &&
-        !_userToggledUrgent.value) {
-      _isUrgentDelivery.value = false;
+    final hasMedicineItems = _cartController.hasMedicineItems;
+
+    // Only auto-update the toggle if there are medicine items
+    // and the urgent status has changed
+    if (hasMedicineItems) {
+      // If cart has urgent items but toggle is off, turn it on
+      if (hasUrgentItems && !_isUrgentDelivery.value) {
+        _isUrgentDelivery.value = true;
+      }
+      // If cart has no urgent items but toggle is on, don't auto-turn off
+      // Let user manually control it via toggle
+    } else {
+      // No medicine items, ensure urgent is off
+      if (_isUrgentDelivery.value) {
+        _isUrgentDelivery.value = false;
+      }
     }
+
     _updateDeliveryOptions();
   }
 

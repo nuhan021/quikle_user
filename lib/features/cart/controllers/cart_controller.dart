@@ -148,6 +148,13 @@ class CartController extends GetxController {
     update(); // Notify GetBuilder widgets
   }
 
+  // Update urgent status for all medicine items
+  void updateAllMedicineItemsUrgentStatus(bool isUrgent) {
+    _cartService.updateAllMedicineItemsUrgentStatus(isUrgent);
+    _updateCartData();
+    update(); // Notify GetBuilder widgets
+  }
+
   // Check if there are any urgent items in cart
   bool get hasUrgentItems => _cartService.hasUrgentItems;
 

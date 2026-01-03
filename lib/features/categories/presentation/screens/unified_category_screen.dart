@@ -16,6 +16,7 @@ import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 import 'package:quikle_user/core/utils/navigation/navbar_navigation_helper.dart';
 import 'package:quikle_user/features/categories/controllers/unified_category_controller.dart';
+import 'package:quikle_user/features/categories/presentation/widgets/medicine_disclaimer.dart';
 import 'package:quikle_user/core/common/widgets/common_app_bar.dart';
 import 'package:quikle_user/features/categories/presentation/widgets/search_and_filters_section.dart';
 import 'package:quikle_user/features/categories/presentation/widgets/popular_items_section.dart';
@@ -39,6 +40,7 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
   double _navBarHeight = 0.0;
 
   final ScrollController _scroll = ScrollController();
+  bool _disclaimerChecked = false;
 
   @override
   void initState() {
@@ -127,7 +129,26 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) => _measureNavBarHeight());
 
+    // Put the controller for this screen
     final controller = Get.put(UnifiedCategoryController());
+
+    // After first frame, check and show medicine disclaimer if needed.
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (_disclaimerChecked) return;
+      _disclaimerChecked = true;
+      try {
+        if (controller.isMedicineCategory) {
+          final shouldShow = await shouldShowMedicineDisclaimer();
+          if (shouldShow && mounted) {
+            showDialog(
+              context: context,
+              barrierDismissible: true,
+              builder: (_) => const MedicineDisclaimerDialog(),
+            );
+          }
+        }
+      } catch (_) {}
+    });
     final searchController = TextEditingController();
 
     final keyboard = MediaQuery.of(context).viewInsets.bottom;
