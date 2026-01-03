@@ -33,7 +33,6 @@ class FreshchatService extends GetxController {
   StreamSubscription? _unreadCountSubscription;
 
   // Freshchat configuration
-  // TODO: Replace these with your actual Freshchat credentials
   static const String _appId = '7c54e627-275f-4e5c-92af-e3427bf5bf4c';
   static const String _appKey = '8577ea2e-9b72-4348-9c6a-a157ec00c9cd';
   static const String _domain = 'msdk.in.freshchat.com';

@@ -52,43 +52,89 @@ class SearchAndFiltersSection extends StatelessWidget {
                     child: Stack(
                       alignment: Alignment.centerLeft,
                       children: [
-                        if (dynamicHint != null &&
-                            (searchController?.text.isEmpty ?? true))
-                          Obx(() {
-                            final hint = dynamicHint!.value;
-                            return Row(
-                              children: [
-                                Text(
-                                  _extractPrefix(hint),
-                                  style: getTextStyle(
-                                    font: CustomFonts.manrope,
-                                    fontWeight: FontWeight.w400,
-                                    color: AppColors.featherGrey,
-                                    fontSize: 12.sp,
-                                  ),
-                                ),
-                                Text(
-                                  _extractKeyword(hint),
-                                  key: ValueKey(hint),
-                                  style: getTextStyle(
-                                    font: CustomFonts.manrope,
-                                    fontWeight: FontWeight.w400,
-                                    color: AppColors.featherGrey,
-                                    fontSize: 12.sp,
-                                  ),
-                                ),
-                                Text(
-                                  _extractSuffix(hint),
-                                  style: getTextStyle(
-                                    font: CustomFonts.manrope,
-                                    fontWeight: FontWeight.w400,
-                                    color: AppColors.featherGrey,
-                                    fontSize: 12.sp,
-                                  ),
-                                ),
-                              ],
-                            );
-                          }),
+                        if (dynamicHint != null)
+                          // If a TextEditingController is provided we listen to it so
+                          // the dynamic hint hides immediately when the user types.
+                          (searchController != null
+                              ? AnimatedBuilder(
+                                  animation: searchController!,
+                                  builder: (context, _) {
+                                    if ((searchController?.text.isEmpty ??
+                                        true)) {
+                                      return Obx(() {
+                                        final hint = dynamicHint!.value;
+                                        return Row(
+                                          children: [
+                                            Text(
+                                              _extractPrefix(hint),
+                                              style: getTextStyle(
+                                                font: CustomFonts.manrope,
+                                                fontWeight: FontWeight.w400,
+                                                color: AppColors.featherGrey,
+                                                fontSize: 12.sp,
+                                              ),
+                                            ),
+                                            Text(
+                                              _extractKeyword(hint),
+                                              key: ValueKey(hint),
+                                              style: getTextStyle(
+                                                font: CustomFonts.manrope,
+                                                fontWeight: FontWeight.w400,
+                                                color: AppColors.featherGrey,
+                                                fontSize: 12.sp,
+                                              ),
+                                            ),
+                                            Text(
+                                              _extractSuffix(hint),
+                                              style: getTextStyle(
+                                                font: CustomFonts.manrope,
+                                                fontWeight: FontWeight.w400,
+                                                color: AppColors.featherGrey,
+                                                fontSize: 12.sp,
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      });
+                                    }
+                                    return const SizedBox.shrink();
+                                  },
+                                )
+                              : Obx(() {
+                                  final hint = dynamicHint!.value;
+                                  return Row(
+                                    children: [
+                                      Text(
+                                        _extractPrefix(hint),
+                                        style: getTextStyle(
+                                          font: CustomFonts.manrope,
+                                          fontWeight: FontWeight.w400,
+                                          color: AppColors.featherGrey,
+                                          fontSize: 12.sp,
+                                        ),
+                                      ),
+                                      Text(
+                                        _extractKeyword(hint),
+                                        key: ValueKey(hint),
+                                        style: getTextStyle(
+                                          font: CustomFonts.manrope,
+                                          fontWeight: FontWeight.w400,
+                                          color: AppColors.featherGrey,
+                                          fontSize: 12.sp,
+                                        ),
+                                      ),
+                                      Text(
+                                        _extractSuffix(hint),
+                                        style: getTextStyle(
+                                          font: CustomFonts.manrope,
+                                          fontWeight: FontWeight.w400,
+                                          color: AppColors.featherGrey,
+                                          fontSize: 12.sp,
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                })),
                         TextField(
                           controller: searchController,
                           onChanged: onSearchChanged,

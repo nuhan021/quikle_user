@@ -64,13 +64,18 @@ class _UnifiedProductCardState extends State<UnifiedProductCard> {
 
   void _handleAddToCart() {
     if (widget.onAddToCart != null) {
-      if (widget.enableCartAnimation) {
-        try {
-          Get.find<CartAnimationController>();
-          _triggerCartAnimation();
-        } catch (e) {}
-      }
+      // First perform the add-to-cart action so that any widgets that appear
+      // (like the floating cart button) are built. Then trigger the animation
+      // in a post-frame callback so the cart position is available.
       widget.onAddToCart!();
+      if (widget.enableCartAnimation) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          try {
+            Get.find<CartAnimationController>();
+            _triggerCartAnimation();
+          } catch (e) {}
+        });
+      }
     }
   }
 

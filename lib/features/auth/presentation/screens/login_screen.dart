@@ -243,6 +243,12 @@ class LoginScreen extends StatelessWidget {
                       controller: controller.phoneController,
                       keyboardType: TextInputType.number,
                       textInputAction: TextInputAction.done,
+                      // Automatically dismiss keyboard when user typed 10 digits
+                      onChanged: (value) {
+                        if (value.length == 10) {
+                          FocusManager.instance.primaryFocus?.unfocus();
+                        }
+                      },
                       onSubmitted: (_) =>
                           FocusManager.instance.primaryFocus?.unfocus(),
                       inputFormatters: [
