@@ -34,6 +34,13 @@ android {
     buildTypes {
         release {
             signingConfig = signingConfigs.getByName("debug")
+            // Enable code shrinking, obfuscation, and optimization for release builds.
+            // Flutter's release build can invoke R8; ensure we provide proguard rules file.
+            isMinifyEnabled = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
 }
