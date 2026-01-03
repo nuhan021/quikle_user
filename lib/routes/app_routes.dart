@@ -28,6 +28,8 @@ import 'package:quikle_user/features/prescription/presentation/screens/prescript
 import 'package:quikle_user/features/prescription/presentation/screens/prescription_details_screen.dart';
 import 'package:quikle_user/features/profile/presentation/screens/privacy_policy_screen.dart';
 import 'package:quikle_user/features/profile/presentation/screens/terms_conditions_screen.dart';
+import 'package:quikle_user/features/profile/presentation/screens/about_us_screen.dart';
+import 'package:quikle_user/features/profile/presentation/screens/license_screen.dart';
 
 class AppRoute {
   static const String _splash = '/';
@@ -64,6 +66,7 @@ class AppRoute {
   static const String splashWrapper = '/splashWrapper';
   static const String _privacyPolicy = '/privacy-policy';
   static const String _termsConditions = '/terms-conditions';
+  static const String _license = '/license';
   static const String _prescription = '/prescription';
 
   static String getSplashScreen() => _splash;
@@ -100,6 +103,7 @@ class AppRoute {
   static String getSplashWrapper() => splashWrapper;
   static String getPrivacyPolicy() => _privacyPolicy;
   static String getTermsConditions() => _termsConditions;
+  static String getLicense() => _license;
   static String getPrescription() => _prescription;
 
   static final List<GetPage<dynamic>> routes = <GetPage>[
@@ -172,6 +176,8 @@ class AppRoute {
     GetPage(name: AppRoute.splashWrapper, page: () => const SplashWrapper()),
     GetPage(name: _privacyPolicy, page: () => const PrivacyPolicyScreen()),
     GetPage(name: _termsConditions, page: () => const TermsConditionsScreen()),
+    GetPage(name: _aboutUs, page: () => const AboutUsScreen()),
+    GetPage(name: _license, page: () => const LicenseScreen()),
     GetPage(name: _prescription, page: () => const PrescriptionListScreen()),
     // GetPage(
     //   name: _home,

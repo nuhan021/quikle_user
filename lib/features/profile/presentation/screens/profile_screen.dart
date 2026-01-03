@@ -103,6 +103,17 @@ class ProfileScreen extends StatelessWidget {
                     title: 'Prescription',
                     onTap: () => _navigateToPrescriptionPage(context),
                   ),
+                  SizedBox(height: 16.h),
+
+                  // Other Information section
+                  const ProfileSectionHeader(title: 'Other Information'),
+                  SizedBox(height: 8.h),
+
+                  ProfileMenuItem(
+                    assetIcon: ImagePath.aboutUsIcon,
+                    title: 'About Us',
+                    onTap: () => _navigateToAboutUs(context),
+                  ),
                   SizedBox(height: 8.h),
 
                   ProfileMenuItem(
@@ -118,7 +129,18 @@ class ProfileScreen extends StatelessWidget {
                     onTap: () => _showDeleteAccountDialog(context),
                   ),
 
-                  SizedBox(height: 100.h),
+                  // SizedBox(height: 24.h),
+
+                  // Hallmark / brand mark at bottom
+                  Center(
+                    child: Image.asset(
+                      ImagePath.hallmark,
+                      width: 150.w,
+                      height: 150.w,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                  SizedBox(height: 40.h),
                 ],
               ),
             ),
@@ -166,6 +188,10 @@ class ProfileScreen extends StatelessWidget {
 
   void _navigateToHelpSupport(BuildContext context) {
     Get.toNamed(AppRoute.getHelpSupport());
+  }
+
+  void _navigateToAboutUs(BuildContext context) {
+    Get.toNamed(AppRoute.getAboutUs());
   }
 
   void _showSignOutDialog(BuildContext context) {
