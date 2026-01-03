@@ -24,6 +24,7 @@ class ProfileScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.homeGrey,
       body: SafeArea(
+        bottom: false,
         child: ListView(
           physics: const ClampingScrollPhysics(),
           padding: EdgeInsets.zero,
@@ -71,8 +72,6 @@ class ProfileScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-
-                  SizedBox(height: 24.h),
 
                   // Your Information Section
                   const ProfileSectionHeader(title: 'Your Information'),

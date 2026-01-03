@@ -49,6 +49,12 @@ class MapAddressPickerController extends GetxController {
     mapController?.dispose();
     searchController.dispose();
     _debounce?.cancel();
+    // If the user closed the map without confirming, ensure the AddAddressController
+    // does not keep the "willOpenMap" flag set.
+    try {
+      final addController = Get.find<AddAddressController>();
+      addController.willOpenMap.value = false;
+    } catch (_) {}
     super.onClose();
   }
 
@@ -595,6 +601,8 @@ class MapAddressPickerController extends GetxController {
     }
 
     // Go back to close the map screen
+    // We are confirming selection — clear the navigation flag and mark as from map
+    addAddressController.willOpenMap.value = false;
     Get.back();
 
     // Show the address details sheet after a small delay (after navigation completes)

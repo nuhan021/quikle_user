@@ -14,6 +14,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback? onNotificationTap;
   final VoidCallback? onProfileTap;
   final VoidCallback? onBackTap;
+  final double titleFontSize;
 
   final bool showBackButton;
   final List<Widget>? actions;
@@ -40,6 +41,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.backgroundColor = AppColors.eggshellWhite,
     this.addressWidget,
     this.isFromHome = false,
+    this.titleFontSize = 16,
   });
 
   bool get _useCustomActions => actions != null && actions!.isNotEmpty;
@@ -144,7 +146,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
       overflow: TextOverflow.ellipsis,
       style: getTextStyle(
         font: CustomFonts.obviously,
-        fontSize: 16.sp,
+        fontSize: titleFontSize.sp,
         fontWeight: FontWeight.w500,
         color: txtColor,
       ),
@@ -167,7 +169,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
         child: SafeArea(
           bottom: false,
-          top: !isFromHome, // Don't add top safe area if coming from home
+          top: !isFromHome,
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 8.w),
             child: Row(

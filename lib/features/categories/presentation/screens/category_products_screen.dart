@@ -132,6 +132,7 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen>
           body: Stack(
             children: [
               SafeArea(
+                bottom: false,
                 child: NotificationListener<ScrollNotification>(
                   onNotification: _onScrollNotification,
                   child: Obx(() {

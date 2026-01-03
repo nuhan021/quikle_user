@@ -144,6 +144,7 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
           body: Stack(
             children: [
               SafeArea(
+                bottom: false,
                 child: NotificationListener<ScrollNotification>(
                   onNotification: _onScrollNotification,
                   child: Obx(() {
@@ -168,10 +169,14 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
                         SliverToBoxAdapter(
                           child: CommonAppBar(
                             title: controller.categoryTitle.value,
+                            titleFontSize: 20,
                             showNotification: false,
                             showProfile: false,
                             onBackTap: () => Get.back(),
-                            addressWidget: AddressWidget(),
+                            addressWidget: AddressWidget(
+                              nameFontSize: 10,
+                              addressFontSize: 10,
+                            ),
                           ),
                         ),
 

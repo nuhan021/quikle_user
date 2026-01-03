@@ -61,22 +61,15 @@ class CartScreen extends StatelessWidget {
                 padding: EdgeInsets.symmetric(horizontal: 16.w),
                 child: Column(
                   children: [
-                    // Show receiver details only when there's a selected shipping
-                    // address or when the user provided a different receiver.
+                    // Show receiver details only when there is a selected
+                    // shipping address OR when the user has set a different
+                    // receiver. If selectedShippingAddress is null, hide it.
                     Obx(() {
-                      final hasDifferentReceiver =
-                          payoutController.isDifferentReceiver &&
-                          payoutController.receiverName.isNotEmpty;
                       final selectedAddr =
                           payoutController.selectedShippingAddress;
-
-                      final hasSelectedAddress =
-                          selectedAddr != null &&
-                          (selectedAddr.name.isNotEmpty ||
-                              selectedAddr.phoneNumber.isNotEmpty);
-
                       final showReceiver =
-                          hasDifferentReceiver || hasSelectedAddress;
+                          selectedAddr != null ||
+                          payoutController.isDifferentReceiver;
 
                       if (!showReceiver) return const SizedBox.shrink();
 
@@ -265,52 +258,49 @@ class CartScreen extends StatelessWidget {
     final paymentMethodController = Get.find<PaymentMethodController>();
 
     Get.bottomSheet(
-      SafeArea(
-        top: false, // allow full sheet up to status bar
-        child: Container(
-          padding: EdgeInsets.all(16.w),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),
-          ),
-          child: Obx(() {
-            final paymentMethods = paymentMethodController.paymentMethods;
-
-            return SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'Select Payment Method',
-                    style: TextStyle(
-                      fontSize: 18.sp,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  SizedBox(height: 16.h),
-
-                  ...paymentMethods.map((method) {
-                    return ListTile(
-                      leading: method.type.iconPath != null
-                          ? Image.asset(
-                              method.type.iconPath!,
-                              width: 24,
-                              height: 24,
-                            )
-                          : const Icon(Icons.payment),
-                      title: Text(method.type.displayName),
-                      onTap: () {
-                        paymentMethodController.selectPaymentMethod(method);
-                        Get.back();
-                      },
-                    );
-                  }).toList(),
-                ],
-              ),
-            );
-          }),
+      Container(
+        padding: EdgeInsets.all(16.w),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),
         ),
+        child: Obx(() {
+          final paymentMethods = paymentMethodController.paymentMethods;
+
+          return SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Select Payment Method',
+                  style: TextStyle(
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                SizedBox(height: 16.h),
+
+                ...paymentMethods.map((method) {
+                  return ListTile(
+                    leading: method.type.iconPath != null
+                        ? Image.asset(
+                            method.type.iconPath!,
+                            width: 24,
+                            height: 24,
+                          )
+                        : const Icon(Icons.payment),
+                    title: Text(method.type.displayName),
+                    onTap: () {
+                      paymentMethodController.selectPaymentMethod(method);
+                      Get.back();
+                    },
+                  );
+                }).toList(),
+              ],
+            ),
+          );
+        }),
       ),
       isScrollControlled: true,
       backgroundColor: Colors.transparent,

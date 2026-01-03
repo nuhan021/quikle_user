@@ -37,6 +37,10 @@ class LocationOptions extends StatelessWidget {
         // Add from Map Button
         _MapPickerButton(
           onMapSelected: () {
+            // Mark that user is intentionally navigating to the map
+            final addController = Get.find<AddAddressController>();
+            addController.willOpenMap.value = true;
+
             Navigator.of(context).pop();
             MapAddressPickerScreen.show(context);
           },
