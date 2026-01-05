@@ -5,7 +5,7 @@ import 'package:lottie/lottie.dart';
 import 'package:quikle_user/core/common/styles/global_text_style.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
-import 'package:quikle_user/features/orders/data/models/order_model.dart';
+import 'package:quikle_user/features/orders/data/models/order/order_model.dart';
 
 class OrderSuccessDialog extends StatelessWidget {
   final OrderModel order;

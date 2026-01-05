@@ -5,8 +5,8 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:quikle_user/core/services/storage_service.dart';
 import 'package:quikle_user/core/utils/constants/enums/order_enums.dart';
 import 'package:quikle_user/core/utils/logging/logger.dart';
-import 'package:quikle_user/features/orders/data/models/order_model.dart';
-import 'package:quikle_user/features/orders/data/services/order_tracking_service.dart';
+import 'package:quikle_user/features/orders/data/models/order/order_model.dart';
+import 'package:quikle_user/features/orders/data/services/order/order_tracking_service.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 

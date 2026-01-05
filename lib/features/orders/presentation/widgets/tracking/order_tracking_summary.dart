@@ -6,8 +6,8 @@ import 'package:intl/intl.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 import 'package:quikle_user/features/orders/controllers/order_tracking_controller.dart';
-import 'package:quikle_user/features/orders/data/models/order_model.dart';
-import 'package:quikle_user/features/orders/presentation/screens/order_invoice_screen.dart';
+import 'package:quikle_user/features/orders/data/models/order/order_model.dart';
+import 'package:quikle_user/features/orders/presentation/screens/order/order_invoice_screen.dart';
 
 class OrderTrackingSummary extends StatelessWidget {
   final OrderModel order;

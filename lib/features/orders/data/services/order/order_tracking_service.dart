@@ -1,5 +1,5 @@
-import '../models/order_model.dart';
-import '../../../../core/utils/constants/enums/order_enums.dart';
+import 'package:quikle_user/features/orders/data/models/order/order_model.dart';
+import 'package:quikle_user/core/utils/constants/enums/order_enums.dart';
 
 class OrderTrackingService {
   Future<Map<String, dynamic>> getOrderTrackingData(String orderId) async {

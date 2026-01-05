@@ -22,7 +22,7 @@ import 'package:quikle_user/features/categories/presentation/widgets/search_and_
 import 'package:quikle_user/features/categories/presentation/widgets/popular_items_section.dart';
 import 'package:quikle_user/features/categories/presentation/widgets/product_grid_section.dart';
 import 'package:quikle_user/features/categories/presentation/widgets/category_product_item.dart';
-import 'package:quikle_user/features/orders/presentation/widgets/live_order_indicator.dart';
+import 'package:quikle_user/features/orders/presentation/widgets/tracking/live_order_indicator.dart';
 import 'package:quikle_user/features/restaurants/presentation/widgets/top_restaurants_section.dart';
 import 'package:quikle_user/features/prescription/presentation/widgets/prescription_upload_section.dart';
 

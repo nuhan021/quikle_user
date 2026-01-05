@@ -6,12 +6,12 @@ import 'package:quikle_user/core/common/widgets/customer_support_fab.dart';
 import 'package:quikle_user/core/utils/logging/logger.dart';
 import 'package:quikle_user/core/services/freshchat_service.dart';
 import 'package:quikle_user/features/orders/controllers/order_tracking_controller.dart';
-import 'package:quikle_user/features/orders/data/models/order_model.dart';
-import 'package:quikle_user/features/orders/presentation/widgets/order_tracking_app_bar.dart';
-import 'package:quikle_user/features/orders/presentation/widgets/order_tracking_map_section.dart';
-import 'package:quikle_user/features/orders/presentation/widgets/time_estimation_section.dart';
-import 'package:quikle_user/features/orders/presentation/widgets/progress_section.dart';
-import 'package:quikle_user/features/orders/presentation/widgets/order_tracking_summary.dart';
+import 'package:quikle_user/features/orders/data/models/order/order_model.dart';
+import 'package:quikle_user/features/orders/presentation/widgets/tracking/order_tracking_app_bar.dart';
+import 'package:quikle_user/features/orders/presentation/widgets/tracking/order_tracking_map_section.dart';
+import 'package:quikle_user/features/orders/presentation/widgets/tracking/time_estimation_section.dart';
+import 'package:quikle_user/features/orders/presentation/widgets/tracking/progress_section.dart';
+import 'package:quikle_user/features/orders/presentation/widgets/tracking/order_tracking_summary.dart';
 
 class OrderTrackingScreen extends StatelessWidget {
   final OrderModel order;

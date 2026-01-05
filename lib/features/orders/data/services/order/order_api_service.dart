@@ -5,7 +5,7 @@ import 'package:quikle_user/core/utils/constants/api_constants.dart';
 import 'package:quikle_user/core/utils/constants/enums/order_enums.dart';
 import 'package:quikle_user/core/utils/logging/logger.dart';
 import 'package:quikle_user/features/cart/data/models/cart_item_model.dart';
-import 'package:quikle_user/features/orders/data/models/order_model.dart';
+import 'package:quikle_user/features/orders/data/models/order/order_model.dart';
 import 'package:quikle_user/features/payout/data/models/delivery_option_model.dart';
 import 'package:quikle_user/features/payout/data/models/payment_method_model.dart';
 import 'package:quikle_user/features/profile/data/models/shipping_address_model.dart';

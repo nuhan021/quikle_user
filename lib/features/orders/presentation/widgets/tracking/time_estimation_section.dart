@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:quikle_user/core/common/styles/global_text_style.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 import 'package:quikle_user/features/orders/controllers/order_tracking_controller.dart';
-import 'package:quikle_user/features/orders/presentation/widgets/delivery_person_card.dart';
+import 'package:quikle_user/features/orders/presentation/widgets/tracking/delivery_person_card.dart';
 
 class TimeEstimationSection extends StatelessWidget {
   final OrderTrackingController controller;

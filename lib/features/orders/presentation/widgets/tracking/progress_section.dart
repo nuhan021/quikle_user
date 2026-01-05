@@ -5,7 +5,7 @@ import 'package:quikle_user/core/common/styles/global_text_style.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 import 'package:quikle_user/features/orders/controllers/order_tracking_controller.dart';
-import 'package:quikle_user/features/orders/presentation/widgets/progress_step.dart';
+import 'package:quikle_user/features/orders/presentation/widgets/tracking/progress_step.dart';
 
 class ProgressSection extends StatelessWidget {
   final OrderTrackingController controller;

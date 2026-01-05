@@ -19,7 +19,7 @@ import 'package:quikle_user/features/categories/presentation/widgets/category_pr
 import 'package:quikle_user/features/categories/presentation/widgets/minimal_subcategories_section.dart';
 import 'package:quikle_user/features/categories/presentation/widgets/minimal_subcategories_shimmer.dart';
 import 'package:quikle_user/features/categories/presentation/widgets/load_more_products_shimmer.dart';
-import 'package:quikle_user/features/orders/presentation/widgets/live_order_indicator.dart';
+import 'package:quikle_user/features/orders/presentation/widgets/tracking/live_order_indicator.dart';
 
 class CategoryProductsScreen extends StatefulWidget {
   const CategoryProductsScreen({super.key});
