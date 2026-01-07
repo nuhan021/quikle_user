@@ -105,3 +105,125 @@ Future<void> main() async {
 
   runApp(const MyApp());
 }
+
+/**
+ * 
+ * 
+ * Cashfree 
+ * 
+ * 
+ */
+
+// import 'package:flutter/material.dart';
+// import 'package:quikle_user/features/payment/services/cashfree_payment_service.dart';
+
+// void main() {
+//   runApp(const MyApp());
+// }
+
+// class MyApp extends StatelessWidget {
+//   const MyApp({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return const MaterialApp(home: PaymentPage());
+//   }
+// }
+
+// class PaymentPage extends StatefulWidget {
+//   const PaymentPage({super.key});
+
+//   @override
+//   State<PaymentPage> createState() => _PaymentPageState();
+// }
+
+// class _PaymentPageState extends State<PaymentPage> {
+//   final CashfreePaymentService _paymentService = CashfreePaymentService();
+
+//   final TextEditingController _cfOrderIdController = TextEditingController();
+//   final TextEditingController _paymentSessionIdController =
+//       TextEditingController();
+//   final TextEditingController _parentOrderIdController =
+//       TextEditingController();
+
+//   @override
+//   void initState() {
+//     super.initState();
+//     _paymentService.initialize(
+//       onPaymentSuccess: (orderId) {
+//         debugPrint('Payment Success: $orderId');
+//       },
+//       onPaymentError: (orderId, errorMessage) {
+//         debugPrint('Payment Error: $errorMessage');
+//       },
+//       onPaymentProcessing: () {
+//         debugPrint('Payment Processing');
+//       },
+//     );
+//   }
+
+//   void _payNow() {
+//     if (_cfOrderIdController.text.isEmpty ||
+//         _paymentSessionIdController.text.isEmpty ||
+//         _parentOrderIdController.text.isEmpty) {
+//       ScaffoldMessenger.of(
+//         context,
+//       ).showSnackBar(const SnackBar(content: Text('Please fill all fields')));
+//       return;
+//     }
+
+//     _paymentService.startPayment(
+//       cfOrderId: _cfOrderIdController.text.trim(),
+//       paymentSessionId: _paymentSessionIdController.text.trim(),
+//       parentOrderId: _parentOrderIdController.text.trim(),
+//     );
+//   }
+
+//   @override
+//   void dispose() {
+//     _cfOrderIdController.dispose();
+//     _paymentSessionIdController.dispose();
+//     _parentOrderIdController.dispose();
+//     super.dispose();
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(title: const Text('Cashfree Payment')),
+//       body: Padding(
+//         padding: const EdgeInsets.all(16),
+//         child: Column(
+//           children: [
+//             TextField(
+//               controller: _cfOrderIdController,
+//               decoration: const InputDecoration(
+//                 labelText: 'CF Order ID',
+//                 border: OutlineInputBorder(),
+//               ),
+//             ),
+//             const SizedBox(height: 12),
+//             TextField(
+//               controller: _paymentSessionIdController,
+//               decoration: const InputDecoration(
+//                 labelText: 'Payment Session ID',
+//                 border: OutlineInputBorder(),
+//               ),
+//               maxLines: 3,
+//             ),
+//             const SizedBox(height: 12),
+//             TextField(
+//               controller: _parentOrderIdController,
+//               decoration: const InputDecoration(
+//                 labelText: 'Parent Order ID',
+//                 border: OutlineInputBorder(),
+//               ),
+//             ),
+//             const SizedBox(height: 24),
+//             ElevatedButton(onPressed: _payNow, child: const Text('Pay Now')),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }

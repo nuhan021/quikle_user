@@ -37,13 +37,23 @@ class OrderTrackingService {
       },
       {
         'status': OrderStatus.confirmed,
-        'title': 'Preparing',
-        'description': 'Restaurant is preparing your order',
+        'title': 'Order Confirmed',
+        'description': 'Your order has been confirmed',
         'time': order.status.index >= OrderStatus.confirmed.index
-            ? orderTime.add(const Duration(minutes: 10))
+            ? orderTime.add(const Duration(minutes: 5))
             : null,
         'isCompleted': _isStepCompleted(OrderStatus.confirmed, order.status),
         'isCurrent': _isCurrentStep(OrderStatus.confirmed, order.status),
+      },
+      {
+        'status': OrderStatus.preparing,
+        'title': 'Preparing',
+        'description': 'Restaurant is preparing your order',
+        'time': order.status.index >= OrderStatus.preparing.index
+            ? orderTime.add(const Duration(minutes: 10))
+            : null,
+        'isCompleted': _isStepCompleted(OrderStatus.preparing, order.status),
+        'isCurrent': _isCurrentStep(OrderStatus.preparing, order.status),
       },
       {
         'status': OrderStatus.shipped,
@@ -111,6 +121,8 @@ class OrderTrackingService {
       case OrderStatus.confirmed:
       case OrderStatus.processing:
         return '25-30 mins';
+      case OrderStatus.preparing:
+        return '20-25 mins';
       case OrderStatus.shipped:
         return '15-20 mins';
       case OrderStatus.outForDelivery:
@@ -157,6 +169,8 @@ class OrderTrackingService {
         return stepStatus == OrderStatus.confirmed;
       case OrderStatus.processing:
         return stepStatus == OrderStatus.processing;
+      case OrderStatus.preparing:
+        return stepStatus == OrderStatus.preparing;
       case OrderStatus.shipped:
         return stepStatus == OrderStatus.shipped;
       case OrderStatus.outForDelivery:

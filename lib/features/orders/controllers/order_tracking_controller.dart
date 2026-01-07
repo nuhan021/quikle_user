@@ -135,6 +135,8 @@ class OrderTrackingController extends GetxController {
       case OrderStatus.processing:
         return 0.2;
       case OrderStatus.confirmed:
+        return 0.3;
+      case OrderStatus.preparing:
         return 0.4;
       case OrderStatus.shipped:
         return 0.6;
@@ -154,6 +156,8 @@ class OrderTrackingController extends GetxController {
       case OrderStatus.processing:
         return 'Order Placed';
       case OrderStatus.confirmed:
+        return 'Order Confirmed';
+      case OrderStatus.preparing:
         return 'Preparing';
       case OrderStatus.shipped:
         return 'Ready for Pickup';
@@ -186,6 +190,7 @@ class OrderTrackingController extends GetxController {
     return [
       OrderStatus.confirmed,
       OrderStatus.processing,
+      OrderStatus.preparing,
       OrderStatus.shipped,
       OrderStatus.outForDelivery,
     ].contains(order.status);

@@ -40,6 +40,19 @@ class RefundService {
         );
 
       case OrderStatus.confirmed:
+        if (order.riderInfo != null) {
+          isAllowed = true;
+          // Apply 10% cancellation fee (configurable via API)
+          cancellationFee = orderAmount * 0.10;
+          return CancellationEligibility(
+            isAllowed: isAllowed,
+            message: 'Cancellation charges apply at this stage.',
+            orderAmount: orderAmount,
+            cancellationFee: cancellationFee,
+            refundAmount: orderAmount - cancellationFee,
+            isFeeWaived: false,
+          );
+        }
         isAllowed = true;
         return CancellationEligibility(
           isAllowed: isAllowed,
@@ -50,7 +63,7 @@ class RefundService {
           isFeeWaived: true,
         );
 
-      case OrderStatus.shipped: // Preparing/Packing stage
+      case OrderStatus.preparing:
         isAllowed = true;
         // Apply 10% cancellation fee (configurable via API)
         cancellationFee = orderAmount * 0.10;
@@ -63,10 +76,24 @@ class RefundService {
           isFeeWaived: false,
         );
 
+      // case OrderStatus.shipped: // Preparing/Packing stage
+      //   isAllowed = true;
+      //   // Apply 10% cancellation fee (configurable via API)
+      //   cancellationFee = orderAmount * 0.10;
+      //   return CancellationEligibility(
+      //     isAllowed: isAllowed,
+      //     message: 'Cancellation charges apply at this stage.',
+      //     orderAmount: orderAmount,
+      //     cancellationFee: cancellationFee,
+      //     refundAmount: orderAmount - cancellationFee,
+      //     isFeeWaived: false,
+      //   );
+
       case OrderStatus.outForDelivery:
       case OrderStatus.delivered:
       case OrderStatus.cancelled:
       case OrderStatus.refunded:
+      case OrderStatus.shipped:
         return CancellationEligibility(
           isAllowed: false,
           message: CancellationEligibility.getMessageForStatus(order.status),

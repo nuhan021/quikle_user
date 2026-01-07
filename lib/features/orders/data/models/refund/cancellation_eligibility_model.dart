@@ -47,6 +47,8 @@ class CancellationEligibility {
         return 'Cancellation available. You will receive a full refund.';
       case OrderStatus.confirmed:
         return 'Cancellation available. Refund depends on processing stage.';
+      case OrderStatus.preparing:
+        return 'Cancellation charges apply at this stage.';
       case OrderStatus.shipped:
         return 'Cancellation charges apply at this stage.';
       case OrderStatus.outForDelivery:

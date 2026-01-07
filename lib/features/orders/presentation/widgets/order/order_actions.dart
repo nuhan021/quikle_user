@@ -25,6 +25,7 @@ class OrderActions extends StatelessWidget {
     final canShowCancelButton =
         order.status == OrderStatus.processing ||
         order.status == OrderStatus.confirmed ||
+        order.status == OrderStatus.preparing ||
         order.status == OrderStatus.shipped;
 
     final showDisabledCancelButton =

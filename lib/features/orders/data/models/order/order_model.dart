@@ -141,6 +141,7 @@ class OrderModel {
 
   bool get isTrackable {
     return (status == OrderStatus.confirmed ||
+        status == OrderStatus.preparing ||
         status == OrderStatus.shipped ||
         status == OrderStatus.outForDelivery);
   }
@@ -153,6 +154,8 @@ class OrderModel {
         return 'Processing';
       case OrderStatus.confirmed:
         return 'Confirmed';
+      case OrderStatus.preparing:
+        return 'Preparing';
       case OrderStatus.shipped:
         return 'Shipped';
       case OrderStatus.outForDelivery:
@@ -229,10 +232,14 @@ class OrderModel {
     OrderStatus orderStatus = OrderStatus.pending;
     if (json['status'] != null) {
       final s = json['status'].toString().toLowerCase();
-      orderStatus = OrderStatus.values.firstWhere(
-        (e) => e.name.toLowerCase() == s,
-        orElse: () => OrderStatus.pending,
-      );
+      if (s == 'prepared') {
+        orderStatus = OrderStatus.preparing;
+      } else {
+        orderStatus = OrderStatus.values.firstWhere(
+          (e) => e.name.toLowerCase() == s,
+          orElse: () => OrderStatus.pending,
+        );
+      }
     }
 
     // Parse items -> convert API item structure into CartItemModel
