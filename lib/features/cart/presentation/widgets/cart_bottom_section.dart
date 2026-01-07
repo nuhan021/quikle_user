@@ -17,7 +17,6 @@ class CartBottomSection extends StatelessWidget {
   final VoidCallback onPlaceOrder;
   final VoidCallback onPaymentMethodTap;
 
-  /// NEW: pass cart total from caller
   final double totalAmount;
 
   static String? _selectedAddressIdForCart;
@@ -40,11 +39,9 @@ class CartBottomSection extends StatelessWidget {
     }
   }
 
-  /// Changed: pass BuildContext so we can use ScaffoldMessenger (no Get.snackbar)
   void _showAddressSelection(BuildContext context) async {
     final addressController = Get.find<AddressController>();
 
-    // If no addresses exist, open the add address screen directly
     if (addressController.addresses.isEmpty) {
       AddAddressScreen.show(context);
       return;
@@ -53,15 +50,10 @@ class CartBottomSection extends StatelessWidget {
     final pickedId = await showAddressSelectionSheet(addressController);
 
     if (pickedId != null && pickedId.isNotEmpty) {
-      // Optimistically update the UI and mark this address default locally,
-      // then persist to backend. If persistence fails we roll back and show
-      // an error. This keeps Cart and Receiver UI in sync immediately.
       _selectedAddressIdForCart = pickedId;
       try {
         await addressController.selectAndPersistDefault(pickedId);
       } catch (e) {
-        // selectAndPersistDefault shows snackbar on failure; ensure cart local
-        // selection is consistent (fallback to controller state)
         final defaultAddr = addressController.defaultAddress;
         _selectedAddressIdForCart = defaultAddr?.id;
       }
@@ -99,15 +91,11 @@ class CartBottomSection extends StatelessWidget {
               ),
             ],
           ),
-          // Increased top/bottom padding so address row doesn't feel cramped
           padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 12.h),
           child: Column(
             children: [
               GetBuilder<AddressController>(
                 builder: (controller) {
-                  // Auto-select default address if none selected, or if current
-                  // selection no longer exists (e.g., address removed) then pick
-                  // the controller's default, or first available address.
                   final defaultAddr = controller.defaultAddress;
                   final selectionMissing =
                       _selectedAddressIdForCart == null ||
@@ -202,10 +190,8 @@ class CartBottomSection extends StatelessWidget {
                 },
               ),
               SizedBox(height: 16.h),
-              // Address row
               Row(
                 children: [
-                  // Payment method box (takes remaining space)
                   Expanded(
                     child: Obx(() {
                       final paymentController =
@@ -216,6 +202,8 @@ class CartBottomSection extends StatelessWidget {
                       return GestureDetector(
                         onTap: onPaymentMethodTap,
                         child: Container(
+                          // Ensure same visual height as the Place order button
+                          constraints: BoxConstraints(minHeight: 36.h),
                           padding: EdgeInsets.symmetric(
                             vertical: 12.h,
                             horizontal: 10.w,
@@ -265,9 +253,6 @@ class CartBottomSection extends StatelessWidget {
                   ),
 
                   SizedBox(width: 12.w),
-
-                  // Place Order button sized to its intrinsic content so the
-                  // total price and 'Place order' text are always visible.
                   IntrinsicWidth(
                     child: Obx(() {
                       final cartController = Get.find<CartController>();
@@ -276,6 +261,8 @@ class CartBottomSection extends StatelessWidget {
                       return GestureDetector(
                         onTap: isPlacingOrder ? null : onPlaceOrder,
                         child: Container(
+                          // Match minimum height with payment method container
+                          constraints: BoxConstraints(minHeight: 36.h),
                           padding: EdgeInsets.symmetric(
                             vertical: 12.h,
                             horizontal: 12.w,
@@ -311,7 +298,6 @@ class CartBottomSection extends StatelessWidget {
                               : Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    // Total price (left) - keep full content visible
                                     Text(
                                       '₹ ${totalAmount.toStringAsFixed(2)}',
                                       style: getTextStyle(
@@ -322,7 +308,6 @@ class CartBottomSection extends StatelessWidget {
                                       ),
                                     ),
 
-                                    // Thin divider
                                     SizedBox(width: 8.w),
                                     Container(
                                       width: 1.w,
@@ -333,7 +318,6 @@ class CartBottomSection extends StatelessWidget {
                                     ),
                                     SizedBox(width: 8.w),
 
-                                    // Place order (right)
                                     Text(
                                       'Place order',
                                       style: getTextStyle(

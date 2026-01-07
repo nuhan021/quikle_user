@@ -1,6 +1,6 @@
 import 'package:quikle_user/core/utils/logging/logger.dart';
-import 'package:quikle_user/features/orders/data/models/order_model.dart';
-import 'package:quikle_user/features/orders/data/services/order_api_service.dart';
+import 'package:quikle_user/features/orders/data/models/order/order_model.dart';
+import 'package:quikle_user/features/orders/data/services/order/order_api_service.dart';
 
 class OrderService {
   final OrderApiService _apiService = OrderApiService();

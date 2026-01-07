@@ -3,11 +3,11 @@ import 'package:flutter/rendering.dart';
 import 'package:quikle_user/core/common/widgets/cart_animation_overlay.dart';
 import 'package:quikle_user/core/common/widgets/custom_navbar.dart';
 import 'package:quikle_user/core/common/widgets/floating_cart_button.dart';
-import 'package:quikle_user/features/home/presentation/screens/home_content_screen.dart';
-import 'package:quikle_user/features/orders/presentation/screens/orders_screen.dart';
 import 'package:quikle_user/features/categories/presentation/screens/categories_screen.dart';
+import 'package:quikle_user/features/home/presentation/screens/home_content_screen.dart';
+import 'package:quikle_user/features/orders/presentation/screens/order/orders_screen.dart';
 import 'package:quikle_user/features/profile/presentation/screens/profile_screen.dart';
-import 'package:quikle_user/features/orders/presentation/widgets/live_order_indicator.dart';
+import 'package:quikle_user/features/orders/presentation/widgets/tracking/live_order_indicator.dart';
 
 class MainScreen extends StatefulWidget {
   final int initialIndex;

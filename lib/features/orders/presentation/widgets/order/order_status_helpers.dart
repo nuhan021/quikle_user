@@ -22,15 +22,21 @@ class OrderStatusHelpers {
           width: 20.0,
           height: 20.0,
         );
+      case OrderStatus.preparing:
+        return Image.asset(
+          'assets/icons/preparing.png',
+          width: 20.0,
+          height: 20.0,
+        );
       case OrderStatus.shipped:
         return Image.asset(
-          'assets/icons/ordered.png',
+          'assets/icons/shipped.png',
           width: 20.0,
           height: 20.0,
         );
       case OrderStatus.outForDelivery:
         return Image.asset(
-          'assets/icons/ordered.png',
+          'assets/icons/out_for_delivery.png',
           width: 20.0,
           height: 20.0,
         );
@@ -63,6 +69,8 @@ class OrderStatusHelpers {
         return const Color(0xFFE6AF00);
       case OrderStatus.confirmed:
         return const Color(0xFF484848);
+      case OrderStatus.preparing:
+        return const Color(0xFFF57C00);
       case OrderStatus.shipped:
         return const Color(0xFF484848);
       case OrderStatus.outForDelivery:
@@ -83,7 +91,9 @@ class OrderStatusHelpers {
       case OrderStatus.processing:
         return 'Processing';
       case OrderStatus.confirmed:
-        return 'Ordered';
+        return 'Confirmed';
+      case OrderStatus.preparing:
+        return 'Preparing';
       case OrderStatus.shipped:
         return 'Shipped';
       case OrderStatus.outForDelivery:

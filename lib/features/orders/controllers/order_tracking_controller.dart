@@ -5,8 +5,8 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:quikle_user/core/services/storage_service.dart';
 import 'package:quikle_user/core/utils/constants/enums/order_enums.dart';
 import 'package:quikle_user/core/utils/logging/logger.dart';
-import 'package:quikle_user/features/orders/data/models/order_model.dart';
-import 'package:quikle_user/features/orders/data/services/order_tracking_service.dart';
+import 'package:quikle_user/features/orders/data/models/order/order_model.dart';
+import 'package:quikle_user/features/orders/data/services/order/order_tracking_service.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 
@@ -135,6 +135,8 @@ class OrderTrackingController extends GetxController {
       case OrderStatus.processing:
         return 0.2;
       case OrderStatus.confirmed:
+        return 0.3;
+      case OrderStatus.preparing:
         return 0.4;
       case OrderStatus.shipped:
         return 0.6;
@@ -154,6 +156,8 @@ class OrderTrackingController extends GetxController {
       case OrderStatus.processing:
         return 'Order Placed';
       case OrderStatus.confirmed:
+        return 'Order Confirmed';
+      case OrderStatus.preparing:
         return 'Preparing';
       case OrderStatus.shipped:
         return 'Ready for Pickup';
@@ -186,6 +190,7 @@ class OrderTrackingController extends GetxController {
     return [
       OrderStatus.confirmed,
       OrderStatus.processing,
+      OrderStatus.preparing,
       OrderStatus.shipped,
       OrderStatus.outForDelivery,
     ].contains(order.status);

@@ -6,10 +6,10 @@ import 'package:quikle_user/core/common/styles/global_text_style.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 import 'package:quikle_user/core/utils/constants/enums/order_enums.dart';
-import 'package:quikle_user/features/orders/data/models/order_model.dart';
-import 'package:quikle_user/features/orders/presentation/screens/order_tracking_screen.dart';
-import 'package:quikle_user/features/orders/presentation/widgets/order_item_widget.dart';
-import 'package:quikle_user/features/orders/presentation/widgets/order_status_helpers.dart';
+import 'package:quikle_user/features/orders/data/models/order/order_model.dart';
+import 'package:quikle_user/features/orders/presentation/screens/order/order_tracking_screen.dart';
+import 'package:quikle_user/features/orders/presentation/widgets/order/order_item_widget.dart';
+import 'package:quikle_user/features/orders/presentation/widgets/order/order_status_helpers.dart';
 
 class OrderCard extends StatelessWidget {
   final OrderModel order;

@@ -21,9 +21,9 @@ import 'package:quikle_user/features/profile/presentation/screens/notification_s
 import 'package:quikle_user/features/profile/presentation/screens/help_support_screen.dart';
 import 'package:quikle_user/features/home/data/models/product_model.dart';
 import 'package:quikle_user/features/search/presentation/screens/search_screen.dart';
-import 'package:quikle_user/features/orders/presentation/screens/order_tracking_screen.dart';
-import 'package:quikle_user/features/orders/presentation/screens/order_invoice_screen.dart';
-import 'package:quikle_user/features/orders/data/models/order_model.dart';
+import 'package:quikle_user/features/orders/presentation/screens/order/order_tracking_screen.dart';
+import 'package:quikle_user/features/orders/presentation/screens/order/order_invoice_screen.dart';
+import 'package:quikle_user/features/orders/data/models/order/order_model.dart';
 import 'package:quikle_user/features/prescription/presentation/screens/prescription_list_screen.dart';
 import 'package:quikle_user/features/prescription/presentation/screens/prescription_details_screen.dart';
 import 'package:quikle_user/features/profile/presentation/screens/privacy_policy_screen.dart';

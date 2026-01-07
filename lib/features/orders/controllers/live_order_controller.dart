@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:get/get.dart';
 import 'package:quikle_user/core/utils/constants/enums/order_enums.dart';
-import 'package:quikle_user/features/orders/data/models/order_model.dart';
-import 'package:quikle_user/features/orders/data/services/order_service.dart';
+import 'package:quikle_user/features/orders/data/models/order/order_model.dart';
+import 'package:quikle_user/features/orders/data/services/order/order_service.dart';
 
 class LiveOrderController extends GetxController {
   final OrderService _orderService = OrderService();
@@ -67,6 +67,7 @@ class LiveOrderController extends GetxController {
       final trackableOrders = orders.where((order) {
         return [
           OrderStatus.confirmed,
+          OrderStatus.preparing,
           OrderStatus.shipped,
           OrderStatus.outForDelivery,
         ].contains(order.status);
@@ -90,6 +91,9 @@ class LiveOrderController extends GetxController {
         _progressPercentage.value = 0.2;
         break;
       case OrderStatus.processing:
+        _progressPercentage.value = 0.3;
+        break;
+      case OrderStatus.preparing:
         _progressPercentage.value = 0.4;
         break;
       case OrderStatus.shipped:
@@ -113,6 +117,8 @@ class LiveOrderController extends GetxController {
       case OrderStatus.confirmed:
         return 'Order Confirmed';
       case OrderStatus.processing:
+        return 'Processing';
+      case OrderStatus.preparing:
         return 'Preparing';
       case OrderStatus.shipped:
         return 'Ready for Pickup';

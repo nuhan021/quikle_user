@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
-import '../data/models/order_model.dart';
-import '../data/services/order_service.dart';
+import 'package:quikle_user/features/orders/data/models/order/order_model.dart';
+import 'package:quikle_user/features/orders/data/services/order/order_service.dart';
 
 class OrdersController extends GetxController {
   final OrderService _orderService = OrderService();

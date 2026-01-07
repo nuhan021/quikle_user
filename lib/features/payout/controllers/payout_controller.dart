@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:quikle_user/features/orders/data/models/order_model.dart';
-import 'package:quikle_user/features/orders/data/services/order_api_service.dart';
+import 'package:quikle_user/features/orders/data/models/order/order_model.dart';
+import 'package:quikle_user/features/orders/data/services/order/order_api_service.dart';
 import 'package:quikle_user/features/payment/data/models/order_creation_response.dart';
 import 'package:quikle_user/features/payout/presentation/widgets/order_failure_dialog.dart';
 import 'package:quikle_user/features/payout/presentation/widgets/order_success_dialog.dart';

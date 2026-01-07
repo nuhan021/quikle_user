@@ -44,6 +44,7 @@ class _ChangeReceiverModalState extends State<ChangeReceiverModal> {
       maxChildSize: 0.5,
       builder: (context, scrollController) {
         return SafeArea(
+          bottom: false,
           child: Container(
             decoration: BoxDecoration(
               color: Colors.white,

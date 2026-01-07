@@ -6,9 +6,9 @@ import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 import 'package:quikle_user/features/main/presentation/screens/main_screen.dart';
 import 'package:quikle_user/features/orders/controllers/orders_controller.dart';
-import 'package:quikle_user/features/orders/presentation/widgets/brief_order_card.dart';
-import 'package:quikle_user/features/orders/presentation/screens/order_invoice_screen.dart';
-import 'package:quikle_user/features/orders/presentation/screens/order_tracking_screen.dart';
+import 'package:quikle_user/features/orders/presentation/widgets/order/brief_order_card.dart';
+import 'package:quikle_user/features/orders/presentation/screens/order/order_invoice_screen.dart';
+import 'package:quikle_user/features/orders/presentation/screens/order/order_tracking_screen.dart';
 import 'package:quikle_user/features/profile/presentation/widgets/unified_profile_app_bar.dart';
 import 'package:shimmer/shimmer.dart';
 

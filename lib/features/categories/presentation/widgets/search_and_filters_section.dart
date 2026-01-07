@@ -165,6 +165,12 @@ class SearchAndFiltersSection extends StatelessWidget {
                       ],
                     ),
                   ),
+                  Container(
+                    width: 1.w,
+                    height: 24.h,
+                    color: Colors.grey.withValues(alpha: 0.3),
+                    margin: EdgeInsets.symmetric(horizontal: 8.w),
+                  ),
                   IconButton(
                     icon: Image.asset(
                       ImagePath.voiceIcon,

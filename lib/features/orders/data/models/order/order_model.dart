@@ -7,8 +7,8 @@ import 'package:quikle_user/features/home/data/models/product_model.dart';
 import 'package:quikle_user/features/payout/data/models/delivery_option_model.dart';
 import 'package:quikle_user/features/payout/data/models/payment_method_model.dart';
 import 'package:quikle_user/features/profile/data/models/shipping_address_model.dart';
-import 'rider_info_model.dart';
-import 'vendor_info_model.dart';
+import 'package:quikle_user/features/orders/data/models/order/rider_info_model.dart';
+import 'package:quikle_user/features/orders/data/models/order/vendor_info_model.dart';
 
 class OrderModel {
   final String orderId;
@@ -34,6 +34,14 @@ class OrderModel {
   final VendorInfo? vendorInfo;
   final RiderInfo? riderInfo;
 
+  // Refund-related fields (optional, populated when applicable)
+  final String? cancellationReason;
+  final double? refundAmount;
+  final String? refundStatus; // Store as string for API flexibility
+  final String? refundReference; // RRN or transaction ID
+  final DateTime? refundInitiatedAt;
+  final DateTime? refundCompletedAt;
+
   const OrderModel({
     required this.orderId,
     required this.userId,
@@ -57,6 +65,12 @@ class OrderModel {
     this.vendors,
     this.vendorInfo,
     this.riderInfo,
+    this.cancellationReason,
+    this.refundAmount,
+    this.refundStatus,
+    this.refundReference,
+    this.refundInitiatedAt,
+    this.refundCompletedAt,
   });
 
   OrderModel copyWith({
@@ -82,6 +96,12 @@ class OrderModel {
     List<Map<String, dynamic>>? vendors,
     VendorInfo? vendorInfo,
     RiderInfo? riderInfo,
+    String? cancellationReason,
+    double? refundAmount,
+    String? refundStatus,
+    String? refundReference,
+    DateTime? refundInitiatedAt,
+    DateTime? refundCompletedAt,
   }) {
     return OrderModel(
       orderId: orderId ?? this.orderId,
@@ -106,6 +126,12 @@ class OrderModel {
       vendors: vendors ?? this.vendors,
       vendorInfo: vendorInfo ?? this.vendorInfo,
       riderInfo: riderInfo ?? this.riderInfo,
+      cancellationReason: cancellationReason ?? this.cancellationReason,
+      refundAmount: refundAmount ?? this.refundAmount,
+      refundStatus: refundStatus ?? this.refundStatus,
+      refundReference: refundReference ?? this.refundReference,
+      refundInitiatedAt: refundInitiatedAt ?? this.refundInitiatedAt,
+      refundCompletedAt: refundCompletedAt ?? this.refundCompletedAt,
     );
   }
 
@@ -115,6 +141,7 @@ class OrderModel {
 
   bool get isTrackable {
     return (status == OrderStatus.confirmed ||
+        status == OrderStatus.preparing ||
         status == OrderStatus.shipped ||
         status == OrderStatus.outForDelivery);
   }
@@ -127,6 +154,8 @@ class OrderModel {
         return 'Processing';
       case OrderStatus.confirmed:
         return 'Confirmed';
+      case OrderStatus.preparing:
+        return 'Preparing';
       case OrderStatus.shipped:
         return 'Shipped';
       case OrderStatus.outForDelivery:
@@ -182,6 +211,12 @@ class OrderModel {
       'vendors': vendors,
       'vendor_info': vendorInfo?.toJson(),
       'riderInfo': riderInfo?.toJson(),
+      'cancellationReason': cancellationReason,
+      'refundAmount': refundAmount,
+      'refundStatus': refundStatus,
+      'refundReference': refundReference,
+      'refundInitiatedAt': refundInitiatedAt?.toIso8601String(),
+      'refundCompletedAt': refundCompletedAt?.toIso8601String(),
     };
   }
 
@@ -197,10 +232,14 @@ class OrderModel {
     OrderStatus orderStatus = OrderStatus.pending;
     if (json['status'] != null) {
       final s = json['status'].toString().toLowerCase();
-      orderStatus = OrderStatus.values.firstWhere(
-        (e) => e.name.toLowerCase() == s,
-        orElse: () => OrderStatus.pending,
-      );
+      if (s == 'prepared') {
+        orderStatus = OrderStatus.preparing;
+      } else {
+        orderStatus = OrderStatus.values.firstWhere(
+          (e) => e.name.toLowerCase() == s,
+          orElse: () => OrderStatus.pending,
+        );
+      }
     }
 
     // Parse items -> convert API item structure into CartItemModel
@@ -291,6 +330,16 @@ class OrderModel {
           : null,
       riderInfo: json['rider_info'] != null
           ? RiderInfo.fromJson(json['rider_info'] as Map<String, dynamic>)
+          : null,
+      cancellationReason: json['cancellation_reason'],
+      refundAmount: toDouble(json['refund_amount']),
+      refundStatus: json['refund_status'],
+      refundReference: json['refund_reference'],
+      refundInitiatedAt: json['refund_initiated_at'] != null
+          ? DateTime.tryParse(json['refund_initiated_at'])
+          : null,
+      refundCompletedAt: json['refund_completed_at'] != null
+          ? DateTime.tryParse(json['refund_completed_at'])
           : null,
     );
   }

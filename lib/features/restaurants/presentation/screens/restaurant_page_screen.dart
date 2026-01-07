@@ -13,7 +13,7 @@ import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 import 'package:quikle_user/core/common/widgets/common_app_bar.dart';
 import 'package:quikle_user/core/utils/navigation/navbar_navigation_helper.dart';
-import 'package:quikle_user/features/orders/presentation/widgets/live_order_indicator.dart';
+import 'package:quikle_user/features/orders/presentation/widgets/tracking/live_order_indicator.dart';
 import 'package:quikle_user/core/common/widgets/slivers/fixed_widget_header_delegate.dart';
 import 'package:quikle_user/features/restaurants/controllers/restaurant_page_controller.dart';
 
