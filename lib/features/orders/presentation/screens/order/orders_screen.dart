@@ -6,7 +6,7 @@ import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 import 'package:quikle_user/features/main/presentation/screens/main_screen.dart';
 import 'package:quikle_user/features/orders/controllers/orders_controller.dart';
-import 'package:quikle_user/features/orders/presentation/widgets/order/brief_order_card.dart';
+import 'package:quikle_user/features/orders/presentation/widgets/order/grouped_orders_section.dart';
 import 'package:quikle_user/features/orders/presentation/screens/order/order_invoice_screen.dart';
 import 'package:quikle_user/features/orders/presentation/screens/order/order_tracking_screen.dart';
 import 'package:quikle_user/features/profile/presentation/widgets/unified_profile_app_bar.dart';
@@ -160,25 +160,36 @@ class OrdersScreen extends StatelessWidget {
                   );
                 }
 
-                // ✅ Actual order list
+                // ✅ Order list with grouping
                 return RefreshIndicator(
                   onRefresh: controller.refreshOrders,
                   color: AppColors.beakYellow,
                   child: ListView.builder(
                     padding: EdgeInsets.only(top: 16.h, bottom: 100.h),
-                    itemCount: controller.orders.length,
+                    itemCount: controller.groupedOrders.length,
                     itemBuilder: (context, index) {
-                      final order = controller.orders[index];
-                      return BriefOrderCard(
-                        order: order,
-                        onTap: () {
-                          Get.to(() => OrderInvoiceScreen(order: order));
+                      final groupedOrder = controller.groupedOrders[index];
+
+                      // Check if this is a group (has parent_order_id or multiple orders)
+                      final isGroup =
+                          groupedOrder.orders.length > 1 ||
+                          groupedOrder.orders.first.parentOrderId != null;
+
+                      // Show grouped section with all orders
+                      return GroupedOrdersSection(
+                        groupedOrder: groupedOrder,
+                        onOrderTap: (order) {
+                          // Hide actions if this order is part of a group
+                          Get.to(
+                            () => OrderInvoiceScreen(
+                              order: order,
+                              hideActions: isGroup,
+                            ),
+                          );
                         },
-                        onTrack: order.isTrackable
-                            ? () {
-                                Get.to(() => OrderTrackingScreen(order: order));
-                              }
-                            : null,
+                        onTrack: (order) {
+                          Get.to(() => OrderTrackingScreen(order: order));
+                        },
                       );
                     },
                   ),

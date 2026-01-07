@@ -22,8 +22,13 @@ import 'package:quikle_user/features/orders/presentation/screens/refund/payment_
 
 class OrderInvoiceScreen extends StatelessWidget {
   final OrderModel order;
+  final bool hideActions; // Hide actions if this order is part of a group
 
-  const OrderInvoiceScreen({super.key, required this.order});
+  const OrderInvoiceScreen({
+    super.key,
+    required this.order,
+    this.hideActions = false,
+  });
 
   // Initialize RefundController if not already registered
   RefundController get _refundController {
@@ -67,13 +72,23 @@ class OrderInvoiceScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           OrderHeader(order: order),
-                          SizedBox(height: 16.h),
-                          OrderActions(
-                            order: order,
-                            onCancel: _handleCancelOrder,
-                            onReportIssue: _handleReportIssue,
-                            onPaymentRefundStatus: _handlePaymentRefundStatus,
-                          ),
+
+                          // Show actions only if not part of a group
+                          if (!hideActions) ...[
+                            SizedBox(height: 16.h),
+                            OrderActions(
+                              order: order,
+                              onCancel: _handleCancelOrder,
+                              onReportIssue: _handleReportIssue,
+                              onPaymentRefundStatus: _handlePaymentRefundStatus,
+                            ),
+                          ],
+
+                          // Show info message if part of a group
+                          // if (hideActions) ...[
+                          //   SizedBox(height: 16.h),
+                          //   _buildGroupActionInfo(),
+                          // ],
                           SizedBox(height: 16.h),
                           OrderItemsList(order: order),
                           SizedBox(height: 16.h),
@@ -186,4 +201,36 @@ class OrderInvoiceScreen extends StatelessWidget {
   void _handlePaymentRefundStatus() {
     Get.to(() => PaymentRefundStatusScreen(order: order));
   }
+
+  // /// Build info widget for grouped orders
+  // Widget _buildGroupActionInfo() {
+  //   return Container(
+  //     padding: EdgeInsets.all(16.w),
+  //     decoration: BoxDecoration(
+  //       color: AppColors.beakYellow.withValues(alpha: 0.1),
+  //       borderRadius: BorderRadius.circular(12.r),
+  //       border: Border.all(
+  //         color: AppColors.beakYellow.withValues(alpha: 0.3),
+  //         width: 1,
+  //       ),
+  //     ),
+  //     child: Row(
+  //       children: [
+  //         Icon(Icons.info_outline, color: AppColors.beakYellow, size: 20.sp),
+  //         SizedBox(width: 12.w),
+  //         Expanded(
+  //           child: Text(
+  //             'This order is part of a group. Use the group menu (⋮) to cancel, report issues, or check refund status.',
+  //             style: TextStyle(
+  //               fontSize: 13.sp,
+  //               fontWeight: FontWeight.w400,
+  //               color: const Color(0xFF6B5300),
+  //               height: 1.4,
+  //             ),
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 }
