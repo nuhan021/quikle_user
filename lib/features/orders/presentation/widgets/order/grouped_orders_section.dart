@@ -97,7 +97,7 @@ class GroupedOrdersSection extends StatelessWidget {
 
   Widget _buildGroupHeader() {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+      padding: EdgeInsets.symmetric(horizontal: 16.w),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -279,9 +279,8 @@ class GroupedOrdersSection extends StatelessWidget {
   }
 
   Future<void> _handleCancelAllOrders() async {
-    // Use the first order for eligibility check (applies to entire group)
-    final firstOrder = groupedOrder.orders.first;
-    await _refundController.checkCancellationEligibility(firstOrder);
+    // Calculate group total and pass grouped order info for eligibility check
+    await _refundController.checkCancellationEligibilityForGroup(groupedOrder);
 
     final eligibility = _refundController.cancellationEligibility;
 
@@ -296,9 +295,15 @@ class GroupedOrdersSection extends StatelessWidget {
       return;
     }
 
-    // Show cancellation bottom sheet
+    // Show cancellation bottom sheet with group refund amount
+    final firstOrder = groupedOrder.orders.first;
     final result = await Get.bottomSheet<bool>(
-      CancellationBottomSheet(order: firstOrder, eligibility: eligibility),
+      CancellationBottomSheet(
+        order: firstOrder,
+        eligibility: eligibility,
+        isGroupCancellation: true,
+        totalOrders: groupedOrder.orders.length,
+      ),
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
     );
@@ -340,8 +345,13 @@ class GroupedOrdersSection extends StatelessWidget {
   }
 
   void _handlePaymentRefundStatus() {
-    // Use the first order for payment/refund status (represents the group)
+    // Use the first order for payment/refund status but with the group's total amount
     final firstOrder = groupedOrder.orders.first;
-    Get.to(() => PaymentRefundStatusScreen(order: firstOrder));
+    Get.to(
+      () => PaymentRefundStatusScreen(
+        order: firstOrder,
+        totalAmount: groupedOrder.totalAmount, // Pass the group total
+      ),
+    );
   }
 }

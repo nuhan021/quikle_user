@@ -13,11 +13,15 @@ import 'package:quikle_user/features/orders/data/models/order/order_model.dart';
 class CancellationBottomSheet extends StatefulWidget {
   final OrderModel order;
   final CancellationEligibility eligibility;
+  final bool isGroupCancellation; // True if cancelling a group of orders
+  final int totalOrders; // Number of orders in the group
 
   const CancellationBottomSheet({
     super.key,
     required this.order,
     required this.eligibility,
+    this.isGroupCancellation = false,
+    this.totalOrders = 1,
   });
 
   @override
@@ -48,7 +52,9 @@ class _CancellationBottomSheetState extends State<CancellationBottomSheet> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Cancel Order',
+                    widget.isGroupCancellation
+                        ? 'Cancel Order Group'
+                        : 'Cancel Order',
                     style: getTextStyle(
                       font: CustomFonts.obviously,
                       fontSize: 18.sp,
@@ -64,6 +70,43 @@ class _CancellationBottomSheetState extends State<CancellationBottomSheet> {
                   ),
                 ],
               ),
+
+              // Show group info if cancelling multiple orders
+              if (widget.isGroupCancellation) ...[
+                SizedBox(height: 12.h),
+                Container(
+                  padding: EdgeInsets.all(12.w),
+                  decoration: BoxDecoration(
+                    color: AppColors.beakYellow.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8.r),
+                    border: Border.all(
+                      color: AppColors.beakYellow.withValues(alpha: 0.3),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.info_outline,
+                        color: AppColors.beakYellow,
+                        size: 18.sp,
+                      ),
+                      SizedBox(width: 8.w),
+                      Expanded(
+                        child: Text(
+                          'Cancelling ${widget.totalOrders} orders from this group',
+                          style: getTextStyle(
+                            font: CustomFonts.inter,
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w500,
+                            color: const Color(0xFF6B5300),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+
               SizedBox(height: 20.h),
 
               // Reason selection

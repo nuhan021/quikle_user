@@ -4,6 +4,7 @@ import 'package:quikle_user/features/orders/data/models/refund/cancellation_elig
 import 'package:quikle_user/features/orders/data/models/refund/refund_info_model.dart';
 import 'package:quikle_user/features/orders/data/models/refund/issue_report_model.dart';
 import 'package:quikle_user/features/orders/data/models/order/order_model.dart';
+import 'package:quikle_user/features/orders/data/models/order/grouped_order_model.dart';
 import 'package:quikle_user/features/orders/data/services/refund/refund_service.dart';
 
 /// Controller for managing refund and cancellation operations
@@ -44,6 +45,28 @@ class RefundController extends GetxController {
       _cancellationEligibility.value = eligibility;
     } catch (e) {
       print('Error checking cancellation eligibility: $e');
+      Get.snackbar(
+        'Error',
+        'Failed to check cancellation eligibility',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } finally {
+      _isLoadingEligibility.value = false;
+    }
+  }
+
+  /// Check if grouped orders can be cancelled and get refund impact
+  /// Uses the total amount of all orders in the group for refund calculation
+  Future<void> checkCancellationEligibilityForGroup(
+    GroupedOrderModel groupedOrder,
+  ) async {
+    try {
+      _isLoadingEligibility.value = true;
+      final eligibility = await _refundService
+          .getCancellationEligibilityForGroup(groupedOrder);
+      _cancellationEligibility.value = eligibility;
+    } catch (e) {
+      print('Error checking group cancellation eligibility: $e');
       Get.snackbar(
         'Error',
         'Failed to check cancellation eligibility',

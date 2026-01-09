@@ -140,7 +140,10 @@ class OrderModel {
   }
 
   bool get canBeCancelled {
-    return status == OrderStatus.pending || status == OrderStatus.processing;
+    return status == OrderStatus.pending ||
+        status == OrderStatus.processing ||
+        status == OrderStatus.confirmed ||
+        status == OrderStatus.preparing;
   }
 
   bool get isTrackable {

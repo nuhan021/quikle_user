@@ -4,6 +4,7 @@ import 'package:quikle_user/features/orders/data/models/refund/cancellation_elig
 import 'package:quikle_user/features/orders/data/models/refund/refund_info_model.dart';
 import 'package:quikle_user/features/orders/data/models/refund/issue_report_model.dart';
 import 'package:quikle_user/features/orders/data/models/order/order_model.dart';
+import 'package:quikle_user/features/orders/data/models/order/grouped_order_model.dart';
 
 /// Service for handling refund and cancellation operations
 /// API-ready: All methods return Future and can be easily replaced with HTTP calls
@@ -18,45 +19,47 @@ class RefundService {
     await Future.delayed(const Duration(milliseconds: 300));
 
     // Frontend logic (replace with API response when available)
-    return _calculateEligibility(order);
+    return _calculateEligibility(order.total, order.status);
+  }
+
+  /// Check if grouped orders can be cancelled and get refund impact
+  /// Uses the total amount of all orders in the group
+  /// TODO: Replace with API call when backend is ready
+  /// API endpoint: GET /api/orders/group/{parentOrderId}/cancellation-eligibility
+  Future<CancellationEligibility> getCancellationEligibilityForGroup(
+    GroupedOrderModel groupedOrder,
+  ) async {
+    // Simulate API delay
+    await Future.delayed(const Duration(milliseconds: 300));
+
+    // Use group total and group status for eligibility
+    return _calculateEligibility(
+      groupedOrder.totalAmount,
+      groupedOrder.groupStatus,
+    );
   }
 
   /// Frontend fallback logic for cancellation eligibility
-  CancellationEligibility _calculateEligibility(OrderModel order) {
-    final orderAmount = order.total;
+  /// Updated refund rules:
+  /// - Pending/Processing/Confirmed: Full refund (100%)
+  /// - Preparing: 90% refund (10% cut)
+  /// - Shipped/Out for Delivery/Delivered/Cancelled/Refunded: No refund (0%)
+  CancellationEligibility _calculateEligibility(
+    double orderAmount,
+    OrderStatus status,
+  ) {
     double cancellationFee = 0.0;
     bool isAllowed = false;
 
-    switch (order.status) {
+    switch (status) {
+      case OrderStatus.pending:
       case OrderStatus.processing:
-        isAllowed = true;
-        return CancellationEligibility(
-          isAllowed: isAllowed,
-          message: CancellationEligibility.getMessageForStatus(order.status),
-          orderAmount: orderAmount,
-          cancellationFee: 0.0,
-          refundAmount: orderAmount,
-          isFeeWaived: true,
-        );
-
       case OrderStatus.confirmed:
-        if (order.riderInfo != null) {
-          isAllowed = true;
-          // Apply 10% cancellation fee (configurable via API)
-          cancellationFee = orderAmount * 0.10;
-          return CancellationEligibility(
-            isAllowed: isAllowed,
-            message: 'Cancellation charges apply at this stage.',
-            orderAmount: orderAmount,
-            cancellationFee: cancellationFee,
-            refundAmount: orderAmount - cancellationFee,
-            isFeeWaived: false,
-          );
-        }
+        // Full refund - no charges
         isAllowed = true;
         return CancellationEligibility(
           isAllowed: isAllowed,
-          message: CancellationEligibility.getMessageForStatus(order.status),
+          message: 'Full refund available for cancellation.',
           orderAmount: orderAmount,
           cancellationFee: 0.0,
           refundAmount: orderAmount,
@@ -64,48 +67,27 @@ class RefundService {
         );
 
       case OrderStatus.preparing:
+        // 90% refund - 10% cancellation fee
         isAllowed = true;
-        // Apply 10% cancellation fee (configurable via API)
         cancellationFee = orderAmount * 0.10;
         return CancellationEligibility(
           isAllowed: isAllowed,
-          message: 'Cancellation charges apply at this stage.',
+          message: 'Order is being prepared. 10% cancellation fee applies.',
           orderAmount: orderAmount,
           cancellationFee: cancellationFee,
           refundAmount: orderAmount - cancellationFee,
           isFeeWaived: false,
         );
 
-      // case OrderStatus.shipped: // Preparing/Packing stage
-      //   isAllowed = true;
-      //   // Apply 10% cancellation fee (configurable via API)
-      //   cancellationFee = orderAmount * 0.10;
-      //   return CancellationEligibility(
-      //     isAllowed: isAllowed,
-      //     message: 'Cancellation charges apply at this stage.',
-      //     orderAmount: orderAmount,
-      //     cancellationFee: cancellationFee,
-      //     refundAmount: orderAmount - cancellationFee,
-      //     isFeeWaived: false,
-      //   );
-
+      case OrderStatus.shipped:
       case OrderStatus.outForDelivery:
       case OrderStatus.delivered:
       case OrderStatus.cancelled:
       case OrderStatus.refunded:
-      case OrderStatus.shipped:
+        // No refund available
         return CancellationEligibility(
           isAllowed: false,
-          message: CancellationEligibility.getMessageForStatus(order.status),
-          orderAmount: orderAmount,
-          cancellationFee: 0.0,
-          refundAmount: 0.0,
-        );
-
-      default:
-        return CancellationEligibility(
-          isAllowed: false,
-          message: 'Cancellation not available for this order status.',
+          message: CancellationEligibility.getMessageForStatus(status),
           orderAmount: orderAmount,
           cancellationFee: 0.0,
           refundAmount: 0.0,
