@@ -1,3 +1,8 @@
+import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
+import 'package:quikle_user/core/services/network_caller.dart';
+import 'package:quikle_user/core/services/storage_service.dart';
+import 'package:quikle_user/core/utils/constants/api_constants.dart';
 import 'package:quikle_user/core/utils/constants/enums/order_enums.dart';
 import 'package:quikle_user/core/utils/constants/enums/refund_enums.dart';
 import 'package:quikle_user/features/orders/data/models/refund/cancellation_eligibility_model.dart';
@@ -9,6 +14,8 @@ import 'package:quikle_user/features/orders/data/models/order/grouped_order_mode
 /// Service for handling refund and cancellation operations
 /// API-ready: All methods return Future and can be easily replaced with HTTP calls
 class RefundService {
+  final NetworkCaller _networkCaller = NetworkCaller();
+
   /// Check if order can be cancelled and get refund impact
   /// TODO: Replace with API call when backend is ready
   /// API endpoint: GET /api/orders/{orderId}/cancellation-eligibility
@@ -128,56 +135,130 @@ class RefundService {
   }
 
   /// Get refund status and timeline for an order
-  /// TODO: Replace with API call when backend is ready
-  /// API endpoint: GET /api/orders/{orderId}/refund-status
   Future<RefundInfo?> getRefundStatus(String orderId) async {
     // Simulate API delay
     await Future.delayed(const Duration(milliseconds: 300));
 
-    // TODO: Replace with actual API call
-    // For now, return null (no refund) as default
-    // When API is ready, it will return RefundInfo.fromJson(response.data)
     return null;
   }
 
-  /// Create an issue report for an order
-  /// TODO: Replace with API call when backend is ready
-  /// API endpoint: POST /api/orders/{orderId}/issues
-  /// Request body: { "issueType": "missingItem", "description": "...", "photoUrl": "...", "transactionId": "..." }
   Future<Map<String, dynamic>> createIssueReport({
     required IssueReport report,
   }) async {
-    // Simulate API delay
-    await Future.delayed(const Duration(milliseconds: 500));
+    try {
+      final token = StorageService.token;
+      if (token == null) {
+        throw Exception('Authentication token not found');
+      }
 
-    // TODO: Replace with actual API call
-    // Example:
-    // final response = await http.post(
-    //   Uri.parse('$baseUrl/api/orders/${report.orderId}/issues'),
-    //   body: report.toJson(),
-    // );
+      // Prepare form fields
+      final fields = <String, String>{
+        'order_id': report.orderId,
+        'reason': report.issueType.name,
+      };
 
-    // Generate a mock ticket ID
-    final ticketId =
-        'QK-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}';
+      // Add optional fields
+      if (report.customDescription != null &&
+          report.customDescription!.isNotEmpty) {
+        fields['details'] = report.customDescription!;
+      }
 
-    return {
-      'success': true,
-      'ticketId': ticketId,
-      'message': 'Ticket created: $ticketId',
-      'sla': report.getSlaMessage(),
-    };
+      if (report.transactionId != null && report.transactionId!.isNotEmpty) {
+        fields['transection_id'] = report.transactionId!;
+      }
+
+      // Prepare file if photoUrl contains a local path
+      List<http.MultipartFile>? files;
+      if (report.photoUrl != null && report.photoUrl!.isNotEmpty) {
+        // Check if it's a local file path (not a URL)
+        if (!report.photoUrl!.startsWith('http')) {
+          final mime = _inferMime(report.photoUrl!);
+          final multipartFile = await http.MultipartFile.fromPath(
+            'file',
+            report.photoUrl!,
+            contentType: MediaType.parse(mime),
+          );
+          files = [multipartFile];
+        }
+      }
+
+      // Make API call
+      final response = await _networkCaller.multipartRequest(
+        ApiConstants.reportIssue,
+        fields: fields,
+        files: files,
+        token: 'Bearer $token',
+      );
+
+      if (!response.isSuccess) {
+        throw Exception(
+          response.errorMessage.isNotEmpty
+              ? response.errorMessage
+              : 'Failed to submit issue report',
+        );
+      }
+
+      // Parse response data - handle both Map and String cases
+      Map<String, dynamic> responseData;
+      if (response.responseData is Map<String, dynamic>) {
+        responseData = response.responseData as Map<String, dynamic>;
+      } else if (response.responseData is String) {
+        responseData = {'raw': response.responseData};
+      } else {
+        responseData = {};
+      }
+
+      final ticketId =
+          (responseData['id']?.toString() ??
+          responseData['ticket_id']?.toString() ??
+          'QK-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}');
+
+      final result = {
+        'success': true,
+        'ticketId': ticketId,
+        'message':
+            responseData['message'] ??
+            responseData['detail'] ??
+            'Issue reported successfully. Ticket ID: $ticketId',
+        'sla': report.getSlaMessage(),
+      };
+
+      print('✅ Returning Success Result: $result');
+      return result;
+    } catch (e) {
+      print('Error creating issue report: $e');
+      return {
+        'success': false,
+        'message': 'Failed to submit issue: ${e.toString()}',
+      };
+    }
+  }
+
+  /// Helper method to infer MIME type from file extension
+  String _inferMime(String path) {
+    final ext = path.toLowerCase().split('.').last;
+    switch (ext) {
+      case 'jpg':
+      case 'jpeg':
+        return 'image/jpeg';
+      case 'png':
+        return 'image/png';
+      case 'gif':
+        return 'image/gif';
+      case 'webp':
+        return 'image/webp';
+      case 'pdf':
+        return 'application/pdf';
+      default:
+        return 'application/octet-stream';
+    }
   }
 
   /// Upload photo for issue report
-  /// TODO: Replace with actual file upload API
-  /// API endpoint: POST /api/uploads/issue-photos
+  /// Note: Photo upload is now handled directly in createIssueReport
+  /// This method returns the local path as-is for backward compatibility
   Future<String?> uploadIssuePhoto(String localPath) async {
-    // Simulate upload delay
-    await Future.delayed(const Duration(milliseconds: 800));
-
-    // TODO: Replace with actual upload logic
-    // For now, return a mock URL
-    return 'https://quikle.com/uploads/issues/${DateTime.now().millisecondsSinceEpoch}.jpg';
+    // Return the local path - it will be uploaded when creating the issue report
+    return localPath;
   }
 }

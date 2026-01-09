@@ -14,7 +14,7 @@ import 'package:quikle_user/features/profile/presentation/widgets/unified_profil
 /// Screen displaying payment and refund status with timeline
 class PaymentRefundStatusScreen extends StatefulWidget {
   final OrderModel order;
-  final double? totalAmount; // Optional: Use this for grouped orders
+  final double? totalAmount;
 
   const PaymentRefundStatusScreen({
     super.key,

@@ -146,27 +146,11 @@ class RefundController extends GetxController {
       final result = await _refundService.createIssueReport(report: report);
 
       if (result['success'] == true) {
-        Get.snackbar(
-          'Issue Reported',
-          result['message'] ?? 'Your issue has been reported',
-          snackPosition: SnackPosition.BOTTOM,
-        );
         return result;
       } else {
-        Get.snackbar(
-          'Failed',
-          result['message'] ?? 'Failed to submit issue',
-          snackPosition: SnackPosition.BOTTOM,
-        );
         return null;
       }
     } catch (e) {
-      print('Error submitting issue report: $e');
-      Get.snackbar(
-        'Error',
-        'Failed to submit issue. Please try again.',
-        snackPosition: SnackPosition.BOTTOM,
-      );
       return null;
     } finally {
       _isSubmittingIssue.value = false;

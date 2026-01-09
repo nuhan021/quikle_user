@@ -347,14 +347,24 @@ class _ReportIssueBottomSheetState extends State<ReportIssueBottomSheet> {
   Future<void> _handleSubmit() async {
     if (_selectedIssueType == null) return;
 
+    print('🔵 BottomSheet: Starting submit process...');
+
     // Upload photo if present
     String? photoUrl;
     if (_selectedPhotoPath != null) {
+      print('📸 BottomSheet: Uploading photo...');
       photoUrl = await _refundController.uploadIssuePhoto(_selectedPhotoPath!);
+      print('📸 BottomSheet: Photo URL: $photoUrl');
     }
 
+    // Use parentOrderId for grouped orders, otherwise use orderId
+    final reportOrderId = widget.order.parentOrderId ?? widget.order.orderId;
+    print(
+      '📋 BottomSheet: Using order ID: $reportOrderId (parent: ${widget.order.parentOrderId}, order: ${widget.order.orderId})',
+    );
+
     final report = IssueReport(
-      orderId: widget.order.orderId,
+      orderId: reportOrderId,
       issueType: _selectedIssueType!,
       customDescription: _descriptionController.text.trim().isEmpty
           ? null
@@ -369,7 +379,7 @@ class _ReportIssueBottomSheetState extends State<ReportIssueBottomSheet> {
     final result = await _refundController.submitIssueReport(report: report);
 
     if (result != null) {
-      Get.back(result: result); // Close and return result
-    }
+      Navigator.of(context).pop(result);
+    } else {}
   }
 }

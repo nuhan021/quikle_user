@@ -86,4 +86,8 @@ class ApiConstants {
   // Promo / Coupons
   static const String getCoupons = "$baseUrl/promo/cupons/";
   static const String applyCoupon = "$baseUrl/promo/cupons/apply";
+
+  //Refund and Issues api's
+  static const String reportIssue =
+      "$baseUrl/payment/refunds/reports-and-issues";
 }

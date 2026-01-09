@@ -336,10 +336,10 @@ class GroupedOrdersSection extends StatelessWidget {
       Get.snackbar(
         'Issue Reported',
         'Ticket created: $ticketId. We\'ll respond $sla.',
-        snackPosition: SnackPosition.BOTTOM,
+        snackPosition: SnackPosition.TOP,
         duration: const Duration(seconds: 4),
-        backgroundColor: Colors.green.withValues(alpha: 0.1),
-        colorText: Colors.green,
+        // backgroundColor: Colors.green.withValues(alpha: 0.1),
+        // colorText: Colors.green,
       );
     }
   }
@@ -347,6 +347,8 @@ class GroupedOrdersSection extends StatelessWidget {
   void _handlePaymentRefundStatus() {
     // Use the first order for payment/refund status but with the group's total amount
     final firstOrder = groupedOrder.orders.first;
+    _refundController;
+
     Get.to(
       () => PaymentRefundStatusScreen(
         order: firstOrder,
