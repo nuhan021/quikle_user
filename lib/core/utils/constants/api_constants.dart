@@ -90,4 +90,6 @@ class ApiConstants {
   //Refund and Issues api's
   static const String reportIssue =
       "$baseUrl/payment/refunds/reports-and-issues";
+  static const String cancelOrder =
+      "$baseUrl/payment/refunds/orders/{order_id}/cancel";
 }

@@ -15,6 +15,7 @@ class CancellationBottomSheet extends StatefulWidget {
   final CancellationEligibility eligibility;
   final bool isGroupCancellation; // True if cancelling a group of orders
   final int totalOrders; // Number of orders in the group
+  final String? parentOrderId; // Parent order ID for grouped orders
 
   const CancellationBottomSheet({
     super.key,
@@ -22,6 +23,7 @@ class CancellationBottomSheet extends StatefulWidget {
     required this.eligibility,
     this.isGroupCancellation = false,
     this.totalOrders = 1,
+    this.parentOrderId,
   });
 
   @override
@@ -299,13 +301,26 @@ class _CancellationBottomSheetState extends State<CancellationBottomSheet> {
   Future<void> _handleCancellation() async {
     if (_selectedReason == null) return;
 
+    // Use parent order ID if it's a group cancellation, otherwise use the individual order ID
+    final orderIdToCancel = widget.parentOrderId ?? widget.order.orderId;
+
+    print('🚀 Starting cancellation for order: $orderIdToCancel');
+
     final success = await _refundController.requestCancellation(
-      orderId: widget.order.orderId,
+      orderId: orderIdToCancel,
       reason: _selectedReason!,
     );
 
+    print('🎯 Cancellation success value in bottom sheet: $success');
+
     if (success) {
-      Get.back(result: true); // Close bottom sheet and return success
+      print('✅ Success is true, closing bottom sheet');
+      // Use Navigator.pop instead of Get.back for more reliable closure
+      if (mounted) {
+        Navigator.of(context).pop(true);
+      }
+    } else {
+      print('❌ Success is false, keeping bottom sheet open');
     }
   }
 }

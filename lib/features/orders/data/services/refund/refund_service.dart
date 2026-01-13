@@ -103,35 +103,51 @@ class RefundService {
   }
 
   /// Request order cancellation with reason
-  /// TODO: Replace with API call when backend is ready
-  /// API endpoint: POST /api/orders/{orderId}/cancel
-  /// Request body: { "reason": "changedMind", "customNote": "..." }
+  /// API endpoint: POST /payment/refunds/orders/{orderId}/cancel
   Future<Map<String, dynamic>> requestCancellation({
     required String orderId,
     required CancellationReason reason,
     String? customNote,
   }) async {
-    // Simulate API delay
-    await Future.delayed(const Duration(milliseconds: 500));
+    try {
+      // Use the selected reason's display name, or custom note if reason is 'other'
+      final reasonText =
+          reason == CancellationReason.other && customNote != null
+          ? customNote
+          : reason.displayName;
 
-    // TODO: Replace with actual API call
-    // Example:
-    // final response = await http.post(
-    //   Uri.parse('$baseUrl/api/orders/$orderId/cancel'),
-    //   body: {
-    //     'reason': reason.name,
-    //     'customNote': customNote,
-    //   },
-    // );
+      // Build URL with query parameter
+      final url = ApiConstants.cancelOrder.replaceAll('{order_id}', orderId);
+      final urlWithReason = '$url?reason=${Uri.encodeComponent(reasonText)}';
 
-    // Mock response for now
-    return {
-      'success': true,
-      'message': 'Your order has been cancelled as requested.',
-      'orderId': orderId,
-      'refundInitiated': true,
-      'refundReference': 'REF${DateTime.now().millisecondsSinceEpoch}',
-    };
+      // Make API call using NetworkCaller
+      final response = await _networkCaller.postRequest(
+        urlWithReason,
+        headers: {'accept': 'application/json'},
+      );
+
+      if (response.isSuccess) {
+        return {
+          'success': true,
+          'message': 'Your order has been cancelled successfully.',
+          'orderId': orderId,
+          'refundInitiated': true,
+          'data': response.responseData,
+        };
+      } else {
+        return {
+          'success': false,
+          'message': response.errorMessage.isNotEmpty
+              ? response.errorMessage
+              : 'Failed to cancel order. Please try again.',
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Something went wrong. Please try again.',
+      };
+    }
   }
 
   /// Get refund status and timeline for an order

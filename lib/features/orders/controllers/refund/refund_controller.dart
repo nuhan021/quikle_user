@@ -92,27 +92,12 @@ class RefundController extends GetxController {
       );
 
       if (result['success'] == true) {
-        Get.snackbar(
-          'Order Cancelled',
-          result['message'] ?? 'Your order has been cancelled',
-          snackPosition: SnackPosition.BOTTOM,
-        );
         return true;
       } else {
-        Get.snackbar(
-          'Cancellation Failed',
-          result['message'] ?? 'Failed to cancel order',
-          snackPosition: SnackPosition.BOTTOM,
-        );
         return false;
       }
     } catch (e) {
       print('Error requesting cancellation: $e');
-      Get.snackbar(
-        'Error',
-        'Failed to cancel order. Please try again.',
-        snackPosition: SnackPosition.BOTTOM,
-      );
       return false;
     } finally {
       _isCancelling.value = false;
