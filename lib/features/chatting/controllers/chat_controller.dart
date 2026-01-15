@@ -70,7 +70,7 @@ class ChatController extends GetxController {
         isSent: true,
         timestamp: DateTime.now().toIso8601String(),
       );
-      _chatService.sendMessage(messageController.text);
+      _chatService.sendMessage(messageController.text, riderId);
       messages.add(msg);
       messageController.clear();
     }

@@ -16,7 +16,7 @@ class ChatService {
     try {
       final token = StorageService.token;
       final url = Uri.parse(
-        'https://quikle-u4dv.onrender.com/rider/chat/history/customers/$customerId/riders/$riderId?limit=$limit',
+        'https://caditya619-backend-ng0e.onrender.com/rider/chat/history/customers/$customerId/riders/$riderId?limit=$limit',
       );
 
       final headers = <String, String>{'accept': 'application/json'};
@@ -48,7 +48,7 @@ class ChatService {
     Function onDone,
   ) {
     final url =
-        'wss://quikle-u4dv.onrender.com/rider/ws/chat/customers/$customerId';
+        'wss://caditya619-backend-ng0e.onrender.com/rider/ws/chat/customers/$customerId';
     _channel = WebSocketChannel.connect(Uri.parse(url));
 
     _channel.stream.listen(
@@ -64,8 +64,8 @@ class ChatService {
     );
   }
 
-  void sendMessage(String text) {
-    final message = {"to_type": "riders", "to_id": 3, "text": text};
+  void sendMessage(String text, String riderId) {
+    final message = {"to_type": "riders", "to_id": riderId, "text": text};
     _channel.sink.add(jsonEncode(message));
   }
 

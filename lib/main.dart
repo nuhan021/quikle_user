@@ -227,3 +227,119 @@ Future<void> main() async {
 //     );
 //   }
 // }
+
+/*
+
+PHone pe
+
+
+
+ */
+
+// import 'dart:convert';
+// import 'package:flutter/material.dart';
+// import 'package:phonepe_payment_sdk/phonepe_payment_sdk.dart';
+
+// void main() {
+//   runApp(const MaterialApp(home: PhonePePaymentPage()));
+// }
+
+// class PhonePePaymentPage extends StatefulWidget {
+//   const PhonePePaymentPage({super.key});
+
+//   @override
+//   State<PhonePePaymentPage> createState() => _PhonePePaymentPageState();
+// }
+
+// class _PhonePePaymentPageState extends State<PhonePePaymentPage> {
+//   // Use your actual Sandbox MID from the dashboard
+//   String merchantId = "M23KQHM5ST3C2";
+//   bool isInitialized = false;
+
+//   @override
+//   void initState() {
+//     super.initState();
+//     phonePeInit();
+//   }
+
+//   void phonePeInit() async {
+//     try {
+//       // environment: 'SANDBOX' for testing, 'PRODUCTION' for live
+//       bool result = await PhonePePaymentSdk.init(
+//         'SANDBOX',
+//         merchantId,
+//         "UserFlowID001",
+//         true,
+//       );
+//       setState(() {
+//         isInitialized = result;
+//       });
+//     } catch (e) {
+//       print("Init Error: $e");
+//     }
+//   }
+
+//   void startPayment() async {
+//     // 1. The Token from your backend
+//     String backendToken =
+//         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmVzT24iOjE3Njg0NzQxNzc1MTMsIm1lcmNoYW50SWQiOiJNMjNLUUhNNTNTNzNDIiwibWVyY2hhbnRPcmRlcklkIjoiUE9SRF8yRUQ5Q0I4MiJ9.tqkjJjvi10ZMBvttiPVMrnJ7qoz62czZJvThFDZRpVk";
+
+//     String phonePeOrderId = "OMO2601150949375131868821";
+
+//     Map<String, dynamic> payload = {
+//       "orderId": phonePeOrderId,
+//       "merchantId": merchantId,
+//       "token": backendToken,
+//       "paymentMode": {"type": "PAY_PAGE"},
+//     };
+
+//     String request = jsonEncode(payload);
+
+//     // 3. Set the target app (Simulator)
+//     String appSchema = "com.phonepe.simulator";
+
+//     try {
+//       var response = await PhonePePaymentSdk.startTransaction(
+//         request, // Send encoded request
+//         appSchema,
+//       );
+
+//       if (response != null) {
+//         String status = response['status'].toString();
+//         String error = response['error'] ?? "None";
+
+//         if (status == 'SUCCESS') {
+//           _showSnackBar("Success!");
+//         } else {
+//           _showSnackBar("Status: $status, Error: $error");
+//         }
+//       }
+//     } catch (e) {
+//       _showSnackBar("Transaction Error: $e");
+//     }
+//   }
+
+//   void _showSnackBar(String msg) {
+//     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(title: const Text("PhonePe Test")),
+//       body: Center(
+//         child: ElevatedButton(
+//           onPressed: isInitialized ? startPayment : null,
+//           style: ElevatedButton.styleFrom(
+//             backgroundColor: Colors.purple,
+//             padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+//           ),
+//           child: Text(
+//             isInitialized ? "PAY NOW" : "SDK Not Ready",
+//             style: const TextStyle(color: Colors.white),
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }

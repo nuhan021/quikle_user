@@ -261,7 +261,7 @@ class OrderTrackingController extends GetxController {
       }
 
       final wsUrl =
-          'wss://quikle-u4dv.onrender.com/rider/ws/location/customers/$customerId';
+          'wss://caditya619-backend-ng0e.onrender.com/rider/ws/location/customers/$customerId';
       print('🔌 Connecting to WebSocket: $wsUrl');
 
       _locationChannel = WebSocketChannel.connect(Uri.parse(wsUrl));
