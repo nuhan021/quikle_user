@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:quikle_user/core/utils/logging/logger.dart';
 import 'package:quikle_user/features/chatting/controllers/chat_controller.dart';
+import 'package:quikle_user/features/chatting/presentation/widgets/chat_header.dart';
+import 'package:quikle_user/features/chatting/presentation/widgets/messages_list.dart';
+import 'package:quikle_user/features/chatting/presentation/widgets/chat_input.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key, this.rider, this.riderId});
@@ -23,7 +27,6 @@ class _ChatScreenState extends State<ChatScreen> {
       final text = (message?.text ?? '').toString().trim();
       if (text.isEmpty) return false;
       final low = text.toLowerCase();
-      // filter out common socket pings or control messages
       if (low == 'ping' ||
           low == 'pong' ||
           low == 'heartbeat' ||
@@ -35,28 +38,54 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
+  String _formatTimestamp(dynamic ts) {
+    try {
+      if (ts == null) return '';
+      DateTime dt;
+      if (ts is DateTime) {
+        dt = ts;
+      } else if (ts is int) {
+        dt = DateTime.fromMillisecondsSinceEpoch(ts);
+      } else {
+        dt = DateTime.parse(ts.toString());
+      }
+
+      final local = dt.toLocal();
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
+      final msgDay = DateTime(local.year, local.month, local.day);
+      final daysDiff = today.difference(msgDay).inDays;
+
+      if (daysDiff == 0) return DateFormat('h:mm a').format(local);
+      if (daysDiff == 1)
+        return 'Yesterday ${DateFormat('h:mm a').format(local)}';
+      if (daysDiff < 7) return DateFormat('EEE h:mm a').format(local);
+      return DateFormat('dd MMM, h:mm a').format(local);
+    } catch (_) {
+      return ts?.toString() ?? '';
+    }
+  }
+
   @override
   void initState() {
     super.initState();
-    // determine riderId: prefer explicit param, otherwise extract from rider object
-    String riderId = '';
+    String rid = '';
     try {
       if (widget.riderId != null && widget.riderId!.isNotEmpty) {
-        riderId = widget.riderId!;
+        rid = widget.riderId!;
       } else if (widget.rider == null) {
-        riderId = '';
+        rid = '';
       } else if (widget.rider is Map) {
-        riderId = (widget.rider['riderId'] ?? widget.rider['id'] ?? '')
-            .toString();
+        rid = (widget.rider['riderId'] ?? widget.rider['id'] ?? '').toString();
       } else {
         final dyn = widget.rider;
-        riderId = (dyn.riderId ?? dyn.id ?? '').toString();
+        rid = (dyn.riderId ?? dyn.id ?? '').toString();
       }
     } catch (_) {
-      riderId = '';
+      rid = '';
     }
 
-    controller = Get.put(ChatController(riderId: riderId));
+    controller = Get.put(ChatController(riderId: rid));
     ever(controller.messages, (_) => _scrollToBottom());
   }
 
@@ -97,215 +126,39 @@ class _ChatScreenState extends State<ChatScreen> {
 
     return Scaffold(
       backgroundColor: Colors.grey[50],
-      appBar: AppBar(
-        elevation: 1,
-        backgroundColor: Colors.white,
-        centerTitle: true,
-        title: Column(
-          children: [
-            Text(
-              'Chat with $riderName',
-              style: TextStyle(fontSize: 18.sp, color: Colors.black87),
-            ),
-            SizedBox(height: 2.h),
-            Text(
-              'Live chat',
-              style: TextStyle(fontSize: 12.sp, color: Colors.grey[600]),
-            ),
-          ],
-        ),
-      ),
       body: SafeArea(
-        child: Column(
+        child: Stack(
           children: [
-            Expanded(
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
-                child: Obx(() {
-                  if (controller.isLoading.value) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-
-                  final visible = controller.messages
-                      .where(_isDisplayable)
-                      .toList();
-
-                  if (visible.isEmpty) {
-                    return Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.chat_bubble_outline,
-                            size: 56,
-                            color: Colors.grey[400],
-                          ),
-                          SizedBox(height: 8.h),
-                          Text(
-                            'No messages yet',
-                            style: TextStyle(
-                              color: Colors.grey[600],
-                              fontSize: 16.sp,
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
-
-                  return ListView.builder(
-                    controller: _scrollController,
-                    reverse: true,
-                    itemCount: visible.length,
-                    padding: EdgeInsets.only(top: 8.h, bottom: 8.h),
-                    itemBuilder: (context, index) {
-                      final message = visible[visible.length - 1 - index];
-                      final isSent = message.isSent;
-                      final bubbleColor = isSent
-                          ? Color(0xFFDCF8C6)
-                          : Colors.white;
-                      final textColor = Colors.black87;
-
-                      return Row(
-                        mainAxisAlignment: isSent
-                            ? MainAxisAlignment.end
-                            : MainAxisAlignment.start,
-                        children: [
-                          Flexible(
-                            child: Container(
-                              margin: EdgeInsets.symmetric(vertical: 6.h),
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 12.w,
-                                vertical: 10.h,
-                              ),
-                              decoration: BoxDecoration(
-                                color: bubbleColor,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black12,
-                                    blurRadius: 2,
-                                    offset: Offset(0, 1),
-                                  ),
-                                ],
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(16.r),
-                                  topRight: Radius.circular(16.r),
-                                  bottomLeft: Radius.circular(
-                                    isSent ? 16.r : 4.r,
-                                  ),
-                                  bottomRight: Radius.circular(
-                                    isSent ? 4.r : 16.r,
-                                  ),
-                                ),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    message.text,
-                                    style: TextStyle(
-                                      color: textColor,
-                                      fontSize: 15.sp,
-                                    ),
-                                  ),
-                                  if (message.timestamp != null) ...[
-                                    SizedBox(height: 6.h),
-                                    Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        Text(
-                                          message.timestamp!,
-                                          style: TextStyle(
-                                            fontSize: 11.sp,
-                                            color: Colors.grey[600],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                }),
-              ),
+            Column(
+              children: [
+                ChatHeader(riderName: riderName, onBack: () => Get.back()),
+                Expanded(
+                  child: MessagesList(
+                    controller: controller,
+                    scrollController: _scrollController,
+                    riderName: riderName,
+                    formatTimestamp: _formatTimestamp,
+                    isDisplayable: _isDisplayable,
+                  ),
+                ),
+                ChatInput(controller: controller, riderName: riderName),
+              ],
             ),
 
-            // input area (WhatsApp-like)
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black12,
-                    blurRadius: 4,
-                    offset: Offset(0, -1),
+            // bottom handle
+            Positioned(
+              bottom: 6.h,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: Container(
+                  width: 128.w,
+                  height: 6.h,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(12.r),
                   ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 12.w),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[100],
-                        borderRadius: BorderRadius.circular(24.r),
-                      ),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: TextField(
-                              controller: controller.messageController,
-                              minLines: 1,
-                              maxLines: 5,
-                              decoration: InputDecoration(
-                                hintText: 'Type a message',
-                                border: InputBorder.none,
-                                isDense: true,
-                                contentPadding: EdgeInsets.symmetric(
-                                  vertical: 8.h,
-                                ),
-                                focusedBorder: InputBorder.none,
-                                enabledBorder: InputBorder.none,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 8.w),
-                  ValueListenableBuilder<TextEditingValue>(
-                    valueListenable: controller.messageController,
-                    builder: (context, value, child) {
-                      final enabled = value.text.trim().isNotEmpty;
-                      return GestureDetector(
-                        onTap: enabled ? controller.sendMessage : null,
-                        child: Container(
-                          padding: EdgeInsets.all(12.w),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: enabled
-                                ? Color(0xFF128C7E)
-                                : Colors.grey.shade300,
-                          ),
-                          child: Icon(
-                            Icons.send,
-                            color: enabled ? Colors.white : Colors.grey[600],
-                            size: 20.sp,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ],
+                ),
               ),
             ),
           ],
