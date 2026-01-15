@@ -14,8 +14,13 @@ import 'package:quikle_user/features/profile/presentation/widgets/unified_profil
 /// Screen displaying payment and refund status with timeline
 class PaymentRefundStatusScreen extends StatefulWidget {
   final OrderModel order;
+  final double? totalAmount;
 
-  const PaymentRefundStatusScreen({super.key, required this.order});
+  const PaymentRefundStatusScreen({
+    super.key,
+    required this.order,
+    this.totalAmount,
+  });
 
   @override
   State<PaymentRefundStatusScreen> createState() =>
@@ -80,7 +85,8 @@ class _PaymentRefundStatusScreenState extends State<PaymentRefundStatusScreen> {
 
   Widget _buildPaymentInfoCard() {
     final paymentMethod = widget.order.paymentMethod.name;
-    final amountPaid = widget.order.total;
+    final amountPaid =
+        widget.totalAmount ?? widget.order.total; // Use group total if provided
 
     return Container(
       width: double.infinity,

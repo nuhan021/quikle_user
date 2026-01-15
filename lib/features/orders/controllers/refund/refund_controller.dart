@@ -4,6 +4,7 @@ import 'package:quikle_user/features/orders/data/models/refund/cancellation_elig
 import 'package:quikle_user/features/orders/data/models/refund/refund_info_model.dart';
 import 'package:quikle_user/features/orders/data/models/refund/issue_report_model.dart';
 import 'package:quikle_user/features/orders/data/models/order/order_model.dart';
+import 'package:quikle_user/features/orders/data/models/order/grouped_order_model.dart';
 import 'package:quikle_user/features/orders/data/services/refund/refund_service.dart';
 
 /// Controller for managing refund and cancellation operations
@@ -54,6 +55,28 @@ class RefundController extends GetxController {
     }
   }
 
+  /// Check if grouped orders can be cancelled and get refund impact
+  /// Uses the total amount of all orders in the group for refund calculation
+  Future<void> checkCancellationEligibilityForGroup(
+    GroupedOrderModel groupedOrder,
+  ) async {
+    try {
+      _isLoadingEligibility.value = true;
+      final eligibility = await _refundService
+          .getCancellationEligibilityForGroup(groupedOrder);
+      _cancellationEligibility.value = eligibility;
+    } catch (e) {
+      print('Error checking group cancellation eligibility: $e');
+      Get.snackbar(
+        'Error',
+        'Failed to check cancellation eligibility',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } finally {
+      _isLoadingEligibility.value = false;
+    }
+  }
+
   /// Request order cancellation
   Future<bool> requestCancellation({
     required String orderId,
@@ -69,27 +92,12 @@ class RefundController extends GetxController {
       );
 
       if (result['success'] == true) {
-        Get.snackbar(
-          'Order Cancelled',
-          result['message'] ?? 'Your order has been cancelled',
-          snackPosition: SnackPosition.BOTTOM,
-        );
         return true;
       } else {
-        Get.snackbar(
-          'Cancellation Failed',
-          result['message'] ?? 'Failed to cancel order',
-          snackPosition: SnackPosition.BOTTOM,
-        );
         return false;
       }
     } catch (e) {
       print('Error requesting cancellation: $e');
-      Get.snackbar(
-        'Error',
-        'Failed to cancel order. Please try again.',
-        snackPosition: SnackPosition.BOTTOM,
-      );
       return false;
     } finally {
       _isCancelling.value = false;
@@ -123,27 +131,11 @@ class RefundController extends GetxController {
       final result = await _refundService.createIssueReport(report: report);
 
       if (result['success'] == true) {
-        Get.snackbar(
-          'Issue Reported',
-          result['message'] ?? 'Your issue has been reported',
-          snackPosition: SnackPosition.BOTTOM,
-        );
         return result;
       } else {
-        Get.snackbar(
-          'Failed',
-          result['message'] ?? 'Failed to submit issue',
-          snackPosition: SnackPosition.BOTTOM,
-        );
         return null;
       }
     } catch (e) {
-      print('Error submitting issue report: $e');
-      Get.snackbar(
-        'Error',
-        'Failed to submit issue. Please try again.',
-        snackPosition: SnackPosition.BOTTOM,
-      );
       return null;
     } finally {
       _isSubmittingIssue.value = false;

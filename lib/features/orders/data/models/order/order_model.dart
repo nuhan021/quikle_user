@@ -13,6 +13,7 @@ import 'package:quikle_user/features/orders/data/models/order/vendor_info_model.
 class OrderModel {
   final String orderId;
   final String userId;
+  final String? parentOrderId; // Group orders by this ID
   final List<CartItemModel> items;
   final ShippingAddressModel shippingAddress;
   final DeliveryOptionModel deliveryOption;
@@ -45,6 +46,7 @@ class OrderModel {
   const OrderModel({
     required this.orderId,
     required this.userId,
+    this.parentOrderId,
     required this.items,
     required this.shippingAddress,
     required this.deliveryOption,
@@ -76,6 +78,7 @@ class OrderModel {
   OrderModel copyWith({
     String? orderId,
     String? userId,
+    String? parentOrderId,
     List<CartItemModel>? items,
     ShippingAddressModel? shippingAddress,
     DeliveryOptionModel? deliveryOption,
@@ -106,6 +109,7 @@ class OrderModel {
     return OrderModel(
       orderId: orderId ?? this.orderId,
       userId: userId ?? this.userId,
+      parentOrderId: parentOrderId ?? this.parentOrderId,
       items: items ?? this.items,
       shippingAddress: shippingAddress ?? this.shippingAddress,
       deliveryOption: deliveryOption ?? this.deliveryOption,
@@ -136,7 +140,10 @@ class OrderModel {
   }
 
   bool get canBeCancelled {
-    return status == OrderStatus.pending || status == OrderStatus.processing;
+    return status == OrderStatus.pending ||
+        status == OrderStatus.processing ||
+        status == OrderStatus.confirmed ||
+        status == OrderStatus.preparing;
   }
 
   bool get isTrackable {
@@ -173,6 +180,7 @@ class OrderModel {
     return {
       'orderId': orderId,
       'userId': userId,
+      'parent_order_id': parentOrderId,
       'items': items
           .map(
             (item) => {
@@ -303,6 +311,7 @@ class OrderModel {
     return OrderModel(
       orderId: json['order_id'] ?? "",
       userId: json['user_id']?.toString() ?? "",
+      parentOrderId: json['parent_order_id'],
       items: items,
       shippingAddress: shippingAddress,
       deliveryOption: deliveryOption,

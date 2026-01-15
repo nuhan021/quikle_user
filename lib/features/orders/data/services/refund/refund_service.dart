@@ -1,13 +1,21 @@
+import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
+import 'package:quikle_user/core/services/network_caller.dart';
+import 'package:quikle_user/core/services/storage_service.dart';
+import 'package:quikle_user/core/utils/constants/api_constants.dart';
 import 'package:quikle_user/core/utils/constants/enums/order_enums.dart';
 import 'package:quikle_user/core/utils/constants/enums/refund_enums.dart';
 import 'package:quikle_user/features/orders/data/models/refund/cancellation_eligibility_model.dart';
 import 'package:quikle_user/features/orders/data/models/refund/refund_info_model.dart';
 import 'package:quikle_user/features/orders/data/models/refund/issue_report_model.dart';
 import 'package:quikle_user/features/orders/data/models/order/order_model.dart';
+import 'package:quikle_user/features/orders/data/models/order/grouped_order_model.dart';
 
 /// Service for handling refund and cancellation operations
 /// API-ready: All methods return Future and can be easily replaced with HTTP calls
 class RefundService {
+  final NetworkCaller _networkCaller = NetworkCaller();
+
   /// Check if order can be cancelled and get refund impact
   /// TODO: Replace with API call when backend is ready
   /// API endpoint: GET /api/orders/{orderId}/cancellation-eligibility
@@ -18,45 +26,47 @@ class RefundService {
     await Future.delayed(const Duration(milliseconds: 300));
 
     // Frontend logic (replace with API response when available)
-    return _calculateEligibility(order);
+    return _calculateEligibility(order.total, order.status);
+  }
+
+  /// Check if grouped orders can be cancelled and get refund impact
+  /// Uses the total amount of all orders in the group
+  /// TODO: Replace with API call when backend is ready
+  /// API endpoint: GET /api/orders/group/{parentOrderId}/cancellation-eligibility
+  Future<CancellationEligibility> getCancellationEligibilityForGroup(
+    GroupedOrderModel groupedOrder,
+  ) async {
+    // Simulate API delay
+    await Future.delayed(const Duration(milliseconds: 300));
+
+    // Use group total and group status for eligibility
+    return _calculateEligibility(
+      groupedOrder.totalAmount,
+      groupedOrder.groupStatus,
+    );
   }
 
   /// Frontend fallback logic for cancellation eligibility
-  CancellationEligibility _calculateEligibility(OrderModel order) {
-    final orderAmount = order.total;
+  /// Updated refund rules:
+  /// - Pending/Processing/Confirmed: Full refund (100%)
+  /// - Preparing: 90% refund (10% cut)
+  /// - Shipped/Out for Delivery/Delivered/Cancelled/Refunded: No refund (0%)
+  CancellationEligibility _calculateEligibility(
+    double orderAmount,
+    OrderStatus status,
+  ) {
     double cancellationFee = 0.0;
     bool isAllowed = false;
 
-    switch (order.status) {
+    switch (status) {
+      case OrderStatus.pending:
       case OrderStatus.processing:
-        isAllowed = true;
-        return CancellationEligibility(
-          isAllowed: isAllowed,
-          message: CancellationEligibility.getMessageForStatus(order.status),
-          orderAmount: orderAmount,
-          cancellationFee: 0.0,
-          refundAmount: orderAmount,
-          isFeeWaived: true,
-        );
-
       case OrderStatus.confirmed:
-        if (order.riderInfo != null) {
-          isAllowed = true;
-          // Apply 10% cancellation fee (configurable via API)
-          cancellationFee = orderAmount * 0.10;
-          return CancellationEligibility(
-            isAllowed: isAllowed,
-            message: 'Cancellation charges apply at this stage.',
-            orderAmount: orderAmount,
-            cancellationFee: cancellationFee,
-            refundAmount: orderAmount - cancellationFee,
-            isFeeWaived: false,
-          );
-        }
+        // Full refund - no charges
         isAllowed = true;
         return CancellationEligibility(
           isAllowed: isAllowed,
-          message: CancellationEligibility.getMessageForStatus(order.status),
+          message: 'Full refund available for cancellation.',
           orderAmount: orderAmount,
           cancellationFee: 0.0,
           refundAmount: orderAmount,
@@ -64,48 +74,27 @@ class RefundService {
         );
 
       case OrderStatus.preparing:
+        // 90% refund - 10% cancellation fee
         isAllowed = true;
-        // Apply 10% cancellation fee (configurable via API)
         cancellationFee = orderAmount * 0.10;
         return CancellationEligibility(
           isAllowed: isAllowed,
-          message: 'Cancellation charges apply at this stage.',
+          message: 'Order is being prepared. 10% cancellation fee applies.',
           orderAmount: orderAmount,
           cancellationFee: cancellationFee,
           refundAmount: orderAmount - cancellationFee,
           isFeeWaived: false,
         );
 
-      // case OrderStatus.shipped: // Preparing/Packing stage
-      //   isAllowed = true;
-      //   // Apply 10% cancellation fee (configurable via API)
-      //   cancellationFee = orderAmount * 0.10;
-      //   return CancellationEligibility(
-      //     isAllowed: isAllowed,
-      //     message: 'Cancellation charges apply at this stage.',
-      //     orderAmount: orderAmount,
-      //     cancellationFee: cancellationFee,
-      //     refundAmount: orderAmount - cancellationFee,
-      //     isFeeWaived: false,
-      //   );
-
+      case OrderStatus.shipped:
       case OrderStatus.outForDelivery:
       case OrderStatus.delivered:
       case OrderStatus.cancelled:
       case OrderStatus.refunded:
-      case OrderStatus.shipped:
+        // No refund available
         return CancellationEligibility(
           isAllowed: false,
-          message: CancellationEligibility.getMessageForStatus(order.status),
-          orderAmount: orderAmount,
-          cancellationFee: 0.0,
-          refundAmount: 0.0,
-        );
-
-      default:
-        return CancellationEligibility(
-          isAllowed: false,
-          message: 'Cancellation not available for this order status.',
+          message: CancellationEligibility.getMessageForStatus(status),
           orderAmount: orderAmount,
           cancellationFee: 0.0,
           refundAmount: 0.0,
@@ -114,88 +103,178 @@ class RefundService {
   }
 
   /// Request order cancellation with reason
-  /// TODO: Replace with API call when backend is ready
-  /// API endpoint: POST /api/orders/{orderId}/cancel
-  /// Request body: { "reason": "changedMind", "customNote": "..." }
+  /// API endpoint: POST /payment/refunds/orders/{orderId}/cancel
   Future<Map<String, dynamic>> requestCancellation({
     required String orderId,
     required CancellationReason reason,
     String? customNote,
   }) async {
-    // Simulate API delay
-    await Future.delayed(const Duration(milliseconds: 500));
+    try {
+      // Use the selected reason's display name, or custom note if reason is 'other'
+      final reasonText =
+          reason == CancellationReason.other && customNote != null
+          ? customNote
+          : reason.displayName;
 
-    // TODO: Replace with actual API call
-    // Example:
-    // final response = await http.post(
-    //   Uri.parse('$baseUrl/api/orders/$orderId/cancel'),
-    //   body: {
-    //     'reason': reason.name,
-    //     'customNote': customNote,
-    //   },
-    // );
+      // Build URL with query parameter
+      final url = ApiConstants.cancelOrder.replaceAll('{order_id}', orderId);
+      final urlWithReason = '$url?reason=${Uri.encodeComponent(reasonText)}';
 
-    // Mock response for now
-    return {
-      'success': true,
-      'message': 'Your order has been cancelled as requested.',
-      'orderId': orderId,
-      'refundInitiated': true,
-      'refundReference': 'REF${DateTime.now().millisecondsSinceEpoch}',
-    };
+      // Make API call using NetworkCaller
+      final response = await _networkCaller.postRequest(
+        urlWithReason,
+        headers: {'accept': 'application/json'},
+      );
+
+      if (response.isSuccess) {
+        return {
+          'success': true,
+          'message': 'Your order has been cancelled successfully.',
+          'orderId': orderId,
+          'refundInitiated': true,
+          'data': response.responseData,
+        };
+      } else {
+        return {
+          'success': false,
+          'message': response.errorMessage.isNotEmpty
+              ? response.errorMessage
+              : 'Failed to cancel order. Please try again.',
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Something went wrong. Please try again.',
+      };
+    }
   }
 
   /// Get refund status and timeline for an order
-  /// TODO: Replace with API call when backend is ready
-  /// API endpoint: GET /api/orders/{orderId}/refund-status
   Future<RefundInfo?> getRefundStatus(String orderId) async {
     // Simulate API delay
     await Future.delayed(const Duration(milliseconds: 300));
 
-    // TODO: Replace with actual API call
-    // For now, return null (no refund) as default
-    // When API is ready, it will return RefundInfo.fromJson(response.data)
     return null;
   }
 
-  /// Create an issue report for an order
-  /// TODO: Replace with API call when backend is ready
-  /// API endpoint: POST /api/orders/{orderId}/issues
-  /// Request body: { "issueType": "missingItem", "description": "...", "photoUrl": "...", "transactionId": "..." }
   Future<Map<String, dynamic>> createIssueReport({
     required IssueReport report,
   }) async {
-    // Simulate API delay
-    await Future.delayed(const Duration(milliseconds: 500));
+    try {
+      final token = StorageService.token;
+      if (token == null) {
+        throw Exception('Authentication token not found');
+      }
 
-    // TODO: Replace with actual API call
-    // Example:
-    // final response = await http.post(
-    //   Uri.parse('$baseUrl/api/orders/${report.orderId}/issues'),
-    //   body: report.toJson(),
-    // );
+      // Prepare form fields
+      final fields = <String, String>{
+        'order_id': report.orderId,
+        'reason': report.issueType.name,
+      };
 
-    // Generate a mock ticket ID
-    final ticketId =
-        'QK-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}';
+      // Add optional fields
+      if (report.customDescription != null &&
+          report.customDescription!.isNotEmpty) {
+        fields['details'] = report.customDescription!;
+      }
 
-    return {
-      'success': true,
-      'ticketId': ticketId,
-      'message': 'Ticket created: $ticketId',
-      'sla': report.getSlaMessage(),
-    };
+      if (report.transactionId != null && report.transactionId!.isNotEmpty) {
+        fields['transection_id'] = report.transactionId!;
+      }
+
+      // Prepare file if photoUrl contains a local path
+      List<http.MultipartFile>? files;
+      if (report.photoUrl != null && report.photoUrl!.isNotEmpty) {
+        // Check if it's a local file path (not a URL)
+        if (!report.photoUrl!.startsWith('http')) {
+          final mime = _inferMime(report.photoUrl!);
+          final multipartFile = await http.MultipartFile.fromPath(
+            'file',
+            report.photoUrl!,
+            contentType: MediaType.parse(mime),
+          );
+          files = [multipartFile];
+        }
+      }
+
+      // Make API call
+      final response = await _networkCaller.multipartRequest(
+        ApiConstants.reportIssue,
+        fields: fields,
+        files: files,
+        token: 'Bearer $token',
+      );
+
+      if (!response.isSuccess) {
+        throw Exception(
+          response.errorMessage.isNotEmpty
+              ? response.errorMessage
+              : 'Failed to submit issue report',
+        );
+      }
+
+      // Parse response data - handle both Map and String cases
+      Map<String, dynamic> responseData;
+      if (response.responseData is Map<String, dynamic>) {
+        responseData = response.responseData as Map<String, dynamic>;
+      } else if (response.responseData is String) {
+        responseData = {'raw': response.responseData};
+      } else {
+        responseData = {};
+      }
+
+      final ticketId =
+          (responseData['id']?.toString() ??
+          responseData['ticket_id']?.toString() ??
+          'QK-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}');
+
+      final result = {
+        'success': true,
+        'ticketId': ticketId,
+        'message':
+            responseData['message'] ??
+            responseData['detail'] ??
+            'Issue reported successfully. Ticket ID: $ticketId',
+        'sla': report.getSlaMessage(),
+      };
+
+      print('✅ Returning Success Result: $result');
+      return result;
+    } catch (e) {
+      print('Error creating issue report: $e');
+      return {
+        'success': false,
+        'message': 'Failed to submit issue: ${e.toString()}',
+      };
+    }
+  }
+
+  /// Helper method to infer MIME type from file extension
+  String _inferMime(String path) {
+    final ext = path.toLowerCase().split('.').last;
+    switch (ext) {
+      case 'jpg':
+      case 'jpeg':
+        return 'image/jpeg';
+      case 'png':
+        return 'image/png';
+      case 'gif':
+        return 'image/gif';
+      case 'webp':
+        return 'image/webp';
+      case 'pdf':
+        return 'application/pdf';
+      default:
+        return 'application/octet-stream';
+    }
   }
 
   /// Upload photo for issue report
-  /// TODO: Replace with actual file upload API
-  /// API endpoint: POST /api/uploads/issue-photos
+  /// Note: Photo upload is now handled directly in createIssueReport
+  /// This method returns the local path as-is for backward compatibility
   Future<String?> uploadIssuePhoto(String localPath) async {
-    // Simulate upload delay
-    await Future.delayed(const Duration(milliseconds: 800));
-
-    // TODO: Replace with actual upload logic
-    // For now, return a mock URL
-    return 'https://quikle.com/uploads/issues/${DateTime.now().millisecondsSinceEpoch}.jpg';
+    // Return the local path - it will be uploaded when creating the issue report
+    return localPath;
   }
 }

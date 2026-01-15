@@ -61,7 +61,7 @@ class IssueReport {
       case IssueType.missingItem:
       case IssueType.wrongItem:
       case IssueType.damagedItem:
-        return 'within 30 minutes'; // Grocery/Food items
+        return 'within 30 minutes';
       case IssueType.paymentIssue:
         return 'within 1 hour';
       default:
