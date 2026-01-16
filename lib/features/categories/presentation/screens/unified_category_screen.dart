@@ -190,7 +190,7 @@ class _UnifiedCategoryScreenState extends State<UnifiedCategoryScreen>
                         SliverToBoxAdapter(
                           child: CommonAppBar(
                             title: controller.categoryTitle.value,
-                            titleFontSize: 20,
+                            titleFontSize: 18,
                             showNotification: false,
                             showProfile: false,
                             onBackTap: () => Get.back(),
