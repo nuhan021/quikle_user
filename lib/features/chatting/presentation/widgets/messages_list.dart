@@ -59,24 +59,7 @@ class MessagesList extends StatelessWidget {
         itemCount: visible.length + 1,
         itemBuilder: (context, index) {
           if (index == visible.length) {
-            return Center(
-              child: Container(
-                margin: EdgeInsets.symmetric(vertical: 8.h),
-                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-                decoration: BoxDecoration(
-                  color: Colors.grey[100],
-                  borderRadius: BorderRadius.circular(20.r),
-                ),
-                child: Text(
-                  'Today 10:45 AM',
-                  style: TextStyle(
-                    fontSize: 11.sp,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.grey[600],
-                  ),
-                ),
-              ),
-            );
+            return Center();
           }
 
           final message = visible[visible.length - 1 - index];

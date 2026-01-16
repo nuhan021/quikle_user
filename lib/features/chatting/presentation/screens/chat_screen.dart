@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:quikle_user/core/utils/logging/logger.dart';
@@ -143,23 +142,6 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
                 ChatInput(controller: controller, riderName: riderName),
               ],
-            ),
-
-            // bottom handle
-            Positioned(
-              bottom: 6.h,
-              left: 0,
-              right: 0,
-              child: Center(
-                child: Container(
-                  width: 128.w,
-                  height: 6.h,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                ),
-              ),
             ),
           ],
         ),

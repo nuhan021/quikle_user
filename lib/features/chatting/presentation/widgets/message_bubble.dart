@@ -22,7 +22,7 @@ class MessageBubble extends StatelessWidget {
     if (!isSent) {
       // driver message (left)
       return Padding(
-        padding: EdgeInsets.symmetric(vertical: 6.h),
+        padding: EdgeInsets.only(top: 4.h, bottom: 4.h, left: 8.w, right: 50.w),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
@@ -81,7 +81,7 @@ class MessageBubble extends StatelessWidget {
     } else {
       // user message (right)
       return Padding(
-        padding: EdgeInsets.symmetric(vertical: 6.h),
+        padding: EdgeInsets.only(top: 4.h, bottom: 4.h, left: 50.w, right: 8.w),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
           crossAxisAlignment: CrossAxisAlignment.end,

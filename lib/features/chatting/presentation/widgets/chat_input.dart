@@ -17,102 +17,18 @@ class ChatInput extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(color: Colors.white.withOpacity(0.8)),
+      color: Colors.white.withValues(alpha: .85),
       child: ClipRect(
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+          filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
           child: Padding(
-            padding: EdgeInsets.only(
-              bottom: 8.h,
-              left: 12.w,
-              right: 12.w,
-              top: 8.h,
-            ),
+            padding: EdgeInsets.fromLTRB(12.w, 8.h, 12.w, 8.h),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      _buildQuickChip('I\'m here'),
-                      SizedBox(width: 8.w),
-                      _buildQuickChip('OK'),
-                      SizedBox(width: 8.w),
-                      _buildQuickChip('Be there in 2 mins'),
-                      SizedBox(width: 8.w),
-                      _buildQuickChip('Near the entrance'),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 8.h),
-                Row(
-                  children: [
-                    Container(
-                      width: 48.w,
-                      height: 48.w,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[100],
-                        shape: BoxShape.circle,
-                      ),
-                      child: IconButton(
-                        icon: Icon(Icons.add, color: Colors.black87),
-                        onPressed: () {},
-                      ),
-                    ),
-                    SizedBox(width: 8.w),
-                    Expanded(
-                      child: Stack(
-                        children: [
-                          TextField(
-                            controller: controller.messageController,
-                            minLines: 1,
-                            maxLines: 5,
-                            decoration: InputDecoration(
-                              hintText: 'Message $riderName...',
-                              filled: true,
-                              fillColor: Colors.grey[100],
-                              contentPadding: EdgeInsets.symmetric(
-                                horizontal: 16.w,
-                                vertical: 14.h,
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(999),
-                                borderSide: BorderSide.none,
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                            right: 6.w,
-                            top: 6.h,
-                            child: GestureDetector(
-                              onTap: controller.sendMessage,
-                              child: Container(
-                                width: 44.w,
-                                height: 44.w,
-                                decoration: BoxDecoration(
-                                  color: Color(0xFFFFC200),
-                                  shape: BoxShape.circle,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black12,
-                                      blurRadius: 6,
-                                      offset: Offset(0, 2),
-                                    ),
-                                  ],
-                                ),
-                                child: Icon(
-                                  Icons.arrow_upward,
-                                  color: Colors.black87,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+                _quickReplies(),
+                SizedBox(height: 10.h),
+                _messageComposer(),
               ],
             ),
           ),
@@ -121,20 +37,103 @@ class ChatInput extends StatelessWidget {
     );
   }
 
-  Widget _buildQuickChip(String text) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
-      decoration: BoxDecoration(
-        color: Color(0xFFFFC200).withOpacity(0.08),
-        border: Border.all(color: Color(0xFFFFC200).withOpacity(0.3)),
-        borderRadius: BorderRadius.circular(12.r),
+  Widget _quickReplies() {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: [
+          _quickChip("I'm here"),
+          SizedBox(width: 8.w),
+          _quickChip("OK"),
+          SizedBox(width: 8.w),
+          _quickChip("Be there in 2 mins"),
+          SizedBox(width: 8.w),
+          _quickChip("Near the entrance"),
+        ],
       ),
-      child: Text(
-        text,
-        style: TextStyle(
-          fontSize: 14.sp,
-          fontWeight: FontWeight.w700,
-          color: Colors.black87,
+    );
+  }
+
+  Widget _messageComposer() {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 6.h),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade100,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Expanded(
+            child: TextField(
+              controller: controller.messageController,
+              minLines: 1,
+              maxLines: 1,
+              decoration: InputDecoration(
+                hintText: 'Message $riderName...',
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 14.w,
+                  vertical: 12.h,
+                ),
+              ),
+            ),
+          ),
+          SizedBox(width: 6.w),
+          _sendButton(),
+        ],
+      ),
+    );
+  }
+
+  Widget _sendButton() {
+    return GestureDetector(
+      onTap: controller.sendMessage,
+      child: Container(
+        width: 44.w,
+        height: 44.w,
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFFFFD54F), Color(0xFFFFB300)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.15),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Icon(Icons.send_rounded, size: 20.sp, color: Colors.black87),
+      ),
+    );
+  }
+
+  Widget _quickChip(String text) {
+    return GestureDetector(
+      onTap: () {
+        controller.messageController.text = text;
+        controller.sendMessage();
+      },
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+        decoration: BoxDecoration(
+          color: const Color(0xFFFFC200).withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(14.r),
+          border: Border.all(
+            color: const Color(0xFFFFC200).withValues(alpha: 0.35),
+          ),
+        ),
+        child: Text(
+          text,
+          style: TextStyle(
+            fontSize: 14.sp,
+            fontWeight: FontWeight.w700,
+            color: Colors.black87,
+          ),
         ),
       ),
     );
