@@ -301,15 +301,33 @@ class _CancellationBottomSheetState extends State<CancellationBottomSheet> {
   Future<void> _handleCancellation() async {
     if (_selectedReason == null) return;
 
-    // Use parent order ID if it's a group cancellation, otherwise use the individual order ID
-    final orderIdToCancel = widget.parentOrderId ?? widget.order.orderId;
+    print('🚀 Starting cancellation...');
+    print('📦 Is Group Cancellation: ${widget.isGroupCancellation}');
+    print('🔑 Parent Order ID: ${widget.parentOrderId}');
+    print('🔑 Individual Order ID: ${widget.order.orderId}');
 
-    print('🚀 Starting cancellation for order: $orderIdToCancel');
+    bool success;
 
-    final success = await _refundController.requestCancellation(
-      orderId: orderIdToCancel,
-      reason: _selectedReason!,
-    );
+    // Use parent order ID for group cancellation, individual order ID for single order
+    if (widget.isGroupCancellation && widget.parentOrderId != null) {
+      // Cancelling entire group - use parent order ID with group cancellation API
+      print(
+        '🎯 Cancelling entire group with parent order ID: ${widget.parentOrderId}',
+      );
+      success = await _refundController.requestCancellation(
+        orderId: widget.parentOrderId!,
+        reason: _selectedReason!,
+      );
+    } else {
+      // Cancelling individual order - use individual order cancellation API
+      print(
+        '🎯 Cancelling individual order with order ID: ${widget.order.orderId}',
+      );
+      success = await _refundController.requestIndividualOrderCancellation(
+        orderId: widget.order.orderId,
+        reason: _selectedReason!,
+      );
+    }
 
     print('🎯 Cancellation success value in bottom sheet: $success');
 

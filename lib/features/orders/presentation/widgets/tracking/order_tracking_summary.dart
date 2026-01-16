@@ -234,7 +234,7 @@ class OrderTrackingSummary extends StatelessWidget {
       width: double.infinity,
       child: OutlinedButton(
         onPressed: () {
-          Get.to(() => OrderInvoiceScreen(order: order, hideActions: true));
+          Get.to(() => OrderInvoiceScreen(order: order));
         },
         style: OutlinedButton.styleFrom(
           side: BorderSide(color: AppColors.beakYellow, width: 1.5),

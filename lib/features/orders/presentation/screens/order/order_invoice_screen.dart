@@ -30,13 +30,8 @@ class OrderInvoiceScreen extends StatelessWidget {
     this.hideActions = false,
   });
 
-  // Initialize RefundController if not already registered
-  RefundController get _refundController {
-    if (!Get.isRegistered<RefundController>()) {
-      Get.put(RefundController());
-    }
-    return Get.find<RefundController>();
-  }
+  // Get RefundController from global bindings
+  RefundController get _refundController => Get.find<RefundController>();
 
   @override
   Widget build(BuildContext context) {
@@ -62,11 +57,10 @@ class OrderInvoiceScreen extends StatelessWidget {
                     padding: EdgeInsets.only(
                       left: 16.w,
                       right: 16.w,
-                      top: 16.h,
+                      top: 20.h,
                       bottom: 0,
                     ),
                     child: SingleChildScrollView(
-                      // physics: const ClampingScrollPhysics(),
                       physics: const ClampingScrollPhysics(),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -75,7 +69,7 @@ class OrderInvoiceScreen extends StatelessWidget {
 
                           // Show actions only if not part of a group
                           if (!hideActions) ...[
-                            SizedBox(height: 16.h),
+                            SizedBox(height: 20.h),
                             OrderActions(
                               order: order,
                               onCancel: _handleCancelOrder,
@@ -84,22 +78,17 @@ class OrderInvoiceScreen extends StatelessWidget {
                             ),
                           ],
 
-                          // Show info message if part of a group
-                          // if (hideActions) ...[
-                          //   SizedBox(height: 16.h),
-                          //   _buildGroupActionInfo(),
-                          // ],
-                          SizedBox(height: 16.h),
+                          SizedBox(height: 20.h),
                           OrderItemsList(order: order),
-                          SizedBox(height: 16.h),
+                          SizedBox(height: 20.h),
                           PricingDetails(order: order),
-                          SizedBox(height: 16.h),
+                          SizedBox(height: 20.h),
                           PaymentInfoCard(order: order),
-                          SizedBox(height: 16.h),
+                          SizedBox(height: 20.h),
                           ShippingAddressCard(order: order),
-                          SizedBox(height: 16.h),
+                          SizedBox(height: 20.h),
                           DeliveryInfoCard(order: order),
-                          SizedBox(height: 24.h),
+                          SizedBox(height: 100.h), // Extra space for FAB
                         ],
                       ),
                     ),
@@ -201,36 +190,4 @@ class OrderInvoiceScreen extends StatelessWidget {
   void _handlePaymentRefundStatus() {
     Get.to(() => PaymentRefundStatusScreen(order: order));
   }
-
-  // /// Build info widget for grouped orders
-  // Widget _buildGroupActionInfo() {
-  //   return Container(
-  //     padding: EdgeInsets.all(16.w),
-  //     decoration: BoxDecoration(
-  //       color: AppColors.beakYellow.withValues(alpha: 0.1),
-  //       borderRadius: BorderRadius.circular(12.r),
-  //       border: Border.all(
-  //         color: AppColors.beakYellow.withValues(alpha: 0.3),
-  //         width: 1,
-  //       ),
-  //     ),
-  //     child: Row(
-  //       children: [
-  //         Icon(Icons.info_outline, color: AppColors.beakYellow, size: 20.sp),
-  //         SizedBox(width: 12.w),
-  //         Expanded(
-  //           child: Text(
-  //             'This order is part of a group. Use the group menu (⋮) to cancel, report issues, or check refund status.',
-  //             style: TextStyle(
-  //               fontSize: 13.sp,
-  //               fontWeight: FontWeight.w400,
-  //               color: const Color(0xFF6B5300),
-  //               height: 1.4,
-  //             ),
-  //           ),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
 }

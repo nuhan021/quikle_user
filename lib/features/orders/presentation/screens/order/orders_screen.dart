@@ -169,23 +169,11 @@ class OrdersScreen extends StatelessWidget {
                     itemCount: controller.groupedOrders.length,
                     itemBuilder: (context, index) {
                       final groupedOrder = controller.groupedOrders[index];
-
-                      // Check if this is a group (has parent_order_id or multiple orders)
-                      final isGroup =
-                          groupedOrder.orders.length > 1 ||
-                          groupedOrder.orders.first.parentOrderId != null;
-
                       // Show grouped section with all orders
                       return GroupedOrdersSection(
                         groupedOrder: groupedOrder,
                         onOrderTap: (order) {
-                          // Hide actions if this order is part of a group
-                          Get.to(
-                            () => OrderInvoiceScreen(
-                              order: order,
-                              hideActions: isGroup,
-                            ),
-                          );
+                          Get.to(() => OrderInvoiceScreen(order: order));
                         },
                         onTrack: (order) {
                           Get.to(() => OrderTrackingScreen(order: order));

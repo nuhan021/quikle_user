@@ -34,25 +34,21 @@ class GroupedOrdersSection extends StatefulWidget {
 class _GroupedOrdersSectionState extends State<GroupedOrdersSection> {
   bool _isCopied = false;
 
-  RefundController get _refundController {
-    if (!Get.isRegistered<RefundController>()) {
-      Get.put(RefundController());
-    }
-    return Get.find<RefundController>();
-  }
+  // Get RefundController from global bindings
+  RefundController get _refundController => Get.find<RefundController>();
 
   @override
   Widget build(BuildContext context) {
-    if (widget.groupedOrder.orders.length == 1 &&
-        widget.groupedOrder.orders.first.parentOrderId == null) {
-      return BriefOrderCard(
-        order: widget.groupedOrder.orders.first,
-        onTap: () => widget.onOrderTap(widget.groupedOrder.orders.first),
-        onTrack: widget.groupedOrder.orders.first.isTrackable
-            ? () => widget.onTrack?.call(widget.groupedOrder.orders.first)
-            : null,
-      );
-    }
+    // if (widget.groupedOrder.orders.length == 1 &&
+    //     widget.groupedOrder.orders.first.parentOrderId == null) {
+    //   return BriefOrderCard(
+    //     order: widget.groupedOrder.orders.first,
+    //     onTap: () => widget.onOrderTap(widget.groupedOrder.orders.first),
+    //     onTrack: widget.groupedOrder.orders.first.isTrackable
+    //         ? () => widget.onTrack?.call(widget.groupedOrder.orders.first)
+    //         : null,
+    //   );
+    // }
 
     // Show grouped orders with minimal clean design
     return Container(

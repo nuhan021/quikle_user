@@ -21,6 +21,7 @@ import 'package:quikle_user/features/profile/data/services/help_support_service.
 import 'package:quikle_user/features/splash/controllers/splash_controller.dart';
 import 'package:quikle_user/features/cart/controllers/cart_controller.dart';
 import 'package:quikle_user/features/orders/controllers/live_order_controller.dart';
+import 'package:quikle_user/features/orders/controllers/refund/refund_controller.dart';
 import 'package:quikle_user/features/prescription/controllers/prescription_controller.dart';
 import 'package:quikle_user/core/services/prescription_notification_service.dart';
 
@@ -64,6 +65,7 @@ class ControllerBinder extends Bindings {
     );
     Get.put<HelpSupportController>(HelpSupportController(), permanent: true);
     Get.put<LiveOrderController>(LiveOrderController(), permanent: true);
+    Get.put<RefundController>(RefundController(), permanent: true);
     Get.put<PrescriptionController>(PrescriptionController(), permanent: true);
 
     //NotificationController

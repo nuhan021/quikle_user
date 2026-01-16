@@ -104,6 +104,33 @@ class RefundController extends GetxController {
     }
   }
 
+  /// Request individual order cancellation (for orders within a group)
+  Future<bool> requestIndividualOrderCancellation({
+    required String orderId,
+    required CancellationReason reason,
+    String? customNote,
+  }) async {
+    try {
+      _isCancelling.value = true;
+      final result = await _refundService.requestIndividualOrderCancellation(
+        orderId: orderId,
+        reason: reason,
+        customNote: customNote,
+      );
+
+      if (result['success'] == true) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      print('Error requesting individual order cancellation: $e');
+      return false;
+    } finally {
+      _isCancelling.value = false;
+    }
+  }
+
   /// Load refund status for an order
   Future<void> loadRefundStatus(String orderId) async {
     try {

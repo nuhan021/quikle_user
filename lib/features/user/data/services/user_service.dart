@@ -205,12 +205,12 @@ class UserService extends GetxController {
         return false;
       }
 
-      final String endpoint = ApiConstants.deleteAccount.replaceFirst(
-        '{user_id}',
-        userId,
-      );
+      // final String endpoint = ApiConstants.deleteAccount.replaceFirst(
+      //   '{user_id}',
+      //   userId,
+      // );
       final response = await _networkCaller.deleteRequest(
-        endpoint,
+        ApiConstants.deleteAccount,
         headers: {
           'Authorization': 'Bearer $token',
           'refresh-token': '$refreshToken',

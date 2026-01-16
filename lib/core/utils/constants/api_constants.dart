@@ -26,11 +26,11 @@ class ApiConstants {
   static const String getFoodProducts = "$baseUrl/items/food/";
   static const String getMedicineProducts = "$baseUrl/items/medicine/is_otc/";
   // Groceries endpoint
-  static const String getGroceriesProducts = "$baseUrl/items/groceries/";
+  static const String getGroceriesProducts = "$baseUrl/items/grocery/";
 
   //Profile api's
   static const String getUserProfile = "$baseUrl/customer/profile/";
-  static const String deleteAccount = "$baseUrl/user/users/{user_id}";
+  static const String deleteAccount = "$baseUrl/user/users/me/delete";
 
   //Shipping address api's
   static const String shippingAddresses =
@@ -92,4 +92,6 @@ class ApiConstants {
       "$baseUrl/payment/refunds/reports-and-issues";
   static const String cancelOrder =
       "$baseUrl/payment/refunds/orders/{order_id}/cancel";
+  static const String cancelIndividualOrder =
+      "$baseUrl/payment/refunds/individual-orders/{order_id}/cancel";
 }
