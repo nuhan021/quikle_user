@@ -130,11 +130,11 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
   Future<void> _onSavePressed() async {
     try {
       if (controller.isClosed) {
-        Get.snackbar(
-          'Error',
-          'Profile controller is not available',
-          snackPosition: SnackPosition.TOP,
-        );
+        // Get.snackbar(
+        //   'Error',
+        //   'Profile controller is not available',
+        //   snackPosition: SnackPosition.TOP,
+        // );
         return;
       }
 

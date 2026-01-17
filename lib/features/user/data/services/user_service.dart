@@ -141,6 +141,11 @@ class UserService extends GetxController {
   Future<bool> updateProfile(UserModel updatedUser) async {
     final token = StorageService.token;
     final refreshToken = StorageService.refreshToken;
+
+    AppLoggerHelper.debug(
+      'Updating profile for user ID: ${updatedUser.toJson()}',
+    );
+
     try {
       final ResponseData response = await _networkCaller.putRequest(
         ApiConstants.getUserProfile,
