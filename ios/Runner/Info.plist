@@ -58,6 +58,8 @@
     <string>This app needs access to speech recognition for voice search functionality.</string>
     <key>NSUserNotificationUsageDescription</key>
     <string>This app needs permission to send notifications for order updates and alerts.</string>
+    <key>NSUserTrackingUsageDescription</key>
+    <string>This app uses your location to provide personalized order tracking and recommendations.</string>
     <key>UIApplicationSupportsIndirectInputEvents</key>
     <true/>
     <key>UIBackgroundModes</key>
