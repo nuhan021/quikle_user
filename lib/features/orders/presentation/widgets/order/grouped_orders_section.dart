@@ -303,7 +303,7 @@ class _GroupedOrdersSectionState extends State<GroupedOrdersSection> {
 
                   // Quantity and price
                   Text(
-                    '$quantity • $price',
+                    '$quantity • ₹$price',
                     style: getTextStyle(
                       font: CustomFonts.inter,
                       fontSize: 11.sp,

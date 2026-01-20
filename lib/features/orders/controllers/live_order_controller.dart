@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:get/get.dart';
 import 'package:quikle_user/core/utils/constants/enums/order_enums.dart';
+import 'package:quikle_user/core/utils/logging/logger.dart';
 import 'package:quikle_user/features/orders/data/models/order/order_model.dart';
 import 'package:quikle_user/features/orders/data/services/order/order_service.dart';
 
@@ -75,7 +76,19 @@ class LiveOrderController extends GetxController {
 
       if (trackableOrders.isEmpty) return null;
 
+      //Print all the trackable orders for debugging
+      for (var order in trackableOrders) {
+        AppLoggerHelper.debug(
+          'Liver order found for all orders: ${order.orderId} with status ${order.status}',
+        );
+      }
+
       trackableOrders.sort((a, b) => b.orderDate.compareTo(a.orderDate));
+
+      AppLoggerHelper.debug(
+        'Live order found: ${trackableOrders.first.orderId} with status ${trackableOrders.first.status}',
+      );
+
       return trackableOrders.first;
     } catch (e) {
       print('Error finding live order: $e');
@@ -134,16 +147,20 @@ class LiveOrderController extends GetxController {
   String get estimatedTime {
     if (_currentLiveOrder.value?.estimatedDelivery == null) return '';
 
+    // If order is actually delivered, don't show time estimation
+    if (_currentLiveOrder.value!.status == OrderStatus.delivered) {
+      return 'Delivered';
+    }
+
     final now = DateTime.now();
     final delivery = _currentLiveOrder.value!.estimatedDelivery!;
     final difference = delivery.difference(now);
 
     if (difference.inMinutes > 0) {
       return '${difference.inMinutes} mins';
-    } else if (difference.inMinutes > -30) {
-      return 'Arriving soon';
     } else {
-      return 'Delivered';
+      // If time has passed but order is still in transit, show appropriate message
+      return 'Arriving soon';
     }
   }
 
