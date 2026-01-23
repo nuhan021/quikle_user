@@ -9,7 +9,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.quickle.quickleuser</string>
+	<string>com.quikle.quikleuser</string>
 	<key>PROJECT_ID</key>
 	<string>quiklerider-22552</string>
 	<key>STORAGE_BUCKET</key>
@@ -25,6 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:948140389448:ios:b3af43b95c2c21d089d47d</string>
+	<string>1:948140389448:ios:3dcf97deae2230b789d47d</string>
 </dict>
 </plist>

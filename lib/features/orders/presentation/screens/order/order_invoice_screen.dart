@@ -66,18 +66,6 @@ class OrderInvoiceScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           OrderHeader(order: order),
-
-                          // Show actions only if not part of a group
-                          if (!hideActions) ...[
-                            SizedBox(height: 20.h),
-                            OrderActions(
-                              order: order,
-                              onCancel: _handleCancelOrder,
-                              onReportIssue: _handleReportIssue,
-                              onPaymentRefundStatus: _handlePaymentRefundStatus,
-                            ),
-                          ],
-
                           SizedBox(height: 20.h),
                           OrderItemsList(order: order),
                           SizedBox(height: 20.h),
@@ -88,6 +76,16 @@ class OrderInvoiceScreen extends StatelessWidget {
                           ShippingAddressCard(order: order),
                           SizedBox(height: 20.h),
                           DeliveryInfoCard(order: order),
+                          // Show actions only if not part of a group
+                          if (!hideActions) ...[
+                            SizedBox(height: 20.h),
+                            OrderActions(
+                              order: order,
+                              onCancel: _handleCancelOrder,
+                              onReportIssue: _handleReportIssue,
+                              onPaymentRefundStatus: _handlePaymentRefundStatus,
+                            ),
+                          ],
                           SizedBox(height: 100.h), // Extra space for FAB
                         ],
                       ),

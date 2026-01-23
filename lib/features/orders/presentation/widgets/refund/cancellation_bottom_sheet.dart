@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:quikle_user/core/common/styles/global_text_style.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
+import 'package:quikle_user/core/utils/constants/enums/order_enums.dart';
 import 'package:quikle_user/core/utils/constants/enums/refund_enums.dart';
 import 'package:quikle_user/features/orders/controllers/refund/refund_controller.dart';
 import 'package:quikle_user/features/orders/data/models/refund/cancellation_eligibility_model.dart';
@@ -111,6 +112,39 @@ class _CancellationBottomSheetState extends State<CancellationBottomSheet> {
 
               SizedBox(height: 20.h),
 
+              // Status-based message banner
+              Container(
+                padding: EdgeInsets.all(12.w),
+                decoration: BoxDecoration(
+                  color: _getMessageBannerColor(),
+                  borderRadius: BorderRadius.circular(8.r),
+                  border: Border.all(color: _getMessageBorderColor(), width: 1),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(
+                      Icons.info_outline,
+                      color: _getMessageIconColor(),
+                      size: 18.sp,
+                    ),
+                    SizedBox(width: 8.w),
+                    Expanded(
+                      child: Text(
+                        widget.eligibility.message,
+                        style: getTextStyle(
+                          font: CustomFonts.inter,
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w500,
+                          color: _getMessageTextColor(),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 20.h),
+
               // Reason selection
               Text(
                 'Why are you cancelling?',
@@ -171,7 +205,7 @@ class _CancellationBottomSheetState extends State<CancellationBottomSheet> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Refund Details',
+                      'Refund Breakdown',
                       style: getTextStyle(
                         font: CustomFonts.inter,
                         fontSize: 14.sp,
@@ -191,23 +225,43 @@ class _CancellationBottomSheetState extends State<CancellationBottomSheet> {
                         '- ₹${widget.eligibility.cancellationFee.toStringAsFixed(2)}',
                         isDeduction: true,
                       ),
-                    ] else if (widget.eligibility.isFeeWaived) ...[
-                      SizedBox(height: 8.h),
+                      SizedBox(height: 4.h),
                       Text(
-                        'Cancellation fee waived',
+                        'Cancellation charges apply at this stage.',
                         style: getTextStyle(
                           font: CustomFonts.inter,
-                          fontSize: 12.sp,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.green,
+                          fontSize: 11.sp,
+                          fontWeight: FontWeight.w400,
+                          color: Colors.orange.shade700,
                         ),
+                      ),
+                    ] else if (widget.eligibility.isFeeWaived) ...[
+                      SizedBox(height: 8.h),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.check_circle,
+                            size: 14.sp,
+                            color: Colors.green,
+                          ),
+                          SizedBox(width: 4.w),
+                          Text(
+                            'Cancellation fee waived',
+                            style: getTextStyle(
+                              font: CustomFonts.inter,
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.green,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                     SizedBox(height: 12.h),
                     Divider(height: 1, color: Colors.grey.shade400),
                     SizedBox(height: 12.h),
                     _buildAmountRow(
-                      'You will get',
+                      'You will receive',
                       '₹${widget.eligibility.refundAmount.toStringAsFixed(2)}',
                       isTotal: true,
                     ),
@@ -339,6 +393,66 @@ class _CancellationBottomSheetState extends State<CancellationBottomSheet> {
       }
     } else {
       print('❌ Success is false, keeping bottom sheet open');
+    }
+  }
+
+  /// Get banner background color based on order status
+  Color _getMessageBannerColor() {
+    switch (widget.order.status) {
+      case OrderStatus.processing:
+        return Colors.green.shade50;
+      case OrderStatus.confirmed:
+        return Colors.blue.shade50;
+      case OrderStatus.preparing:
+      case OrderStatus.shipped:
+        return Colors.orange.shade50;
+      default:
+        return Colors.grey.shade50;
+    }
+  }
+
+  /// Get banner border color based on order status
+  Color _getMessageBorderColor() {
+    switch (widget.order.status) {
+      case OrderStatus.processing:
+        return Colors.green.shade200;
+      case OrderStatus.confirmed:
+        return Colors.blue.shade200;
+      case OrderStatus.preparing:
+      case OrderStatus.shipped:
+        return Colors.orange.shade200;
+      default:
+        return Colors.grey.shade200;
+    }
+  }
+
+  /// Get icon color based on order status
+  Color _getMessageIconColor() {
+    switch (widget.order.status) {
+      case OrderStatus.processing:
+        return Colors.green.shade700;
+      case OrderStatus.confirmed:
+        return Colors.blue.shade700;
+      case OrderStatus.preparing:
+      case OrderStatus.shipped:
+        return Colors.orange.shade700;
+      default:
+        return Colors.grey.shade700;
+    }
+  }
+
+  /// Get text color based on order status
+  Color _getMessageTextColor() {
+    switch (widget.order.status) {
+      case OrderStatus.processing:
+        return Colors.green.shade900;
+      case OrderStatus.confirmed:
+        return Colors.blue.shade900;
+      case OrderStatus.preparing:
+      case OrderStatus.shipped:
+        return Colors.orange.shade900;
+      default:
+        return Colors.grey.shade900;
     }
   }
 }

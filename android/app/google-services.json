@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:948140389448:android:9e624ce4b7408dfc89d47d",
+        "mobilesdk_app_id": "1:948140389448:android:6604803a2a7fe9e989d47d",
         "android_client_info": {
-          "package_name": "com.example.quikle_rider"
+          "package_name": "com.quikle.quikle_rider"
         }
       },
       "oauth_client": [],
@@ -26,9 +26,28 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:948140389448:android:c81a99c0094dd41f89d47d",
+        "mobilesdk_app_id": "1:948140389448:android:18e941c3474003ac89d47d",
         "android_client_info": {
-          "package_name": "com.quickle.quickleuser"
+          "package_name": "com.quikle.quikleuser"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC-6w9TFkbTRzefAyR7uUidqVLG_AODC_w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:948140389448:android:a2ba40c036976fcd89d47d",
+        "android_client_info": {
+          "package_name": "com.quikle.quiklevendor"
         }
       },
       "oauth_client": [],

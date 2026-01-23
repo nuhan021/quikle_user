@@ -6,17 +6,25 @@ import 'package:quikle_user/core/common/widgets/customer_support_fab.dart';
 import 'package:quikle_user/core/utils/logging/logger.dart';
 import 'package:quikle_user/core/services/freshchat_service.dart';
 import 'package:quikle_user/features/orders/controllers/order_tracking_controller.dart';
+import 'package:quikle_user/features/orders/controllers/refund/refund_controller.dart';
 import 'package:quikle_user/features/orders/data/models/order/order_model.dart';
 import 'package:quikle_user/features/orders/presentation/widgets/tracking/order_tracking_app_bar.dart';
 import 'package:quikle_user/features/orders/presentation/widgets/tracking/order_tracking_map_section.dart';
 import 'package:quikle_user/features/orders/presentation/widgets/tracking/time_estimation_section.dart';
 import 'package:quikle_user/features/orders/presentation/widgets/tracking/progress_section.dart';
 import 'package:quikle_user/features/orders/presentation/widgets/tracking/order_tracking_summary.dart';
+import 'package:quikle_user/features/orders/presentation/widgets/order/order_actions.dart';
+import 'package:quikle_user/features/orders/presentation/widgets/refund/cancellation_bottom_sheet.dart';
+import 'package:quikle_user/features/orders/presentation/widgets/refund/report_issue_bottom_sheet.dart';
+import 'package:quikle_user/features/orders/presentation/screens/refund/payment_refund_status_screen.dart';
 
 class OrderTrackingScreen extends StatelessWidget {
   final OrderModel order;
 
   const OrderTrackingScreen({super.key, required this.order});
+
+  // Get RefundController from global bindings
+  RefundController get _refundController => Get.find<RefundController>();
 
   @override
   Widget build(BuildContext context) {
@@ -79,6 +87,17 @@ class OrderTrackingScreen extends StatelessWidget {
                           SizedBox(height: 12.h),
                           ProgressSection(controller: controller),
                           SizedBox(height: 12.h),
+                          // Order Actions Section
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 16.w),
+                            child: OrderActions(
+                              order: order,
+                              onCancel: _handleCancelOrder,
+                              onReportIssue: _handleReportIssue,
+                              onPaymentRefundStatus: _handlePaymentRefundStatus,
+                            ),
+                          ),
+                          SizedBox(height: 100.h), // Extra space for FAB
                         ],
                       ),
                     ),
@@ -115,5 +134,62 @@ class OrderTrackingScreen extends StatelessWidget {
           .map((item) => '${item.product.title} x${item.quantity}')
           .toList(),
     );
+  }
+
+  /// Handler for Cancel Order button
+  Future<void> _handleCancelOrder() async {
+    // Check eligibility first
+    await _refundController.checkCancellationEligibility(order);
+
+    final eligibility = _refundController.cancellationEligibility;
+
+    if (eligibility == null || !eligibility.isAllowed) {
+      Get.snackbar(
+        'Cannot Cancel',
+        eligibility?.message ?? 'This order cannot be cancelled',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
+    // Show cancellation bottom sheet
+    final result = await Get.bottomSheet<bool>(
+      CancellationBottomSheet(order: order, eligibility: eligibility),
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+    );
+
+    // Refresh order if cancelled successfully
+    if (result == true) {
+      // TODO: Refresh order data from API
+      Get.back(); // Go back to previous screen
+    }
+  }
+
+  /// Handler for Report an Issue button
+  Future<void> _handleReportIssue() async {
+    final result = await Get.bottomSheet<Map<String, dynamic>>(
+      ReportIssueBottomSheet(order: order),
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+    );
+
+    if (result != null) {
+      // Show success message with ticket ID
+      final ticketId = result['ticketId'];
+      final sla = result['sla'];
+
+      Get.snackbar(
+        'Issue Reported',
+        'Ticket created: $ticketId. We\'ll respond $sla.',
+        snackPosition: SnackPosition.BOTTOM,
+        duration: const Duration(seconds: 4),
+      );
+    }
+  }
+
+  /// Handler for Payment & Refund Status button
+  void _handlePaymentRefundStatus() {
+    Get.to(() => PaymentRefundStatusScreen(order: order));
   }
 }

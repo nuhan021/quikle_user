@@ -22,81 +22,22 @@ class OrderActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Processing, Confirmed, Preparing/Packing, Shipped - show active cancel button
     final canShowCancelButton =
         order.status == OrderStatus.processing ||
         order.status == OrderStatus.confirmed ||
         order.status == OrderStatus.preparing ||
         order.status == OrderStatus.shipped;
 
-    final showDisabledCancelButton =
-        order.status == OrderStatus.outForDelivery ||
-        order.status == OrderStatus.delivered;
+    // Out for delivery - show disabled with specific message
+    final isOutForDelivery = order.status == OrderStatus.outForDelivery;
 
-    // final showCancelledBanner = order.status == OrderStatus.cancelled;
+    // Delivered - show disabled with specific message
+    final isDelivered = order.status == OrderStatus.delivered;
 
     return Column(
       children: [
-        // Cancelled Banner
-        // if (showCancelledBanner)
-        //   Container(
-        //     width: double.infinity,
-        //     padding: EdgeInsets.all(16.w),
-        //     margin: EdgeInsets.only(bottom: 12.h),
-        //     decoration: BoxDecoration(
-        //       gradient: LinearGradient(
-        //         colors: [Colors.red.shade50, Colors.red.shade100],
-        //         begin: Alignment.topLeft,
-        //         end: Alignment.bottomRight,
-        //       ),
-        //       borderRadius: BorderRadius.circular(12.r),
-        //       border: Border.all(color: Colors.red.shade200, width: 1),
-        //     ),
-        //     child: Row(
-        //       children: [
-        //         Container(
-        //           padding: EdgeInsets.all(8.w),
-        //           decoration: BoxDecoration(
-        //             color: Colors.white,
-        //             shape: BoxShape.circle,
-        //           ),
-        //           child: Icon(
-        //             Icons.cancel_rounded,
-        //             color: Colors.red,
-        //             size: 24.sp,
-        //           ),
-        //         ),
-        //         SizedBox(width: 12.w),
-        //         Expanded(
-        //           child: Column(
-        //             crossAxisAlignment: CrossAxisAlignment.start,
-        //             children: [
-        //               Text(
-        //                 'Order Cancelled',
-        //                 style: getTextStyle(
-        //                   font: CustomFonts.obviously,
-        //                   fontSize: 14.sp,
-        //                   fontWeight: FontWeight.w600,
-        //                   color: Colors.red.shade900,
-        //                 ),
-        //               ),
-        //               SizedBox(height: 2.h),
-        //               Text(
-        //                 'Your order has been cancelled as requested.',
-        //                 style: getTextStyle(
-        //                   font: CustomFonts.inter,
-        //                   fontSize: 12.sp,
-        //                   fontWeight: FontWeight.w400,
-        //                   color: Colors.red.shade700,
-        //                 ),
-        //               ),
-        //             ],
-        //           ),
-        //         ),
-        //       ],
-        //     ),
-        //   ),
-
-        // Quick Actions Grid
+        // Quick Actions Container
         Container(
           width: double.infinity,
           padding: EdgeInsets.all(16.w),
@@ -115,7 +56,7 @@ class OrderActions extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Quick Actions',
+                'Need Help?',
                 style: getTextStyle(
                   font: CustomFonts.obviously,
                   fontSize: 16.sp,
@@ -125,7 +66,7 @@ class OrderActions extends StatelessWidget {
               ),
               SizedBox(height: 16.h),
 
-              // Action Cards in a responsive grid
+              // Cancel Order Action Card
               if (canShowCancelButton) ...[
                 _buildActionCard(
                   icon: Icons.cancel_rounded,
@@ -136,21 +77,95 @@ class OrderActions extends StatelessWidget {
                   onTap: onCancel,
                 ),
                 SizedBox(height: 12.h),
-              ] else if (showDisabledCancelButton) ...[
+              ] else if (isOutForDelivery) ...[
+                // Disabled cancel button with specific message for out for delivery
                 _buildActionCard(
                   icon: Icons.cancel_rounded,
                   iconColor: Colors.grey.shade400,
                   iconBgColor: Colors.grey.shade100,
                   title: 'Cancel Order',
-                  subtitle: order.status == OrderStatus.outForDelivery
-                      ? 'Not available - Out for delivery'
-                      : 'Not available - Already delivered',
+                  subtitle: 'Not available - Out for delivery',
                   onTap: null,
                   isDisabled: true,
+                ),
+                SizedBox(height: 8.h),
+                Container(
+                  padding: EdgeInsets.all(12.w),
+                  decoration: BoxDecoration(
+                    color: Colors.orange.shade50,
+                    borderRadius: BorderRadius.circular(8.r),
+                    border: Border.all(color: Colors.orange.shade200, width: 1),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(
+                        Icons.info_outline,
+                        color: Colors.orange.shade700,
+                        size: 18.sp,
+                      ),
+                      SizedBox(width: 8.w),
+                      Expanded(
+                        child: Text(
+                          "Cancellation isn't available because your order is already out for delivery. If you need help, tap 'Report an Issue' or 'Chat with support'.",
+                          style: getTextStyle(
+                            font: CustomFonts.inter,
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.orange.shade900,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 12.h),
+              ] else if (isDelivered) ...[
+                // Disabled cancel button with specific message for delivered
+                _buildActionCard(
+                  icon: Icons.cancel_rounded,
+                  iconColor: Colors.grey.shade400,
+                  iconBgColor: Colors.grey.shade100,
+                  title: 'Cancel Order',
+                  subtitle: 'Not available - Already delivered',
+                  onTap: null,
+                  isDisabled: true,
+                ),
+                SizedBox(height: 8.h),
+                Container(
+                  padding: EdgeInsets.all(12.w),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.shade50,
+                    borderRadius: BorderRadius.circular(8.r),
+                    border: Border.all(color: Colors.blue.shade200, width: 1),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(
+                        Icons.info_outline,
+                        color: Colors.blue.shade700,
+                        size: 18.sp,
+                      ),
+                      SizedBox(width: 8.w),
+                      Expanded(
+                        child: Text(
+                          "This order has already been delivered, so it can't be cancelled. If something is wrong, tap 'Report an Issue'.",
+                          style: getTextStyle(
+                            font: CustomFonts.inter,
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.blue.shade900,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 SizedBox(height: 12.h),
               ],
 
+              // Report an Issue Action Card
               _buildActionCard(
                 icon: Icons.report_problem_rounded,
                 iconColor: AppColors.primary,
@@ -161,6 +176,7 @@ class OrderActions extends StatelessWidget {
               ),
               SizedBox(height: 12.h),
 
+              // Payment & Refund Action Card
               _buildActionCard(
                 icon: Icons.account_balance_wallet_rounded,
                 iconColor: const Color(0xFF2E7D32),

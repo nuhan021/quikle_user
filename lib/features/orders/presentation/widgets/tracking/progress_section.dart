@@ -7,10 +7,17 @@ import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 import 'package:quikle_user/features/orders/controllers/order_tracking_controller.dart';
 import 'package:quikle_user/features/orders/presentation/widgets/tracking/progress_step.dart';
 
-class ProgressSection extends StatelessWidget {
+class ProgressSection extends StatefulWidget {
   final OrderTrackingController controller;
 
   const ProgressSection({super.key, required this.controller});
+
+  @override
+  State<ProgressSection> createState() => _ProgressSectionState();
+}
+
+class _ProgressSectionState extends State<ProgressSection> {
+  bool _isExpanded = false;
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +36,7 @@ class ProgressSection extends StatelessWidget {
         ],
       ),
       child: Obx(() {
-        if (controller.isLoading.value) {
+        if (widget.controller.isLoading.value) {
           return const Center(child: CircularProgressIndicator());
         }
 
@@ -48,13 +55,30 @@ class ProgressSection extends StatelessWidget {
   }
 
   Widget _buildSectionTitle() {
-    return Text(
-      'Delivery Progress',
-      style: getTextStyle(
-        font: CustomFonts.obviously,
-        fontSize: 14.sp,
-        fontWeight: FontWeight.w500,
-        color: const Color(0xFF333333),
+    return InkWell(
+      onTap: () {
+        setState(() {
+          _isExpanded = !_isExpanded;
+        });
+      },
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            'Delivery Progress',
+            style: getTextStyle(
+              font: CustomFonts.obviously,
+              fontSize: 14.sp,
+              fontWeight: FontWeight.w500,
+              color: const Color(0xFF333333),
+            ),
+          ),
+          Icon(
+            _isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+            color: const Color(0xFF666666),
+            size: 24.sp,
+          ),
+        ],
       ),
     );
   }
@@ -67,7 +91,7 @@ class ProgressSection extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                controller.statusText,
+                widget.controller.statusText,
                 style: getTextStyle(
                   font: CustomFonts.inter,
                   fontSize: 12.sp,
@@ -85,7 +109,7 @@ class ProgressSection extends StatelessWidget {
                 ),
                 child: FractionallySizedBox(
                   alignment: Alignment.centerLeft,
-                  widthFactor: controller.progressPercentage,
+                  widthFactor: widget.controller.progressPercentage,
                   child: Container(
                     decoration: BoxDecoration(
                       color: AppColors.ebonyBlack,
@@ -99,7 +123,7 @@ class ProgressSection extends StatelessWidget {
         ),
         SizedBox(width: 16.w),
         Text(
-          '${(controller.progressPercentage * 100).toInt()}%',
+          '${(widget.controller.progressPercentage * 100).toInt()}%',
           style: getTextStyle(
             font: CustomFonts.obviously,
             fontSize: 12.sp,
@@ -112,34 +136,75 @@ class ProgressSection extends StatelessWidget {
   }
 
   Widget _buildProgressSteps() {
-    // Recompute isCompleted/isCurrent here based on controller.order.status
-    // to avoid any mismatch between service-provided flags and the current
-    // controller state.
+    // Show only current step when collapsed
+    if (!_isExpanded) {
+      final currentStep = widget.controller.deliverySteps.firstWhere((step) {
+        try {
+          final orderStatus = widget.controller.order.status;
+          final status = step['status'];
+          if (status == null) return false;
+
+          final stepIndex = (status as dynamic).index as int?;
+          final orderIndex = (orderStatus as dynamic).index as int?;
+          if (stepIndex != null && orderIndex != null) {
+            return orderIndex == stepIndex;
+          }
+          return orderStatus == status;
+        } catch (_) {
+          return step['isCurrent'] ?? false;
+        }
+      }, orElse: () => widget.controller.deliverySteps.last);
+
+      bool isCompleted = false;
+      bool isCurrent = false;
+
+      try {
+        final orderStatus = widget.controller.order.status;
+        final status = currentStep['status'];
+        if (status != null) {
+          final stepIndex = (status as dynamic).index as int?;
+          final orderIndex = (orderStatus as dynamic).index as int?;
+          if (stepIndex != null && orderIndex != null) {
+            isCompleted = orderIndex > stepIndex;
+            isCurrent = orderIndex == stepIndex;
+          } else {
+            isCurrent = orderStatus == status;
+            isCompleted = false;
+          }
+        }
+      } catch (_) {
+        isCompleted = currentStep['isCompleted'] ?? false;
+        isCurrent = currentStep['isCurrent'] ?? false;
+      }
+
+      final merged = Map<String, dynamic>.from(currentStep)
+        ..['isCompleted'] = isCompleted
+        ..['isCurrent'] = isCurrent;
+
+      return ProgressStep(step: merged);
+    }
+
+    // Show all steps when expanded
     return Column(
-      children: controller.deliverySteps.map((step) {
+      children: widget.controller.deliverySteps.map((step) {
         final status = step['status'];
-        // default to false if no status available
         bool isCompleted = false;
         bool isCurrent = false;
 
         try {
-          final orderStatus = controller.order.status;
+          final orderStatus = widget.controller.order.status;
           if (status != null) {
-            // Compare based on index if it's an enum
-            // If status is an enum value from OrderStatus, it will have index
             final stepIndex = (status as dynamic).index as int?;
             final orderIndex = (orderStatus as dynamic).index as int?;
             if (stepIndex != null && orderIndex != null) {
               isCompleted = orderIndex > stepIndex;
               isCurrent = orderIndex == stepIndex;
             } else {
-              // Fallback: direct equality
               isCurrent = orderStatus == status;
               isCompleted = false;
             }
           }
         } catch (_) {
-          // ignore and fallback to service-provided values
           isCompleted = step['isCompleted'] ?? false;
           isCurrent = step['isCurrent'] ?? false;
         }
