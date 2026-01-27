@@ -157,8 +157,15 @@ class OrderApiService {
 
       AppLoggerHelper.debug('Creating order with body: $requestBody');
 
+      final url = ApiConstants.createOrder.replaceFirst(
+        '{order_type_name}',
+        deliveryOption.type.toApiValue(),
+      );
+
+      AppLoggerHelper.debug('Order creation URL: $url');
+
       final ResponseData response = await _networkCaller.postRequest(
-        ApiConstants.createOrder,
+        url,
         body: requestBody,
         headers: {
           'Authorization': 'Bearer $token',

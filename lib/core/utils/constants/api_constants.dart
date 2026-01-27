@@ -52,7 +52,11 @@ class ApiConstants {
   static const String getReviews = "$baseUrl/items/reviews/?item_id={item_id}";
 
   //Order api's
-  static const String createOrder = "$baseUrl/customer/orders/";
+  static const String createOrder =
+      "$baseUrl/customer/orders/?order_type={order_type_name}";
+
+  //https://caditya619-backend-ng0e.onrender.com/customer/orders/?order_type=combined
+
   static const String getOrders = "$baseUrl/customer/orders/";
 
   //Payment api's

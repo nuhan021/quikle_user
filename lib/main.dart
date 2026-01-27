@@ -64,8 +64,8 @@ Future<void> main() async {
   });
 
   //Print the FCM token
-  String? fcmToken = await FirebaseMessaging.instance.getToken();
-  print("📱 FCM Token: $fcmToken");
+  // String? fcmToken = await FirebaseMessaging.instance.getToken();
+  // print("📱 FCM Token: $fcmToken");
 
   String? apnsToken = await FirebaseMessaging.instance.getAPNSToken();
   print("🍏 APNS Token: $apnsToken");

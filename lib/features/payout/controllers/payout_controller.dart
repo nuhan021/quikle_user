@@ -261,7 +261,7 @@ class PayoutController extends GetxController {
       );
 
       AppLoggerHelper.debug(
-        'Order creation response data: $orderCreationResponse',
+        'Order creation response data in payout: ${orderCreationResponse.data.orderId}',
       );
 
       if (!orderCreationResponse.success) {
@@ -310,18 +310,6 @@ class PayoutController extends GetxController {
         _pendingShippingAddress = finalShippingAddress;
 
         _isProcessingPayment.value = false;
-
-        // Log payment data for debugging
-        AppLoggerHelper.debug('=== Payment Detection ===');
-        AppLoggerHelper.debug('PhonePe Order ID: ${orderData.phonePeOrderId}');
-        AppLoggerHelper.debug('PhonePe Token: ${orderData.phonePeToken}');
-        AppLoggerHelper.debug('Merchant ID: ${orderData.merchantId}');
-        AppLoggerHelper.debug('Cashfree Order ID: ${orderData.cfOrderId}');
-        AppLoggerHelper.debug(
-          'Payment Session ID: ${orderData.paymentSessionId}',
-        );
-        AppLoggerHelper.debug('========================');
-
         // Check if it's PhonePe or Cashfree payment
         if (orderData.phonePeOrderId != null &&
             orderData.phonePeToken != null &&

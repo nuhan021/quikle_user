@@ -26,6 +26,7 @@ class PhonePePaymentService {
   // Store parent order ID and token for verification
   String? _parentOrderId;
   String? _token;
+  String? _paymentId;
 
   /// Initialize the payment service with callbacks
   void initialize({
@@ -50,16 +51,17 @@ class PhonePePaymentService {
     required String phonePeOrderId,
     required String token,
     required String parentOrderId,
-    required String merchantId,
+    required String paymentId,
   }) async {
     try {
       // Store order details for verification
       _parentOrderId = parentOrderId;
       _token = token;
+      _paymentId = paymentId;
 
       AppLoggerHelper.debug('Starting PhonePe payment...');
       AppLoggerHelper.debug('PhonePe Order ID: $phonePeOrderId');
-      AppLoggerHelper.debug('Merchant ID from backend: $merchantId');
+      AppLoggerHelper.debug('Merchant ID from backend: $paymentId');
       AppLoggerHelper.debug('Parent Order ID: $parentOrderId');
 
       // Use the correct PhonePe merchant ID (not the one from backend which is wrong)
@@ -92,7 +94,7 @@ class PhonePePaymentService {
       // Build payment payload
       Map<String, dynamic> payload = {
         "orderId": phonePeOrderId,
-        "merchantId": merchantId,
+        "merchantId": paymentId,
         "token": token,
         "paymentMode": {"type": "PAY_PAGE"},
       };
@@ -149,10 +151,11 @@ class PhonePePaymentService {
   Future<void> _verifyPaymentStatus() async {
     try {
       AppLoggerHelper.debug('Verifying PhonePe payment status with backend...');
-      AppLoggerHelper.debug('Merchant Order ID: $_parentOrderId');
+      AppLoggerHelper.debug('Payment ID: $_paymentId');
+      AppLoggerHelper.debug('PhonePe Token: $_token');
 
       final verifyResponse = await _paymentApiService.verifyPhonePePayment(
-        merchantOrderId: _parentOrderId!,
+        merchantOrderId: _paymentId!,
         token: _token!,
       );
 

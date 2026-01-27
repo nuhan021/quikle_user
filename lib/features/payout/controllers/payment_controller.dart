@@ -57,7 +57,7 @@ class PaymentController extends GetxController {
         phonePeOrderId: phonePeOrderId,
         token: token,
         parentOrderId: parentOrderId,
-        merchantId: merchantId,
+        paymentId: merchantId,
       );
     } finally {
       _isProcessing.value = false;
