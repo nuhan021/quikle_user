@@ -3,7 +3,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:quikle_user/core/utils/logging/logger.dart';
 import 'package:quikle_user/features/auth/data/services/auth_service.dart';
-import 'package:quikle_user/features/profile/controllers/favorites_controller.dart';
+import 'package:quikle_user/features/profile/favorites/controllers/favorites_controller.dart';
 import 'package:quikle_user/routes/app_routes.dart';
 
 class LoginController extends GetxController {

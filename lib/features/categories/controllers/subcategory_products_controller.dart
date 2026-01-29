@@ -4,7 +4,7 @@ import 'package:quikle_user/features/categories/data/models/subcategory_model.da
 import 'package:quikle_user/features/categories/data/services/category_service.dart';
 import 'package:quikle_user/features/home/data/models/category_model.dart';
 import 'package:quikle_user/features/home/data/models/product_model.dart';
-import 'package:quikle_user/features/profile/controllers/favorites_controller.dart';
+import 'package:quikle_user/features/profile/favorites/controllers/favorites_controller.dart';
 import 'package:quikle_user/routes/app_routes.dart';
 
 class SubcategoryProductsController extends GetxController {

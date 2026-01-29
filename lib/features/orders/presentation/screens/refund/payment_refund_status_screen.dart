@@ -7,7 +7,7 @@ import 'package:quikle_user/features/orders/data/models/order/order_model.dart';
 import 'package:quikle_user/features/orders/presentation/widgets/refund/payment_info_card.dart';
 import 'package:quikle_user/features/orders/presentation/widgets/refund/payment_refund_shimmer.dart';
 import 'package:quikle_user/features/orders/presentation/widgets/refund/refund_status_card.dart';
-import 'package:quikle_user/features/profile/presentation/widgets/unified_profile_app_bar.dart';
+import 'package:quikle_user/features/profile/user_profile/presentation/widgets/unified_profile_app_bar.dart';
 
 /// Screen displaying payment and refund status with timeline
 class PaymentRefundStatusScreen extends StatefulWidget {

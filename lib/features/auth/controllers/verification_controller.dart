@@ -5,8 +5,8 @@ import 'package:quikle_user/core/models/response_data.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:quikle_user/features/auth/controllers/login_controller.dart';
 import 'package:quikle_user/features/auth/data/services/auth_service.dart';
-import 'package:quikle_user/features/profile/controllers/address_controller.dart';
-import 'package:quikle_user/features/profile/controllers/favorites_controller.dart';
+import 'package:quikle_user/features/profile/address/controllers/address_controller.dart';
+import 'package:quikle_user/features/profile/favorites/controllers/favorites_controller.dart';
 import 'package:quikle_user/features/prescription/controllers/prescription_controller.dart';
 
 import '../presentation/screens/splash_wrapper.dart';

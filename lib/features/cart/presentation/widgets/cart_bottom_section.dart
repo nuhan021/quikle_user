@@ -7,10 +7,10 @@ import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 import 'package:quikle_user/core/utils/constants/image_path.dart';
 import 'package:quikle_user/core/utils/constants/enums/address_type_enums.dart';
-import '../../../profile/controllers/address_controller.dart';
-import '../../../profile/controllers/payment_method_controller.dart';
+import 'package:quikle_user/features/profile/address/controllers/address_controller.dart';
+import 'package:quikle_user/features/profile/payment/controllers/payment_method_controller.dart';
 import '../../../home/presentation/widgets/address/adress_sheet_widget.dart';
-import '../../../profile/presentation/screens/add_address_screen.dart';
+import 'package:quikle_user/features/profile/address/presentation/screens/add_address_screen.dart';
 import '../../../cart/controllers/cart_controller.dart';
 
 class CartBottomSection extends StatelessWidget {

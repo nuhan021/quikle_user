@@ -6,7 +6,7 @@ import 'package:quikle_user/features/cart/data/models/cart_item_model.dart';
 import 'package:quikle_user/features/home/data/models/product_model.dart';
 import 'package:quikle_user/features/payout/data/models/delivery_option_model.dart';
 import 'package:quikle_user/features/payout/data/models/payment_method_model.dart';
-import 'package:quikle_user/features/profile/data/models/shipping_address_model.dart';
+import 'package:quikle_user/features/profile/address/data/models/shipping_address_model.dart';
 import 'package:quikle_user/features/orders/data/models/order/rider_info_model.dart';
 import 'package:quikle_user/features/orders/data/models/order/vendor_info_model.dart';
 

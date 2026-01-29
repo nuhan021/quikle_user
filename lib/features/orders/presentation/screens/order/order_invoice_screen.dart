@@ -11,7 +11,7 @@ import 'package:quikle_user/features/orders/presentation/widgets/order/payment_i
 import 'package:quikle_user/features/orders/presentation/widgets/order/shipping_address_card.dart';
 import 'package:quikle_user/features/orders/presentation/widgets/order/delivery_info_card.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
-import 'package:quikle_user/features/profile/presentation/widgets/unified_profile_app_bar.dart';
+import 'package:quikle_user/features/profile/user_profile/presentation/widgets/unified_profile_app_bar.dart';
 import 'package:quikle_user/features/orders/presentation/screens/order/order_tracking_screen.dart';
 import 'package:quikle_user/core/common/widgets/customer_support_fab.dart';
 import 'package:quikle_user/core/services/freshchat_service.dart';

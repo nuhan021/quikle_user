@@ -4,7 +4,7 @@ import 'package:quikle_user/features/home/data/models/product_model.dart';
 import 'package:quikle_user/features/restaurants/data/models/restaurant_model.dart';
 import 'package:quikle_user/features/restaurants/data/services/restaurant_products_service.dart';
 import 'package:quikle_user/features/cart/controllers/cart_controller.dart';
-import 'package:quikle_user/features/profile/controllers/favorites_controller.dart';
+import 'package:quikle_user/features/profile/favorites/controllers/favorites_controller.dart';
 import 'package:quikle_user/routes/app_routes.dart';
 
 class RestaurantPageController extends GetxController {

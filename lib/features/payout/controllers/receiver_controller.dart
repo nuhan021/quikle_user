@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../profile/data/models/shipping_address_model.dart';
+import 'package:quikle_user/features/profile/address/data/models/shipping_address_model.dart';
 
 class ReceiverController extends GetxController {
   final _isDifferentReceiver = false.obs;

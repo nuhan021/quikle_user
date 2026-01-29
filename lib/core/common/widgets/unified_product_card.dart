@@ -10,7 +10,7 @@ import 'package:quikle_user/core/utils/constants/image_path.dart';
 import 'package:quikle_user/features/cart/controllers/cart_controller.dart';
 import 'package:quikle_user/features/home/data/models/product_model.dart';
 import 'package:quikle_user/features/home/data/models/shop_model.dart';
-import 'package:quikle_user/features/profile/controllers/favorites_controller.dart';
+import 'package:quikle_user/features/profile/favorites/controllers/favorites_controller.dart';
 
 enum ProductCardVariant { home, category, youMayLike, cart, horizontal }
 

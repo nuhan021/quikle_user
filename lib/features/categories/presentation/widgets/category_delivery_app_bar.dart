@@ -8,7 +8,7 @@ import 'package:quikle_user/core/utils/constants/enums/address_type_enums.dart';
 import 'package:quikle_user/core/utils/constants/image_path.dart';
 import 'package:quikle_user/core/common/widgets/common_app_bar.dart';
 import 'package:quikle_user/features/home/presentation/widgets/address/adress_sheet_widget.dart';
-import 'package:quikle_user/features/profile/controllers/address_controller.dart';
+import 'package:quikle_user/features/profile/address/controllers/address_controller.dart';
 import 'package:quikle_user/routes/app_routes.dart';
 
 class CategoryDeliveryAppBar extends StatelessWidget

@@ -9,7 +9,7 @@ import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:quikle_user/features/orders/controllers/order_tracking_controller.dart';
 import 'package:geocoding/geocoding.dart';
-import 'package:quikle_user/features/profile/data/models/shipping_address_model.dart';
+import 'package:quikle_user/features/profile/address/data/models/shipping_address_model.dart';
 
 class OrderTrackingMapSection extends StatefulWidget {
   final double? vendorLat;

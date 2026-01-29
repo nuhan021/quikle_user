@@ -8,7 +8,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:quikle_user/features/home/data/models/product_model.dart';
 import 'package:quikle_user/features/search/data/services/search_service.dart';
 import 'package:quikle_user/features/cart/controllers/cart_controller.dart';
-import 'package:quikle_user/features/profile/controllers/favorites_controller.dart';
+import 'package:quikle_user/features/profile/favorites/controllers/favorites_controller.dart';
 import 'package:quikle_user/routes/app_routes.dart';
 import 'package:quikle_user/core/services/whatsapp_service.dart';
 import 'package:quikle_user/core/services/storage_service.dart';

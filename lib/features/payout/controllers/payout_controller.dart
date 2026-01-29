@@ -7,8 +7,8 @@ import 'package:quikle_user/features/payout/presentation/widgets/order_failure_d
 import 'package:quikle_user/features/payout/presentation/widgets/order_success_dialog.dart';
 import 'package:quikle_user/features/payout/presentation/widgets/payment_failure_dialog.dart';
 import '../data/models/payment_method_model.dart';
-import '../../profile/data/models/shipping_address_model.dart';
-import '../../profile/controllers/address_controller.dart';
+import 'package:quikle_user/features/profile/address/data/models/shipping_address_model.dart';
+import 'package:quikle_user/features/profile/address/controllers/address_controller.dart';
 import '../data/services/payout_service.dart';
 import '../../cart/controllers/cart_controller.dart';
 import '../../user/controllers/user_controller.dart';
@@ -316,7 +316,7 @@ class PayoutController extends GetxController {
             orderData.merchantId != null) {
           AppLoggerHelper.debug(
             'Initiating PhonePe payment for order: ${orderData.phonePeOrderId}',
-          );  
+          );
           await paymentController.startPhonePePayment(
             phonePeOrderId: orderData.phonePeOrderId!,
             token: orderData.phonePeToken!,
@@ -334,14 +334,14 @@ class PayoutController extends GetxController {
           );
         }
       } else {
-        _handlePaymentSuccess(orderData, finalShippingAddress); 
+        _handlePaymentSuccess(orderData, finalShippingAddress);
       }
     } catch (e) {
       AppLoggerHelper.error('Error placing order', e);
       _isProcessingPayment.value = false;
 
       String errorMessage = 'Something went wrong. Please try again.';
-      if (e.toString().contains('Cashfree') || 
+      if (e.toString().contains('Cashfree') ||
           e.toString().contains('payment') ||
           e.toString().contains('session')) {
         errorMessage =

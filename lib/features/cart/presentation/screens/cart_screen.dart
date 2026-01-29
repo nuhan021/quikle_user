@@ -12,8 +12,8 @@ import '../../../payout/presentation/widgets/delivery_options_section.dart';
 import '../../../payout/presentation/widgets/coupon_section.dart';
 import '../../../payout/presentation/widgets/receiver_details.dart';
 import '../../../payout/controllers/payout_controller.dart';
-import '../../../profile/controllers/payment_method_controller.dart';
-import '../../../profile/controllers/address_controller.dart';
+import 'package:quikle_user/features/profile/payment/controllers/payment_method_controller.dart';
+import 'package:quikle_user/features/profile/address/controllers/address_controller.dart';
 import '../../../payout/data/models/payment_method_model.dart' as payout;
 
 class CartScreen extends StatelessWidget {

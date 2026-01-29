@@ -3,7 +3,7 @@ import 'package:quikle_user/core/utils/constants/enums/delivery_enums.dart';
 import 'package:quikle_user/core/utils/constants/enums/payment_enums.dart';
 import 'package:quikle_user/features/payout/data/models/delivery_option_model.dart';
 import 'package:quikle_user/features/payout/data/models/payment_method_model.dart';
-import 'package:quikle_user/features/profile/data/models/shipping_address_model.dart';
+import 'package:quikle_user/features/profile/address/data/models/shipping_address_model.dart';
 import 'package:quikle_user/core/services/network_caller.dart';
 import 'package:quikle_user/core/services/storage_service.dart';
 import 'package:quikle_user/core/utils/constants/api_constants.dart';

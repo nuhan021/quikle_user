@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/features/categories/controllers/categories_screen_controller.dart';
-import 'package:quikle_user/features/profile/presentation/widgets/unified_profile_app_bar.dart';
+import 'package:quikle_user/features/profile/user_profile/presentation/widgets/unified_profile_app_bar.dart';
 import 'package:quikle_user/features/categories/presentation/widgets/subcategory_grid_section.dart';
 import 'package:quikle_user/features/categories/presentation/widgets/category_screen_shimmer.dart';
 

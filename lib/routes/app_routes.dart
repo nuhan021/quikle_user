@@ -2,7 +2,7 @@ import 'package:get/get.dart';
 import 'package:quikle_user/features/auth/presentation/screens/splash_wrapper.dart';
 import 'package:quikle_user/features/auth/presentation/screens/verification_scree.dart';
 import 'package:quikle_user/features/main/presentation/screens/main_screen.dart';
-import 'package:quikle_user/features/profile/presentation/screens/my_profile_screen.dart';
+import 'package:quikle_user/features/profile/user_profile/presentation/screens/my_profile_screen.dart';
 import 'package:quikle_user/features/splash/presentation/screens/splash_screen.dart';
 import 'package:quikle_user/features/auth/presentation/screens/login_screen.dart';
 import 'package:quikle_user/features/cart/presentation/screens/cart_screen.dart';
@@ -13,12 +13,12 @@ import 'package:quikle_user/features/categories/presentation/screens/category_pr
 import 'package:quikle_user/features/restaurants/presentation/screens/category_restaurants_screen.dart';
 import 'package:quikle_user/features/restaurants/presentation/screens/restaurant_page_screen.dart';
 import 'package:quikle_user/features/payout/presentation/screens/checkout_screen.dart';
-import 'package:quikle_user/features/profile/presentation/screens/favorites_screen.dart';
-import 'package:quikle_user/features/profile/presentation/screens/address_book_screen.dart';
-import 'package:quikle_user/features/profile/presentation/screens/add_address_screen.dart';
-import 'package:quikle_user/features/profile/presentation/screens/payment_method_screen.dart';
-import 'package:quikle_user/features/profile/presentation/screens/notification_settings_screen.dart';
-import 'package:quikle_user/features/profile/presentation/screens/help_support_screen.dart';
+import 'package:quikle_user/features/profile/favorites/presentation/screens/favorites_screen.dart';
+import 'package:quikle_user/features/profile/address/presentation/screens/address_book_screen.dart';
+import 'package:quikle_user/features/profile/address/presentation/screens/add_address_screen.dart';
+import 'package:quikle_user/features/profile/payment/presentation/screens/payment_method_screen.dart';
+import 'package:quikle_user/features/profile/settings/presentation/screens/notification_settings_screen.dart';
+import 'package:quikle_user/features/profile/help_support/presentation/screens/help_support_screen.dart';
 import 'package:quikle_user/features/home/data/models/product_model.dart';
 import 'package:quikle_user/features/search/presentation/screens/search_screen.dart';
 import 'package:quikle_user/features/orders/presentation/screens/order/order_tracking_screen.dart';
@@ -26,10 +26,10 @@ import 'package:quikle_user/features/orders/presentation/screens/order/order_inv
 import 'package:quikle_user/features/orders/data/models/order/order_model.dart';
 import 'package:quikle_user/features/prescription/presentation/screens/prescription_list_screen.dart';
 import 'package:quikle_user/features/prescription/presentation/screens/prescription_details_screen.dart';
-import 'package:quikle_user/features/profile/presentation/screens/privacy_policy_screen.dart';
-import 'package:quikle_user/features/profile/presentation/screens/terms_conditions_screen.dart';
-import 'package:quikle_user/features/profile/presentation/screens/about_us_screen.dart';
-import 'package:quikle_user/features/profile/presentation/screens/license_screen.dart';
+import 'package:quikle_user/features/profile/legal/presentation/screens/privacy_policy_screen.dart';
+import 'package:quikle_user/features/profile/legal/presentation/screens/terms_conditions_screen.dart';
+import 'package:quikle_user/features/profile/legal/presentation/screens/about_us_screen.dart';
+import 'package:quikle_user/features/profile/legal/presentation/screens/license_screen.dart';
 
 class AppRoute {
   static const String _splash = '/';

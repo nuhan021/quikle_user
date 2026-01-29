@@ -4,8 +4,8 @@ import 'package:get/get.dart';
 import 'package:quikle_user/core/common/styles/global_text_style.dart';
 import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
+import '../../../profile/address/presentation/screens/address_book_screen.dart';
 import '../../controllers/payout_controller.dart';
-import '../../../profile/presentation/screens/address_book_screen.dart';
 
 class ShippingAddressSection extends StatelessWidget {
   const ShippingAddressSection({super.key});

@@ -7,8 +7,8 @@ import 'package:quikle_user/core/utils/constants/enums/address_type_enums.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 import 'package:quikle_user/features/home/presentation/widgets/address/adress_sheet_widget.dart';
 import 'package:quikle_user/core/utils/constants/image_path.dart';
-import 'package:quikle_user/features/profile/controllers/address_controller.dart';
-import 'package:quikle_user/features/profile/presentation/screens/add_address_screen.dart';
+import 'package:quikle_user/features/profile/address/controllers/address_controller.dart';
+import 'package:quikle_user/features/profile/address/presentation/screens/add_address_screen.dart';
 
 class AddressWidget extends StatelessWidget {
   final AddressController addressController = Get.find<AddressController>();

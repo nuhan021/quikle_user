@@ -6,7 +6,7 @@ import 'package:quikle_user/core/utils/logging/logger.dart';
 import 'package:quikle_user/features/cart/controllers/cart_controller.dart';
 import 'package:quikle_user/features/home/data/models/product_model.dart';
 import 'package:quikle_user/features/home/data/models/shop_model.dart';
-import 'package:quikle_user/features/profile/controllers/favorites_controller.dart';
+import 'package:quikle_user/features/profile/favorites/controllers/favorites_controller.dart';
 import '../data/models/review_model.dart';
 import '../data/models/question_model.dart';
 import '../data/services/product_service.dart';

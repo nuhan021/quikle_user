@@ -5,8 +5,8 @@ import 'package:quikle_user/core/utils/constants/colors.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
 import 'package:quikle_user/core/utils/constants/enums/address_type_enums.dart';
 import 'package:quikle_user/core/utils/constants/image_path.dart';
-import 'package:quikle_user/features/profile/controllers/address_controller.dart';
-import 'package:quikle_user/features/profile/presentation/screens/add_address_screen.dart';
+import 'package:quikle_user/features/profile/address/controllers/address_controller.dart';
+import 'package:quikle_user/features/profile/address/presentation/screens/add_address_screen.dart';
 import 'package:iconsax/iconsax.dart';
 
 Future<String?> showAddressSelectionSheet(AddressController addressController) {

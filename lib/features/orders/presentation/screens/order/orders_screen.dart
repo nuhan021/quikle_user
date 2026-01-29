@@ -9,7 +9,7 @@ import 'package:quikle_user/features/orders/controllers/orders_controller.dart';
 import 'package:quikle_user/features/orders/presentation/widgets/order/grouped_orders_section.dart';
 import 'package:quikle_user/features/orders/presentation/screens/order/order_invoice_screen.dart';
 import 'package:quikle_user/features/orders/presentation/screens/order/order_tracking_screen.dart';
-import 'package:quikle_user/features/profile/presentation/widgets/unified_profile_app_bar.dart';
+import 'package:quikle_user/features/profile/user_profile/presentation/widgets/unified_profile_app_bar.dart';
 import 'package:shimmer/shimmer.dart';
 
 class OrdersScreen extends StatelessWidget {

@@ -6,7 +6,7 @@ import 'package:quikle_user/core/common/widgets/floating_cart_button.dart';
 import 'package:quikle_user/features/categories/presentation/screens/categories_screen.dart';
 import 'package:quikle_user/features/home/presentation/screens/home_content_screen.dart';
 import 'package:quikle_user/features/orders/presentation/screens/order/orders_screen.dart';
-import 'package:quikle_user/features/profile/presentation/screens/profile_screen.dart';
+import 'package:quikle_user/features/profile/user_profile/presentation/screens/profile_screen.dart';
 import 'package:quikle_user/features/orders/presentation/widgets/tracking/live_order_indicator.dart';
 
 class MainScreen extends StatefulWidget {
