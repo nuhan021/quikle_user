@@ -185,6 +185,12 @@ class AddressDetailsScreen extends StatelessWidget {
                     ),
                     SizedBox(height: 28.h),
 
+                    // Address Type Selection (show when editing)
+                    if (addressToEdit != null) ...[
+                      const AddressTypeSelector(),
+                      SizedBox(height: 28.h),
+                    ],
+
                     // Address Details Section
                     Text(
                       'Address Details',
