@@ -202,11 +202,35 @@ class RefundService {
   }
 
   /// Get refund status and timeline for an order
-  Future<RefundInfo?> getRefundStatus(String orderId) async {
-    // Simulate API delay
-    await Future.delayed(const Duration(milliseconds: 300));
+  /// For grouped orders, pass parentOrderId. For single orders, pass orderId.
+  /// API endpoint: GET /payment/refunds/refund/{order_id or parent_order_id}
+  Future<RefundInfo?> getRefundStatus(
+    String orderId, {
+    String? parentOrderId,
+  }) async {
+    try {
+      // Use parentOrderId if provided (for grouped orders), otherwise use orderId
+      final orderIdToUse = parentOrderId ?? orderId;
 
-    return null;
+      final url = ApiConstants.getRefundStatus.replaceAll(
+        '{order_id}',
+        orderIdToUse,
+      );
+
+      final response = await _networkCaller.getRequest(url);
+
+      if (response.isSuccess && response.responseData != null) {
+        // Parse response data
+        final data = response.responseData as Map<String, dynamic>;
+        return RefundInfo.fromJson(data);
+      } else {
+        print('Failed to get refund status: ${response.errorMessage}');
+        return null;
+      }
+    } catch (e) {
+      print('Error getting refund status: $e');
+      return null;
+    }
   }
 
   Future<Map<String, dynamic>> createIssueReport({

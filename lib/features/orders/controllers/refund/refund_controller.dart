@@ -132,10 +132,14 @@ class RefundController extends GetxController {
   }
 
   /// Load refund status for an order
-  Future<void> loadRefundStatus(String orderId) async {
+  /// For grouped orders, pass parentOrderId. For single orders, only orderId is needed.
+  Future<void> loadRefundStatus(String orderId, {String? parentOrderId}) async {
     try {
       _isLoadingRefundStatus.value = true;
-      final refundStatus = await _refundService.getRefundStatus(orderId);
+      final refundStatus = await _refundService.getRefundStatus(
+        orderId,
+        parentOrderId: parentOrderId,
+      );
       _refundInfo.value = refundStatus;
     } catch (e) {
       print('Error loading refund status: $e');

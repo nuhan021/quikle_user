@@ -316,7 +316,7 @@ class PayoutController extends GetxController {
             orderData.merchantId != null) {
           AppLoggerHelper.debug(
             'Initiating PhonePe payment for order: ${orderData.phonePeOrderId}',
-          );
+          );  
           await paymentController.startPhonePePayment(
             phonePeOrderId: orderData.phonePeOrderId!,
             token: orderData.phonePeToken!,
@@ -334,14 +334,14 @@ class PayoutController extends GetxController {
           );
         }
       } else {
-        _handlePaymentSuccess(orderData, finalShippingAddress);
+        _handlePaymentSuccess(orderData, finalShippingAddress); 
       }
     } catch (e) {
       AppLoggerHelper.error('Error placing order', e);
       _isProcessingPayment.value = false;
 
       String errorMessage = 'Something went wrong. Please try again.';
-      if (e.toString().contains('Cashfree') ||
+      if (e.toString().contains('Cashfree') || 
           e.toString().contains('payment') ||
           e.toString().contains('session')) {
         errorMessage =

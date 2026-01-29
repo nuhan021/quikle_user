@@ -98,4 +98,6 @@ class ApiConstants {
       "$baseUrl/payment/refunds/orders/{order_id}/cancel";
   static const String cancelIndividualOrder =
       "$baseUrl/payment/refunds/individual-orders/{order_id}/cancel";
+  static const String getRefundStatus =
+      "$baseUrl/payment/refunds/refund/{order_id}";
 }

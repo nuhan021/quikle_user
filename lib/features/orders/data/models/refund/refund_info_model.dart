@@ -4,7 +4,8 @@ import 'package:quikle_user/core/utils/constants/enums/refund_enums.dart';
 class RefundInfo {
   final String orderId;
   final double refundAmount;
-  final RefundStatus status;
+  final String statusString; // Store status as string from API
+  final RefundStatus status; // Keep for backward compatibility
   final RefundDestination destination;
   final String? refundReference; // RRN or transaction ID
   final DateTime? initiatedAt;
@@ -16,6 +17,7 @@ class RefundInfo {
   const RefundInfo({
     required this.orderId,
     required this.refundAmount,
+    required this.statusString,
     required this.status,
     required this.destination,
     this.refundReference,
@@ -27,20 +29,28 @@ class RefundInfo {
   });
 
   factory RefundInfo.fromJson(Map<String, dynamic> json) {
+    // Handle different API response formats
+    final refundId = json['refund_id'] ?? json['orderId'] ?? '';
+    final refundAmt = (json['refund_amount'] ?? json['refundAmount'] ?? 0.0)
+        .toDouble();
+    final statusStr = json['status']?.toString() ?? '';
+    final completedAtStr = json['completed_at'] ?? json['completedAt'];
+
     return RefundInfo(
-      orderId: json['orderId'] ?? '',
-      refundAmount: (json['refundAmount'] ?? 0.0).toDouble(),
-      status: _parseRefundStatus(json['status']),
+      orderId: refundId,
+      refundAmount: refundAmt,
+      statusString: statusStr,
+      status: _parseRefundStatus(statusStr),
       destination: _parseRefundDestination(json['destination']),
-      refundReference: json['refundReference'],
+      refundReference: json['refundReference'] ?? json['refund_reference'],
       initiatedAt: json['initiatedAt'] != null
           ? DateTime.parse(json['initiatedAt'])
           : null,
       processedAt: json['processedAt'] != null
           ? DateTime.parse(json['processedAt'])
           : null,
-      completedAt: json['completedAt'] != null
-          ? DateTime.parse(json['completedAt'])
+      completedAt: completedAtStr != null
+          ? DateTime.parse(completedAtStr)
           : null,
       expectedCompletionDate: json['expectedCompletionDate'] != null
           ? DateTime.parse(json['expectedCompletionDate'])
@@ -53,6 +63,7 @@ class RefundInfo {
     return {
       'orderId': orderId,
       'refundAmount': refundAmount,
+      'statusString': statusString,
       'status': status.name,
       'destination': destination.name,
       'refundReference': refundReference,
@@ -84,8 +95,13 @@ class RefundInfo {
 
   /// Returns estimated completion message
   String getExpectedTimelineMessage() {
-    if (status == RefundStatus.completed) {
+    // Use statusString for more accurate status
+    if (statusString.toLowerCase() == 'completed' ||
+        status == RefundStatus.completed) {
       return 'Refund completed';
+    }
+    if (statusString.toLowerCase() == 'processing') {
+      return 'Refund is being processed. Expected within 3–5 business days.';
     }
     if (expectedCompletionDate != null) {
       final days = expectedCompletionDate!.difference(DateTime.now()).inDays;
