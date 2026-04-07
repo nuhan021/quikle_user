@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'core/bindings/controller_binder.dart';
+import 'core/site_configuration/widgets/global_service_unavailable_banner.dart';
 import 'core/utils/theme/theme.dart';
 
 class MyApp extends StatelessWidget {
@@ -28,7 +29,12 @@ class MyApp extends StatelessWidget {
               data: mediaQueryData.copyWith(
                 textScaler: const TextScaler.linear(1.0),
               ),
-              child: widget!,
+              child: Column(
+                children: [
+                  Expanded(child: widget ?? const SizedBox.shrink()),
+                  const GlobalServiceUnavailableBanner(),
+                ],
+              ),
             );
           },
         );
