@@ -1,5 +1,5 @@
 class ApiConstants {
-  static const String baseUrl = "https://caditya619-backend-ng0e.onrender.com";
+  static const String baseUrl = "https://api.quikle.in";
 
   //Get banner images
   static const String getBannerImages = "$baseUrl/banner/pictures/";
@@ -67,6 +67,9 @@ class ApiConstants {
 
   //Favorites api's
   static const String favorites = "$baseUrl/favourites/favorites/";
+
+  //Site configuration api's
+  static const String siteConfiguration = "$baseUrl/site/configuration/";
 
   //Save FCM Token
   static const String saveFcmToken = "$baseUrl/rider/save_token/";
