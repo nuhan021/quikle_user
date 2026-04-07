@@ -3,6 +3,8 @@ import 'package:quikle_user/core/common/widgets/cart_animation_overlay.dart';
 import 'package:quikle_user/core/notification/controllers/notification_controller.dart';
 import 'package:quikle_user/core/notification/services/notification_service.dart';
 import 'package:quikle_user/core/services/cart_position_service.dart';
+import 'package:quikle_user/core/site_configuration/controllers/site_configuration_controller.dart';
+import 'package:quikle_user/core/site_configuration/services/site_configuration_service.dart';
 import 'package:quikle_user/features/profile/controllers/add_address_controller.dart';
 import 'package:quikle_user/features/user/data/services/user_service.dart';
 import 'package:quikle_user/features/user/controllers/user_controller.dart';
@@ -32,6 +34,10 @@ class ControllerBinder extends Bindings {
     // Services
 
     Get.put(NetworkController(), permanent: true);
+    Get.put<SiteConfigurationService>(
+      SiteConfigurationService(),
+      permanent: true,
+    );
     Get.put<UserService>(UserService(), permanent: true);
     Get.put<AuthService>(AuthService(), permanent: true);
     Get.put<AddressService>(AddressService(), permanent: true);
@@ -65,6 +71,10 @@ class ControllerBinder extends Bindings {
     Get.put<HelpSupportController>(HelpSupportController(), permanent: true);
     Get.put<LiveOrderController>(LiveOrderController(), permanent: true);
     Get.put<PrescriptionController>(PrescriptionController(), permanent: true);
+    Get.put<SiteConfigurationController>(
+      SiteConfigurationController(),
+      permanent: true,
+    );
 
     //NotificationController
     Get.put<NotificationService>(NotificationService(), permanent: true);
