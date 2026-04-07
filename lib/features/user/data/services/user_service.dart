@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:quikle_user/core/models/response_data.dart';
 import 'package:quikle_user/core/services/freshchat_service.dart';
 import 'package:quikle_user/core/services/network_caller.dart';
+import 'package:quikle_user/core/site_configuration/controllers/site_configuration_controller.dart';
 import 'package:quikle_user/core/services/storage_service.dart';
 import 'package:quikle_user/core/utils/constants/api_constants.dart';
 import 'package:quikle_user/core/utils/logging/logger.dart';
@@ -187,6 +188,9 @@ class UserService extends GetxController {
     }
 
     await StorageService.logoutUser();
+    if (Get.isRegistered<SiteConfigurationController>()) {
+      Get.find<SiteConfigurationController>().reset();
+    }
     _currentUser.value = null;
     _isLoggedIn.value = false;
     Get.offAllNamed(AppRoute.getLoginScreen());
