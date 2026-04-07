@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'package:app_settings/app_settings.dart';
 import 'package:quikle_user/core/common/styles/global_text_style.dart';
 import 'package:quikle_user/core/utils/constants/enums/font_enum.dart';
-import 'package:quikle_user/features/auth/presentation/screens/login_screen.dart';
 import '../../../../core/services/network_controller.dart';
 
 class NoInternetScreen extends StatelessWidget {
