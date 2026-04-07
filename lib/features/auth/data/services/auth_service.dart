@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:quikle_user/core/models/response_data.dart';
 import 'package:quikle_user/core/services/network_caller.dart';
+import 'package:quikle_user/core/site_configuration/controllers/site_configuration_controller.dart';
 import 'package:quikle_user/core/services/storage_service.dart';
 import 'package:quikle_user/core/utils/constants/api_constants.dart';
 import 'package:quikle_user/features/user/data/models/user_model.dart';
@@ -79,6 +80,7 @@ class AuthService {
       await verifyToken();
 
       await UserService.instance.refreshUser();
+      await _refreshSiteConfiguration();
 
       return ResponseData(
         isSuccess: true,
@@ -127,6 +129,7 @@ class AuthService {
       await verifyToken();
 
       await UserService.instance.refreshUser();
+      await _refreshSiteConfiguration();
 
       return ResponseData(
         isSuccess: true,
@@ -185,5 +188,13 @@ class AuthService {
         await StorageService.saveUserId(userId);
       }
     } catch (e) {}
+  }
+
+  Future<void> _refreshSiteConfiguration() async {
+    if (!Get.isRegistered<SiteConfigurationController>()) {
+      return;
+    }
+
+    await Get.find<SiteConfigurationController>().refreshConfiguration();
   }
 }
