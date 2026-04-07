@@ -5,7 +5,6 @@ import 'package:quikle_user/core/models/response_data.dart';
 import 'package:quikle_user/core/services/network_caller.dart';
 import 'package:quikle_user/core/services/storage_service.dart';
 import 'package:quikle_user/core/utils/constants/api_constants.dart';
-import 'package:quikle_user/core/utils/logging/logger.dart';
 
 class NotificationService {
   final NetworkCaller _networkCaller = NetworkCaller();
